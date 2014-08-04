@@ -2,3 +2,4 @@ upplay
 Makefile
 .ui
 .moc
+.obj

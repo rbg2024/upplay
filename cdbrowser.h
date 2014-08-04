@@ -18,11 +18,17 @@
 #ifndef _CDBROWSER_H_INCLUDED_
 #define _CDBROWSER_H_INCLUDED_
 
+#include <vector>
 #include <iostream>
-using namespace std;
 
 #include <QtWebKit/QWebView>
 #include <QVariant>
+#include <QTimer>
+
+#include "libupnpp/cdirectory.hxx"
+
+class DirReader;
+class UPnPDirContent;
 
 class CDBrowser : public QWebView
 {
@@ -33,11 +39,11 @@ class CDBrowser : public QWebView
     virtual ~CDBrowser();
 
  public slots:
-    virtual void tryAppend()
-        {
-            cerr << "tryAppend" <<endl;
-            appendHtml("<p>This was appended</p>");
-        }
+    virtual void serversPage();
+    void onDone(int);
+    void browseContainer(unsigned int i, const std::string);
+    void onSliceAvailable(const UPnPDirContent *);
+
  signals:
 
  protected:
@@ -47,6 +53,11 @@ class CDBrowser : public QWebView
     virtual void onLinkClicked(const QUrl &);
 
  private:
+    std::vector<ContentDirectoryService> m_ctdirs;
+    QTimer m_timer;
+    DirReader *m_reader;
+    std::vector<std::string> m_objids;
+    unsigned int m_cdsidx;
 };
 
 // A QObject to hold a QString. Maybe there would be a simpler way to

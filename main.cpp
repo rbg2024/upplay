@@ -98,28 +98,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-
-
-    const string friendlyName("MinimServer[jfmac]");
-    ContentDirectoryService server;
-    if (!superdir->getServer(friendlyName, server)) {
-        sleep(1);
-        if (!superdir->getServer(friendlyName, server)) {
-            cerr << "Server not found" << endl;
-            return(1);
-        }
-    }
-    DirReader *reader = new DirReader(0, &server, "0$albums$15");
-    TestObj mainO(0, reader);
-
-    mainO.connect(reader, SIGNAL(sliceAvailable(const UPnPDirContent *)),
-                  &mainO, SLOT(onSliceAvailable(const UPnPDirContent *)));
-    mainO.connect(reader, SIGNAL(done(int)),
-                  &mainO, SLOT(onDone(int)));
-
     MainWindow w;
     w.show();
-    QTimer::singleShot(0, &mainO, SLOT(initRead()));
-    QTimer::singleShot(2000, w.cdbrowser, SLOT(tryAppend()));
     return app.exec();
 }
