@@ -23,12 +23,13 @@ using namespace std;
 #include <QUrl>
 
 #include "libupnpp/log.hxx"
-#include "libupnpp/discovery.hxx"
 #include "libupnpp/cdircontent.hxx"
 
 #include "cdbrowser.h"
 #include "upputils.h"
 #include "dirreader.h"
+
+using namespace UPnPClient;
 
 CDBrowser::CDBrowser(QWidget* parent)
     : QWebView(parent), m_reader(0)
@@ -201,10 +202,8 @@ static QString DSToHtml(unsigned int idx, const ContentDirectoryService& cds)
 
 void CDBrowser::serversPage()
 {
-    UPnPDeviceDirectory *superdir = UPnPDeviceDirectory::getTheDir();
-
     vector<ContentDirectoryService> ctdirs;
-    if (!superdir->getDirServices(ctdirs)) {
+    if (!ContentDirectoryService::getServices(ctdirs)) {
         LOGERR("CDBrowser::serversPage: getDirServices failed" << endl);
         return;
     }

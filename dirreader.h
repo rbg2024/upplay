@@ -33,7 +33,7 @@ class DirReader : public QThread {
     Q_OBJECT;
 
  public: 
-    DirReader(QObject *parent, ContentDirectoryService *server, 
+    DirReader(QObject *parent, UPnPClient::ContentDirectoryService *server, 
               std::string objid)
         : QThread(parent), m_serv(server), m_objid(objid)
     {
@@ -81,7 +81,7 @@ signals:
     void done(int);
 
 private:
-    ContentDirectoryService *m_serv;
+    UPnPClient::ContentDirectoryService *m_serv;
     std::string m_objid;
     std::vector<UPnPDirContent*> m_slices;
     int m_status;

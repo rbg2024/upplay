@@ -31,8 +31,9 @@ using namespace std;
 #include "libupnpp/cdirectory.hxx"
 
 #include "dirreader.h"
-#include "testobj.h"
 #include "mainw.h"
+
+using namespace UPnPClient;
 
 static const char *thisprog;
 

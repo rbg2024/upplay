@@ -53,7 +53,7 @@ class CDBrowser : public QWebView
     virtual void onLinkClicked(const QUrl &);
 
  private:
-    std::vector<ContentDirectoryService> m_ctdirs;
+    std::vector<UPnPClient::ContentDirectoryService> m_ctdirs;
     QTimer m_timer;
     DirReader *m_reader;
     std::vector<std::string> m_objids;

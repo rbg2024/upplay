@@ -11,10 +11,9 @@ HEADERS += \
         dirreader.h \
         mainw.h \
         cdbrowser.h \
-        testobj.h
 
 SOURCES += \
-        main.cpp \
+        upplay.cpp \
         cdbrowser.cpp
 
 FORMS   = \
