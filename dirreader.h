@@ -26,15 +26,14 @@
 
 #include <upnp/upnp.h>
 
-#include "libupnpp/cdirectory.hxx"
-#include "libupnpp/cdircontent.hxx"
+#include "libupnpp/control/cdirectory.hxx"
+//#include "libupnpp/cdircontent.hxx"
 
 class DirReader : public QThread {
     Q_OBJECT;
 
  public: 
-    DirReader(QObject *parent, UPnPClient::ContentDirectoryService *server, 
-              std::string objid)
+    DirReader(QObject *parent, UPnPClient::CDSH server, std::string objid)
         : QThread(parent), m_serv(server), m_objid(objid)
     {
     }
@@ -81,7 +80,7 @@ signals:
     void done(int);
 
 private:
-    UPnPClient::ContentDirectoryService *m_serv;
+    UPnPClient::CDSH m_serv;
     std::string m_objid;
     std::vector<UPnPDirContent*> m_slices;
     int m_status;

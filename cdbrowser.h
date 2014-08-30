@@ -25,7 +25,7 @@
 #include <QVariant>
 #include <QTimer>
 
-#include "libupnpp/cdirectory.hxx"
+#include "libupnpp/control/cdirectory.hxx"
 
 class DirReader;
 class UPnPDirContent;
@@ -41,7 +41,7 @@ class CDBrowser : public QWebView
  public slots:
     virtual void serversPage();
     void onDone(int);
-    void browseContainer(unsigned int i, const std::string);
+    void browseContainer(unsigned int i, std::string, std::string);
     void onSliceAvailable(const UPnPDirContent *);
 
  signals:
@@ -53,10 +53,15 @@ class CDBrowser : public QWebView
     virtual void onLinkClicked(const QUrl &);
 
  private:
-    std::vector<UPnPClient::ContentDirectoryService> m_ctdirs;
+    // The currently active content directory servers
+    std::vector<UPnPClient::CDSH> m_ctdirs;
+
+    // Current path: vector of objid/title pairs
+    std::vector<std::pair<std::string, std::string> > m_curpath;
+
     QTimer m_timer;
     DirReader *m_reader;
-    std::vector<std::string> m_objids;
+    std::vector<std::pair<std::string, std::string> > m_objids;
     unsigned int m_cdsidx;
 };
 

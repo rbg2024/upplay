@@ -26,6 +26,4 @@ unix {
   MOC_DIR = .moc
   OBJECTS_DIR = .obj
   LIBS += -lupnpp
-  INCLUDEPATH += ../upmpd
-  DEPENDPATH += $$INCLUDEPATH
 }

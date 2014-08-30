@@ -23,7 +23,6 @@ using namespace std;
 #include <QUrl>
 
 #include "libupnpp/log.hxx"
-#include "libupnpp/cdircontent.hxx"
 
 #include "cdbrowser.h"
 #include "upputils.h"
@@ -84,7 +83,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 	    return;
 	}
         m_cdsidx = i;
-	browseContainer(m_cdsidx, "0");
+	browseContainer(m_cdsidx, "0", "(root)");
     }
     break;
 
@@ -96,7 +95,22 @@ void CDBrowser::onLinkClicked(const QUrl &url)
                    << " id count: " << m_objids.size() << endl);
 	    return;
 	}
-	browseContainer(m_cdsidx, m_objids[i]);
+	browseContainer(m_cdsidx, m_objids[i].first, m_objids[i].second);
+    }
+    break;
+
+    case 'L':
+    {
+	unsigned int i = atoi(scurl.c_str()+1);
+        if (i > m_curpath.size()) {
+	    LOGERR("CDBrowser::onLinkClicked: bad curpath index: " << i 
+                   << " path count: " << m_curpath.size() << endl);
+	    return;
+	}
+        string objid = m_curpath[i].first;
+        string title = m_curpath[i].second;
+        m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
+	browseContainer(m_cdsidx, objid, title);
     }
     break;
 
@@ -106,14 +120,15 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     }
 }
 
-static const string init_container_page(
+static const QString init_container_page(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
     "</head><body>"
     "</body></html>"
     );
 
-void CDBrowser::browseContainer(unsigned int cdsidx, const string ctid)
+void CDBrowser::browseContainer(unsigned int cdsidx, string ctid,
+                                string cttitle)
 {
     LOGDEB("CDBrowser::browseContainer: cdsidx: " << cdsidx << " ctid " 
            << ctid << endl);
@@ -123,13 +138,24 @@ void CDBrowser::browseContainer(unsigned int cdsidx, const string ctid)
         return;
     }
     m_objids.clear();
-    setHtml(QString::fromUtf8(init_container_page.c_str()));
+
+    m_curpath.push_back(pair<string,string>(ctid, cttitle));
+
+    QString htmlpath("<div class=\"browsepath\">");
+    for (unsigned i = 0; i < m_curpath.size(); i++) {
+        QString title = QString::fromUtf8(m_curpath[i].second.c_str());
+        htmlpath += QString("<a href=\"L%1\">%2</a>/").arg(i).arg(title);
+    }
+    htmlpath += QString("</div>");
+
+    setHtml(init_container_page);
+    appendHtml(htmlpath);
 
     if (m_reader) {
         delete m_reader;
         m_reader = 0;
     }
-    m_reader = new DirReader(this, &m_ctdirs[cdsidx], ctid);
+    m_reader = new DirReader(this, m_ctdirs[cdsidx], ctid);
 
     connect(m_reader, SIGNAL(sliceAvailable(const UPnPDirContent *)),
             this, SLOT(onSliceAvailable(const UPnPDirContent *)));
@@ -172,11 +198,11 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
 
     LOGDEB("CDBrowser::onSliceAvailable" << endl);
     for (auto& entry: dc->m_containers) {
-        m_objids.push_back(entry.m_id);
+        m_objids.push_back(pair<string, string>(entry.m_id, entry.m_title));
         html += CTToHtml(m_objids.size()-1, entry);
     }
     for (auto& entry: dc->m_items) {
-        m_objids.push_back(entry.m_id);
+        m_objids.push_back(pair<string, string>(entry.m_id, entry.m_title));
         html += ItemToHtml(m_objids.size()-1, entry);
     }
     appendHtml(html);
@@ -190,20 +216,20 @@ static const string init_server_page(
     "</body></html>"
     );
 
-static QString DSToHtml(unsigned int idx, const ContentDirectoryService& cds)
+static QString DSToHtml(unsigned int idx, CDSH cds)
 {
     QString out;
     out += QString("<div class=\"cdserver\" cdsid=\"%1\">").arg(idx);
     out += QString("<a href=\"S%1\">").arg(idx);
-    out += QString::fromUtf8(cds.getFriendlyName().c_str());
+    out += QString::fromUtf8(cds->getFriendlyName().c_str());
     out += QString("</a></div>");
     return out;
 }
 
 void CDBrowser::serversPage()
 {
-    vector<ContentDirectoryService> ctdirs;
-    if (!ContentDirectoryService::getServices(ctdirs)) {
+    vector<CDSH> ctdirs;
+    if (!ContentDirectory::getServices(ctdirs)) {
         LOGERR("CDBrowser::serversPage: getDirServices failed" << endl);
         return;
     }
@@ -213,7 +239,7 @@ void CDBrowser::serversPage()
     bool same = ctdirs.size() == m_ctdirs.size();
     if (same) {
         for (unsigned i = 0; i < ctdirs.size(); i++) {
-            if (ctdirs[i].getDeviceId().compare(m_ctdirs[i].getDeviceId())) {
+            if (ctdirs[i]->getDeviceId().compare(m_ctdirs[i]->getDeviceId())) {
                 same = false;
                 break;
             }

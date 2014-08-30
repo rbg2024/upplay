@@ -27,8 +27,6 @@ using namespace std;
 #include <QTimer>
 
 #include "libupnpp/upnpplib.hxx"
-#include "libupnpp/discovery.hxx"
-#include "libupnpp/cdirectory.hxx"
 
 #include "dirreader.h"
 #include "mainw.h"
@@ -92,12 +90,7 @@ int main(int argc, char **argv)
             mylib->errAsString("main", mylib->getInitError()) << endl;
         return 1;
     }
-    mylib->setLogFileName("/tmp/libupnp.log");
-    UPnPDeviceDirectory *superdir = UPnPDeviceDirectory::getTheDir();
-    if (!superdir || !superdir->ok()) {
-        cerr << "Discovery services startup failed" << endl;
-        return 1;
-    }
+    //mylib->setLogFileName("/tmp/libupnp.log");
 
     MainWindow w;
     w.show();
