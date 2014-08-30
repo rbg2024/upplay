@@ -21,28 +21,27 @@
 
 #ifndef GUI_SIMPLEPLAYER_H
 #define GUI_SIMPLEPLAYER_H
-#include "GUI/ui_GUI_Player.h"
-#include "GUI/playlist/GUI_Playlist.h"
-#include "GUI/library/GUI_Library_windowed.h"
-#include "GUI/library/GUI_LibraryPath.h"
-#include "GUI/equalizer/GUI_Equalizer.h"
-#include "GUI/playlist_chooser/GUI_PlaylistChooser.h"
-#include "GUI/LastFM/GUI_LFMRadioWidget.h"
-#include "GUI/stream/GUI_Stream.h"
-#include "GUI/Podcasts/GUI_Podcasts.h"
-#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
-#include "GUI/Notifications/GUI_Notifications.h"
-#include "GUI/startup_dialog/GUI_Startup_Dialog.h"
-#include "GUI/LanguageChooser/GUI_LanguageChooser.h"
+#include "ui_GUI_Player.h"
+//#include "GUI/playlist/GUI_Playlist.h"
+//#include "GUI/library/GUI_Library_windowed.h"
+//#include "GUI/library/GUI_LibraryPath.h"
+//#include "GUI/equalizer/GUI_Equalizer.h"
+//#include "GUI/playlist_chooser/GUI_PlaylistChooser.h"
+//#include "GUI/LastFM/GUI_LFMRadioWidget.h"
+//#include "GUI/stream/GUI_Stream.h"
+//#include "GUI/Podcasts/GUI_Podcasts.h"
+//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
+//#include "GUI/Notifications/GUI_Notifications.h"
+//#include "GUI/startup_dialog/GUI_Startup_Dialog.h"
+//#include "GUI/LanguageChooser/GUI_LanguageChooser.h"
 
-#include "CoverLookup/CoverLookup.h"
-#include "Notification/Notification.h"
-#include "PlayerPlugin/PlayerPluginHandler.h"
-#include "PlayerPlugin/PlayerPlugin.h"
-
+//#include "CoverLookup/CoverLookup.h"
+//#include "Notification/Notification.h"
+//#include "PlayerPlugin/PlayerPluginHandler.h"
+//#include "PlayerPlugin/PlayerPlugin.h"
 
 #include "HelperStructs/Helper.h"
-#include "HelperStructs/AsyncWebAccess.h"
+//#include "HelperStructs/AsyncWebAccess.h"
 
 #include <QMainWindow>
 #include <QCloseEvent>
@@ -57,6 +56,18 @@
 #include <QAction>
 #include <QDebug>
 
+class GUI_Playlist;
+class PlayerPlugin;
+class GUI_Library_windowed;
+class GUI_InfoDialog;
+class PlayerPluginHandler;
+class GUI_LibraryPath;
+class GUI_Notifications;
+class GUI_Startup_Dialog;
+class GUI_LanguageChooser;
+class CoverLookup;
+class GUI_Alternate_Covers;
+class AsyncWebAccess;
 
 class GUI_Player : public QMainWindow, private Ui::Sayonara
 {

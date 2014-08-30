@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Notification/NotificationPluginLoader.h"
+//#include "Notification/NotificationPluginLoader.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "GUI/player/GUI_TrayIcon.h"
@@ -53,7 +53,7 @@ GUI_TrayIcon::GUI_TrayIcon (QObject *parent) : QSystemTrayIcon (parent) {
 
     m_vol_step = 5;
 
-    m_plugin_loader = NotificationPluginLoader::getInstance();
+//    m_plugin_loader = NotificationPluginLoader::getInstance();
     m_notification_active = m_settings->getShowNotification();
     m_timeout = m_settings->getNotificationTimeout();
     
@@ -155,6 +155,7 @@ void GUI_TrayIcon::timer_timed_out()
 void GUI_TrayIcon::songChangedMessage (const MetaData& md) {
     _md = md;
     _md_set = true;
+#if 0
     if(m_notification_active){
         Notification* n = m_plugin_loader->get_cur_plugin();
 
@@ -168,7 +169,7 @@ void GUI_TrayIcon::songChangedMessage (const MetaData& md) {
             this -> showMessage("Sayonara", md.title + tr(" by ") + md.artist,QSystemTrayIcon::Information, m_timeout);
         }
     }
-
+#endif
 }
 
 

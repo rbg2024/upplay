@@ -33,7 +33,7 @@ void GUI_Player::coverClicked() {
         QString searchstring = QString("Radio ") + m_metadata.title;
         QString targetpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
-        m_alternate_covers->start(searchstring, targetpath);
+//        m_alternate_covers->start(searchstring, targetpath);
     }
 
     else {
@@ -51,7 +51,7 @@ void GUI_Player::coverClicked() {
 
         QString targetpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
-        m_alternate_covers->start(searchstring, targetpath);
+        //m_alternate_covers->start(searchstring, targetpath);
     }
 
 

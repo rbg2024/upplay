@@ -80,8 +80,8 @@ void GUI_Player::setupConnections(){
 			SLOT(setLibraryPathClicked(bool)));
 	connect(ui->action_fetch_all_covers, SIGNAL(triggered(bool)), this,
 			SLOT(fetch_all_covers_clicked(bool)));
-    connect(ui->action_startup, SIGNAL(triggered(bool)), ui_startup_dialog,
-            SLOT(show()));
+//    connect(ui->action_startup, SIGNAL(triggered(bool)), ui_startup_dialog,
+//            SLOT(show()));
 	connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
 			SLOT(min2tray_toggled(bool)));
 	connect(ui->action_only_one_instance, SIGNAL(toggled(bool)), this,
@@ -89,6 +89,7 @@ void GUI_Player::setupConnections(){
 
 	connect(ui->action_streamrecorder, SIGNAL(triggered(bool)), this,
 			SLOT(sl_action_streamripper_toggled(bool)));
+#if 0
     connect(ui->action_notifications, SIGNAL(triggered(bool)), ui_notifications,
             SLOT(show()));
 	connect(ui->action_SocketConnection, SIGNAL(triggered(bool)), this,
@@ -98,7 +99,7 @@ void GUI_Player::setupConnections(){
             SLOT(sl_live_search(bool)));
     connect(ui->action_notifyNewVersion, SIGNAL(triggered(bool)), this,
             SLOT(sl_notify_new_version(bool)));
-
+#endif
 
 	// about
 	connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
@@ -124,6 +125,7 @@ void GUI_Player::setupConnections(){
 
 
 	// cover lookup
+#if 0
     connect(m_cov_lookup, SIGNAL(sig_covers_found(const QStringList&, QString)),
             this, SLOT(covers_found(const QStringList&, QString)));
 
@@ -147,7 +149,7 @@ void GUI_Player::setupConnections(){
     
     if(ui_libpath)
         connect(ui_libpath, SIGNAL(sig_library_path_set()), this, SLOT(setLibraryPathClicked()));
-
+#endif
 
 
     QList<QKeySequence> lst;

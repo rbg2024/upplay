@@ -25,8 +25,10 @@
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/MetaData.h"
 
-#include "Notification/Notification.h"
-#include "Notification/NotificationPluginLoader.h"
+//#include "Notification/Notification.h"
+//#include "Notification/NotificationPluginLoader.h"
+
+class NotificationPluginLoader;
 
 #include <QSystemTrayIcon>
 #include <QAction>

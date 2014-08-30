@@ -18,20 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GUI/ui_GUI_Player.h"
+#include "ui_GUI_Player.h"
 #include "GUI/player/GUI_Player.h"
 #include "GUI/player/GUI_TrayIcon.h"
-#include "GUI/stream/GUI_Stream.h"
-#include "GUI/Podcasts/GUI_Podcasts.h"
-#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
+//#include "GUI/stream/GUI_Stream.h"
+//#include "GUI/Podcasts/GUI_Podcasts.h"
+//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
 
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
-#include "HelperStructs/AsyncWebAccess.h"
-#include "CoverLookup/CoverLookup.h"
+//#include "HelperStructs/AsyncWebAccess.h"
+//#include "CoverLookup/CoverLookup.h"
 
-#include "StreamPlugins/LastFM/LastFM.h"
+//#include "StreamPlugins/LastFM/LastFM.h"
 
 #include <QMessageBox>
 #include <QFileDialog>
@@ -69,9 +69,9 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 	initGUI();
     m_translator = translator;
     m_settings = CSettingsStorage::getInstance();
-        ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
+    ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
-    m_async_wa = new AsyncWebAccess(this);
+//    m_async_wa = new AsyncWebAccess(this);
 
     ui->lab_artist->hide();
     ui->lab_title->hide();
@@ -89,15 +89,15 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
 	ui_playlist = 0;
 
-    ui_notifications = new GUI_Notifications(this);
-    ui_startup_dialog = new GUI_Startup_Dialog(this);
-    ui_language_chooser= new GUI_LanguageChooser(this);
+        ui_notifications = 0;//new GUI_Notifications(this);
+        ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
+        ui_language_chooser= 0;//new GUI_LanguageChooser(this);
 
 	m_skinSuffix = "";
 	m_class_name = "Player";
 
-    m_cov_lookup = new CoverLookup();
-	m_alternate_covers = new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
+        m_cov_lookup = 0;//new CoverLookup();
+        m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
 
     ui->action_ViewLFMRadio->setVisible(m_settings->getLastFMActive());
 
@@ -108,13 +108,13 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
 	ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
 
-    bool showOnlyTracks = m_settings->getLibShowOnlyTracks();
+        bool showOnlyTracks = m_settings->getLibShowOnlyTracks();
 	ui->action_showOnlyTracks->setChecked(showOnlyTracks);
 
 	QSizePolicy p = ui->library_widget->sizePolicy();
 	m_library_stretch_factor = p.horizontalStretch();
 
-    bool show_library = m_settings->getShowLibrary();
+        bool show_library = m_settings->getShowLibrary();
     ui->action_viewLibrary->setChecked(show_library);
     this->showLibrary(show_library);
 
@@ -140,20 +140,21 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     m_library_width = 600;
 
+#if 0
     QString lib_path = m_settings->getLibraryPath();
     ui_libpath = 0;
     if(lib_path.size() == 0){
         ui_libpath = new GUI_LibraryPath(this->ui->library_widget);
     }
-
+#endif
 
 	/* TRAY ACTIONS */
 	this->setupTrayActions();
 
 	/* SIGNALS AND SLOTS */
     this->setupConnections();
-    m_async_wa->set_url("http://sayonara.luciocarreras.de/current_version");
-    m_async_wa->start();
+//    m_async_wa->set_url("http://sayonara.luciocarreras.de/current_version");
+//    m_async_wa->start();
 
 	ui->plugin_widget->resize(ui->plugin_widget->width(), 0);
     ui_info_dialog = 0;
@@ -174,15 +175,15 @@ void GUI_Player::language_changed(QString language){
 
     this->ui->retranslateUi(this);
 
-    ui_notifications->language_changed();
-    ui_startup_dialog->language_changed();
-    ui_language_chooser->language_changed(true);
-    m_alternate_covers->language_changed();
+    //ui_notifications->language_changed();
+    //ui_startup_dialog->language_changed();
+    //ui_language_chooser->language_changed(true);
+    //m_alternate_covers->language_changed();
 
-    if(ui_libpath)
-        ui_libpath->language_changed();
+//    if(ui_libpath)
+//        ui_libpath->language_changed();
 
-    QList<PlayerPlugin*> all_plugins = _pph->get_all_plugins();
+//    QList<PlayerPlugin*> all_plugins = _pph->get_all_plugins();
     QList<QAction*> actions = ui->menuView->actions();
 
     foreach(QAction* action, actions){
@@ -192,12 +193,13 @@ void GUI_Player::language_changed(QString language){
     }
 
     actions.clear();
-
+#if 0
     foreach(PlayerPlugin* p, all_plugins){
         QAction* action = p->getAction();
         action->setData(p->getName());
         actions << action;
     }
+#endif
 
     this->ui->menuView->insertActions(this->ui->action_Dark, actions);
     this->ui->menuView->insertSeparator(this->ui->action_Dark);
@@ -325,7 +327,7 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
 
 
 void GUI_Player::fetch_cover(){
-
+#if 0
     QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
     if(! QFile::exists(cover_path) ){
@@ -355,6 +357,7 @@ void GUI_Player::fetch_cover(){
 
     ui->albumCover->setIcon(QIcon(cover_path));
     ui->albumCover->repaint();
+#endif
 }
 
 
@@ -468,10 +471,10 @@ void GUI_Player::correct_btn_clicked(bool b){
 
     MetaDataList lst;
     lst.push_back(m_metadata_corrected);
-    ui_info_dialog->setMetaData(lst);
-    ui_info_dialog->setMode(INFO_MODE_TRACKS);
+    //ui_info_dialog->setMetaData(lst);
+//    ui_info_dialog->setMode(INFO_MODE_TRACKS);
 
-    ui_info_dialog->show(TAB_EDIT);
+//    ui_info_dialog->show(TAB_EDIT);
 
 }
 /** LAST FM **/
@@ -577,16 +580,19 @@ QWidget* GUI_Player::getParentOfLibrary() {
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist) {
 	ui_playlist = playlist;
+#if 0
     if(ui_playlist){
         ui_playlist->show();
         ui_playlist->resize(ui->playlist_widget->size());
         QAction* action = createAction( QKeySequence(tr("Ctrl+P")) );
         connect(action, SIGNAL(triggered()), ui_playlist, SLOT(setFocus()));
     }
+#endif
 }
 
 
 void GUI_Player::setLibrary(GUI_Library_windowed* library) {
+#if 0
     ui_library = library;
     if(ui_library && !ui_libpath){
         ui_library->show();
@@ -600,9 +606,11 @@ void GUI_Player::setLibrary(GUI_Library_windowed* library) {
         ui_libpath->show();
         ui_libpath->resize(ui->library_widget->size());
     }
+#endif
 }
 
 void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph){
+#if 0
 	_pph = pph;
 
 	QList<PlayerPlugin*> lst = _pph->get_all_plugins();
@@ -621,7 +629,7 @@ void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph){
 
 	connect(_pph, SIGNAL(sig_show_plugin(PlayerPlugin*)), this, SLOT(showPlugin(PlayerPlugin*)));
     connect(_pph, SIGNAL(sig_hide_all_plugins()), this, SLOT(hideAllPlugins()));
-
+#endif
 }
 
 void GUI_Player::stopped(){
@@ -703,22 +711,22 @@ void GUI_Player::ui_loaded(){
 
         signal(SIGWINCH, signal_handler);
 	#endif
-    if(ui_libpath)
-        ui_libpath->resize(this->ui->library_widget->size());
+//    if(ui_libpath)
+//        ui_libpath->resize(this->ui->library_widget->size());
 
 
 
     changeSkin(m_settings->getPlayerStyle() == 1);
     this->ui->action_Fullscreen->setChecked(m_settings->getPlayerFullscreen());
 
-    this->ui_playlist->resize(this->ui->playlist_widget->size());
+//    this->ui_playlist->resize(this->ui->playlist_widget->size());
 }
 
 
 void GUI_Player::notification_changed(bool active, int timeout_ms){
 
-    m_trayIcon->set_timeout(timeout_ms);
-    m_trayIcon->set_notification_active(active);
+//    m_trayIcon->set_timeout(timeout_ms);
+//    m_trayIcon->set_notification_active(active);
 }
 
 
@@ -732,24 +740,25 @@ void GUI_Player::moveEvent(QMoveEvent *e){
 }
 
 void GUI_Player::resizeEvent(QResizeEvent* e) {
-
+#if 0
     QMainWindow::resizeEvent(e);
 
-    ui_playlist->resize(ui->playlist_widget->size());
+//    ui_playlist->resize(ui->playlist_widget->size());
 
-    if(ui->library_widget->isVisible()){
+//    if(ui->library_widget->isVisible()){
 
-        if(ui_libpath)
-            ui_libpath->resize(ui->library_widget->size());
-        else
-            ui_library->resize(ui->library_widget->size());
-    }
+//        if(ui_libpath)
+//            ui_libpath->resize(ui->library_widget->size());
+//        else
+//            ui_library->resize(ui->library_widget->size());
+//    }
 
 	QSize sz = ui->plugin_widget->size();
 
 
     _pph->resize(sz);
     m_settings->setPlayerSize(this->size());
+#endif
     this->update();
 }
 
@@ -792,8 +801,8 @@ void GUI_Player::really_close(bool b){
 
 void GUI_Player::async_wa_finished(){
 
-    QString new_version = m_async_wa->get_data();
-	QString cur_version = m_settings->getVersion();
+    QString new_version = "1.0";//m_async_wa->get_data();
+    QString cur_version = m_settings->getVersion();
 	new_version = new_version.trimmed();
 
 	qDebug() << "Newest Version: " << new_version;

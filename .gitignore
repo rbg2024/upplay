@@ -3,3 +3,4 @@ Makefile
 .ui
 .moc
 .obj
+GUI/player/player

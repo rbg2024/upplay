@@ -26,15 +26,9 @@ using namespace std;
 #include <QObject>
 #include <QTimer>
 
-#include "libupnpp/upnpplib.hxx"
+#include "GUI_Player.h"
 
-#include "contentDirectory/dirreader.h"
-#include "GUI/browser/browserw.h"
-#include "GUI/player/GUI_Player.h"
-#include "GUI/playlist/GUI_Playlist.h"
-#include "playlist/Playlist.h"
-
-using namespace UPnPClient;
+//using namespace UPnPClient;
 
 static const char *thisprog;
 
@@ -52,7 +46,6 @@ Usage(void)
     fprintf(fp, "%s: Usage: %s", thisprog, usage);
     exit((op_flags & OPT_h)==0);
 }
-
 
 int main(int argc, char **argv)
 {
@@ -83,26 +76,7 @@ int main(int argc, char **argv)
     if (argc > 0)
         Usage();
 
-    LibUPnP *mylib = LibUPnP::getLibUPnP();
-    if (!mylib) {
-        cerr << "Can't get LibUPnP" << endl;
-        return 1;
-    }
-    if (!mylib->ok()) {
-        cerr << "Lib init failed: " <<
-            mylib->errAsString("main", mylib->getInitError()) << endl;
-        return 1;
-    }
-    //mylib->setLogFileName("/tmp/libupnp.log");
-
-    GUI_Player *player = new GUI_Player(0,0);
-    Playlist *playlist = new Playlist();
-    CDBrowser cdb(player->getParentOfLibrary());
-    GUI_Playlist *ui_playlist = 
-        new GUI_Playlist(player->getParentOfPlaylist(), 0);
-    player->setPlaylist(ui_playlist);
-    //ui_playlist->resize(player->getParentOfPlaylist()->size());
-
-    player->show();
+    GUI_Player w(0,0);
+    w.show();
     return app.exec();
 }

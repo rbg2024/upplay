@@ -17,17 +17,17 @@
 #ifndef _MAINW_H_INCLUDED_
 #define _MAINW_H_INCLUDED_
 
-#include <QMainWindow>
+#include <QWidget>
 
 #include "ui_mainw.h"
 
-class MainWindow : public QMainWindow, public Ui::MainWindow
+class BrowserW : public QWidget, public Ui::BrowserW
 {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget * parent = 0) 
-	: QMainWindow(parent)
+    BrowserW(QWidget * parent = 0) 
+	: QWidget(parent)
         {
             setupUi(this);
             //init();

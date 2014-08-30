@@ -27,7 +27,7 @@
 
 #include <QDir>
 #include <QFileDialog>
-
+#include <QMessageBox>
 
 
 /** FILE **/
@@ -71,7 +71,7 @@ void GUI_Player::folderSelectedClicked(bool) {
 // -> base
 void GUI_Player::importFolderClicked(bool b){
 	Q_UNUSED(b);
-
+#if 0
     QString lib_path = m_settings->getLibraryPath();
 
     if(lib_path.size() == 0 || !QFile::exists(lib_path)){
@@ -89,11 +89,12 @@ void GUI_Player::importFolderClicked(bool b){
 	if(dir.size() > 0){
 		emit sig_import_dir(dir);
 	}
+#endif
 }
 
 void GUI_Player::importFilesClicked( bool b ){
    Q_UNUSED(b);
-
+#if 0
     QString lib_path = m_settings->getLibraryPath();
 
     if(lib_path.size() == 0 || !QFile::exists(lib_path)){
@@ -114,7 +115,7 @@ void GUI_Player::importFilesClicked( bool b ){
 					QDir::homePath(), filter);
 
     if(files.size() > 0) emit sig_import_files(files);
-
+#endif
 }
 
 
@@ -132,7 +133,7 @@ void GUI_Player::clearLibraryClicked(bool b){
 // prvt slot
 void GUI_Player::fetch_all_covers_clicked(bool b) {
 	Q_UNUSED(b);
-    m_cov_lookup->fetch_all_album_covers();
+//    m_cov_lookup->fetch_all_album_covers();
     qDebug() << "Fetch all covers triggered";
 }
 /** FILE END **/
@@ -209,7 +210,7 @@ void GUI_Player::setLibraryPathClicked(bool b) {
 	Q_UNUSED(b);
 
 	QString start_dir = QDir::homePath();
-    QString old_dir = m_settings->getLibraryPath();
+        QString old_dir = m_settings->getLibraryPath();
 
     if (old_dir.size() > 0 && QFile::exists(old_dir)){
 		start_dir = old_dir;
@@ -219,6 +220,8 @@ void GUI_Player::setLibraryPathClicked(bool b) {
 			old_dir, QFileDialog::ShowDirsOnly);
     if (dir.size() > 0 && (old_dir.compare(dir) != 0)) {
 		emit libpath_changed(dir);
+#if 0
+
         m_settings->setLibraryPath(dir);
         if(this->ui_libpath && ui_libpath->isVisible()){
             ui_libpath->hide();
@@ -228,6 +231,7 @@ void GUI_Player::setLibraryPathClicked(bool b) {
                 ui_library->resize(this->ui->library_widget->size());
             }
         }
+#endif
 
         QMessageBox dialog(this);
 
@@ -249,14 +253,14 @@ void GUI_Player::setLibraryPathClicked(bool b) {
 void GUI_Player::psl_libpath_changed(QString & dir){
 
     if (dir.size() > 0 && ui_libpath) {
-
+#if 0
         if(ui_libpath->isVisible() && this->ui->library_widget->isVisible()){
             ui_libpath->hide();
 
             ui_library->show();
             ui_library->resize(this->ui->library_widget->size());
         }
-
+#endif
         ui_libpath = 0;
     }
 }
@@ -318,7 +322,7 @@ void GUI_Player::sl_live_search(bool b){
 
 void GUI_Player::sl_action_language_toggled(bool b){
     Q_UNUSED(b);
-    ui_language_chooser->show();
+//    ui_language_chooser->show();
 }
 
 /** PREFERENCES END **/
@@ -335,7 +339,7 @@ void GUI_Player::help(bool b){
 void GUI_Player::about(bool b){
 	Q_UNUSED(b);
 
-    QString version = m_settings->getVersion();
+        QString version = m_settings->getVersion();
     QString link = Helper::createLink("http://sayonara.luciocarreras.de");
 
     QMessageBox infobox(this);

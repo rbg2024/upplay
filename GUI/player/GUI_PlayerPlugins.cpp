@@ -36,13 +36,13 @@ QWidget* GUI_Player::getParentOfPlugin() {
 }
 
 void GUI_Player::setInfoDialog(GUI_InfoDialog* dialog){
-    ui_info_dialog = dialog;
-    ui_info_dialog->setMode(INFO_MODE_TRACKS);
+//    ui_info_dialog = dialog;
+//    ui_info_dialog->setMode(INFO_MODE_TRACKS);
 }
 
 
 void GUI_Player::hideAllPlugins(){
-
+#if 0
     m_settings->setShownPlugin("");
     if(ui->plugin_widget->isHidden()) return;
 
@@ -53,11 +53,12 @@ void GUI_Player::hideAllPlugins(){
     ui->plugin_widget->setMinimumHeight(0);
 
     ui_playlist->resize(pl_size);
+#endif
 }
 
 
 void GUI_Player::showPlugin(PlayerPlugin* plugin){
-
+#if 0
     hideAllPlugins();
 
     if(!plugin) return;
@@ -82,6 +83,7 @@ void GUI_Player::showPlugin(PlayerPlugin* plugin){
 
 	ui_playlist->resize(pl_size);
     m_settings->setShownPlugin(plugin->getName());
+#endif
 }
 
 

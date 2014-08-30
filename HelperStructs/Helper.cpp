@@ -29,8 +29,8 @@
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/globals.h"
-#include "HelperStructs/WebAccess.h"
-#include "DatabaseAccess/CDatabaseConnector.h"
+//#include "HelperStructs/WebAccess.h"
+//#include "DatabaseAccess/CDatabaseConnector.h"
 
 #include <string>
 #include <iostream>
@@ -54,7 +54,7 @@
 #include <QMap>
 #include <QString>
 
-#include "StreamPlugins/LastFM/LFMGlobals.h"
+//#include "StreamPlugins/LastFM/LFMGlobals.h"
 
 using namespace std;
 
@@ -191,7 +191,7 @@ QString Helper::get_cover_path(int album_id){
     if(album_id == -1) return "";
 
     Album album;
-    bool success = CDatabaseConnector::getInstance()->getAlbumByID(album_id, album);
+    bool success = false;//CDatabaseConnector::getInstance()->getAlbumByID(album_id, album);
     if(!success) return "";
 
     if(album.artists.size() == 0){
@@ -211,7 +211,7 @@ QString Helper::get_cover_path(int album_id){
 
 QString Helper::createLink(QString name, QString target, bool underline){
 	
-	int dark = CSettingsStorage::getInstance()->getPlayerStyle();
+    int dark = 0;//CSettingsStorage::getInstance()->getPlayerStyle();
 	if(target.size() == 0) target = name;
 
 	QString content;
@@ -251,17 +251,20 @@ QString Helper::calc_filesize_str(qint64 filesize){
 }
 
 QString Helper::calc_lfm_artist_adress(QString artist){
-	QString url = QString ("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=");
+    QString url = "";QString ("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=");
+#if 0
 	QString api_key = LFM_API_KEY;
 	url += api_key + "&";
 	url += "artist=" + QUrl::toPercentEncoding(artist);
+#endif
 	return url;
 }
 
 
 QString Helper::calc_lfm_album_adress(QString artist, QString album){
 
-	QString url = QString ("http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=");
+    QString url = "";//QString ("http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=");
+#if 0
 	QString api_key = LFM_API_KEY;
 
 	if(album == "")
@@ -270,6 +273,7 @@ QString Helper::calc_lfm_album_adress(QString artist, QString album){
 	url += api_key + "&";
 	url += "artist=" + QUrl::toPercentEncoding(artist);
 	if(album != "") url += "&album=" + QUrl::toPercentEncoding(album);
+#endif
 	return url;
 
 }
@@ -414,6 +418,7 @@ QStringList Helper::get_podcast_extensions(){
 
 
 bool Helper::is_podcastfile(QString filename, QString* content){
+#if 0
     QStringList extensions = get_podcast_extensions();
 
     bool extension_ok = false;
@@ -443,6 +448,7 @@ bool Helper::is_podcastfile(QString filename, QString* content){
 
 
     if(header.contains("<rss")) return true;
+#endif
     return false;
 }
 
@@ -544,10 +550,11 @@ bool Helper::read_file_into_str(QString filename, QString* content){
 
 }
 
+#if 0
 bool Helper::read_http_into_str(QString url, QString* content){
     return WebAccess::read_http_into_str(url, content);
 }
-
+#endif
 
 QString Helper::easy_tag_finder(QString tag, QString& xml_doc){
 
@@ -654,9 +661,9 @@ QString Helper::get_album_w_disc(const MetaData& md){
     if(md.album_id <= 0) return md.album.trimmed();
 
     QRegExp re(QString("(\\s)?-?(\\s)?((cd)|(CD)|((d|D)((is)|(IS))(c|C|k|K)))(\\d|(\\s\\d))"));
-    CDatabaseConnector* db = CDatabaseConnector::getInstance();
+//    CDatabaseConnector* db = CDatabaseConnector::getInstance();
     Album album;
-    bool success = db->getAlbumByID(md.album_id, album);
+    bool success = false;//db->getAlbumByID(md.album_id, album);
 
     if(!success) return md.album.trimmed();
 
@@ -675,7 +682,7 @@ QString Helper::get_album_major_artist(int albumid){
     MetaDataList v_md;
     QList<int> idlist;
     idlist << albumid;
-    CDatabaseConnector::getInstance()->getAllTracksByAlbum(idlist, v_md);
+//    CDatabaseConnector::getInstance()->getAllTracksByAlbum(idlist, v_md);
 
     if(v_md.size() == 0) return "";
     if(v_md.size() == 1) return v_md[0].artist;
@@ -704,8 +711,8 @@ QString Helper::get_album_major_artist(int albumid){
 
 
 Album Helper::get_album_from_metadata(const MetaData& md) {
-
     Album album;
+#if 0
     CDatabaseConnector* db = CDatabaseConnector::getInstance();
     bool success = false;
 
@@ -727,7 +734,7 @@ Album Helper::get_album_from_metadata(const MetaData& md) {
     album.name = md.album;
     album.artists.clear();
     album.artists.push_back(md.artist);
-
+#endif
     return album;
 }
 
@@ -736,7 +743,7 @@ Album Helper::get_album_from_metadata(const MetaData& md) {
 QString Helper::get_newest_version(){
 
     QString str;
-    WebAccess::read_http_into_str("http://sayonara.luciocarreras.de/newest", &str);
+//    WebAccess::read_http_into_str("http://sayonara.luciocarreras.de/newest", &str);
     return str;
 
 }

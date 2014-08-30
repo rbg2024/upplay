@@ -27,7 +27,6 @@
 #include <upnp/upnp.h>
 
 #include "libupnpp/control/cdirectory.hxx"
-//#include "libupnpp/cdircontent.hxx"
 
 class DirReader : public QThread {
     Q_OBJECT;
@@ -37,6 +36,7 @@ class DirReader : public QThread {
         : QThread(parent), m_serv(server), m_objid(objid)
     {
     }
+
     ~DirReader()
     {
         for (auto& entry: m_slices)
@@ -82,7 +82,9 @@ signals:
 private:
     UPnPClient::CDSH m_serv;
     std::string m_objid;
-    std::vector<UPnPDirContent*> m_slices;
+    // We use a list (vs vector) so that existing element addresses
+    // are unchanged when we append
+    std::list<UPnPDirContent*> m_slices;
     int m_status;
 };
 
