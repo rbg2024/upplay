@@ -75,11 +75,8 @@ public:
     int discnumber;
     int n_discs;
 
-
     bool is_extern;
     int radio_mode;
-
-
 
     bool pl_selected;
     bool pl_playing;
@@ -88,6 +85,7 @@ public:
     bool is_lib_selected;
     bool is_disabled;
 
+    QString didl;
 
     inline MetaData () {
         id = -1;
@@ -116,6 +114,8 @@ public:
 
         is_lib_selected = false;
         is_disabled = false;
+
+        didl = "";
     }
 
     void print(){
@@ -162,6 +162,7 @@ public:
         list.push_back( (pl_dragged) ? "1" : "0" );
         list.push_back( (is_lib_selected) ? "1" : "0" );
         list.push_back( (is_disabled) ? "1" : "0");
+        list.push_back(didl);
 
         return list;
     }
@@ -196,6 +197,7 @@ public:
         md.pl_dragged = (list[21] == "1");
         md.is_lib_selected = (list[22] == "1");
         md.is_disabled = (list[23] == "1");
+        md.didl = list[24];
 
         return true;
     }

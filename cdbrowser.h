@@ -25,9 +25,12 @@
 #include <QVariant>
 #include <QTimer>
 
+#include "libupnpp/control/mediaserver.hxx"
 #include "libupnpp/control/cdirectory.hxx"
 
-class DirReader;
+#include "HelperStructs/MetaData.h"
+
+class ContentDirectoryQO;
 class UPnPDirContent;
 
 class CDBrowser : public QWebView
@@ -41,10 +44,11 @@ class CDBrowser : public QWebView
  public slots:
     virtual void serversPage();
     void onDone(int);
-    void browseContainer(unsigned int i, std::string, std::string);
+    void browseContainer(std::string, std::string);
     void onSliceAvailable(const UPnPDirContent *);
 
  signals:
+    void sig_tracks_for_playlist_available(MetaDataList&);
 
  protected:
 
@@ -53,16 +57,18 @@ class CDBrowser : public QWebView
     virtual void onLinkClicked(const QUrl &);
 
  private:
-    // The currently active content directory servers
-    std::vector<UPnPClient::CDSH> m_ctdirs;
+    // The currently seen Media Server descriptions
+    std::vector<UPnPDeviceDesc> m_msdescs;
+    int m_cdsidx;
+    UPnPClient::MSRH m_ms;
 
     // Current path: vector of objid/title pairs
     std::vector<std::pair<std::string, std::string> > m_curpath;
 
     QTimer m_timer;
-    DirReader *m_reader;
-    std::vector<std::pair<std::string, std::string> > m_objids;
-    unsigned int m_cdsidx;
+
+    ContentDirectoryQO *m_reader;
+    std::vector<UPnPDirObject> m_entries;
 };
 
 // A QObject to hold a QString. Maybe there would be a simpler way to

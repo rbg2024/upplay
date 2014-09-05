@@ -26,13 +26,9 @@ using namespace std;
 #include <QObject>
 #include <QTimer>
 
-#include "libupnpp/upnpplib.hxx"
+#include <libupnpp/upnpplib.hxx>
 
-#include "contentDirectory/dirreader.h"
-#include "GUI/browser/browserw.h"
-#include "GUI/player/GUI_Player.h"
-#include "GUI/playlist/GUI_Playlist.h"
-#include "playlist/Playlist.h"
+#include "application.h"
 
 using namespace UPnPClient;
 
@@ -62,6 +58,12 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName("upplay");
 
     string a_config;
+
+    QStringList params;
+    for(int i = 1; i < argc; i++){
+        QString param(argv[i]);
+        params.push_back(param);
+    }
 
     thisprog = argv[0];
     argc--; argv++;
@@ -95,14 +97,15 @@ int main(int argc, char **argv)
     }
     //mylib->setLogFileName("/tmp/libupnp.log");
 
-    GUI_Player *player = new GUI_Player(0,0);
-    Playlist *playlist = new Playlist();
-    CDBrowser cdb(player->getParentOfLibrary());
-    GUI_Playlist *ui_playlist = 
-        new GUI_Playlist(player->getParentOfPlaylist(), 0);
-    player->setPlaylist(ui_playlist);
-    //ui_playlist->resize(player->getParentOfPlaylist()->size());
+    QFont font("DejaVu Sans", 9, 55,  false);
+	font.setHintingPreference(QFont::PreferNoHinting);
+	int strategy =  (QFont::PreferDefault | QFont::PreferQuality);
+	font.setStyleStrategy((QFont::StyleStrategy) strategy  );
+    app.setFont(font);
 
-    player->show();
+    Application application(&app, params.size(), 0);
+    if(!application.is_initialized()) 
+        return 1;
+
     return app.exec();
 }

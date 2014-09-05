@@ -28,16 +28,17 @@
 
 #include "libupnpp/control/cdirectory.hxx"
 
-class DirReader : public QThread {
+class ContentDirectoryQO : public QThread {
     Q_OBJECT;
 
  public: 
-    DirReader(QObject *parent, UPnPClient::CDSH server, std::string objid)
+    ContentDirectoryQO(UPnPClient::CDSH server, std::string objid, 
+                       QObject *parent = 0)
         : QThread(parent), m_serv(server), m_objid(objid)
     {
     }
 
-    ~DirReader()
+    ~ContentDirectoryQO()
     {
         for (auto& entry: m_slices)
             delete entry;

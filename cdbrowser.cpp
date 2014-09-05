@@ -26,12 +26,12 @@ using namespace std;
 
 #include "cdbrowser.h"
 #include "upputils.h"
-#include "dirreader.h"
+#include "upqo/cdirectory_qo.h"
 
 using namespace UPnPClient;
 
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_reader(0)
+    : QWebView(parent), m_cdsidx(-1), m_reader(0)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
@@ -47,7 +47,7 @@ CDBrowser::CDBrowser(QWidget* parent)
 
 CDBrowser::~CDBrowser()
 {
-
+    delete m_reader;
 }
 
 void CDBrowser::appendHtml(const QString& html)
@@ -77,30 +77,50 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     case 'S':
     {
 	unsigned int i = atoi(scurl.c_str()+1);
-        if (i > m_ctdirs.size()) {
+        if (i > m_msdescs.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad link index: " << i 
-                   << " cd count: " << m_ctdirs.size() << endl);
+                   << " cd count: " << m_msdescs.size() << endl);
 	    return;
 	}
         m_cdsidx = i;
-	browseContainer(m_cdsidx, "0", "(root)");
+        m_ms = MSRH(new MediaServer(m_msdescs[m_cdsidx]));
+	browseContainer("0", "(root)");
+    }
+    break;
+
+    case 'I':
+    {
+        // Item clicked add to playlist
+
+	unsigned int i = atoi(scurl.c_str()+1);
+        if (i > m_entries.size()) {
+	    LOGERR("CDBrowser::onLinkClicked: bad objid index: " << i 
+                   << " id count: " << m_entries.size() << endl);
+	    return;
+	}
+        MetaDataList mdl;
+        mdl.resize(1);
+        udirentToMetadata(&m_entries[i], &mdl[0]);
+        emit sig_tracks_for_playlist_available(mdl);
     }
     break;
 
     case 'C':
     {
+        // Container clicked
 	unsigned int i = atoi(scurl.c_str()+1);
-        if (i > m_objids.size()) {
+        if (i > m_entries.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad objid index: " << i 
-                   << " id count: " << m_objids.size() << endl);
+                   << " id count: " << m_entries.size() << endl);
 	    return;
 	}
-	browseContainer(m_cdsidx, m_objids[i].first, m_objids[i].second);
+	browseContainer(m_entries[i].m_id, m_entries[i].m_title);
     }
     break;
 
     case 'L':
     {
+        // Click in curpath section.
 	unsigned int i = atoi(scurl.c_str()+1);
         if (i > m_curpath.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad curpath index: " << i 
@@ -110,7 +130,12 @@ void CDBrowser::onLinkClicked(const QUrl &url)
         string objid = m_curpath[i].first;
         string title = m_curpath[i].second;
         m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
-	browseContainer(m_cdsidx, objid, title);
+        if (i == 0) {
+            m_msdescs.clear();
+            serversPage();
+        } else {
+            browseContainer(objid, title);
+        }
     }
     break;
 
@@ -127,17 +152,19 @@ static const QString init_container_page(
     "</body></html>"
     );
 
-void CDBrowser::browseContainer(unsigned int cdsidx, string ctid,
-                                string cttitle)
+void CDBrowser::browseContainer(string ctid, string cttitle)
 {
-    LOGDEB("CDBrowser::browseContainer: cdsidx: " << cdsidx << " ctid " 
-           << ctid << endl);
-    if (cdsidx > m_ctdirs.size()) {
-        LOGERR("CDBrowser::browseCT: bad index: " << cdsidx << " cd count: " <<
-               m_ctdirs.size() << endl);
+    LOGDEB("CDBrowser::browseContainer: " << " ctid " << ctid << endl);
+    if (!m_ms) {
+        LOGERR("CDBrowser::browseContainer: server not set" << endl);
         return;
     }
-    m_objids.clear();
+    CDSH cds = m_ms->cds();
+    if (!cds) {
+        LOGERR("Cant reach content directory service" << endl);
+        return;
+    }
+    m_entries.clear();
 
     m_curpath.push_back(pair<string,string>(ctid, cttitle));
 
@@ -155,7 +182,7 @@ void CDBrowser::browseContainer(unsigned int cdsidx, string ctid,
         delete m_reader;
         m_reader = 0;
     }
-    m_reader = new DirReader(this, m_ctdirs[cdsidx], ctid);
+    m_reader = new ContentDirectoryQO(cds, ctid, this);
 
     connect(m_reader, SIGNAL(sliceAvailable(const UPnPDirContent *)),
             this, SLOT(onSliceAvailable(const UPnPDirContent *)));
@@ -168,9 +195,8 @@ void CDBrowser::onDone(int)
     LOGDEB("CDBrowser::onDone" << endl);
     if (m_reader) {
         m_reader->wait();
-        delete m_reader;
-        m_reader = 0;
     }
+    LOGDEB("CDBrowser::onDone done" << endl);
 }
 
 static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
@@ -197,13 +223,15 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
     QString html;
 
     LOGDEB("CDBrowser::onSliceAvailable" << endl);
+    m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
+                      dc->m_items.size());
     for (auto& entry: dc->m_containers) {
-        m_objids.push_back(pair<string, string>(entry.m_id, entry.m_title));
-        html += CTToHtml(m_objids.size()-1, entry);
+        m_entries.push_back(entry);
+        html += CTToHtml(m_entries.size()-1, entry);
     }
     for (auto& entry: dc->m_items) {
-        m_objids.push_back(pair<string, string>(entry.m_id, entry.m_title));
-        html += ItemToHtml(m_objids.size()-1, entry);
+        m_entries.push_back(entry);
+        html += ItemToHtml(m_entries.size()-1, entry);
     }
     appendHtml(html);
 }
@@ -216,30 +244,29 @@ static const string init_server_page(
     "</body></html>"
     );
 
-static QString DSToHtml(unsigned int idx, CDSH cds)
+static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
 {
     QString out;
     out += QString("<div class=\"cdserver\" cdsid=\"%1\">").arg(idx);
     out += QString("<a href=\"S%1\">").arg(idx);
-    out += QString::fromUtf8(cds->getFriendlyName().c_str());
+    out += QString::fromUtf8(dev.friendlyName.c_str());
     out += QString("</a></div>");
     return out;
 }
 
 void CDBrowser::serversPage()
 {
-    vector<CDSH> ctdirs;
-    if (!ContentDirectory::getServices(ctdirs)) {
-        LOGERR("CDBrowser::serversPage: getDirServices failed" << endl);
+    vector<UPnPDeviceDesc> msdescs;
+    if (!MediaServer::getDeviceDescs(msdescs)) {
+        LOGERR("CDBrowser::serversPage: getDeviceDescs failed" << endl);
         return;
     }
-    LOGDEB("CDBrowser::serversPage: got " << ctdirs.size() << " services" 
-           << endl);
+    LOGDEB("CDBrowser::serversPage: " << msdescs.size() << " servers" << endl);
     
-    bool same = ctdirs.size() == m_ctdirs.size();
+    bool same = msdescs.size() == m_msdescs.size();
     if (same) {
-        for (unsigned i = 0; i < ctdirs.size(); i++) {
-            if (ctdirs[i]->getDeviceId().compare(m_ctdirs[i]->getDeviceId())) {
+        for (unsigned i = 0; i < msdescs.size(); i++) {
+            if (msdescs[i].UDN.compare(m_msdescs[i].UDN)) {
                 same = false;
                 break;
             }
@@ -247,15 +274,15 @@ void CDBrowser::serversPage()
     }
     if (same) {
         //LOGDEB("CDBrowser::serversPage: no change" << endl);
-        m_timer.start(1000);
+        m_timer.start(5000);
         return;
     } else {
         LOGDEB1("CDBrowser::serversPage: updating" << endl);
     }
-    m_ctdirs = ctdirs;
+    m_msdescs = msdescs;
     setHtml(QString::fromUtf8(init_server_page.c_str()));
-    for (unsigned i = 0; i < ctdirs.size(); i++) {
-        appendHtml(DSToHtml(i, ctdirs[i]));
+    for (unsigned i = 0; i < msdescs.size(); i++) {
+        appendHtml(DSToHtml(i, msdescs[i]));
     }
-    m_timer.start(1000);
+    m_timer.start(5000);
 }

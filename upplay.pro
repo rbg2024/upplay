@@ -8,7 +8,7 @@ QMAKE_CXXFLAGS += -std=c++0x
 CONFIG  += qt warn_on thread release 
 
 HEADERS += \
-        GUI/browser/browserw.h \
+        application.h \
         GUI/ContextMenu.h \
         GUI/player/GUI_Player.h \
         GUI/player/GUI_TrayIcon.h \
@@ -25,9 +25,10 @@ HEADERS += \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
         HelperStructs/Style.h \
-        contentDirectory/cdbrowser.h \
-        contentDirectory/dirreader.h \
-        playlist/Playlist.h
+        playlist/Playlist.h \
+        \
+        upqo/cdirectory_qo.h \
+        cdbrowser.h
 
 SOURCES += \
         GUI/ContextMenu.cpp \
@@ -45,16 +46,17 @@ SOURCES += \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.cpp \
         GUI/playlist/model/PlaylistItemModel.cpp \
         GUI/playlist/view/PlaylistView.cpp \
+        application.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
         playlist/Playlist_GUI_slots.cpp \
         playlist/Playlist.cpp \
-        contentDirectory/cdbrowser.cpp \
-        upplay.cpp
+        cdbrowser.cpp \
+        upplay.cpp \
+        upputils.cpp
 
 FORMS   = \
-        GUI/browser/browserw.ui \
         GUI/player/GUI_Player.ui \
         GUI/playlist/GUI_Playlist.ui \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
