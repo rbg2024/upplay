@@ -34,10 +34,33 @@
 #include <QMap>
 #include <QSharedMemory>
 
+#include <iostream>
 #include <fstream>
 #include <string>
 
+#include "libupnpp/upnpplib.hxx"
+#include "libupnpp/control/mediarenderer.hxx"
+#include "libupnpp/control/renderingcontrol.hxx"
+#include "libupnpp/control/discovery.hxx"
+using namespace UPnPClient;
+
 using namespace std;
+
+UPnPDeviceDirectory *superdir;
+
+MRDH getRenderer(const string& friendlyName)
+{
+    if (superdir == 0) {
+        superdir = UPnPDeviceDirectory::getTheDir();
+    }
+
+    UPnPDeviceDesc ddesc;
+    if (superdir->getDevByFName(friendlyName, ddesc)) {
+        return MRDH(new MediaRenderer(ddesc));
+    }
+    cerr << "getDevByFname failed" << endl;
+    return MRDH();
+}
 
 bool Application::is_initialized()
 {
@@ -62,6 +85,33 @@ Application::Application(QApplication* qapp, int,
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
 
     cdb = new CDBrowser(player->getParentOfLibrary());
+
+    const string friendlyName("UpMpd-bureau");
+//    const string friendlyName("BubbleUPnP (NookColor)");
+
+    MRDH rdr = getRenderer(friendlyName);
+    if (!rdr) {
+        cerr << "Renderer " << friendlyName << " not found" << endl;
+        return;
+    }
+
+    AVTH avt = rdr->avt();
+    if (!avt) {
+        cerr << "Device " << friendlyName << 
+            " has no AVTransport service" << endl;
+        return;
+    }
+
+    RDCH rdc = rdr->rdc();
+    if (!rdc) {
+        cerr << "Device " << friendlyName << 
+            " has no RenderingControl service" << endl;
+        return;
+    }
+
+    rdco = new RenderingControlQO(rdc);
+    avto = new AVTPlayer(avt);
+
 
     QString dir;
 
@@ -110,25 +160,30 @@ Application::~Application()
 
 void Application::init_connections()
 {
-//    CONNECT(player, pause(), listen, pause());
-//    CONNECT(player, search(int), listen, jump(int));
-//    CONNECT(player, sig_volume_changed(int), listen, setVolume(int));
-//    CONNECT(player, sig_rec_button_toggled(bool), listen, record_button_toggled(bool));
+    CONNECT(player, pause(), avto, pause());
+    // the search (actually seek) param is in percent
+    CONNECT(player, search(int), avto, seekPC(int));
+    CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
+    CONNECT(rdco, volumeChanged(int), player, setVolume(int));
     CONNECT(player, fileSelected(QStringList &), playlist, psl_createPlaylist(QStringList&));
+
     CONNECT(player, play(), playlist, psl_play());
     CONNECT(player, pause(), playlist, psl_pause());
     CONNECT(player, stop(), playlist, psl_stop());
+
     CONNECT(player, forward(), playlist, psl_forward());
     CONNECT(player, backward(), playlist, psl_backward());
 
     CONNECT(player, show_small_playlist_items(bool), ui_playlist, psl_show_small_playlist_items(bool));
 
-    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool), player, update_track(const MetaData&, int, bool));
-//    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool), listen, changeTrack(const MetaData &, int, bool ));
+    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
+            player, update_track(const MetaData&, int, bool));
+    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
+            avto, changeTrack(const MetaData&, int, bool));
 
-//    CONNECT(playlist, sig_no_track_to_play(),  listen, stop());
+    CONNECT(playlist, sig_no_track_to_play(),  avto, stop());
     CONNECT(playlist, sig_no_track_to_play(),  player, stopped());
-//    CONNECT(playlist, sig_goon_playing(), listen, play());
+    CONNECT(playlist, sig_goon_playing(), avto, play());
     CONNECT(playlist, sig_selected_file_changed(int), ui_playlist, track_changed(int));
     CONNECT(playlist, sig_playlist_created(MetaDataList&, int, int), ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
@@ -138,10 +193,12 @@ void Application::init_connections()
     CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), playlist, psl_remove_rows(const QList<int>&, bool));
 
-    CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
-            playlist, psl_createPlaylist(MetaDataList&));
+//    CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
+//            playlist, psl_createPlaylist(MetaDataList&));
 //    CONNECT(library, sig_append_tracks_to_playlist(MetaDataList&),
 //            playlist, psl_append_tracks(MetaDataList&));
+    CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
+            playlist, psl_append_tracks(MetaDataList&));
 }
 
 

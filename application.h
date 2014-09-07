@@ -31,6 +31,8 @@
 #include <QTranslator>
 
 #include "cdbrowser.h"
+#include "upqo/renderingcontrol_qo.h"
+#include "avtadapt.h"
 
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"
@@ -55,17 +57,18 @@ signals:
 public slots:
 
 private:
-    GUI_Player* 		player;
-    Playlist*               playlist;
-    CDBrowser*                  cdb;
+    GUI_Player* 	 player;
+    Playlist*            playlist;
+    CDBrowser*           cdb;
+    RenderingControlQO*  rdco;
+    AVTPlayer*           avto;
+    GUI_Playlist* 	 ui_playlist;
 
-    GUI_Playlist* 			ui_playlist;
+    CSettingsStorage*    set;
+    SettingsThread*      _setting_thread;
+    QApplication*        app;
 
-    CSettingsStorage*       set;
-    SettingsThread*           _setting_thread;
-    QApplication*           app;
-
-    bool					_initialized;
+    bool		 _initialized;
 
     void init_connections();
 

@@ -28,7 +28,10 @@ HEADERS += \
         playlist/Playlist.h \
         \
         upqo/cdirectory_qo.h \
-        cdbrowser.h
+        upqo/avtransport_qo.h \
+        upqo/renderingcontrol_qo.h \
+        cdbrowser.h \
+        avtadapt.h
 
 SOURCES += \
         GUI/ContextMenu.cpp \

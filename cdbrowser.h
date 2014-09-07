@@ -25,13 +25,13 @@
 #include <QVariant>
 #include <QTimer>
 
+#include "libupnpp/control/description.hxx"
 #include "libupnpp/control/mediaserver.hxx"
 #include "libupnpp/control/cdirectory.hxx"
 
 #include "HelperStructs/MetaData.h"
 
 class ContentDirectoryQO;
-class UPnPDirContent;
 
 class CDBrowser : public QWebView
 {

@@ -27,6 +27,7 @@ using namespace std;
 #include <QTimer>
 
 #include <libupnpp/upnpplib.hxx>
+#include <libupnpp/log.hxx>
 
 #include "application.h"
 
@@ -84,6 +85,11 @@ int main(int argc, char **argv)
 
     if (argc > 0)
         Usage();
+
+    if (upnppdebug::Logger::getTheLog("/tmp/upplay.log") == 0) {
+        cerr << "Can't initialize log" << endl;
+        return 1;
+    }
 
     LibUPnP *mylib = LibUPnP::getLibUPnP();
     if (!mylib) {
