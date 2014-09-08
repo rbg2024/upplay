@@ -65,8 +65,8 @@ void signal_handler(int sig){
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     QMainWindow(parent), ui(new Ui::Sayonara) {
-	ui->setupUi(this);
-	initGUI();
+    ui->setupUi(this);
+    initGUI();
     m_translator = translator;
     m_settings = CSettingsStorage::getInstance();
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
@@ -84,46 +84,38 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->lab_copyright->setText(tr("Copyright") + " 2011-2013");
 
     m_metadata_available = false;
-	m_playing = false;
-	m_mute = false;
+    m_playing = false;
+    m_mute = false;
 
-	ui_playlist = 0;
+    ui_playlist = 0;
 
-        ui_notifications = 0;//new GUI_Notifications(this);
-        ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
-        ui_language_chooser= 0;//new GUI_LanguageChooser(this);
+    ui_notifications = 0;//new GUI_Notifications(this);
+    ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
+    ui_language_chooser= 0;//new GUI_LanguageChooser(this);
 
-	m_skinSuffix = "";
-	m_class_name = "Player";
+    m_skinSuffix = "";
+    m_class_name = "Player";
 
-        m_cov_lookup = 0;//new CoverLookup();
-        m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
+    m_cov_lookup = 0;//new CoverLookup();
+    m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
 
-    ui->action_ViewLFMRadio->setVisible(m_settings->getLastFMActive());
+    //ui->action_ViewLFMRadio->setVisible(m_settings->getLastFMActive());
 
     m_min2tray = m_settings->getMinimizeToTray();
     ui->action_min2tray->setChecked(m_min2tray);
-    ui->action_only_one_instance->setChecked(m_settings->getAllowOnlyOneInstance());
 
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
-	ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
+    ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
 
-        bool showOnlyTracks = m_settings->getLibShowOnlyTracks();
-	ui->action_showOnlyTracks->setChecked(showOnlyTracks);
+    QSizePolicy p = ui->library_widget->sizePolicy();
+    m_library_stretch_factor = p.horizontalStretch();
 
-	QSizePolicy p = ui->library_widget->sizePolicy();
-	m_library_stretch_factor = p.horizontalStretch();
-
-        bool show_library = m_settings->getShowLibrary();
+    bool show_library = m_settings->getShowLibrary();
     ui->action_viewLibrary->setChecked(show_library);
     this->showLibrary(show_library);
 
-    bool live_search = m_settings->getLibLiveSheach();
-    this->ui->action_livesearch->setChecked(live_search);
-
     bool notify_new_version = m_settings->getNotifyNewVersion();
     this->ui->action_notifyNewVersion->setChecked(notify_new_version);
-
 
     bool is_fullscreen = m_settings->getPlayerFullscreen();
     if(!is_fullscreen){
@@ -140,23 +132,15 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     m_library_width = 600;
 
-#if 0
-    QString lib_path = m_settings->getLibraryPath();
-    ui_libpath = 0;
-    if(lib_path.size() == 0){
-        ui_libpath = new GUI_LibraryPath(this->ui->library_widget);
-    }
-#endif
+    /* TRAY ACTIONS */
+    this->setupTrayActions();
 
-	/* TRAY ACTIONS */
-	this->setupTrayActions();
-
-	/* SIGNALS AND SLOTS */
+    /* SIGNALS AND SLOTS */
     this->setupConnections();
 //    m_async_wa->set_url("http://sayonara.luciocarreras.de/current_version");
 //    m_async_wa->start();
 
-	ui->plugin_widget->resize(ui->plugin_widget->width(), 0);
+    ui->plugin_widget->resize(ui->plugin_widget->width(), 0);
     ui_info_dialog = 0;
 
     changeSkin(m_settings->getPlayerStyle() == 1);
@@ -164,8 +148,8 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
 
 GUI_Player::~GUI_Player() {
-	qDebug() << "closing player...";
-	delete ui;
+    qDebug() << "closing player...";
+    delete ui;
 }
 
 
@@ -228,12 +212,12 @@ QAction* GUI_Player::createAction(QKeySequence seq){
 
 void GUI_Player::initGUI() {
 
-	ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
+    ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     ui->btn_rec->setIcon(QIcon(Helper::getIconPath() + "rec.png"));
-	ui->btn_stop->setIcon(QIcon(Helper::getIconPath() + "stop.png"));
-	ui->btn_fw->setIcon(QIcon(Helper::getIconPath() + "fwd.png"));
-	ui->btn_bw->setIcon(QIcon(Helper::getIconPath() + "bwd.png"));
+    ui->btn_stop->setIcon(QIcon(Helper::getIconPath() + "stop.png"));
+    ui->btn_fw->setIcon(QIcon(Helper::getIconPath() + "fwd.png"));
+    ui->btn_bw->setIcon(QIcon(Helper::getIconPath() + "bwd.png"));
     ui->btn_correct->setIcon(QIcon(Helper::getIconPath() + "edit.png"));
 
     ui->action_viewLibrary->setText(tr("&Library"));
@@ -276,7 +260,7 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
 
     else
         ui->lab_album->setText(
-                Helper::get_album_w_disc(md) + " (" + QString::number(md.year) + ")");
+            Helper::get_album_w_disc(md) + " (" + QString::number(md.year) + ")");
 
     ui->lab_artist->setText(md.artist);
     ui->lab_title->setText(md.title);
@@ -307,10 +291,10 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
 
     ui->lab_rating->setText(tmp);
     ui->lab_rating->setToolTip(
-            QString("<font color=\"#000000\">") +
-            QString::number(md.bitrate / 1000) +
-            QString(" kBit/s") +
-            QString("</font>"));
+        QString("<font color=\"#000000\">") +
+        QString::number(md.bitrate / 1000) +
+        QString(" kBit/s") +
+        QString("</font>"));
 
     this->setWindowTitle(QString("Sayonara - ") + md.title);
 
@@ -319,7 +303,7 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
 
     fetch_cover();
 
-	setRadioMode(md.radio_mode);
+    setRadioMode(md.radio_mode);
     m_metadata_available = true;
 
     this->repaint();
@@ -365,44 +349,44 @@ void GUI_Player::fetch_cover(){
 // id3 tags have changed
 void GUI_Player::psl_id3_tags_changed(MetaDataList& v_md) {
 
-	MetaData md_new;
-	bool found = false;
+    MetaData md_new;
+    bool found = false;
 
-	for(uint i=0; i<v_md.size(); i++){
-		if(m_metadata.id == v_md[i].id){
-			m_metadata = v_md[i];
-			found = true;
-			break;
-		}
-	}
+    for(uint i=0; i<v_md.size(); i++){
+        if(m_metadata.id == v_md[i].id){
+            m_metadata = v_md[i];
+            found = true;
+            break;
+        }
+    }
 
-	if(!found) return;
+    if(!found) return;
 
-	ui->btn_correct->setVisible(false);
+    ui->btn_correct->setVisible(false);
 
-	if (m_metadata.year < 1000 || m_metadata.album.contains(QString::number(m_metadata.year)))
+    if (m_metadata.year < 1000 || m_metadata.album.contains(QString::number(m_metadata.year)))
         ui->lab_album->setText(m_metadata.album);
 
-	else
+    else
         ui->lab_album->setText(
-				m_metadata.album + " (" + QString::number(m_metadata.year) + ")");
+            m_metadata.album + " (" + QString::number(m_metadata.year) + ")");
 
     ui->lab_artist->setText(m_metadata.artist);
     ui->lab_title->setText(m_metadata.title);
 
     m_trayIcon->songChangedMessage(m_metadata);
 
-	this->setWindowTitle(QString("Sayonara - ") + m_metadata.title);
+    this->setWindowTitle(QString("Sayonara - ") + m_metadata.title);
 
-	emit sig_want_cover(m_metadata);
+    emit sig_want_cover(m_metadata);
 }
 
 
 
 
 /** LAST FM **/
-void GUI_Player::last_fm_logged_in(bool b){
-
+void GUI_Player::last_fm_logged_in(bool ){
+#if 0
     if(!b && m_settings->getLastFMActive())
         QMessageBox::warning(ui->centralwidget, tr("Warning"), tr("Cannot login to Last.fm"));
 
@@ -412,35 +396,39 @@ void GUI_Player::last_fm_logged_in(bool b){
         ui->action_ViewLFMRadio->setChecked(false);
     }
 
-	ui->action_ViewLFMRadio->setVisible(b);
+    ui->action_ViewLFMRadio->setVisible(b);
+#endif
 }
 
 
-void GUI_Player::psl_lfm_activated(bool b){
+void GUI_Player::psl_lfm_activated(bool ){
+#if 0
 /// TODO
 //    show_lfm_radio(false);
-	ui->action_ViewLFMRadio->setChecked(false);
+    ui->action_ViewLFMRadio->setChecked(false);
 
-	ui->action_ViewLFMRadio->setVisible(b);
+    ui->action_ViewLFMRadio->setVisible(b);
+#endif
 }
 
 
 void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected){
-
+#if 0
     m_metadata_corrected = md;
 
     bool radio_off = (m_metadata.radio_mode == RADIO_OFF);
     bool get_lfm_corrections = m_settings->getLastFMCorrections();
 
     ui->btn_correct->setVisible(corrected &&
-    							radio_off &&
-    							get_lfm_corrections);
+                                radio_off &&
+                                get_lfm_corrections);
 
-	if(loved){
+    if(loved){
         ui->lab_title->setText(ui->lab_title->text());
-	}
+    }
 
-	this->repaint();
+    this->repaint();
+#endif
 }
 
 void GUI_Player::correct_btn_clicked(bool)
@@ -483,19 +471,19 @@ void GUI_Player::correct_btn_clicked(bool)
 
 void GUI_Player::setStyle(int style){
 
-	bool dark = (style == 1);
-	changeSkin(dark);
-	ui->action_Dark->setChecked(dark);
+    bool dark = (style == 1);
+    changeSkin(dark);
+    ui->action_Dark->setChecked(dark);
 }
 
 void GUI_Player::changeSkin(bool dark) {
 
     QString stylesheet = Style::get_style(dark);
 
-	this->setStyleSheet(stylesheet);
+    this->setStyleSheet(stylesheet);
 
-	if (dark) 	m_skinSuffix = QString("_dark");
-	else 		m_skinSuffix = QString("");
+    if (dark) 	m_skinSuffix = QString("_dark");
+    else 		m_skinSuffix = QString("");
 
     m_settings->setPlayerStyle(dark ? 1 : 0);
     this->m_trayIcon->change_skin(stylesheet);
@@ -510,7 +498,7 @@ void GUI_Player::changeSkin(bool dark) {
 void GUI_Player::setupTrayActions() {
 
 
-	m_trayIcon = new GUI_TrayIcon(this);
+    m_trayIcon = new GUI_TrayIcon(this);
 
 
     connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(stopClicked()));
@@ -523,10 +511,10 @@ void GUI_Player::setupTrayActions() {
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
 
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-      		this, 		SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
+            this, 		SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
 
     connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)),
-   			this, 		SLOT(volumeChangedByTick(int)));
+            this, 		SLOT(volumeChangedByTick(int)));
 
 
     m_trayIcon->setPlaying(false);
@@ -571,16 +559,16 @@ void GUI_Player::trayItemActivated (QSystemTrayIcon::ActivationReason reason) {
 /** LIBRARY AND PLAYLIST **/
 
 QWidget* GUI_Player::getParentOfPlaylist() {
-	return ui->playlist_widget;
+    return ui->playlist_widget;
 }
 
 QWidget* GUI_Player::getParentOfLibrary() {
-	return ui->library_widget;
+    return ui->library_widget;
 }
 
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist) {
-	ui_playlist = playlist;
+    ui_playlist = playlist;
 #if 0
     if(ui_playlist){
         ui_playlist->show();
@@ -612,23 +600,23 @@ void GUI_Player::setLibrary(GUI_Library_windowed* library) {
 
 void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph){
 #if 0
-	_pph = pph;
+    _pph = pph;
 
-	QList<PlayerPlugin*> lst = _pph->get_all_plugins();
+    QList<PlayerPlugin*> lst = _pph->get_all_plugins();
     QList<QAction*> actions;
 
     foreach(PlayerPlugin* p, lst){
-		QAction* action = p->getAction();
+        QAction* action = p->getAction();
         action->setData(p->getName());
-		// action is connected in Plugin itself
+        // action is connected in Plugin itself
         actions << action;
-	}
+    }
 
 
     this->ui->menuView->insertActions(this->ui->action_Dark, actions);
     this->ui->menuView->insertSeparator(this->ui->action_Dark);
 
-	connect(_pph, SIGNAL(sig_show_plugin(PlayerPlugin*)), this, SLOT(showPlugin(PlayerPlugin*)));
+    connect(_pph, SIGNAL(sig_show_plugin(PlayerPlugin*)), this, SLOT(showPlugin(PlayerPlugin*)));
     connect(_pph, SIGNAL(sig_hide_all_plugins()), this, SLOT(hideAllPlugins()));
 #endif
 }
@@ -639,7 +627,7 @@ void GUI_Player::stopped(){
 }
 
 void GUI_Player::psl_reload_library_allowed(bool b){
-	this->ui->action_reloadLibrary->setEnabled(b);	
+    this->ui->action_reloadLibrary->setEnabled(b);	
 }
 
 
@@ -649,11 +637,11 @@ void GUI_Player::psl_reload_library_allowed(bool b){
 // prvt fct
 void GUI_Player::setRadioMode(int radio){
 
-    bool stream_ripper = m_settings->getStreamRipper();
-	ui->btn_bw->setEnabled(radio == RADIO_OFF);
-	ui->btn_fw->setEnabled(radio != RADIO_STATION);
+    bool stream_ripper = false;//m_settings->getStreamRipper();
+    ui->btn_bw->setEnabled(radio == RADIO_OFF);
+    ui->btn_fw->setEnabled(radio != RADIO_STATION);
 
-	if(stream_ripper){
+    if(stream_ripper){
 
         bool btn_rec_visible = (radio != RADIO_OFF);
 
@@ -668,14 +656,14 @@ void GUI_Player::setRadioMode(int radio){
         }
 
         ui->btn_play->setEnabled(radio == RADIO_OFF);
-	}
+    }
 
-	else{
+    else{
 
-		ui->btn_rec->setVisible(false);
+        ui->btn_rec->setVisible(false);
         ui->btn_play->setVisible(true);
-		ui->btn_play->setEnabled(radio == RADIO_OFF);
-	}
+        ui->btn_play->setEnabled(radio == RADIO_OFF);
+    }
 
     m_trayIcon->set_enable_play(radio == RADIO_OFF);
     m_trayIcon->set_enable_fwd(radio != RADIO_STATION);
@@ -690,16 +678,16 @@ void GUI_Player::setRadioMode(int radio){
 // public slot
 void GUI_Player::psl_strrip_set_active(bool b){
 
-	if(b){
+    if(b){
         ui->btn_play->setVisible(m_metadata.radio_mode == RADIO_OFF);
         ui->btn_rec->setVisible(m_metadata.radio_mode != RADIO_OFF);
-	}
+    }
 
-	else{
-		ui->btn_play->setVisible(true);
+    else{
+        ui->btn_play->setVisible(true);
         ui->btn_play->setEnabled(m_metadata.radio_mode == RADIO_OFF);
-		ui->btn_rec->setVisible(false);
-	}
+        ui->btn_rec->setVisible(false);
+    }
 
     emit sig_rec_button_toggled(ui->btn_rec->isChecked() && ui->btn_rec->isVisible());
 }
@@ -707,11 +695,11 @@ void GUI_Player::psl_strrip_set_active(bool b){
 
 void GUI_Player::ui_loaded(){
 
-    #ifdef Q_OS_UNIX
-		obj_ref = this;
+#ifdef Q_OS_UNIX
+    obj_ref = this;
 
-        signal(SIGWINCH, signal_handler);
-	#endif
+    signal(SIGWINCH, signal_handler);
+#endif
 //    if(ui_libpath)
 //        ui_libpath->resize(this->ui->library_widget->size());
 
@@ -754,7 +742,7 @@ void GUI_Player::resizeEvent(QResizeEvent* e) {
 //            ui_library->resize(ui->library_widget->size());
 //    }
 
-	QSize sz = ui->plugin_widget->size();
+    QSize sz = ui->plugin_widget->size();
 
 
     _pph->resize(sz);
@@ -768,19 +756,19 @@ void GUI_Player::keyPressEvent(QKeyEvent* e) {
 
     e->accept();
 
-	switch (e->key()) {
+    switch (e->key()) {
 
-        case (Qt::Key_F10):
-            ui->action_Dark->setChecked(!ui->action_Dark->isChecked());
-            break;
+    case (Qt::Key_F10):
+        ui->action_Dark->setChecked(!ui->action_Dark->isChecked());
+        break;
 
-		case (Qt::Key_F11):
-			show_fullscreen_toggled(!this->isFullScreen());
-			break;
+    case (Qt::Key_F11):
+        show_fullscreen_toggled(!this->isFullScreen());
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 
 
@@ -795,8 +783,8 @@ void GUI_Player::closeEvent(QCloseEvent* e){
 
 void GUI_Player::really_close(bool b){
 
-	m_min2tray = false;
-	this->close();
+    m_min2tray = false;
+    this->close();
 }
 
 
@@ -804,20 +792,20 @@ void GUI_Player::async_wa_finished(){
 
     QString new_version = "1.0";//m_async_wa->get_data();
     QString cur_version = m_settings->getVersion();
-	new_version = new_version.trimmed();
+    new_version = new_version.trimmed();
 
-	qDebug() << "Newest Version: " << new_version;
-	qDebug() << "This Version:   " << cur_version;
+    qDebug() << "Newest Version: " << new_version;
+    qDebug() << "This Version:   " << cur_version;
 
-	if(new_version > cur_version && m_settings->getNotifyNewVersion()){
-		QMessageBox::information(this, 
-					tr("Info"), 
-					tr("A new version is available!"));
-	}
+    if(new_version > cur_version && m_settings->getNotifyNewVersion()){
+        QMessageBox::information(this, 
+                                 tr("Info"), 
+                                 tr("A new version is available!"));
+    }
 }
 
 void GUI_Player::sl_notify_new_version(bool b){
-	m_settings->setNotifyNewVersion(b);
+    m_settings->setNotifyNewVersion(b);
 }
 
 

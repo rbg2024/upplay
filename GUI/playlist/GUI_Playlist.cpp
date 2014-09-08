@@ -177,16 +177,6 @@ void GUI_Playlist::library_path_changed(QString path){
 
 
 void GUI_Playlist::check_dynamic_play_button(){
-
-    QString libraryPath = CSettingsStorage::getInstance()->getLibraryPath();
-
-    if(libraryPath.size() == 0 || !QFile::exists(libraryPath)){
-        ui->btn_dynamic->setToolTip(tr("Please set library path first"));
-    }
-
-    else{
-        ui->btn_dynamic->setToolTip(tr("Dynamic playing"));
-    }
 }
 
 // Slot: comes from listview

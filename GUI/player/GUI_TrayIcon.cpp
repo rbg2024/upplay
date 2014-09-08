@@ -54,7 +54,7 @@ GUI_TrayIcon::GUI_TrayIcon (QObject *parent) : QSystemTrayIcon (parent) {
     m_vol_step = 5;
 
 //    m_plugin_loader = NotificationPluginLoader::getInstance();
-    m_notification_active = m_settings->getShowNotification();
+    m_notification_active = m_settings->getShowNotifications();
     m_timeout = m_settings->getNotificationTimeout();
     
     _timer = new QTimer(this);

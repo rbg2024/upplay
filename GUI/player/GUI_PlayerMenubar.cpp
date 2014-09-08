@@ -71,51 +71,10 @@ void GUI_Player::folderSelectedClicked(bool) {
 // -> base
 void GUI_Player::importFolderClicked(bool b){
 	Q_UNUSED(b);
-#if 0
-    QString lib_path = m_settings->getLibraryPath();
-
-    if(lib_path.size() == 0 || !QFile::exists(lib_path)){
-
-        int ret = QMessageBox::warning(this, tr("No library path"), tr("Please select library path first"), QMessageBox::Ok, QMessageBox::Cancel);
-        if(ret == QMessageBox::Cancel) return;
-
-        setLibraryPathClicked();
-        return;
-    }
-
-	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-				QDir::homePath(), QFileDialog::ShowDirsOnly);
-
-	if(dir.size() > 0){
-		emit sig_import_dir(dir);
-	}
-#endif
 }
 
 void GUI_Player::importFilesClicked( bool b ){
    Q_UNUSED(b);
-#if 0
-    QString lib_path = m_settings->getLibraryPath();
-
-    if(lib_path.size() == 0 || !QFile::exists(lib_path)){
-
-        int ret = QMessageBox::warning(this, 
-                                       tr("No library path"), 
-                                       tr("Please select library path first"), 
-                                       QMessageBox::Ok, QMessageBox::Cancel);
-        if(ret == QMessageBox::Cancel) return;
-
-        setLibraryPathClicked();
-        return;
-    }
-
-    QStringList extensions = Helper::get_soundfile_extensions();
-    QString filter = QString("Soundfiles (") + extensions.join(" ") + ")";
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Import Files"),
-					QDir::homePath(), filter);
-
-    if(files.size() > 0) emit sig_import_files(files);
-#endif
 }
 
 
@@ -191,11 +150,6 @@ void GUI_Player::show_fullscreen_toggled(bool b){
 }
 
 void GUI_Player::sl_show_only_tracks(bool b){
-
-    m_settings->setLibShowOnlyTracks(b);
-
-	emit sig_show_only_tracks(b);
-
 }
 
 /** VIEW END **/
@@ -208,61 +162,10 @@ void GUI_Player::sl_show_only_tracks(bool b){
 // -> base
 void GUI_Player::setLibraryPathClicked(bool b) {
 	Q_UNUSED(b);
-
-	QString start_dir = QDir::homePath();
-        QString old_dir = m_settings->getLibraryPath();
-
-    if (old_dir.size() > 0 && QFile::exists(old_dir)){
-		start_dir = old_dir;
-    }
-
-	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-			old_dir, QFileDialog::ShowDirsOnly);
-    if (dir.size() > 0 && (old_dir.compare(dir) != 0)) {
-		emit libpath_changed(dir);
-#if 0
-
-        m_settings->setLibraryPath(dir);
-        if(this->ui_libpath && ui_libpath->isVisible()){
-            ui_libpath->hide();
-            ui_libpath = 0;
-            if(m_settings->getShowLibrary()){
-                ui_library->show();
-                ui_library->resize(this->ui->library_widget->size());
-            }
-        }
-#endif
-
-        QMessageBox dialog(this);
-
-		dialog.setFocus();
-		dialog.setIcon(QMessageBox::Question);
-		dialog.setText("<b>" + tr("Library") + "</b>");
-		dialog.setInformativeText(tr("Do you want to reload the Library?"));
-		dialog.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-		dialog.setDefaultButton(QMessageBox::Yes);
-
-		int answer = dialog.exec();
-		if(answer == QMessageBox::Yes)
-            emit reloadLibrary(true);
-
-		dialog.close();
-	}
 }
 
 void GUI_Player::psl_libpath_changed(QString & dir){
-
-    if (dir.size() > 0 && ui_libpath) {
-#if 0
-        if(ui_libpath->isVisible() && this->ui->library_widget->isVisible()){
-            ui_libpath->hide();
-
-            ui_library->show();
-            ui_library->resize(this->ui->library_widget->size());
-        }
-#endif
-        ui_libpath = 0;
-    }
+	Q_UNUSED(dir);
 }
 
 
@@ -290,7 +193,6 @@ void GUI_Player::min2tray_toggled(bool b){
 }
 
 void GUI_Player::only_one_instance_toggled(bool b){
-    m_settings->setAllowOnlyOneInstance(b);
 }
 
 // prvt slot
@@ -317,7 +219,7 @@ void GUI_Player::lastFMClicked(bool b) {
 }
 
 void GUI_Player::sl_live_search(bool b){
-   m_settings->setLibLiveSearch(b);
+//   m_settings->setLibLiveSearch(b);
 }
 
 void GUI_Player::sl_action_language_toggled(bool b){

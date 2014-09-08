@@ -312,17 +312,6 @@ void Playlist::psl_save_playlist(const QString& filename, const MetaDataList& v_
 
 
 void Playlist::save_stream_playlist(){
-
-    if(_v_stream_playlist.size() == 0) {
-
-        return;
-    }
-
-    QString title = "Radio_" + QDate::currentDate().toString("yyyy-mm-dd");
-    title += QTime::currentTime().toString("hh.mm");
-    QString dir = _settings->getStreamRipperPath() + QDir::separator();
-
-    psl_save_playlist(dir + title + ".m3u", _v_stream_playlist, false);
 }
 
 

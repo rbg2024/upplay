@@ -65,7 +65,6 @@ private:
     GUI_Playlist* 	 ui_playlist;
 
     CSettingsStorage*    set;
-    SettingsThread*      _setting_thread;
     QApplication*        app;
 
     bool		 _initialized;

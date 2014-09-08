@@ -79,7 +79,6 @@ Application::Application(QApplication* qapp, int,
     set->setVersion(version);
 
     player = new GUI_Player(translator);
-    _setting_thread  = new SettingsThread(player);
     playlist = new Playlist();
 
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
@@ -138,24 +137,16 @@ Application::Application(QApplication* qapp, int,
 
     ui_playlist->resize(player->getParentOfPlaylist()->size());
 
-    int vol = set->getVolume();
-    player->setVolume(vol);
-
     player->ui_loaded();
 
     _initialized = true;
-
-    _setting_thread->start();
 }
 
 Application::~Application()
 {
-    _setting_thread->stop();
-
     delete ui_playlist;
     delete playlist;
     delete player;
-    
 }
 
 void Application::init_connections()

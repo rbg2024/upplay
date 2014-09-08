@@ -4,3 +4,4 @@ Makefile
 .moc
 .obj
 GUI/player/player
+\#*

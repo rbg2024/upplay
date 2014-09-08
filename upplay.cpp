@@ -104,9 +104,9 @@ int main(int argc, char **argv)
     //mylib->setLogFileName("/tmp/libupnp.log");
 
     QFont font("DejaVu Sans", 9, 55,  false);
-	font.setHintingPreference(QFont::PreferNoHinting);
-	int strategy =  (QFont::PreferDefault | QFont::PreferQuality);
-	font.setStyleStrategy((QFont::StyleStrategy) strategy  );
+    font.setHintingPreference(QFont::PreferNoHinting);
+    int strategy =  (QFont::PreferDefault | QFont::PreferQuality);
+    font.setStyleStrategy((QFont::StyleStrategy) strategy  );
     app.setFont(font);
 
     Application application(&app, params.size(), 0);
