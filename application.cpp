@@ -163,8 +163,10 @@ void Application::init_connections()
     CONNECT(player, pause(), avto, pause());
     // the search (actually seek) param is in percent
     CONNECT(player, search(int), avto, seekPC(int));
+    CONNECT(avto, secsInSongChanged(quint32), 
+            player, setCurrentPosition(quint32));
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
-    CONNECT(rdco, volumeChanged(int), player, setVolume(int));
+    CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
     CONNECT(player, fileSelected(QStringList &), playlist, psl_createPlaylist(QStringList&));
 
     CONNECT(player, play(), playlist, psl_play());

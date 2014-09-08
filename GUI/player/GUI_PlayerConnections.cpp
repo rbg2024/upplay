@@ -117,10 +117,10 @@ void GUI_Player::setupConnections(){
 
     connect(ui->songProgress, SIGNAL(searchSliderReleased(int)), this,
     		SLOT(setProgressJump(int)));
-	connect(ui->songProgress, SIGNAL(searchSliderPressed(int)), this,
-			SLOT(setProgressJump(int)));
-	connect(ui->songProgress, SIGNAL(searchSliderMoved(int)), this,
-			SLOT(setProgressJump(int)));
+//    connect(ui->songProgress, SIGNAL(searchSliderPressed(int)), this,
+//            SLOT(setProgressJump(int)));
+    connect(ui->songProgress, SIGNAL(searchSliderMoved(int)), this,
+            SLOT(setProgressJump(int)));
 
 
 

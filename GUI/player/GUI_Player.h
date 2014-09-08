@@ -95,10 +95,11 @@ public slots:
       * Set current position in filestream
       */
     void psl_strrip_set_active(bool);
-    void setVolume(int vol);
     void trayItemActivated (QSystemTrayIcon::ActivationReason reason);
     void stopped();
 
+    void setVolume(int vol);
+    void setVolumeUi(int volume_percent);
 
     /* Plugins */
 
@@ -278,6 +279,7 @@ private:
 
     void setupTrayActions ();
 
+    void setVolume(int vol, bool dostore, bool doemit);
     void setupVolButton(int percent);
     void initGUI();
     void setupConnections();
@@ -286,7 +288,6 @@ private:
     void fetch_cover();
     QAction* createAction(QKeySequence key_sequence);
     QAction* createAction(QList<QKeySequence>& key_sequences);
-
 };
 
 

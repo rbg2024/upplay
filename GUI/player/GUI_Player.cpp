@@ -443,7 +443,8 @@ void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected
 	this->repaint();
 }
 
-void GUI_Player::correct_btn_clicked(bool b){
+void GUI_Player::correct_btn_clicked(bool)
+{
 
     if(!ui_info_dialog)
         return;
