@@ -18,25 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <functional>
+
+using namespace std;
 
 #include <QApplication>
+#include <QMap>
+#include <QSharedMemory>
+#include <QMessageBox>
+
+#include "application.h"
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"
-
+#include "GUI/renderchoose/renderchoose.h"
 #include "playlist/Playlist.h"
-
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
-
-#include <QMap>
-#include <QSharedMemory>
-
-#include <iostream>
-#include <fstream>
-#include <string>
 
 #include "libupnpp/upnpplib.hxx"
 #include "libupnpp/control/mediarenderer.hxx"
@@ -44,21 +46,30 @@
 #include "libupnpp/control/discovery.hxx"
 using namespace UPnPClient;
 
-using namespace std;
-
 UPnPDeviceDirectory *superdir;
 
-MRDH getRenderer(const string& friendlyName)
+static MRDH getRenderer(const string& name, bool isfriendlyname)
 {
     if (superdir == 0) {
         superdir = UPnPDeviceDirectory::getTheDir();
+        if (superdir == 0) {
+            cerr << "Can't create UPnP discovery object" << endl;
+            exit(1);
+        }
     }
 
     UPnPDeviceDesc ddesc;
-    if (superdir->getDevByFName(friendlyName, ddesc)) {
-        return MRDH(new MediaRenderer(ddesc));
+    if (isfriendlyname) {
+        if (superdir->getDevByFName(name, ddesc)) {
+            return MRDH(new MediaRenderer(ddesc));
+        }
+        cerr << "getDevByFname failed" << endl;
+    } else {
+        if (superdir->getDevByUDN(name, ddesc)) {
+            return MRDH(new MediaRenderer(ddesc));
+        }
+        cerr << "getDevByFname failed" << endl;
     }
-    cerr << "getDevByFname failed" << endl;
     return MRDH();
 }
 
@@ -67,6 +78,68 @@ bool Application::is_initialized()
     return _initialized;
 }
 
+bool Application::setupRenderer(const string& uid)
+{
+    delete rdco;
+    delete avto;
+
+    MRDH rdr = getRenderer(uid, false);
+    if (!rdr) {
+        cerr << "Renderer " << uid << " not found" << endl;
+        return false;
+    }
+
+    AVTH avt = rdr->avt();
+    if (!avt) {
+        cerr << "Device " << uid << 
+            " has no AVTransport service" << endl;
+        return false;
+    }
+
+    RDCH rdc = rdr->rdc();
+    if (!rdc) {
+        cerr << "Device " << uid << 
+            " has no RenderingControl service" << endl;
+        return false;
+    }
+
+    rdco = new RenderingControlQO(rdc);
+    avto = new AVTPlayer(avt);
+    return true;
+}
+
+void Application::chooseRenderer()
+{
+    vector<UPnPDeviceDesc> devices;
+    if (!MediaRenderer::getDeviceDescs(devices) || devices.empty()) {
+        QMessageBox::warning(0, "Upplay", 
+                             tr("No Media Renderers found."));
+        return;
+    }
+    RenderChooseDLG dlg;
+    for (auto it = devices.begin(); it != devices.end(); it++) {
+        dlg.rndsLW->addItem(QString::fromUtf8(it->friendlyName.c_str()));
+    }
+    if (!dlg.exec())
+        return;
+
+    int row = dlg.rndsLW->currentRow();
+    if (row < 0 || row >= int(devices.size())) {
+        cerr << "Internal error: bad row after renderer choose dlg" << endl;
+        return;
+    }
+
+    qDebug() << "Choosen: " << devices[row].friendlyName.c_str();
+
+    if (!setupRenderer(devices[row].UDN)) {
+        QMessageBox::warning(
+            0, "Upplay", tr("Can't connect to ") + 
+            QString::fromUtf8(devices[row].friendlyName.c_str()));
+        return;
+    }
+    set->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
+    renderer_connections();
+}
 
 Application::Application(QApplication* qapp, int, 
                          QTranslator* translator, QObject *parent)
@@ -84,49 +157,27 @@ Application::Application(QApplication* qapp, int,
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
 
     cdb = new CDBrowser(player->getParentOfLibrary());
+    
+    rdco = 0;
+    avto = 0;
 
-    const string friendlyName("UpMpd-bureau");
-//    const string friendlyName("BubbleUPnP (NookColor)");
-
-    MRDH rdr = getRenderer(friendlyName);
-    if (!rdr) {
-        cerr << "Renderer " << friendlyName << " not found" << endl;
-        return;
+    string uid = qs2utf8s(set->getPlayerUID());
+    if (uid.empty()) {
+        chooseRenderer();
+        if (rdco == 0) {
+            exit(1);
+        }
+    } else {
+        if (!setupRenderer(uid)) {
+            cerr << "Can't connect to media renderer" << endl;
+            exit(1);
+        }
     }
-
-    AVTH avt = rdr->avt();
-    if (!avt) {
-        cerr << "Device " << friendlyName << 
-            " has no AVTransport service" << endl;
-        return;
-    }
-
-    RDCH rdc = rdr->rdc();
-    if (!rdc) {
-        cerr << "Device " << friendlyName << 
-            " has no RenderingControl service" << endl;
-        return;
-    }
-
-    rdco = new RenderingControlQO(rdc);
-    avto = new AVTPlayer(avt);
-
-
-    QString dir;
-
-#ifdef Q_OS_UNIX
-    dir = "/usr/lib/sayonara";
-#else
-    dir = app->applicationDirPath();
-#endif
-
-    // The actual audio player. MediaRenderer here.
-    // listen = engine_plugin_loader->get_cur_engine();
 
     init_connections();
 
     qDebug() << "setting up player";
-    player->setWindowTitle("Sayonara " + version);
+    player->setWindowTitle("Upplay " + version);
     player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
     player->setPlaylist(ui_playlist);
@@ -144,52 +195,57 @@ Application::Application(QApplication* qapp, int,
 
 Application::~Application()
 {
-    delete ui_playlist;
-    delete playlist;
-    delete player;
 }
 
-void Application::init_connections()
+void Application::renderer_connections()
 {
     CONNECT(player, pause(), avto, pause());
     // the search (actually seek) param is in percent
     CONNECT(player, search(int), avto, seekPC(int));
     CONNECT(avto, secsInSongChanged(quint32), 
             player, setCurrentPosition(quint32));
+
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
-    CONNECT(player, fileSelected(QStringList &), playlist, psl_createPlaylist(QStringList&));
+    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
+            avto, changeTrack(const MetaData&, int, bool));
+    CONNECT(playlist, sig_no_track_to_play(),  avto, stop());
+    CONNECT(playlist, sig_goon_playing(), avto, play());
+}
+
+void Application::init_connections()
+{
+    if (avto && rdco)
+        renderer_connections();
 
     CONNECT(player, play(), playlist, psl_play());
     CONNECT(player, pause(), playlist, psl_pause());
     CONNECT(player, stop(), playlist, psl_stop());
-
     CONNECT(player, forward(), playlist, psl_forward());
     CONNECT(player, backward(), playlist, psl_backward());
 
-    CONNECT(player, show_small_playlist_items(bool), ui_playlist, psl_show_small_playlist_items(bool));
+    CONNECT(player, show_small_playlist_items(bool), 
+            ui_playlist, psl_show_small_playlist_items(bool));
+    CONNECT(player, sig_choose_renderer(), this, chooseRenderer());
 
     CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
-    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
-            avto, changeTrack(const MetaData&, int, bool));
-
-    CONNECT(playlist, sig_no_track_to_play(),  avto, stop());
     CONNECT(playlist, sig_no_track_to_play(),  player, stopped());
-    CONNECT(playlist, sig_goon_playing(), avto, play());
-    CONNECT(playlist, sig_selected_file_changed(int), ui_playlist, track_changed(int));
-    CONNECT(playlist, sig_playlist_created(MetaDataList&, int, int), ui_playlist, fillPlaylist(MetaDataList&, int, int));
+    CONNECT(playlist, sig_selected_file_changed(int), 
+            ui_playlist, track_changed(int));
+    CONNECT(playlist, sig_playlist_created(MetaDataList&, int, int), 
+            ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
-    CONNECT(ui_playlist, selected_row_changed(int),  playlist, psl_change_track(int));
+    CONNECT(ui_playlist, selected_row_changed(int),  
+            playlist, psl_change_track(int));
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
-    CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), playlist, psl_playlist_mode_changed(const Playlist_Mode&));
-    CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), playlist, psl_insert_tracks(const MetaDataList&, int));
-    CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), playlist, psl_remove_rows(const QList<int>&, bool));
+    CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), 
+            playlist, psl_playlist_mode_changed(const Playlist_Mode&));
+    CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
+            playlist, psl_insert_tracks(const MetaDataList&, int));
+    CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
+            playlist, psl_remove_rows(const QList<int>&, bool));
 
-//    CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
-//            playlist, psl_createPlaylist(MetaDataList&));
-//    CONNECT(library, sig_append_tracks_to_playlist(MetaDataList&),
-//            playlist, psl_append_tracks(MetaDataList&));
     CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
             playlist, psl_append_tracks(MetaDataList&));
 }

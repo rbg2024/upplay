@@ -31,70 +31,11 @@
 
 
 /** FILE **/
-void GUI_Player::fileSelectedClicked(bool) {
-
-	QStringList filetypes = Helper::get_soundfile_extensions();
-    filetypes.append(Helper::get_playlistfile_extensions());
-	QString filetypes_str = QString(tr("Media files") + " (");
-	foreach(QString filetype, filetypes){
-		filetypes_str += filetype;
-		if(filetype != filetypes.last()){
-			filetypes_str += " ";
-		}
-	}
-
-	filetypes_str += ")";
-
-
-
-	QStringList list =
-			QFileDialog::getOpenFileNames(
-					this,
-					tr("Open Media files"),
-					QDir::homePath(),
-					filetypes_str);
-
-	if (list.size() > 0)
-		emit fileSelected(list);
+void GUI_Player::onChangeMediaRenderer()
+{
+    emit sig_choose_renderer();
 }
 
-void GUI_Player::folderSelectedClicked(bool) {
-	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-			getenv("$HOME"),
-			QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	if (dir != "")
-		emit baseDirSelected(dir);
-}
-
-
-// TODO: not ok
-// -> base
-void GUI_Player::importFolderClicked(bool b){
-	Q_UNUSED(b);
-}
-
-void GUI_Player::importFilesClicked( bool b ){
-   Q_UNUSED(b);
-}
-
-
-void GUI_Player::reloadLibraryClicked(bool b) {
-	Q_UNUSED(b);
-    emit reloadLibrary(false);
-}
-
-void GUI_Player::clearLibraryClicked(bool b){
-	Q_UNUSED(b);
-	emit clearLibrary();
-}
-
-
-// prvt slot
-void GUI_Player::fetch_all_covers_clicked(bool b) {
-	Q_UNUSED(b);
-//    m_cov_lookup->fetch_all_album_covers();
-    qDebug() << "Fetch all covers triggered";
-}
 /** FILE END **/
 
 
@@ -102,7 +43,7 @@ void GUI_Player::fetch_all_covers_clicked(bool b) {
 
 void GUI_Player::showLibrary(bool b, bool resize){
 
-    m_settings->setShowLibrary(b);
+    m_settings->setNoShowLibrary(!b);
     int old_width = this->width();
     int lib_width = this->ui->library_widget->width();
     int new_width = old_width;

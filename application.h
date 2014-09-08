@@ -21,6 +21,8 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <string>
+
 #include <QObject>
 
 #define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d))
@@ -51,25 +53,28 @@ class Application : public QObject
     Application(QApplication* qapp, int n_files, QTranslator* translator, 
                 QObject *parent = 0);
     virtual ~Application();
-    
+
 signals:
     
 public slots:
+    void chooseRenderer();
 
 private:
-    GUI_Player* 	 player;
-    Playlist*            playlist;
-    CDBrowser*           cdb;
-    RenderingControlQO*  rdco;
-    AVTPlayer*           avto;
-    GUI_Playlist* 	 ui_playlist;
+    GUI_Player 	 *player;
+    Playlist     *playlist;
+    CDBrowser    *cdb;
+    RenderingControlQO *rdco;
+    AVTPlayer  *avto;
+    GUI_Playlist *ui_playlist;
 
-    CSettingsStorage*    set;
-    QApplication*        app;
+    CSettingsStorage *set;
+    QApplication *app;
 
     bool		 _initialized;
 
     void init_connections();
+    void renderer_connections();
+    bool setupRenderer(const std::string& uid);
 
 public:
     void setFiles2Play(QStringList filelist);

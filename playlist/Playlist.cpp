@@ -167,7 +167,6 @@ void Playlist::send_cur_playing_signal(int i){
     if(!Helper::checkTrack(_v_meta_data[i])) return;
 
     emit sig_selected_file_changed(i);
-    cerr <<  "void Playlist::send_cur_playing_signal" << endl;
     emit sig_selected_file_changed_md(_v_meta_data[i]);
     _cur_play_idx = i;
 }

@@ -110,7 +110,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     QSizePolicy p = ui->library_widget->sizePolicy();
     m_library_stretch_factor = p.horizontalStretch();
 
-    bool show_library = m_settings->getShowLibrary();
+    bool show_library = !m_settings->getNoShowLibrary();
     ui->action_viewLibrary->setChecked(show_library);
     this->showLibrary(show_library);
 

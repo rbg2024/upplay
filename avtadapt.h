@@ -52,7 +52,7 @@ public:
         }
 
 public slots:
-    void changeTrack(const MetaData& md, int pos_secs, bool playnow)
+    void changeTrack(const MetaData& md, int /*pos_secs*/, bool /*playnow*/)
     {
         cerr << "MetaDataAdaptor:: changetrack" << endl;
         MetaDataAdaptor mad(md);

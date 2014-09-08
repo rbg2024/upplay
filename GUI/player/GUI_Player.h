@@ -124,12 +124,7 @@ signals:
 
 
     /* File */
-    void fileSelected (QStringList & filelist);
-    void baseDirSelected (const QString & baseDir);
-    void sig_import_dir(const QString&);
-    void sig_import_files(const QStringList&);
-    void reloadLibrary(bool clear);
-    void clearLibrary();
+    void sig_choose_renderer();
 
     /* Preferences / View */
     void show_playlists();
@@ -149,7 +144,6 @@ signals:
     void sig_fetch_all_covers();
 
     void sig_stream_selected(const QString&, const QString&);
-
 
 
 private slots:
@@ -172,12 +166,7 @@ private slots:
     void volumeLower();
 
     /* File */
-    void fileSelectedClicked(bool);
-    void folderSelectedClicked(bool);
-    void reloadLibraryClicked(bool b = true);
-    void clearLibraryClicked(bool b = true);
-    void importFolderClicked(bool b = true);
-    void importFilesClicked(bool b = true);
+    void onChangeMediaRenderer();
 
     /* View */
     void showLibrary(bool, bool resize=true);
@@ -186,13 +175,11 @@ private slots:
     void show_notification_toggled(bool);
     void show_fullscreen_toggled(bool);
 
-
     /* Preferences */
     void sl_action_language_toggled(bool b=true);
     void lastFMClicked(bool b = true);
     void setLibraryPathClicked(bool b = true);
 
-    void fetch_all_covers_clicked(bool b = true);
     void load_pl_on_startup_toggled(bool);
     void min2tray_toggled(bool);
     void only_one_instance_toggled(bool);

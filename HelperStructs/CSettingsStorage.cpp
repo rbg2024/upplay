@@ -44,7 +44,7 @@ void CSettingsStorage::save_all()
     sync();
 }
 
-#define PROCESS_VARIABLE(NM, TP, CTP)      \
+#define GENCODE_VARIABLE(NM, TP, CTP)      \
     static const QString NM##Key(#NM);     \
     void CSettingsStorage::set##NM(TP val) \
     {                                      \
@@ -56,29 +56,29 @@ void CSettingsStorage::save_all()
     }
 
 
-PROCESS_VARIABLE(Version, QString, String)
+GENCODE_VARIABLE(Version, QString, String)
 
 bool CSettingsStorage::isRunFirstTime () 
 {
     return value(VersionKey).isNull();
 }
 
-PROCESS_VARIABLE(Volume, int, Int)
-PROCESS_VARIABLE(PlayerSize, QSize, Size)
-PROCESS_VARIABLE(PlayerPos, QPoint, Point)
-PROCESS_VARIABLE(PlayerFullscreen, bool, Bool)
-PROCESS_VARIABLE(PlayerStyle, int, Int)
-PROCESS_VARIABLE(ShowNotifications, bool, Bool)
-PROCESS_VARIABLE(Notification, QString, String)
-PROCESS_VARIABLE(NotificationTimeout, int, Int)
-PROCESS_VARIABLE(NotificationScale, int, Int)
-PROCESS_VARIABLE(ShowLibrary, bool, Bool)
-PROCESS_VARIABLE(MinimizeToTray, bool, Bool)
-PROCESS_VARIABLE(ShowSmallPlaylist, bool, Bool)
-PROCESS_VARIABLE(PlaylistNumbers, bool, Bool)
-PROCESS_VARIABLE(Language, QString, String)
-PROCESS_VARIABLE(NotifyNewVersion, bool,  Bool)
-
+GENCODE_VARIABLE(Volume, int, Int)
+GENCODE_VARIABLE(PlayerSize, QSize, Size)
+GENCODE_VARIABLE(PlayerPos, QPoint, Point)
+GENCODE_VARIABLE(PlayerFullscreen, bool, Bool)
+GENCODE_VARIABLE(PlayerStyle, int, Int)
+GENCODE_VARIABLE(ShowNotifications, bool, Bool)
+GENCODE_VARIABLE(Notification, QString, String)
+GENCODE_VARIABLE(NotificationTimeout, int, Int)
+GENCODE_VARIABLE(NotificationScale, int, Int)
+GENCODE_VARIABLE(NoShowLibrary, bool, Bool)
+GENCODE_VARIABLE(MinimizeToTray, bool, Bool)
+GENCODE_VARIABLE(ShowSmallPlaylist, bool, Bool)
+GENCODE_VARIABLE(PlaylistNumbers, bool, Bool)
+GENCODE_VARIABLE(Language, QString, String)
+GENCODE_VARIABLE(NotifyNewVersion, bool,  Bool)
+GENCODE_VARIABLE(PlayerUID, QString, String)
 
 ///////////////////////////////////////////////////
 // Maybe later section

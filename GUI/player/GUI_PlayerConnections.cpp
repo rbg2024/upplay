@@ -39,19 +39,8 @@ void GUI_Player::setupConnections(){
 	connect(ui->albumCover, SIGNAL(clicked()), this, SLOT(coverClicked()));
 
 	// file
-	connect(ui->action_OpenFile, SIGNAL(triggered(bool)), this,
-			SLOT(fileSelectedClicked(bool)));
-
-	connect(ui->action_OpenFolder, SIGNAL(triggered(bool)), this,
-			SLOT(folderSelectedClicked(bool)));
-	connect(ui->action_ImportFolder, SIGNAL(triggered(bool)), this,
-				SLOT(importFolderClicked()));
-        connect(ui->action_ImportFiles, SIGNAL(triggered(bool)), this,
-                        SLOT(importFilesClicked()));
-	connect(ui->action_reloadLibrary, SIGNAL(triggered(bool)), this,
-				SLOT(reloadLibraryClicked(bool)));
-        connect(ui->action_clearLibrary, SIGNAL(triggered(bool)), this,
-				SLOT(clearLibraryClicked(bool)));
+        connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)), 
+                this, SLOT(onChangeMediaRenderer()));
 
 	connect(ui->action_Close, SIGNAL(triggered(bool)), this,
 				SLOT(really_close(bool)));

@@ -65,22 +65,11 @@ protected:
 
 public:
 
-    void set_sth_changed(bool);
-
-    bool get_sth_changed();
     QString getVersion();
     void setVersion(QString str);
 
-    QPair<QString,QString> getLastFMNameAndPW ();
-    bool getLastFMActive();
-    void setLastFMActive(bool b);
-    void getLastFMNameAndPW (QString & name, QString & pw);
-    void setLastFMNameAndPW (const QString & name,const QString & pw);
-    bool getLastFMShowErrors();
-    void setLastFMShowErrors(bool b);
-
-    void setLastFMCorrections(bool checked);
-    bool getLastFMCorrections();
+    void setPlayerUID(QString);
+    QString getPlayerUID();
 
     int getVolume();
     void setVolume(int vol);
@@ -134,26 +123,8 @@ public:
     void setLastFMSessionKey(QString);
     QString getLastFMSessionKey();
 
-    void setShowLibrary(bool);
-    bool getShowLibrary();
-
-    void setLibShownColsTitle(QStringList lst);
-    QStringList getLibShownColsTitle();
-
-    void setLibShownColsAlbum(QStringList lst);
-    QStringList getLibShownColsAlbum();
-
-    void setLibShownColsArtist(QStringList lst);
-    QStringList getLibShownColsArtist();
-
-    void setLibSorting(QList<int> lst);
-    QList<int> getLibSorting();
-
-    void setLibShowOnlyTracks(bool);
-    bool getLibShowOnlyTracks();
-
-    void setLibLiveSearch(bool);
-    bool getLibLiveSheach();
+    void setNoShowLibrary(bool);
+    bool getNoShowLibrary();
 
     void setMinimizeToTray(bool);
     bool getMinimizeToTray();
@@ -161,38 +132,8 @@ public:
     bool getShowSmallPlaylist();
     void setShowSmallPlaylist(bool);
 
-    QString getSoundEngine();
-    void setSoundEngine(QString engine);
-
-    bool getStreamRipper();
-    void setStreamRipper(bool b);
-
-    bool getStreamRipperWarning();
-    void setStreamRipperWarning(bool b);
-
-    QString getStreamRipperPath();
-    void setStreamRipperPath(QString path);
-
-    bool getStreamRipperCompleteTracks();
-    void setStreamRipperCompleteTracks(bool b);
-
-    bool getStreamRipperSessionPath();
-    void setStreamRipperSessionPath(bool b);
-
-    bool getSocketActivated();
-    void setSocketActivated(bool b);
-
-    int getSocketFrom();
-    void setSocketFrom(int val);
-
-    int getSocketTo();
-    void setSocketTo(int val);
-
     bool getPlaylistNumbers();
     void setPlaylistNumbers(bool b);
-
-    bool getAllowOnlyOneInstance();
-    void setAllowOnlyOneInstance(bool b);
 
     QString getLanguage();
     void setLanguage(QString lang);

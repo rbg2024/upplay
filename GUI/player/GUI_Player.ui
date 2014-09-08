@@ -1033,15 +1033,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="action_OpenFile"/>
-    <addaction name="action_OpenFolder"/>
     <addaction name="separator"/>
-    <addaction name="action_ImportFolder"/>
-    <addaction name="action_ImportFiles"/>
-    <addaction name="action_reloadLibrary"/>
-    <addaction name="action_clearLibrary"/>
-    <addaction name="action_fetch_all_covers"/>
-    <addaction name="separator"/>
+    <addaction name="actionChange_Media_Renderer"/>
     <addaction name="separator"/>
     <addaction name="action_Close"/>
    </widget>
@@ -1059,7 +1052,6 @@
     </property>
     <addaction name="action_viewLibrary"/>
     <addaction name="action_smallPlaylistItems"/>
-    <addaction name="action_showOnlyTracks"/>
     <addaction name="separator"/>
     <addaction name="action_Dark"/>
     <addaction name="action_Fullscreen"/>
@@ -1075,19 +1067,10 @@
     </property>
     <addaction name="action_Language"/>
     <addaction name="separator"/>
-    <addaction name="action_setLibPath"/>
-    <addaction name="action_lastFM"/>
-    <addaction name="action_streamrecorder"/>
-    <addaction name="separator"/>
     <addaction name="action_notifications"/>
     <addaction name="action_startup"/>
     <addaction name="action_min2tray"/>
-    <addaction name="action_only_one_instance"/>
     <addaction name="action_notifyNewVersion"/>
-    <addaction name="separator"/>
-    <addaction name="action_SocketConnection"/>
-    <addaction name="separator"/>
-    <addaction name="action_livesearch"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="font">
@@ -1535,6 +1518,11 @@
     <font>
      <family>DejaVu Sans</family>
     </font>
+   </property>
+  </action>
+  <action name="actionChange_Media_Renderer">
+   <property name="text">
+    <string>Change Media Renderer</string>
    </property>
   </action>
  </widget>

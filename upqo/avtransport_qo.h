@@ -35,7 +35,7 @@ public:
         }
             
     }
-    virtual void changed(const char *nm, const char *value)
+    virtual void changed(const char */*nm*/, const char */*value*/)
     {
         //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
     }

@@ -21,6 +21,7 @@ HEADERS += \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.h \
         GUI/playlist/model/PlaylistItemModel.h \
         GUI/playlist/view/PlaylistView.h \
+        GUI/renderchoose/renderchoose.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
@@ -63,7 +64,8 @@ FORMS   = \
         GUI/player/GUI_Player.ui \
         GUI/playlist/GUI_Playlist.ui \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
-        GUI/playlist/entry/GUI_PlaylistEntrySmall.ui 
+        GUI/playlist/entry/GUI_PlaylistEntrySmall.ui \
+        GUI/renderchoose/renderchoose.ui
 
 RESOURCES = 
 
