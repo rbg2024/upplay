@@ -44,7 +44,6 @@ class CDBrowser : public QWebView
  public slots:
     virtual void serversPage();
     void onDone(int);
-    void browseContainer(std::string, std::string);
     void onSliceAvailable(const UPnPDirContent *);
 
  signals:
@@ -57,6 +56,8 @@ class CDBrowser : public QWebView
     virtual void onLinkClicked(const QUrl &);
 
  private:
+    void browseContainer(std::string, std::string);
+
     // The currently seen Media Server descriptions
     std::vector<UPnPDeviceDesc> m_msdescs;
     int m_cdsidx;

@@ -83,8 +83,10 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 	    return;
 	}
         m_cdsidx = i;
+        m_curpath.clear();
+        m_curpath.push_back(pair<string,string>("0", "(servers)"));
         m_ms = MSRH(new MediaServer(m_msdescs[m_cdsidx]));
-	browseContainer("0", "(root)");
+	browseContainer("0", m_msdescs[m_cdsidx].friendlyName);
     }
     break;
 
@@ -133,6 +135,9 @@ void CDBrowser::onLinkClicked(const QUrl &url)
         if (i == 0) {
             m_msdescs.clear();
             serversPage();
+        } else if (i == 1) {
+            // Server root
+            browseContainer("0", title);
         } else {
             browseContainer(objid, title);
         }
