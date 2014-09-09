@@ -24,34 +24,36 @@ using namespace std;
 #include "GUI/player/GUI_TrayIcon.h"
 
 /** PLAYER BUTTONS **/
-void GUI_Player::playClicked(bool) {
+void GUI_Player::playClicked(bool)
+{
 
-    if(!m_metadata_available) {
+    if (!m_metadata_available) {
         emit play();
         return;
     }
 
     if (m_playing) {
-		ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
-		emit pause();
-	}
+        ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+        emit pause();
+    }
 
     else {
-		ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
-		emit play();
-	}
+        ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+        emit play();
+    }
 
-	m_playing = !m_playing;
-        m_trayIcon->setPlaying(m_playing);
+    m_playing = !m_playing;
+    m_trayIcon->setPlaying(m_playing);
 }
 
-void GUI_Player::stopClicked(bool b) {
+void GUI_Player::stopClicked(bool b)
+{
 
 
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     m_trayIcon->setPlaying(false);
-	m_trayIcon->stop();
-	m_playing = false;
+    m_trayIcon->stop();
+    m_playing = false;
 
 
     ui->lab_title->hide();
@@ -68,44 +70,47 @@ void GUI_Player::stopClicked(bool b) {
 
 
 
-	this->setWindowTitle("Sayonara");
+    this->setWindowTitle("Sayonara");
     ui->songProgress->setValue(0);
     ui->curTime->setText("0:00");
-	ui->maxTime->setText("0:00");
+    ui->maxTime->setText("0:00");
 
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
-	if(ui->btn_rec->isVisible() && ui->btn_rec->isChecked()){
-		ui->btn_rec->setChecked(false);
+    if (ui->btn_rec->isVisible() && ui->btn_rec->isChecked()) {
+        ui->btn_rec->setChecked(false);
         emit sig_rec_button_toggled(false);
     }
 
-    if(b){
+    if (b) {
         emit stop();
-	
+
     }
 }
 
-void GUI_Player::backwardClicked(bool) {
+void GUI_Player::backwardClicked(bool)
+{
 
-   // ui->albumCover->setFocus();
-    int cur_pos_sec =  (m_completeLength_ms * ui->songProgress->value()) / 100000;
-    if(cur_pos_sec > 3){
+    // ui->albumCover->setFocus();
+    int cur_pos_sec = (m_completeLength_ms * ui->songProgress->value()) / 100000;
+    if (cur_pos_sec > 3) {
         setProgressJump(0);
     }
 
-    else{
+    else {
         emit backward();
     }
 }
 
-void GUI_Player::forwardClicked(bool) {
+void GUI_Player::forwardClicked(bool)
+{
     //ui->albumCover->setFocus();
-	emit forward();
+    emit forward();
 }
 
 
-void GUI_Player::sl_rec_button_toggled(bool b){
+void GUI_Player::sl_rec_button_toggled(bool b)
+{
 
     emit sig_rec_button_toggled(b);
 }
@@ -114,7 +119,7 @@ void GUI_Player::sl_rec_button_toggled(bool b){
 
 /** PROGRESS BAR **/
 
-void GUI_Player::total_time_changed(qint64 total_time) 
+void GUI_Player::total_time_changed(qint64 total_time)
 {
     QString length_str = Helper::cvtMsecs2TitleLengthString(total_time, true);
     m_completeLength_ms = total_time;
@@ -150,24 +155,25 @@ void GUI_Player::setProgressJump(int percent)
     emit search(percent);
 }
 
-void GUI_Player::setCurrentPosition(quint32 pos_sec) 
+void GUI_Player::setCurrentPosition(quint32 pos_sec)
 {
     if (m_completeLength_ms != 0) {
         int newSliderVal = (pos_sec * 100000) / (m_completeLength_ms);
 
-        if (!ui->songProgress->isSearching() && 
-            newSliderVal < ui->songProgress->maximum()) {
+        if (!ui->songProgress->isSearching() &&
+                newSliderVal < ui->songProgress->maximum()) {
             ui->songProgress->setValue(newSliderVal);
         }
     } else if (pos_sec > m_completeLength_ms / 1000) {
-    	ui->songProgress->setValue(0);
+        ui->songProgress->setValue(0);
     }
 
     if (!ui->songProgress->isSearching()) {
-        if (m_completeLength_ms != 0 && pos_sec > m_completeLength_ms) 
+        if (m_completeLength_ms != 0 && pos_sec > m_completeLength_ms) {
             pos_sec = 0;
+        }
 
-        QString curPosString = 
+        QString curPosString =
             Helper::cvtMsecs2TitleLengthString(pos_sec * 1000);
         ui->curTime->setText(curPosString);
     }
@@ -182,13 +188,13 @@ void GUI_Player::setCurrentPosition(quint32 pos_sec)
 /** VOLUME **/
 // Called e.g. after reading saved volume from settings: adjust ui and
 // set audio volume.
-void GUI_Player::setVolume(int volume_percent) 
+void GUI_Player::setVolume(int volume_percent)
 {
     setVolume(volume_percent, false, true);
 }
 
-// Called from audio when volume has been changed by another player. 
-void GUI_Player::setVolumeUi(int volume_percent) 
+// Called from audio when volume has been changed by another player.
+void GUI_Player::setVolumeUi(int volume_percent)
 {
     setVolume(volume_percent, false, false);
 }
@@ -205,13 +211,15 @@ void GUI_Player::setVolume(int volume_percent, bool dostore, bool doemit)
     ui->volumeSlider->blockSignals(true);
     ui->volumeSlider->setValue(volume_percent);
     ui->volumeSlider->blockSignals(false);
-    if (doemit)
+    if (doemit) {
         emit sig_volume_changed(volume_percent);
-    if (dostore)
+    }
+    if (dostore) {
         m_settings->setVolume(volume_percent);
+    }
 }
 
-void GUI_Player::volumeChangedByTick(int val) 
+void GUI_Player::volumeChangedByTick(int val)
 {
     int currentVolumeOrig_perc = this -> ui->volumeSlider->value();
     int currentVolume_perc = currentVolumeOrig_perc;
@@ -221,12 +229,16 @@ void GUI_Player::volumeChangedByTick(int val)
         //increase volume
         if (currentVolume_perc < ui->volumeSlider->maximum() - vol_step) {
             currentVolume_perc += vol_step;
-        } else currentVolumeOrig_perc = 100;
+        } else {
+            currentVolumeOrig_perc = 100;
+        }
     } else if (val < 0) {
         //decrease volume
         if (currentVolume_perc > ui->volumeSlider->minimum() + vol_step) {
             currentVolume_perc -= vol_step;
-        } else currentVolume_perc = 0;
+        } else {
+            currentVolume_perc = 0;
+        }
     }
 
     if (currentVolumeOrig_perc != currentVolume_perc) {
@@ -234,15 +246,18 @@ void GUI_Player::volumeChangedByTick(int val)
     }
 }
 
-void GUI_Player::volumeHigher(){
+void GUI_Player::volumeHigher()
+{
     volumeChangedByTick(5);
 }
 
-void GUI_Player::volumeLower(){
+void GUI_Player::volumeLower()
+{
     volumeChangedByTick(-5);
 }
 
-void GUI_Player::setupVolButton(int percent) {
+void GUI_Player::setupVolButton(int percent)
+{
 
     QString butFilename = Helper::getIconPath() + "vol_";
 
@@ -259,7 +274,8 @@ void GUI_Player::setupVolButton(int percent) {
     ui->btn_mute->setIcon(QIcon(butFilename));
 }
 
-void GUI_Player::muteButtonPressed() {
+void GUI_Player::muteButtonPressed()
+{
 
     if (m_mute) {
         m_mute = false;
