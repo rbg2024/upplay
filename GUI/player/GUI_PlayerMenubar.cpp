@@ -41,7 +41,8 @@ void GUI_Player::onChangeMediaRenderer()
 
 /** VIEW **/
 
-void GUI_Player::showLibrary(bool b, bool resize){
+void GUI_Player::showLibrary(bool b, bool resize)
+{
 
     m_settings->setNoShowLibrary(!b);
     int old_width = this->width();
@@ -49,9 +50,8 @@ void GUI_Player::showLibrary(bool b, bool resize){
     int new_width = old_width;
     this->ui->library_widget->setVisible(b);
 
-    // invisble
-    if(!b){
-
+    if (!b) {
+        // invisble
         QSizePolicy p = this->ui->library_widget->sizePolicy();
         m_library_stretch_factor = p.horizontalStretch();
 
@@ -61,18 +61,16 @@ void GUI_Player::showLibrary(bool b, bool resize){
         m_library_width = lib_width;
         new_width = old_width - lib_width;
         this->setMinimumSize(300, 500);
-	}
-
-    // visible
-	else{
+    } else {
+        // visible
         QSizePolicy p = this->ui->library_widget->sizePolicy();
-		p.setHorizontalStretch(m_library_stretch_factor);
+        p.setHorizontalStretch(m_library_stretch_factor);
         this->ui->library_widget->setSizePolicy(p);
         new_width = old_width + m_library_width;
         this->setMinimumSize(850, 500);
     }
 
-    if(resize){
+    if (resize) {
         QRect rect = this->geometry();
         rect.setWidth(new_width);
         rect.setHeight(this->height());
@@ -80,17 +78,21 @@ void GUI_Player::showLibrary(bool b, bool resize){
     }
 }
 
-void GUI_Player::show_fullscreen_toggled(bool b){
-	// may happend because of F11 too
-	ui->action_Fullscreen->setChecked(b);
-	if(b)
-		this->showFullScreen();
-	else this->showNormal();
+void GUI_Player::show_fullscreen_toggled(bool b)
+{
+    // may happend because of F11 too
+    ui->action_Fullscreen->setChecked(b);
+    if (b) {
+        this->showFullScreen();
+    } else {
+        this->showNormal();
+    }
 
     m_settings->setPlayerFullscreen(b);
 }
 
-void GUI_Player::sl_show_only_tracks(bool b){
+void GUI_Player::sl_show_only_tracks(bool b)
+{
 }
 
 /** VIEW END **/
@@ -101,88 +103,97 @@ void GUI_Player::sl_show_only_tracks(bool b){
 
 // TODO: not ok
 // -> base
-void GUI_Player::setLibraryPathClicked(bool b) {
-	Q_UNUSED(b);
+void GUI_Player::setLibraryPathClicked(bool b)
+{
+    Q_UNUSED(b);
 }
 
-void GUI_Player::psl_libpath_changed(QString & dir){
-	Q_UNUSED(dir);
+void GUI_Player::psl_libpath_changed(QString& dir)
+{
+    Q_UNUSED(dir);
 }
 
 
 // prvt slot
-void GUI_Player::sl_action_socket_connection_triggered(bool b){
-	emit sig_show_socket();
+void GUI_Player::sl_action_socket_connection_triggered(bool b)
+{
+    emit sig_show_socket();
 }
 
 // prvt slot
-void GUI_Player::load_pl_on_startup_toggled(bool b){
+void GUI_Player::load_pl_on_startup_toggled(bool b)
+{
 
     m_settings->setLoadPlaylist(b);
 }
 
 // prvt slot
-void GUI_Player::show_notification_toggled(bool active){
+void GUI_Player::show_notification_toggled(bool active)
+{
 
     m_settings->setShowNotifications(active);
 }
 
 // prvt slot
-void GUI_Player::min2tray_toggled(bool b){
+void GUI_Player::min2tray_toggled(bool b)
+{
     m_settings->setMinimizeToTray(b);
-	m_min2tray = b;
+    m_min2tray = b;
 }
 
-void GUI_Player::only_one_instance_toggled(bool b){
+void GUI_Player::only_one_instance_toggled(bool b)
+{
 }
 
 // prvt slot
-void GUI_Player::small_playlist_items_toggled(bool b){
+void GUI_Player::small_playlist_items_toggled(bool b)
+{
     m_settings->setShowSmallPlaylist(b);
-	emit show_small_playlist_items(b);
+    emit show_small_playlist_items(b);
 }
 
 // private slot
-void GUI_Player::sl_action_streamripper_toggled(bool b){
+void GUI_Player::sl_action_streamripper_toggled(bool b)
+{
 
     emit sig_show_stream_rec();
 }
 
-
-
-
 // prvt slot
-void GUI_Player::lastFMClicked(bool b) {
-
-	Q_UNUSED(b);
-	emit setupLastFM();
-
+void GUI_Player::lastFMClicked(bool b)
+{
+    Q_UNUSED(b);
+    emit setupLastFM();
 }
 
-void GUI_Player::sl_live_search(bool b){
+void GUI_Player::sl_live_search(bool b)
+{
 //   m_settings->setLibLiveSearch(b);
 }
 
-void GUI_Player::sl_action_language_toggled(bool b){
+void GUI_Player::sl_action_language_toggled(bool b)
+{
     Q_UNUSED(b);
 //    ui_language_chooser->show();
 }
 
 /** PREFERENCES END **/
 
-void GUI_Player::help(bool b){
-	Q_UNUSED(b);
-	QString link = Helper::createLink("http://sayonara.luciocarreras.de/Forum/xmb");
-	
-	QMessageBox::information(this, tr("Help"), tr("Please visit the forum at") + "<br />" + link);
+void GUI_Player::help(bool b)
+{
+    Q_UNUSED(b);
+    QString link = Helper::createLink("http://sayonara.luciocarreras.de/Forum/xmb");
+
+    QMessageBox::information(this, tr("Help"), tr("Please visit the forum at") + "<br />" + link);
 
 }
 
 // private slot
-void GUI_Player::about(bool b){
-	Q_UNUSED(b);
+void GUI_Player::about(bool b)
+{
+    Q_UNUSED(b);
 
-        QString version = m_settings->getVersion();
+    QString version = m_settings->getVersion();
     QString link = Helper::createLink("http://sayonara.luciocarreras.de");
 
     QMessageBox infobox(this);
@@ -194,12 +205,12 @@ void GUI_Player::about(bool b){
 
 
     infobox.setWindowTitle(tr("About Sayonara"));
-    infobox.setText("<b><font size=\"+2\">Sayonara Player "+ version + "</font></b>");
-    infobox.setInformativeText( QString("") +
-				tr("Written by Lucio Carreras") + "<br /><br />" +
-				tr("License") + ": GPL<br /><br />" +
-                "Copyright 2011-2013<br /><br />" + link + "<br /><br /><br />" +
- 				tr("Special thanks to %1 for translating").arg("Julia Karakoz") 
+    infobox.setText("<b><font size=\"+2\">Sayonara Player " + version + "</font></b>");
+    infobox.setInformativeText(QString("") +
+                               tr("Written by Lucio Carreras") + "<br /><br />" +
+                               tr("License") + ": GPL<br /><br />" +
+                               "Copyright 2011-2013<br /><br />" + link + "<br /><br /><br />" +
+                               tr("Special thanks to %1 for translating").arg("Julia Karakoz")
                               );
     infobox.setStandardButtons(QMessageBox::Ok);
     infobox.button(QMessageBox::Ok)->setFocusPolicy(Qt::NoFocus);
