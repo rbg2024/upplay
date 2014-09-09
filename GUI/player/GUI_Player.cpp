@@ -42,20 +42,20 @@ GUI_Player* obj_ref = 0;
 #ifdef Q_OS_UNIX
 #include <signal.h>
 
-void signal_handler(int sig){
+void signal_handler(int sig)
+{
 
-    if(sig == SIGWINCH && obj_ref){
+    if (sig == SIGWINCH && obj_ref) {
         qDebug() << "show everything";
         obj_ref->setHidden(false);
         obj_ref->showNormal();
         obj_ref->activateWindow();
     }
 
-    else if(sig == 15 && obj_ref){
+    else if (sig == 15 && obj_ref) {
         qDebug() << "extern close event";
         obj_ref->really_close();
-    }
-    else {
+    } else {
 
         qDebug() << "signal " << sig << " received";
     }
@@ -64,7 +64,8 @@ void signal_handler(int sig){
 #endif
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Sayonara) {
+    QMainWindow(parent), ui(new Ui::Sayonara)
+{
     ui->setupUi(this);
     initGUI();
     m_translator = translator;
@@ -91,7 +92,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui_notifications = 0;//new GUI_Notifications(this);
     ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
-    ui_language_chooser= 0;//new GUI_LanguageChooser(this);
+    ui_language_chooser = 0; //new GUI_LanguageChooser(this);
 
     m_skinSuffix = "";
     m_class_name = "Player";
@@ -118,7 +119,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     this->ui->action_notifyNewVersion->setChecked(notify_new_version);
 
     bool is_fullscreen = m_settings->getPlayerFullscreen();
-    if(!is_fullscreen){
+    if (!is_fullscreen) {
         QSize size = m_settings->getPlayerSize();
         QPoint pos = m_settings->getPlayerPos();
 
@@ -147,13 +148,15 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 }
 
 
-GUI_Player::~GUI_Player() {
+GUI_Player::~GUI_Player()
+{
     qDebug() << "closing player...";
     delete ui;
 }
 
 
-void GUI_Player::language_changed(QString language){
+void GUI_Player::language_changed(QString language)
+{
 
     m_translator->load(language, Helper::getSharePath() + "/translations/");
 
@@ -170,15 +173,15 @@ void GUI_Player::language_changed(QString language){
 //    QList<PlayerPlugin*> all_plugins = _pph->get_all_plugins();
     QList<QAction*> actions = ui->menuView->actions();
 
-    foreach(QAction* action, actions){
-        if(!action->data().isNull()){
+    foreach(QAction * action, actions) {
+        if (!action->data().isNull()) {
             ui->menuView->removeAction(action);
         }
     }
 
     actions.clear();
 #if 0
-    foreach(PlayerPlugin* p, all_plugins){
+    foreach(PlayerPlugin * p, all_plugins) {
         QAction* action = p->getAction();
         action->setData(p->getName());
         actions << action;
@@ -192,7 +195,8 @@ void GUI_Player::language_changed(QString language){
 }
 
 
-QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list){
+QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list)
+{
     QAction* action = new QAction(this);
 
     action->setShortcuts(seq_list);
@@ -203,14 +207,16 @@ QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list){
     return action;
 }
 
-QAction* GUI_Player::createAction(QKeySequence seq){
+QAction* GUI_Player::createAction(QKeySequence seq)
+{
     QList<QKeySequence> seq_list;
     seq_list << seq;
     return createAction(seq_list);
 }
 
 
-void GUI_Player::initGUI() {
+void GUI_Player::initGUI()
+{
 
     ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
@@ -232,7 +238,8 @@ void GUI_Player::initGUI() {
 
 
 // new track
-void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
+void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
+{
 
     m_metadata = md;
 
@@ -255,8 +262,9 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
     ui->lab_rating->show();
 
     // sometimes ignore the date
-    if (md.year < 1000 || md.album.contains(QString::number(md.year)))
+    if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
         ui->lab_album->setText(Helper::get_album_w_disc(md));
+    }
 
     else
         ui->lab_album->setText(
@@ -271,22 +279,24 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
     QString lengthString = Helper::cvtMsecs2TitleLengthString(md.length_ms, true);
     ui->maxTime->setText(lengthString);
 
-    if(m_playing)
+    if (m_playing) {
         ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
-    else
+    } else {
         ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    }
 
     QString tmp = QString("<font color=\"#FFAA00\" size=\"+10\">");
-    if (md.bitrate < 96000)
+    if (md.bitrate < 96000) {
         tmp += "*";
-    else if (md.bitrate < 128000)
+    } else if (md.bitrate < 128000) {
         tmp += "**";
-    else if (md.bitrate < 160000)
+    } else if (md.bitrate < 160000) {
         tmp += "***";
-    else if (md.bitrate < 256000)
+    } else if (md.bitrate < 256000) {
         tmp += "****";
-    else
+    } else {
         tmp += "*****";
+    }
     tmp += "</font>";
 
     ui->lab_rating->setText(tmp);
@@ -310,20 +320,23 @@ void GUI_Player::update_track(const MetaData & md, int pos_sec, bool playing) {
 }
 
 
-void GUI_Player::fetch_cover(){
+void GUI_Player::fetch_cover()
+{
 #if 0
     QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
-    if(! QFile::exists(cover_path) ){
-        if(m_metadata.radio_mode != RADIO_STATION){
+    if (! QFile::exists(cover_path)) {
+        if (m_metadata.radio_mode != RADIO_STATION) {
 
-            if(m_metadata.album.trimmed().size() == 0 && m_metadata.artist.size() == 0)
+            if (m_metadata.album.trimmed().size() == 0 && m_metadata.artist.size() == 0) {
                 cover_path = Helper::getIconPath() + "logo.png";
+            }
 
-            else if(m_metadata.album_id > -1)
+            else if (m_metadata.album_id > -1) {
                 m_cov_lookup->fetch_cover_album(m_metadata.album_id);
+            }
 
-            else{
+            else {
                 Album album;
                 album.name = m_metadata.album;
                 album.artists << m_metadata.artist;
@@ -335,8 +348,9 @@ void GUI_Player::fetch_cover(){
             cover_path = Helper::getIconPath() + "logo.png";
         }
 
-        else
+        else {
             cover_path = Helper::getIconPath() + "radio.png";
+        }
     }
 
     ui->albumCover->setIcon(QIcon(cover_path));
@@ -347,25 +361,29 @@ void GUI_Player::fetch_cover(){
 
 // public slot:
 // id3 tags have changed
-void GUI_Player::psl_id3_tags_changed(MetaDataList& v_md) {
+void GUI_Player::psl_id3_tags_changed(MetaDataList& v_md)
+{
 
     MetaData md_new;
     bool found = false;
 
-    for(uint i=0; i<v_md.size(); i++){
-        if(m_metadata.id == v_md[i].id){
+    for (uint i = 0; i < v_md.size(); i++) {
+        if (m_metadata.id == v_md[i].id) {
             m_metadata = v_md[i];
             found = true;
             break;
         }
     }
 
-    if(!found) return;
+    if (!found) {
+        return;
+    }
 
     ui->btn_correct->setVisible(false);
 
-    if (m_metadata.year < 1000 || m_metadata.album.contains(QString::number(m_metadata.year)))
+    if (m_metadata.year < 1000 || m_metadata.album.contains(QString::number(m_metadata.year))) {
         ui->lab_album->setText(m_metadata.album);
+    }
 
     else
         ui->lab_album->setText(
@@ -385,13 +403,15 @@ void GUI_Player::psl_id3_tags_changed(MetaDataList& v_md) {
 
 
 /** LAST FM **/
-void GUI_Player::last_fm_logged_in(bool ){
+void GUI_Player::last_fm_logged_in(bool)
+{
 #if 0
-    if(!b && m_settings->getLastFMActive())
+    if (!b && m_settings->getLastFMActive()) {
         QMessageBox::warning(ui->centralwidget, tr("Warning"), tr("Cannot login to Last.fm"));
+    }
 
-    if(!b){
-	/// TODO
+    if (!b) {
+        /// TODO
 //        show_lfm_radio(false);
         ui->action_ViewLFMRadio->setChecked(false);
     }
@@ -401,7 +421,8 @@ void GUI_Player::last_fm_logged_in(bool ){
 }
 
 
-void GUI_Player::psl_lfm_activated(bool ){
+void GUI_Player::psl_lfm_activated(bool)
+{
 #if 0
 /// TODO
 //    show_lfm_radio(false);
@@ -412,7 +433,8 @@ void GUI_Player::psl_lfm_activated(bool ){
 }
 
 
-void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected){
+void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected)
+{
 #if 0
     m_metadata_corrected = md;
 
@@ -423,7 +445,7 @@ void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected
                                 radio_off &&
                                 get_lfm_corrections);
 
-    if(loved){
+    if (loved) {
         ui->lab_title->setText(ui->lab_title->text());
     }
 
@@ -434,8 +456,9 @@ void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected
 void GUI_Player::correct_btn_clicked(bool)
 {
 
-    if(!ui_info_dialog)
+    if (!ui_info_dialog) {
         return;
+    }
 
     MetaData md = m_metadata_corrected;
     m_metadata_corrected = m_metadata;
@@ -444,17 +467,17 @@ void GUI_Player::correct_btn_clicked(bool)
     bool same_album = (m_metadata.album.compare(md.album) == 0);
     bool same_title = (m_metadata.title.compare(md.title) == 0);
 
-    if(!same_artist){
+    if (!same_artist) {
         m_metadata_corrected.artist = md.artist;
         m_metadata_corrected.artist_id = -1;
     }
 
-    if(!same_album){
+    if (!same_album) {
         m_metadata_corrected.album = md.album;
         m_metadata_corrected.album_id = -1;
     }
 
-    if(!same_title){
+    if (!same_title) {
         m_metadata_corrected.title = md.title;
     }
 
@@ -469,21 +492,26 @@ void GUI_Player::correct_btn_clicked(bool)
 /** LAST FM **/
 
 
-void GUI_Player::setStyle(int style){
+void GUI_Player::setStyle(int style)
+{
 
     bool dark = (style == 1);
     changeSkin(dark);
     ui->action_Dark->setChecked(dark);
 }
 
-void GUI_Player::changeSkin(bool dark) {
+void GUI_Player::changeSkin(bool dark)
+{
 
     QString stylesheet = Style::get_style(dark);
 
     this->setStyleSheet(stylesheet);
 
-    if (dark) 	m_skinSuffix = QString("_dark");
-    else 		m_skinSuffix = QString("");
+    if (dark) {
+        m_skinSuffix = QString("_dark");
+    } else {
+        m_skinSuffix = QString("");
+    }
 
     m_settings->setPlayerStyle(dark ? 1 : 0);
     this->m_trayIcon->change_skin(stylesheet);
@@ -495,7 +523,8 @@ void GUI_Player::changeSkin(bool dark) {
 
 
 /** TRAY ICON **/
-void GUI_Player::setupTrayActions() {
+void GUI_Player::setupTrayActions()
+{
 
 
     m_trayIcon = new GUI_TrayIcon(this);
@@ -511,10 +540,10 @@ void GUI_Player::setupTrayActions() {
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
 
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-            this, 		SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
+            this,       SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
 
     connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)),
-            this, 		SLOT(volumeChangedByTick(int)));
+            this,       SLOT(volumeChangedByTick(int)));
 
 
     m_trayIcon->setPlaying(false);
@@ -524,28 +553,31 @@ void GUI_Player::setupTrayActions() {
 }
 
 
-void GUI_Player::trayItemActivated (QSystemTrayIcon::ActivationReason reason) {
+void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
+{
 
     switch (reason) {
 
     case QSystemTrayIcon::Trigger:
 
-        if (this->isMinimized() || isHidden()){
+        if (this->isMinimized() || isHidden()) {
             this->setHidden(false);
             this->showNormal();
             this->activateWindow();
         }
 
-        else if(m_min2tray){
+        else if (m_min2tray) {
             this->setHidden(true);
         }
 
-        else this->showMinimized();
+        else {
+            this->showMinimized();
+        }
 
 
         break;
     case QSystemTrayIcon::MiddleClick:
-    	m_trayIcon->songChangedMessage(m_metadata);
+        m_trayIcon->songChangedMessage(m_metadata);
         break;
     default:
         break;
@@ -558,39 +590,43 @@ void GUI_Player::trayItemActivated (QSystemTrayIcon::ActivationReason reason) {
 
 /** LIBRARY AND PLAYLIST **/
 
-QWidget* GUI_Player::getParentOfPlaylist() {
+QWidget* GUI_Player::getParentOfPlaylist()
+{
     return ui->playlist_widget;
 }
 
-QWidget* GUI_Player::getParentOfLibrary() {
+QWidget* GUI_Player::getParentOfLibrary()
+{
     return ui->library_widget;
 }
 
 
-void GUI_Player::setPlaylist(GUI_Playlist* playlist) {
+void GUI_Player::setPlaylist(GUI_Playlist* playlist)
+{
     ui_playlist = playlist;
 #if 0
-    if(ui_playlist){
+    if (ui_playlist) {
         ui_playlist->show();
         ui_playlist->resize(ui->playlist_widget->size());
-        QAction* action = createAction( QKeySequence(tr("Ctrl+P")) );
+        QAction* action = createAction(QKeySequence(tr("Ctrl+P")));
         connect(action, SIGNAL(triggered()), ui_playlist, SLOT(setFocus()));
     }
 #endif
 }
 
 
-void GUI_Player::setLibrary(GUI_Library_windowed* library) {
+void GUI_Player::setLibrary(GUI_Library_windowed* library)
+{
 #if 0
     ui_library = library;
-    if(ui_library && !ui_libpath){
+    if (ui_library && !ui_libpath) {
         ui_library->show();
         ui_library->resize(ui->library_widget->size());
-        QAction* action = createAction(QKeySequence( tr("Ctrl+L")) );
+        QAction* action = createAction(QKeySequence(tr("Ctrl+L")));
         connect(action, SIGNAL(triggered()), ui_library, SLOT(setFocus()));
     }
 
-    else if(ui_libpath){
+    else if (ui_libpath) {
         ui_library->hide();
         ui_libpath->show();
         ui_libpath->resize(ui->library_widget->size());
@@ -598,14 +634,15 @@ void GUI_Player::setLibrary(GUI_Library_windowed* library) {
 #endif
 }
 
-void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph){
+void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph)
+{
 #if 0
     _pph = pph;
 
     QList<PlayerPlugin*> lst = _pph->get_all_plugins();
     QList<QAction*> actions;
 
-    foreach(PlayerPlugin* p, lst){
+    foreach(PlayerPlugin * p, lst) {
         QAction* action = p->getAction();
         action->setData(p->getName());
         // action is connected in Plugin itself
@@ -621,13 +658,15 @@ void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph){
 #endif
 }
 
-void GUI_Player::stopped(){
+void GUI_Player::stopped()
+{
     m_metadata_available = false;
     stopClicked(false);
 }
 
-void GUI_Player::psl_reload_library_allowed(bool b){
-    this->ui->action_reloadLibrary->setEnabled(b);	
+void GUI_Player::psl_reload_library_allowed(bool b)
+{
+    this->ui->action_reloadLibrary->setEnabled(b);
 }
 
 
@@ -635,17 +674,18 @@ void GUI_Player::psl_reload_library_allowed(bool b){
 
 
 // prvt fct
-void GUI_Player::setRadioMode(int radio){
+void GUI_Player::setRadioMode(int radio)
+{
 
     bool stream_ripper = false;//m_settings->getStreamRipper();
     ui->btn_bw->setEnabled(radio == RADIO_OFF);
     ui->btn_fw->setEnabled(radio != RADIO_STATION);
 
-    if(stream_ripper){
+    if (stream_ripper) {
 
         bool btn_rec_visible = (radio != RADIO_OFF);
 
-        if(btn_rec_visible){
+        if (btn_rec_visible) {
             ui->btn_play->setVisible(radio == RADIO_OFF);
             ui->btn_rec->setVisible(radio != RADIO_OFF);
         }
@@ -658,7 +698,7 @@ void GUI_Player::setRadioMode(int radio){
         ui->btn_play->setEnabled(radio == RADIO_OFF);
     }
 
-    else{
+    else {
 
         ui->btn_rec->setVisible(false);
         ui->btn_play->setVisible(true);
@@ -676,14 +716,15 @@ void GUI_Player::setRadioMode(int radio){
 
 
 // public slot
-void GUI_Player::psl_strrip_set_active(bool b){
+void GUI_Player::psl_strrip_set_active(bool b)
+{
 
-    if(b){
+    if (b) {
         ui->btn_play->setVisible(m_metadata.radio_mode == RADIO_OFF);
         ui->btn_rec->setVisible(m_metadata.radio_mode != RADIO_OFF);
     }
 
-    else{
+    else {
         ui->btn_play->setVisible(true);
         ui->btn_play->setEnabled(m_metadata.radio_mode == RADIO_OFF);
         ui->btn_rec->setVisible(false);
@@ -693,7 +734,8 @@ void GUI_Player::psl_strrip_set_active(bool b){
 }
 
 
-void GUI_Player::ui_loaded(){
+void GUI_Player::ui_loaded()
+{
 
 #ifdef Q_OS_UNIX
     obj_ref = this;
@@ -712,23 +754,26 @@ void GUI_Player::ui_loaded(){
 }
 
 
-void GUI_Player::notification_changed(bool active, int timeout_ms){
+void GUI_Player::notification_changed(bool active, int timeout_ms)
+{
 
 //    m_trayIcon->set_timeout(timeout_ms);
 //    m_trayIcon->set_notification_active(active);
 }
 
 
-void GUI_Player::moveEvent(QMoveEvent *e){
+void GUI_Player::moveEvent(QMoveEvent *e)
+{
 
     QMainWindow::moveEvent(e);
 
-    QPoint p= this->pos();
+    QPoint p = this->pos();
     m_settings->setPlayerPos(p);
 
 }
 
-void GUI_Player::resizeEvent(QResizeEvent* e) {
+void GUI_Player::resizeEvent(QResizeEvent* e)
+{
 #if 0
     QMainWindow::resizeEvent(e);
 
@@ -752,7 +797,8 @@ void GUI_Player::resizeEvent(QResizeEvent* e) {
 }
 
 
-void GUI_Player::keyPressEvent(QKeyEvent* e) {
+void GUI_Player::keyPressEvent(QKeyEvent* e)
+{
 
     e->accept();
 
@@ -772,23 +818,26 @@ void GUI_Player::keyPressEvent(QKeyEvent* e) {
 }
 
 
-void GUI_Player::closeEvent(QCloseEvent* e){
+void GUI_Player::closeEvent(QCloseEvent* e)
+{
 
-    if(m_min2tray){
+    if (m_min2tray) {
         e->ignore();
         this->hide();
     }
 }
 
 
-void GUI_Player::really_close(bool b){
+void GUI_Player::really_close(bool b)
+{
 
     m_min2tray = false;
     this->close();
 }
 
 
-void GUI_Player::async_wa_finished(){
+void GUI_Player::async_wa_finished()
+{
 
     QString new_version = "1.0";//m_async_wa->get_data();
     QString cur_version = m_settings->getVersion();
@@ -797,14 +846,15 @@ void GUI_Player::async_wa_finished(){
     qDebug() << "Newest Version: " << new_version;
     qDebug() << "This Version:   " << cur_version;
 
-    if(new_version > cur_version && m_settings->getNotifyNewVersion()){
-        QMessageBox::information(this, 
-                                 tr("Info"), 
+    if (new_version > cur_version && m_settings->getNotifyNewVersion()) {
+        QMessageBox::information(this,
+                                 tr("Info"),
                                  tr("A new version is available!"));
     }
 }
 
-void GUI_Player::sl_notify_new_version(bool b){
+void GUI_Player::sl_notify_new_version(bool b)
+{
     m_settings->setNotifyNewVersion(b);
 }
 
