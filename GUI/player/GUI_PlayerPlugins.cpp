@@ -31,20 +31,25 @@
 
 
 /** PLUGINS **/
-QWidget* GUI_Player::getParentOfPlugin() {
-	return ui->plugin_widget;
+QWidget* GUI_Player::getParentOfPlugin()
+{
+    return ui->plugin_widget;
 }
 
-void GUI_Player::setInfoDialog(GUI_InfoDialog* dialog){
+void GUI_Player::setInfoDialog(GUI_InfoDialog* dialog)
+{
 //    ui_info_dialog = dialog;
 //    ui_info_dialog->setMode(INFO_MODE_TRACKS);
 }
 
 
-void GUI_Player::hideAllPlugins(){
+void GUI_Player::hideAllPlugins()
+{
 #if 0
     m_settings->setShownPlugin("");
-    if(ui->plugin_widget->isHidden()) return;
+    if (ui->plugin_widget->isHidden()) {
+        return;
+    }
 
     int old_h = this->ui->plugin_widget->minimumHeight();
     QSize pl_size = ui_playlist->size();
@@ -57,12 +62,17 @@ void GUI_Player::hideAllPlugins(){
 }
 
 
-void GUI_Player::showPlugin(PlayerPlugin* plugin){
+void GUI_Player::showPlugin(PlayerPlugin* plugin)
+{
 #if 0
     hideAllPlugins();
 
-    if(!plugin) return;
-    if(!ui_playlist) return;
+    if (!plugin) {
+        return;
+    }
+    if (!ui_playlist) {
+        return;
+    }
 
     QSize pl_size;
     QSize widget_size = plugin->getSize();
@@ -73,15 +83,15 @@ void GUI_Player::showPlugin(PlayerPlugin* plugin){
     _pph->showPlugin(plugin);
 
 
-	pl_size = ui_playlist->size();
+    pl_size = ui_playlist->size();
 
-    widget_size.setWidth( ui->plugin_widget->width() );
+    widget_size.setWidth(ui->plugin_widget->width());
     pl_size.setHeight(pl_size.height() - widget_size.height() + old_h);
 
     ui->plugin_widget->setMinimumHeight(plugin->getSize().height());
     _pph->resize(ui->plugin_widget->size());
 
-	ui_playlist->resize(pl_size);
+    ui_playlist->resize(pl_size);
     m_settings->setShownPlugin(plugin->getName());
 #endif
 }
