@@ -27,9 +27,10 @@
 #include "GUI/player/GUI_Player.h"
 
 /** COVERS **/
-void GUI_Player::coverClicked() {
+void GUI_Player::coverClicked()
+{
 
-   if(m_metadata.radio_mode == RADIO_STATION){
+    if (m_metadata.radio_mode == RADIO_STATION) {
         QString searchstring = QString("Radio ") + m_metadata.title;
         QString targetpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
@@ -39,7 +40,7 @@ void GUI_Player::coverClicked() {
     else {
 
         QString searchstring;
-        if(m_metadata.album.size() != 0 || m_metadata.artist != 0){
+        if (m_metadata.album.size() != 0 || m_metadata.artist != 0) {
             searchstring = m_metadata.album + " " + m_metadata.artist;
         }
 
@@ -59,15 +60,19 @@ void GUI_Player::coverClicked() {
     this->setFocus();
 }
 
-void GUI_Player::sl_alternate_cover_available(QString target_class, QString coverpath){
+void GUI_Player::sl_alternate_cover_available(QString target_class, QString coverpath)
+{
 
     QString own_coverpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-    if(coverpath != own_coverpath) return;
+    if (coverpath != own_coverpath) {
+        return;
+    }
 
     ui->albumCover->setIcon(QIcon(coverpath));
 }
 
-void GUI_Player::sl_no_cover_available(){
+void GUI_Player::sl_no_cover_available()
+{
 
 
     QString coverpath = Helper::getIconPath() + "logo.png";
@@ -77,17 +82,20 @@ void GUI_Player::sl_no_cover_available(){
 
 // public slot
 // cover was found by CoverLookup
-void GUI_Player::covers_found(const QStringList& cover_paths, QString call_id) {
+void GUI_Player::covers_found(const QStringList& cover_paths, QString call_id)
+{
 
     Q_UNUSED(cover_paths);
     Q_UNUSED(call_id);
     QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
     /*if(!cover_paths.contains(cover_path)) return;*/
-    if(!QFile::exists(cover_path)) return;
+    if (!QFile::exists(cover_path)) {
+        return;
+    }
 
     ui->albumCover->setIcon(QIcon(cover_path));
-	ui->albumCover->repaint();
+    ui->albumCover->repaint();
 }
 
 /** COVER END **/
