@@ -18,11 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//#include "Notification/NotificationPluginLoader.h"
-#include "HelperStructs/CSettingsStorage.h"
-#include "HelperStructs/Helper.h"
-#include "GUI/player/GUI_TrayIcon.h"
-
 #include <QAction>
 #include <QMenu>
 #include <QEvent>
@@ -34,8 +29,14 @@
 #include <QTimer>
 #include <QFont>
 
+//#include "Notification/NotificationPluginLoader.h"
+#include "HelperStructs/CSettingsStorage.h"
+#include "HelperStructs/Helper.h"
+#include "GUI/player/GUI_TrayIcon.h"
 
-GUI_TrayIcon::GUI_TrayIcon(QObject *parent) : QSystemTrayIcon(parent)
+
+GUI_TrayIcon::GUI_TrayIcon(QObject *parent) 
+  : QSystemTrayIcon(parent)
 {
 
     m_settings = CSettingsStorage::getInstance();
@@ -92,9 +93,6 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent) : QSystemTrayIcon(parent)
     m_trayContextMenu->setFont(f);
     this->setContextMenu(m_trayContextMenu);
 
-
-
-//    this->setToolTip("Sayonara Player");*/
     this->setIcon(m_playIcon);
 
     connect(m_playAction, SIGNAL(triggered()), this, SLOT(play_clicked()));
@@ -107,7 +105,6 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent) : QSystemTrayIcon(parent)
     connect(_timer, SIGNAL(timeout()), this, SLOT(timer_timed_out()));
 }
 
-
 GUI_TrayIcon::~GUI_TrayIcon()
 {
     delete m_playAction;
@@ -117,7 +114,6 @@ GUI_TrayIcon::~GUI_TrayIcon()
     delete m_muteAction;
     delete m_closeAction;
 }
-
 
 void GUI_TrayIcon::language_changed()
 {
@@ -130,7 +126,6 @@ void GUI_TrayIcon::language_changed()
     m_closeAction->setText(tr("Close"));
     m_showAction->setText(tr("Show"));
 }
-
 
 void GUI_TrayIcon::change_skin(QString stylesheet)
 {
@@ -157,7 +152,6 @@ void GUI_TrayIcon::timer_timed_out()
     }
 }
 
-
 void GUI_TrayIcon::songChangedMessage(const MetaData& md)
 {
     _md = md;
@@ -173,13 +167,12 @@ void GUI_TrayIcon::songChangedMessage(const MetaData& md)
 
         else if (this -> isSystemTrayAvailable()) {
 
-            this -> showMessage("Sayonara", md.title + tr(" by ") + md.artist, QSystemTrayIcon::Information, m_timeout);
+            this -> showMessage("Upplay", md.title + tr(" by ") + md.artist, 
+                                QSystemTrayIcon::Information, m_timeout);
         }
     }
 #endif
 }
-
-
 
 void GUI_TrayIcon::trackChanged(const MetaData& md)
 {
@@ -206,7 +199,7 @@ void GUI_TrayIcon::set_enable_stop(bool b)
     m_stopAction->setEnabled(b);
 }
 
-void GUI_TrayIcon::set_enable_mute(bool b)
+void GUI_TrayIcon::set_enable_mute(bool)
 {
 
 }
@@ -232,9 +225,7 @@ void GUI_TrayIcon::play_clicked()
     qDebug() << "tray: play clicked";
     if (!m_playing) {
         emit sig_play_clicked();
-    }
-
-    else {
+    } else {
         emit sig_pause_clicked();
     }
 }
@@ -276,7 +267,6 @@ void GUI_TrayIcon::mute_clicked()
 
 void GUI_TrayIcon::setMute(bool mute)
 {
-
     _mute = mute;
 
     QString suffix = "";
@@ -287,12 +277,12 @@ void GUI_TrayIcon::setMute(bool mute)
     }
 
     if (!mute) {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_mute" + suffix + ".png"));
+        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_mute" + 
+                                    suffix + ".png"));
         m_muteAction->setText(tr("Mute"));
-    }
-
-    else {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_3" + suffix + ".png"));
+    }  else {
+        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_3" + 
+                                    suffix + ".png"));
         m_muteAction->setText(tr("Unmute"));
     }
 }
@@ -316,5 +306,4 @@ void GUI_TrayIcon::setPlaying(bool play)
 int GUI_TrayIcon::get_vol_step()
 {
     return m_vol_step;
-
 }

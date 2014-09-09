@@ -35,9 +35,7 @@ void GUI_Player::playClicked(bool)
     if (m_playing) {
         ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
         emit pause();
-    }
-
-    else {
+    } else {
         ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
         emit play();
     }
@@ -48,13 +46,10 @@ void GUI_Player::playClicked(bool)
 
 void GUI_Player::stopClicked(bool b)
 {
-
-
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     m_trayIcon->setPlaying(false);
     m_trayIcon->stop();
     m_playing = false;
-
 
     ui->lab_title->hide();
     ui->lab_sayonara->show();
@@ -68,9 +63,7 @@ void GUI_Player::stopClicked(bool b)
     ui->lab_rating->hide();
     ui->lab_copyright->show();
 
-
-
-    this->setWindowTitle("Sayonara");
+    this->setWindowTitle("Upplay");
     ui->songProgress->setValue(0);
     ui->curTime->setText("0:00");
     ui->maxTime->setText("0:00");
@@ -84,20 +77,17 @@ void GUI_Player::stopClicked(bool b)
 
     if (b) {
         emit stop();
-
     }
 }
 
 void GUI_Player::backwardClicked(bool)
 {
-
     // ui->albumCover->setFocus();
-    int cur_pos_sec = (m_completeLength_ms * ui->songProgress->value()) / 100000;
+    int cur_pos_sec = 
+        (m_completeLength_ms * ui->songProgress->value()) / 100000;
     if (cur_pos_sec > 3) {
         setProgressJump(0);
-    }
-
-    else {
+    } else {
         emit backward();
     }
 }
@@ -108,14 +98,11 @@ void GUI_Player::forwardClicked(bool)
     emit forward();
 }
 
-
 void GUI_Player::sl_rec_button_toggled(bool b)
 {
 
     emit sig_rec_button_toggled(b);
 }
-
-
 
 /** PROGRESS BAR **/
 

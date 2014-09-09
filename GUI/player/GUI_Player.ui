@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Sayonara</class>
- <widget class="QMainWindow" name="Sayonara">
+ <class>Upplay</class>
+ <widget class="QMainWindow" name="Upplay">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -31,7 +31,7 @@
    <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>Sayonara Player</string>
+   <string>Upplay Player</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -138,7 +138,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Sayonara Player</string>
+         <string>Upplay Player</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -1150,53 +1150,6 @@
     </font>
    </property>
   </action>
-  <action name="action_lastFM">
-   <property name="icon">
-    <iconset>
-     <normaloff>../../Desktop/lastfm-icon.png</normaloff>../../Desktop/lastfm-icon.png</iconset>
-   </property>
-   <property name="text">
-    <string>Last.fm</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-  </action>
-  <action name="action_reloadLibrary">
-   <property name="text">
-    <string>Reload Library</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-  </action>
-  <action name="action_clearLibrary">
-   <property name="text">
-    <string>Clear Library</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-  </action>
-  <action name="action_setLibPath">
-   <property name="text">
-    <string>Library Path</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-    </font>
-   </property>
-  </action>
   <action name="action_fetch_all_covers">
    <property name="text">
     <string>Fetch all covers</string>
@@ -1206,23 +1159,6 @@
      <family>DejaVu Sans</family>
      <pointsize>9</pointsize>
     </font>
-   </property>
-  </action>
-  <action name="action_ViewLFMRadio">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Radio</string>
-   </property>
-   <property name="shortcut">
-    <string extracomment="STRG + R"/>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
-   <property name="softKeyRole">
-    <enum>QAction::PositiveSoftKey</enum>
    </property>
   </action>
   <action name="action_startup">
@@ -1306,11 +1242,6 @@
     <string>Notifications</string>
    </property>
   </action>
-  <action name="action_OpenStream">
-   <property name="text">
-    <string>Open Stream</string>
-   </property>
-  </action>
   <action name="action_viewLibrary">
    <property name="checkable">
     <bool>true</bool>
@@ -1387,74 +1318,9 @@
     </font>
    </property>
   </action>
-  <action name="action_showOnlyTracks">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Only tracks in library</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-  </action>
   <action name="actionSound_Engine">
    <property name="text">
     <string>Sound Engine</string>
-   </property>
-  </action>
-  <action name="action_engine_gst">
-   <property name="text">
-    <string>Gstreamer</string>
-   </property>
-  </action>
-  <action name="action_engine_phonon">
-   <property name="text">
-    <string>Phonon</string>
-   </property>
-  </action>
-  <action name="action_streamrecorder">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Stream recorder</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-  </action>
-  <action name="action_streamripper_path">
-   <property name="text">
-    <string>Set Streamripper Path</string>
-   </property>
-  </action>
-  <action name="action_ViewStream">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Stream</string>
-   </property>
-   <property name="shortcutContext">
-    <enum>Qt::ApplicationShortcut</enum>
-   </property>
-  </action>
-  <action name="action_SocketConnection">
-   <property name="text">
-    <string>Socket connection</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
    </property>
   </action>
   <action name="action_notifications">
@@ -1534,7 +1400,6 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../sayonara.qrc"/>
  </resources>
  <connections/>
 </ui>

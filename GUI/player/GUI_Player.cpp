@@ -18,24 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ui_GUI_Player.h"
-#include "GUI/player/GUI_Player.h"
-#include "GUI/player/GUI_TrayIcon.h"
-//#include "GUI/stream/GUI_Stream.h"
-//#include "GUI/Podcasts/GUI_Podcasts.h"
-//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
-
-#include "HelperStructs/CSettingsStorage.h"
-#include "HelperStructs/Style.h"
-#include "HelperStructs/globals.h"
-//#include "HelperStructs/AsyncWebAccess.h"
-//#include "CoverLookup/CoverLookup.h"
-
-//#include "StreamPlugins/LastFM/LastFM.h"
-
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPalette>
+
+#include "ui_GUI_Player.h"
+#include "GUI/player/GUI_Player.h"
+#include "GUI/player/GUI_TrayIcon.h"
+#include "HelperStructs/CSettingsStorage.h"
+#include "HelperStructs/Style.h"
+#include "HelperStructs/globals.h"
 
 GUI_Player* obj_ref = 0;
 
@@ -64,7 +56,7 @@ void signal_handler(int sig)
 #endif
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Sayonara)
+    QMainWindow(parent), ui(new Ui::Upplay)
 {
     ui->setupUi(this);
     initGUI();
@@ -79,9 +71,10 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->lab_rating->hide();
     ui->lab_album->hide();
 
-    ui->lab_sayonara->setText(tr("Sayonara Player"));
+    ui->lab_sayonara->setText(tr("Upplay Player"));
     ui->lab_version->setText(m_settings->getVersion());
-    ui->lab_writtenby->setText(tr("Written by") + " Lucio Carreras");
+    ui->lab_writtenby->setText(tr("Based on Sayonara, written by") + 
+                               " Lucio Carreras");
     ui->lab_copyright->setText(tr("Copyright") + " 2011-2013");
 
     m_metadata_available = false;
@@ -99,8 +92,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     m_cov_lookup = 0;//new CoverLookup();
     m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
-
-    //ui->action_ViewLFMRadio->setVisible(m_settings->getLastFMActive());
 
     m_min2tray = m_settings->getMinimizeToTray();
     ui->action_min2tray->setChecked(m_min2tray);
@@ -138,9 +129,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     /* SIGNALS AND SLOTS */
     this->setupConnections();
-//    m_async_wa->set_url("http://sayonara.luciocarreras.de/current_version");
-//    m_async_wa->start();
-
     ui->plugin_widget->resize(ui->plugin_widget->width(), 0);
     ui_info_dialog = 0;
 
@@ -306,7 +294,7 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
         QString(" kBit/s") +
         QString("</font>"));
 
-    this->setWindowTitle(QString("Sayonara - ") + md.title);
+    this->setWindowTitle(QString("Upplay - ") + md.title);
 
 
     ui->btn_correct->setVisible(false);
@@ -358,140 +346,6 @@ void GUI_Player::fetch_cover()
 #endif
 }
 
-
-// public slot:
-// id3 tags have changed
-void GUI_Player::psl_id3_tags_changed(MetaDataList& v_md)
-{
-
-    MetaData md_new;
-    bool found = false;
-
-    for (uint i = 0; i < v_md.size(); i++) {
-        if (m_metadata.id == v_md[i].id) {
-            m_metadata = v_md[i];
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
-        return;
-    }
-
-    ui->btn_correct->setVisible(false);
-
-    if (m_metadata.year < 1000 || m_metadata.album.contains(QString::number(m_metadata.year))) {
-        ui->lab_album->setText(m_metadata.album);
-    }
-
-    else
-        ui->lab_album->setText(
-            m_metadata.album + " (" + QString::number(m_metadata.year) + ")");
-
-    ui->lab_artist->setText(m_metadata.artist);
-    ui->lab_title->setText(m_metadata.title);
-
-    m_trayIcon->songChangedMessage(m_metadata);
-
-    this->setWindowTitle(QString("Sayonara - ") + m_metadata.title);
-
-    emit sig_want_cover(m_metadata);
-}
-
-
-
-
-/** LAST FM **/
-void GUI_Player::last_fm_logged_in(bool)
-{
-#if 0
-    if (!b && m_settings->getLastFMActive()) {
-        QMessageBox::warning(ui->centralwidget, tr("Warning"), tr("Cannot login to Last.fm"));
-    }
-
-    if (!b) {
-        /// TODO
-//        show_lfm_radio(false);
-        ui->action_ViewLFMRadio->setChecked(false);
-    }
-
-    ui->action_ViewLFMRadio->setVisible(b);
-#endif
-}
-
-
-void GUI_Player::psl_lfm_activated(bool)
-{
-#if 0
-/// TODO
-//    show_lfm_radio(false);
-    ui->action_ViewLFMRadio->setChecked(false);
-
-    ui->action_ViewLFMRadio->setVisible(b);
-#endif
-}
-
-
-void GUI_Player::lfm_info_fetched(const MetaData& md, bool loved, bool corrected)
-{
-#if 0
-    m_metadata_corrected = md;
-
-    bool radio_off = (m_metadata.radio_mode == RADIO_OFF);
-    bool get_lfm_corrections = m_settings->getLastFMCorrections();
-
-    ui->btn_correct->setVisible(corrected &&
-                                radio_off &&
-                                get_lfm_corrections);
-
-    if (loved) {
-        ui->lab_title->setText(ui->lab_title->text());
-    }
-
-    this->repaint();
-#endif
-}
-
-void GUI_Player::correct_btn_clicked(bool)
-{
-
-    if (!ui_info_dialog) {
-        return;
-    }
-
-    MetaData md = m_metadata_corrected;
-    m_metadata_corrected = m_metadata;
-
-    bool same_artist = (m_metadata.artist.compare(md.artist) == 0);
-    bool same_album = (m_metadata.album.compare(md.album) == 0);
-    bool same_title = (m_metadata.title.compare(md.title) == 0);
-
-    if (!same_artist) {
-        m_metadata_corrected.artist = md.artist;
-        m_metadata_corrected.artist_id = -1;
-    }
-
-    if (!same_album) {
-        m_metadata_corrected.album = md.album;
-        m_metadata_corrected.album_id = -1;
-    }
-
-    if (!same_title) {
-        m_metadata_corrected.title = md.title;
-    }
-
-    MetaDataList lst;
-    lst.push_back(m_metadata_corrected);
-    //ui_info_dialog->setMetaData(lst);
-//    ui_info_dialog->setMode(INFO_MODE_TRACKS);
-
-//    ui_info_dialog->show(TAB_EDIT);
-
-}
-/** LAST FM **/
-
-
 void GUI_Player::setStyle(int style)
 {
 
@@ -521,14 +375,10 @@ void GUI_Player::changeSkin(bool dark)
 }
 
 
-
 /** TRAY ICON **/
 void GUI_Player::setupTrayActions()
 {
-
-
     m_trayIcon = new GUI_TrayIcon(this);
-
 
     connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(stopClicked()));
     connect(m_trayIcon, SIGNAL(sig_bwd_clicked()), this, SLOT(backwardClicked()));
@@ -549,13 +399,10 @@ void GUI_Player::setupTrayActions()
     m_trayIcon->setPlaying(false);
 
     m_trayIcon->show();
-
 }
-
 
 void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
 {
-
     switch (reason) {
 
     case QSystemTrayIcon::Trigger:
@@ -564,16 +411,11 @@ void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
             this->setHidden(false);
             this->showNormal();
             this->activateWindow();
-        }
-
-        else if (m_min2tray) {
+        } else if (m_min2tray) {
             this->setHidden(true);
-        }
-
-        else {
+        } else {
             this->showMinimized();
         }
-
 
         break;
     case QSystemTrayIcon::MiddleClick:
@@ -600,7 +442,6 @@ QWidget* GUI_Player::getParentOfLibrary()
     return ui->library_widget;
 }
 
-
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 {
     ui_playlist = playlist;
@@ -617,8 +458,8 @@ void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 
 void GUI_Player::setLibrary(GUI_Library_windowed* library)
 {
-#if 0
     ui_library = library;
+#if 0
     if (ui_library && !ui_libpath) {
         ui_library->show();
         ui_library->resize(ui->library_widget->size());
@@ -636,8 +477,8 @@ void GUI_Player::setLibrary(GUI_Library_windowed* library)
 
 void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph)
 {
-#if 0
     _pph = pph;
+#if 0
 
     QList<PlayerPlugin*> lst = _pph->get_all_plugins();
     QList<QAction*> actions;
@@ -663,12 +504,6 @@ void GUI_Player::stopped()
     m_metadata_available = false;
     stopClicked(false);
 }
-
-void GUI_Player::psl_reload_library_allowed(bool b)
-{
-    this->ui->action_reloadLibrary->setEnabled(b);
-}
-
 
 /** LIBRARY AND PLAYLIST END **/
 
@@ -754,9 +589,8 @@ void GUI_Player::ui_loaded()
 }
 
 
-void GUI_Player::notification_changed(bool active, int timeout_ms)
+void GUI_Player::notification_changed(bool /*active*/, int /*timeout_ms*/)
 {
-
 //    m_trayIcon->set_timeout(timeout_ms);
 //    m_trayIcon->set_notification_active(active);
 }
@@ -764,15 +598,13 @@ void GUI_Player::notification_changed(bool active, int timeout_ms)
 
 void GUI_Player::moveEvent(QMoveEvent *e)
 {
-
     QMainWindow::moveEvent(e);
 
     QPoint p = this->pos();
     m_settings->setPlayerPos(p);
-
 }
 
-void GUI_Player::resizeEvent(QResizeEvent* e)
+void GUI_Player::resizeEvent(QResizeEvent*)
 {
 #if 0
     QMainWindow::resizeEvent(e);
@@ -788,7 +620,6 @@ void GUI_Player::resizeEvent(QResizeEvent* e)
 //    }
 
     QSize sz = ui->plugin_widget->size();
-
 
     _pph->resize(sz);
     m_settings->setPlayerSize(this->size());
@@ -817,7 +648,6 @@ void GUI_Player::keyPressEvent(QKeyEvent* e)
     }
 }
 
-
 void GUI_Player::closeEvent(QCloseEvent* e)
 {
 
@@ -827,10 +657,8 @@ void GUI_Player::closeEvent(QCloseEvent* e)
     }
 }
 
-
-void GUI_Player::really_close(bool b)
+void GUI_Player::really_close(bool)
 {
-
     m_min2tray = false;
     this->close();
 }

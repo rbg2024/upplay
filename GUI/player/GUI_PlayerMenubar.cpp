@@ -43,7 +43,6 @@ void GUI_Player::onChangeMediaRenderer()
 
 void GUI_Player::showLibrary(bool b, bool resize)
 {
-
     m_settings->setNoShowLibrary(!b);
     int old_width = this->width();
     int lib_width = this->ui->library_widget->width();
@@ -91,34 +90,11 @@ void GUI_Player::show_fullscreen_toggled(bool b)
     m_settings->setPlayerFullscreen(b);
 }
 
-void GUI_Player::sl_show_only_tracks(bool b)
-{
-}
-
 /** VIEW END **/
 
 
 
 /** PREFERENCES **/
-
-// TODO: not ok
-// -> base
-void GUI_Player::setLibraryPathClicked(bool b)
-{
-    Q_UNUSED(b);
-}
-
-void GUI_Player::psl_libpath_changed(QString& dir)
-{
-    Q_UNUSED(dir);
-}
-
-
-// prvt slot
-void GUI_Player::sl_action_socket_connection_triggered(bool b)
-{
-    emit sig_show_socket();
-}
 
 // prvt slot
 void GUI_Player::load_pl_on_startup_toggled(bool b)
@@ -141,7 +117,7 @@ void GUI_Player::min2tray_toggled(bool b)
     m_min2tray = b;
 }
 
-void GUI_Player::only_one_instance_toggled(bool b)
+void GUI_Player::only_one_instance_toggled(bool)
 {
 }
 
@@ -152,25 +128,6 @@ void GUI_Player::small_playlist_items_toggled(bool b)
     emit show_small_playlist_items(b);
 }
 
-// private slot
-void GUI_Player::sl_action_streamripper_toggled(bool b)
-{
-
-    emit sig_show_stream_rec();
-}
-
-// prvt slot
-void GUI_Player::lastFMClicked(bool b)
-{
-    Q_UNUSED(b);
-    emit setupLastFM();
-}
-
-void GUI_Player::sl_live_search(bool b)
-{
-//   m_settings->setLibLiveSearch(b);
-}
-
 void GUI_Player::sl_action_language_toggled(bool b)
 {
     Q_UNUSED(b);
@@ -179,13 +136,12 @@ void GUI_Player::sl_action_language_toggled(bool b)
 
 /** PREFERENCES END **/
 
-void GUI_Player::help(bool b)
+void GUI_Player::help(bool)
 {
-    Q_UNUSED(b);
-    QString link = Helper::createLink("http://sayonara.luciocarreras.de/Forum/xmb");
+    QString link = Helper::createLink("http://www.lesbonscomptes.com/upplay");
 
-    QMessageBox::information(this, tr("Help"), tr("Please visit the forum at") + "<br />" + link);
-
+    QMessageBox::information(this, tr("Help"), tr("See links on") + "<br />" 
+                             + link);
 }
 
 // private slot
@@ -194,24 +150,25 @@ void GUI_Player::about(bool b)
     Q_UNUSED(b);
 
     QString version = m_settings->getVersion();
-    QString link = Helper::createLink("http://sayonara.luciocarreras.de");
+    QString link = Helper::createLink("http://www.lesbonscomptes.com/upplay");
 
     QMessageBox infobox(this);
     infobox.setParent(this);
-    QPixmap p = QPixmap(Helper::getIconPath() + "logo.png").scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QPixmap p =  QPixmap(Helper::getIconPath() + "logo.png").
+        scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     infobox.setIconPixmap(p);
     infobox.setWindowFlags(Qt::Dialog);
     infobox.setModal(true);
 
-
-    infobox.setWindowTitle(tr("About Sayonara"));
-    infobox.setText("<b><font size=\"+2\">Sayonara Player " + version + "</font></b>");
-    infobox.setInformativeText(QString("") +
-                               tr("Written by Lucio Carreras") + "<br /><br />" +
-                               tr("License") + ": GPL<br /><br />" +
-                               "Copyright 2011-2013<br /><br />" + link + "<br /><br /><br />" +
-                               tr("Special thanks to %1 for translating").arg("Julia Karakoz")
-                              );
+    infobox.setWindowTitle(tr("About Upplay"));
+    infobox.setText("<b><font size=\"+2\">Upplay Player " + 
+                    version + "</font></b>");
+    infobox.setInformativeText(
+        QString("") +
+        tr("Based on Sayonara, written by Lucio Carreras") + "<br />" +
+        tr("License") + ": GPL<br />" +
+        "Copyright 2011-2013<br /><br />" + link + "<br /><br />"
+        );
     infobox.setStandardButtons(QMessageBox::Ok);
     infobox.button(QMessageBox::Ok)->setFocusPolicy(Qt::NoFocus);
     Helper::set_deja_vu_font(&infobox);

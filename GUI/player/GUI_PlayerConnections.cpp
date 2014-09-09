@@ -22,7 +22,6 @@
 
 void GUI_Player::setupConnections()
 {
-
     connect(ui->btn_play, SIGNAL(clicked(bool)), this,
             SLOT(playClicked(bool)));
     connect(ui->btn_fw, SIGNAL(clicked(bool)), this,
@@ -35,8 +34,6 @@ void GUI_Player::setupConnections()
             SLOT(muteButtonPressed()));
     connect(ui->btn_rec, SIGNAL(toggled(bool)), this,
             SLOT(sl_rec_button_toggled(bool)));
-    connect(ui->btn_correct, SIGNAL(clicked(bool)), this,
-            SLOT(correct_btn_clicked(bool)));
     connect(ui->albumCover, SIGNAL(clicked()), this, SLOT(coverClicked()));
 
     // file
@@ -55,8 +52,6 @@ void GUI_Player::setupConnections()
 
     connect(ui->action_smallPlaylistItems, SIGNAL(toggled(bool)), this,
             SLOT(small_playlist_items_toggled(bool)));
-    connect(ui->action_showOnlyTracks, SIGNAL(toggled(bool)), this,
-            SLOT(sl_show_only_tracks(bool)));
     connect(ui->action_Fullscreen, SIGNAL(toggled(bool)), this,
             SLOT(show_fullscreen_toggled(bool)));
 
@@ -64,37 +59,17 @@ void GUI_Player::setupConnections()
     // preferencesF
     connect(ui->action_Language, SIGNAL(triggered(bool)), this,
             SLOT(sl_action_language_toggled(bool)));
-    connect(ui->action_lastFM, SIGNAL(triggered(bool)), this,
-            SLOT(lastFMClicked(bool)));
-    connect(ui->action_setLibPath, SIGNAL(triggered(bool)), this,
-            SLOT(setLibraryPathClicked(bool)));
-//    connect(ui->action_startup, SIGNAL(triggered(bool)), ui_startup_dialog,
-//            SLOT(show()));
     connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
             SLOT(min2tray_toggled(bool)));
     connect(ui->action_only_one_instance, SIGNAL(toggled(bool)), this,
             SLOT(only_one_instance_toggled(bool)));
 
-    connect(ui->action_streamrecorder, SIGNAL(triggered(bool)), this,
-            SLOT(sl_action_streamripper_toggled(bool)));
-#if 0
-    connect(ui->action_notifications, SIGNAL(triggered(bool)), ui_notifications,
-            SLOT(show()));
-    connect(ui->action_SocketConnection, SIGNAL(triggered(bool)), this,
-            SLOT(sl_action_socket_connection_triggered(bool)));
-
-    connect(ui->action_livesearch, SIGNAL(triggered(bool)), this,
-            SLOT(sl_live_search(bool)));
-    connect(ui->action_notifyNewVersion, SIGNAL(triggered(bool)), this,
-            SLOT(sl_notify_new_version(bool)));
-#endif
-
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
 
     connect(ui->action_help, SIGNAL(triggered(bool)), this, SLOT(help(bool)));
-    connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)), this, SLOT(volumeChangedByTick(int)));
-
+    connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)), 
+            this, SLOT(volumeChangedByTick(int)));
 
     connect(ui->volumeSlider, SIGNAL(searchSliderMoved(int)), this,
             SLOT(volumeChanged(int)));
@@ -105,41 +80,8 @@ void GUI_Player::setupConnections()
 
     connect(ui->songProgress, SIGNAL(searchSliderReleased(int)), this,
             SLOT(setProgressJump(int)));
-//    connect(ui->songProgress, SIGNAL(searchSliderPressed(int)), this,
-//            SLOT(setProgressJump(int)));
     connect(ui->songProgress, SIGNAL(searchSliderMoved(int)), this,
             SLOT(setProgressJump(int)));
-
-
-
-    // cover lookup
-#if 0
-    connect(m_cov_lookup, SIGNAL(sig_covers_found(const QStringList&, QString)),
-            this, SLOT(covers_found(const QStringList&, QString)));
-
-    connect(m_alternate_covers, SIGNAL(sig_covers_changed(QString, QString)),
-            this,               SLOT(sl_alternate_cover_available(QString, QString)));
-
-    connect(m_alternate_covers, SIGNAL(sig_no_cover()),
-            this,               SLOT(sl_no_cover_available()));
-
-
-    // notifications
-    connect(ui_notifications, SIGNAL(sig_settings_changed(bool, int)),
-            this, SLOT(notification_changed(bool, int)));
-
-    // language chooser
-    connect(ui_language_chooser, SIGNAL(sig_language_changed(QString)),
-            this, SLOT(language_changed(QString)));
-
-
-    connect(m_async_wa, SIGNAL(finished()), this, SLOT(async_wa_finished()));
-
-    if (ui_libpath) {
-        connect(ui_libpath, SIGNAL(sig_library_path_set()), this, SLOT(setLibraryPathClicked()));
-    }
-#endif
-
 
     QList<QKeySequence> lst;
     lst << QKeySequence(Qt::Key_MediaTogglePlayPause) << QKeySequence(Qt::Key_MediaPlay) << QKeySequence(Qt::Key_MediaPause) << QKeySequence(Qt::Key_Space);

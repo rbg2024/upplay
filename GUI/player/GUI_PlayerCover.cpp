@@ -29,41 +29,28 @@
 /** COVERS **/
 void GUI_Player::coverClicked()
 {
-
-    if (m_metadata.radio_mode == RADIO_STATION) {
-        QString searchstring = QString("Radio ") + m_metadata.title;
-        QString targetpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-
-//        m_alternate_covers->start(searchstring, targetpath);
+    QString searchstring;
+    if (m_metadata.album.size() != 0 || m_metadata.artist != 0) {
+        searchstring = m_metadata.album + " " + m_metadata.artist;
+    } else {
+        searchstring = m_metadata.title + " " + m_metadata.artist;
     }
 
-    else {
+    searchstring = searchstring.trimmed();
 
-        QString searchstring;
-        if (m_metadata.album.size() != 0 || m_metadata.artist != 0) {
-            searchstring = m_metadata.album + " " + m_metadata.artist;
-        }
+    QString targetpath = 
+        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
-        else {
-            searchstring = m_metadata.title + " " + m_metadata.artist;
-        }
-
-        searchstring = searchstring.trimmed();
-
-        QString targetpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-
-        //m_alternate_covers->start(searchstring, targetpath);
-    }
-
-
+    //m_alternate_covers->start(searchstring, targetpath);
 
     this->setFocus();
 }
 
-void GUI_Player::sl_alternate_cover_available(QString target_class, QString coverpath)
+void GUI_Player::sl_alternate_cover_available(QString /*target_class*/,
+                                              QString coverpath)
 {
-
-    QString own_coverpath = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
+    QString own_coverpath = 
+        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
     if (coverpath != own_coverpath) {
         return;
     }
@@ -73,18 +60,14 @@ void GUI_Player::sl_alternate_cover_available(QString target_class, QString cove
 
 void GUI_Player::sl_no_cover_available()
 {
-
-
     QString coverpath = Helper::getIconPath() + "logo.png";
     ui->albumCover->setIcon(QIcon(coverpath));
 }
-
 
 // public slot
 // cover was found by CoverLookup
 void GUI_Player::covers_found(const QStringList& cover_paths, QString call_id)
 {
-
     Q_UNUSED(cover_paths);
     Q_UNUSED(call_id);
     QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);

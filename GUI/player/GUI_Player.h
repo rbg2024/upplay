@@ -17,36 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 #ifndef GUI_SIMPLEPLAYER_H
 #define GUI_SIMPLEPLAYER_H
-#include "ui_GUI_Player.h"
-//#include "GUI/playlist/GUI_Playlist.h"
-//#include "GUI/library/GUI_Library_windowed.h"
-//#include "GUI/library/GUI_LibraryPath.h"
-//#include "GUI/equalizer/GUI_Equalizer.h"
-//#include "GUI/playlist_chooser/GUI_PlaylistChooser.h"
-//#include "GUI/LastFM/GUI_LFMRadioWidget.h"
-//#include "GUI/stream/GUI_Stream.h"
-//#include "GUI/Podcasts/GUI_Podcasts.h"
-//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
-//#include "GUI/Notifications/GUI_Notifications.h"
-//#include "GUI/startup_dialog/GUI_Startup_Dialog.h"
-//#include "GUI/LanguageChooser/GUI_LanguageChooser.h"
-
-//#include "CoverLookup/CoverLookup.h"
-//#include "Notification/Notification.h"
-//#include "PlayerPlugin/PlayerPluginHandler.h"
-//#include "PlayerPlugin/PlayerPlugin.h"
-
-#include "HelperStructs/Helper.h"
-//#include "HelperStructs/AsyncWebAccess.h"
 
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QTranslator>
-#include "GUI/player/GUI_TrayIcon.h"
 
 #include <QList>
 #include <QCloseEvent>
@@ -55,6 +31,22 @@
 #include <QWidget>
 #include <QAction>
 #include <QDebug>
+
+#include "ui_GUI_Player.h"
+//#include "GUI/playlist/GUI_Playlist.h"
+//#include "GUI/library/GUI_Library_windowed.h"
+//#include "GUI/playlist_chooser/GUI_PlaylistChooser.h"
+//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
+//#include "GUI/Notifications/GUI_Notifications.h"
+//#include "GUI/startup_dialog/GUI_Startup_Dialog.h"
+//#include "GUI/LanguageChooser/GUI_LanguageChooser.h"
+//#include "CoverLookup/CoverLookup.h"
+//#include "Notification/Notification.h"
+//#include "PlayerPlugin/PlayerPluginHandler.h"
+//#include "PlayerPlugin/PlayerPlugin.h"
+
+#include "GUI/player/GUI_TrayIcon.h"
+#include "HelperStructs/Helper.h"
 
 class GUI_Playlist;
 class PlayerPlugin;
@@ -69,8 +61,7 @@ class CoverLookup;
 class GUI_Alternate_Covers;
 class AsyncWebAccess;
 
-class GUI_Player : public QMainWindow, private Ui::Sayonara
-{
+class GUI_Player : public QMainWindow {
     Q_OBJECT
 public:
     explicit GUI_Player(QTranslator* translator, QWidget *parent = 0);
@@ -81,15 +72,8 @@ public slots:
     void covers_found(const QStringList& lst, QString call_id);
     void update_track (const MetaData & in, int pos=0, bool playing=true);
     void setCurrentPosition (quint32 pos_sec);
-    void psl_id3_tags_changed(MetaDataList& v_md);
-    void psl_reload_library_allowed(bool);
 
     void really_close(bool=false);
-
-    /* Last FM */
-    void last_fm_logged_in(bool);
-    void lfm_info_fetched(const MetaData& md, bool loved, bool corrected);
-    void psl_lfm_activated(bool b);
 
     /**
       * Set current position in filestream
@@ -106,8 +90,6 @@ public slots:
     void showPlugin(PlayerPlugin* plugin);
     void hideAllPlugins();
 
-    void psl_libpath_changed(QString &);
-
 signals:
 
     /* Player*/
@@ -120,7 +102,6 @@ signals:
     void sig_rec_button_toggled(bool);
     void sig_volume_changed (int);
     void search(int pos_percent);
-    void sig_correct_id3(const MetaData&);
 
 
     /* File */
@@ -129,12 +110,7 @@ signals:
     /* Preferences / View */
     void show_playlists();
     void show_small_playlist_items(bool);
-    void sig_show_socket();
-    void sig_show_stream_rec();
-    void libpath_changed(QString);
-    void setupLastFM();
     void sig_skin_changed(bool);
-    void sig_show_only_tracks(bool);
     void sig_language_changed();
 
     /* Covers */
@@ -153,7 +129,6 @@ private slots:
     void backwardClicked(bool b = true);
     void forwardClicked(bool b = true);
     void sl_rec_button_toggled(bool b);
-    void correct_btn_clicked(bool b=false);
     void coverClicked();
     void setProgressJump(int percent);
     void jump_forward();
@@ -177,21 +152,14 @@ private slots:
 
     /* Preferences */
     void sl_action_language_toggled(bool b=true);
-    void lastFMClicked(bool b = true);
-    void setLibraryPathClicked(bool b = true);
 
     void load_pl_on_startup_toggled(bool);
     void min2tray_toggled(bool);
     void only_one_instance_toggled(bool);
-    void sl_action_streamripper_toggled(bool);
-    void sl_action_socket_connection_triggered(bool);
-    void sl_show_only_tracks(bool);
-    void sl_live_search(bool);
     void sl_notify_new_version(bool);
 
     void about(bool b=false);
     void help(bool b=false);
-
 
     void sl_alternate_cover_available(QString, QString);
     void sl_no_cover_available();
@@ -216,21 +184,15 @@ public:
     void ui_loaded();
     void setStyle(int);
 
-
 protected:
-
     void closeEvent(QCloseEvent* e);
-
     void keyPressEvent(QKeyEvent* e);
     void resizeEvent(QResizeEvent* e);
     void moveEvent(QMoveEvent* e);
 
-
-
-
 private:
 
-    Ui::Sayonara*       ui;
+    Ui::Upplay *ui;
 
     GUI_Playlist*           ui_playlist;
     GUI_Library_windowed*   ui_library;

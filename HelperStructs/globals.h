@@ -1,5 +1,3 @@
-/* globals.h */
-
 /* Copyright (C) 2012  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -10,20 +8,18 @@
  * (at your option) any later version.
 
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT SANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef GLOBALS_H_
+#define GLOBALS_H_
 
 #include <QString>
 #include <QDebug>
-
-
-#ifndef GLOBALS_H_
-#define GLOBALS_H_
 
 
 #define DARK_BLUE(x) QString("<font color=#0000FF>") + x + QString("</font>")
@@ -37,9 +33,6 @@
 // name, target, dark, string
 #define LINK(n, t, d, s) if(d) s="<a href=\"t\">LIGHT_BLUE(n)</a>"; \
                          else  s="<a href=\"t\">DARK_BLUE(n)</a>";
-
-#define SAYONARA_ORANGE_STR QString("#e8841a")
-#define SAYONARA_ORANGE_COL QColor(232, 132, 26)
 
 #define RADIO_OFF 0
 #define RADIO_LFM 1
