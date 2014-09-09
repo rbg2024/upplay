@@ -253,8 +253,8 @@
      <widget class="QPushButton" name="albumCover">
       <property name="minimumSize">
        <size>
-        <width>95</width>
-        <height>95</height>
+        <width>80</width>
+        <height>80</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -271,8 +271,8 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>95</width>
-        <height>95</height>
+        <width>80</width>
+        <height>80</height>
        </size>
       </property>
       <property name="flat">

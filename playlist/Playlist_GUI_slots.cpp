@@ -23,7 +23,6 @@
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/CSettingsStorage.h"
 
-
 // GUI -->
 void Playlist::psl_clear_playlist()
 {
@@ -32,11 +31,9 @@ void Playlist::psl_clear_playlist()
     emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
 }
 
-
 // play a track
 void Playlist::psl_play()
 {
-
     bool pause_old = _pause;
     _pause = false;
 
@@ -51,7 +48,6 @@ void Playlist::psl_play()
 
     // state was stop until now
     if (_cur_play_idx < 0) {
-
         int track_num = 0;
         MetaData md = _v_meta_data[track_num];
 
@@ -143,7 +139,6 @@ void Playlist::psl_insert_tracks(const MetaDataList& v_metadata, int row)
         }
     }
 
-
     psl_save_playlist_to_storage();
     emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
 }
@@ -165,8 +160,6 @@ void Playlist::psl_append_tracks(MetaDataList& v_md)
     }
     emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
 }
-
-
 
 // remove one row
 void Playlist::remove_row(int row)
