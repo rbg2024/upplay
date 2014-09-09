@@ -135,7 +135,7 @@ void GUI_Playlist::resizeEvent(QResizeEvent* e){
     this->ui->listView->reset();
 }
 
-void GUI_Playlist::focusInEvent(QFocusEvent *e){
+void GUI_Playlist::focusInEvent(QFocusEvent *){
 
     this->ui->listView->setFocus();
 }
@@ -212,7 +212,7 @@ void GUI_Playlist::clear_playlist_slot(){
 
 
 // private SLOT: playlist item pressed (init drag & drop)
-void GUI_Playlist::selection_changed(MetaDataList& v_md){
+void GUI_Playlist::selection_changed(MetaDataList&){
 
 //    _info_dialog->setMetaData(v_md);
 
@@ -224,10 +224,9 @@ void GUI_Playlist::double_clicked(int row ){
     emit selected_row_changed(row);
 }
 
-void GUI_Playlist::track_changed(int row){
+void GUI_Playlist::track_changed(int row) {
     ui->listView->set_current_track(row);
 }
-
 
 // private SLOT: rep1, repAll, shuffle or append has changed
 void GUI_Playlist::playlist_mode_changed_slot(){

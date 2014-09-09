@@ -11,7 +11,7 @@ class GUI_PlaylistEntry : public QFrame {
     Q_OBJECT
 
 public:
-    GUI_PlaylistEntry(QWidget* parent){}
+    GUI_PlaylistEntry(QWidget*){}
     virtual ~GUI_PlaylistEntry(){}
 
     virtual  void setContent(const MetaData& md, int idx)=0;

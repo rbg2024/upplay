@@ -213,10 +213,16 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
     out += QString("</a></div>");
     return out;
 }
+
 static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
     out += QString("<div class=\"item\" objid=\"%1\">").arg(idx);
+    string tnum;
+    e.getprop("upnp:originalTrackNumber", tnum);
+    out += QString::fromUtf8((tnum.c_str()));
+    for (unsigned int i = tnum.size(); i < 5; i++)
+        out += QString("&nbsp;");
     out += QString("<a href=\"I%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
     out += QString("</a></div>");

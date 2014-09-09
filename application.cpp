@@ -82,6 +82,8 @@ bool Application::setupRenderer(const string& uid)
 {
     delete rdco;
     delete avto;
+    rdco = 0;
+    avto = 0;
 
     MRDH rdr = getRenderer(uid, false);
     if (!rdr) {
@@ -207,8 +209,15 @@ void Application::renderer_connections()
 
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
-    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
+    CONNECT(playlist, sig_play_now(const MetaData&, int, bool),
             avto, changeTrack(const MetaData&, int, bool));
+    CONNECT(avto, endOfTrackIsNear(), playlist, psl_prepare_for_the_end());
+    CONNECT(avto, tpStateChanged(int), playlist, psl_new_transport_state(int));
+    CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
+    CONNECT(avto, newTrackPlaying(const QString&), 
+            playlist, psl_ext_track_change(const QString&));
+    CONNECT(playlist, sig_next_track_to_play(const MetaData&),
+            avto, infoNextTrack(const MetaData&));
     CONNECT(playlist, sig_no_track_to_play(),  avto, stop());
     CONNECT(playlist, sig_goon_playing(), avto, play());
 }
@@ -228,7 +237,7 @@ void Application::init_connections()
             ui_playlist, psl_show_small_playlist_items(bool));
     CONNECT(player, sig_choose_renderer(), this, chooseRenderer());
 
-    CONNECT(playlist, sig_selected_file_changed_md(const MetaData&, int, bool),
+    CONNECT(playlist, sig_track_metadata(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
     CONNECT(playlist, sig_no_track_to_play(),  player, stopped());
     CONNECT(playlist, sig_selected_file_changed(int), 

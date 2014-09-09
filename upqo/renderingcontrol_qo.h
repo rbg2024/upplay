@@ -32,16 +32,16 @@ public:
 
     void changed(const char *nm, int value)
         {
-            qDebug() << "RDR: Changed: " << nm << " : " << value << " (int)";
+            //qDebug() << "RDR: Changed: " << nm << " : " << value << " (int)";
             if (!strcmp(nm, "Volume")) {
                 emit volumeChanged(value);
             } else if (!strcmp(nm, "Mute")) {
                 emit muteChanged(value);
             }
         }
-    void changed(const char *nm, const char *value)
+    void changed(const char */*nm*/, const char */*value*/)
         {
-            qDebug() << "RDR: Changed: " << nm << " : " << value << " (char*)";
+            //qDebug()<< "RDR: Changed: " << nm << " : " << value << " (char*)";
         }
 
     int volume() {return m_srv->getVolume();}

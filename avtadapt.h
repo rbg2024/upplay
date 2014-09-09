@@ -54,12 +54,17 @@ public:
 public slots:
     void changeTrack(const MetaData& md, int /*pos_secs*/, bool /*playnow*/)
     {
-        cerr << "MetaDataAdaptor:: changetrack" << endl;
         MetaDataAdaptor mad(md);
         AVTransportQO::changeTrack(qs2utf8s(md.filepath), &mad);
         AVTransportQO::play();
     }
 
+    // Inform about the next track to play (for setNextAVTURI)
+    void infoNextTrack(const MetaData& md)
+    {
+        MetaDataAdaptor mad(md);
+        AVTransportQO::prepareNextTrack(qs2utf8s(md.filepath), &mad);
+    }
 };
 
 

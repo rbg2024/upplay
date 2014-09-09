@@ -349,7 +349,7 @@ void PlaylistView::fill(MetaDataList &v_metadata, int cur_play_idx){
 
         QModelIndex model_idx = _model->index(i, 0);
 
-        md.pl_playing = (cur_play_idx == i);
+        md.pl_playing = (cur_play_idx == int(i));
         if(md.pl_playing) idx_cur_playing = model_idx;
 
         if(md.pl_selected)
@@ -365,7 +365,7 @@ void PlaylistView::fill(MetaDataList &v_metadata, int cur_play_idx){
 
 }
 
-void PlaylistView::row_pressed(const QModelIndex& idx){
+void PlaylistView::row_pressed(const QModelIndex&){
 
     QList<int> selected_rows = calc_selections();
     _inner_drag_drop = true;
@@ -385,7 +385,7 @@ void PlaylistView::row_pressed(const QModelIndex& idx){
     emit sig_selection_changed(v_md);
 }
 
-void PlaylistView::row_released(const QModelIndex& idx){
+void PlaylistView::row_released(const QModelIndex&){
     calc_selections();
     _inner_drag_drop = false;
 }
