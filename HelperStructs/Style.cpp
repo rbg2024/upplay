@@ -1,5 +1,3 @@
-/* Style.cpp */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,19 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * Style.cpp
- *
- *  Created on: Oct 27, 2011
- *      Author: luke
- */
-
-#include "HelperStructs/Helper.h"
-#include "HelperStructs/Style.h"
 #include <QString>
 #include <QDebug>
 
+#include "HelperStructs/Helper.h"
+#include "HelperStructs/Style.h"
 
 
 #define NEWLINE "\n";
@@ -100,14 +90,14 @@ QString Style::get_v_slider_style(bool dark, int percent){
 
 
     QString style =  QString("QSlider {") +
-            "border-radius: 4px; " +
-            "background: #383838; " +
+        "border-radius: 4px; " +
+        "background: #383838; " +
 
         "}" +
 
         "QSlider::handle:vertical {" +
-       "     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "+
-         "                                 stop: 0 #6B6B6B, stop: 0.4 " + dark_grey + ");" +
+        "     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "+
+        "                                 stop: 0 #6B6B6B, stop: 0.4 " + dark_grey + ");" +
         "    height: 10px;" +
         "    margin-left: -5px; " +
         "    margin-right: -5px; " +
@@ -132,14 +122,14 @@ QString Style::get_v_slider_style(bool dark, int percent){
 
         "QSlider::add-page:vertical {"+
         /*"    background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, "  +
-        "          stop:0 #E88417, stop: 0.3 #C46600, " +
-        "          stop: 0.7 #C46600, stop:1 #E88417); " +*/
+          "          stop:0 #E88417, stop: 0.3 #C46600, " +
+          "          stop: 0.7 #C46600, stop:1 #E88417); " +*/
         //"      background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(255, 0, 0, 255), stop:0.505051 rgba(255, 228, 0, 255), stop:1 rgba(55, 239, 78, 255)); "
 
         "    background-color: " + back_col + "; "
         "    border-radius: 2px;" +
 
-       "}"+
+        "}"+
 
         "QSlider::sub-page:vertical, QSlider::add-page:vertical:disabled {"+
         "   background: " + darker_grey + ";"+

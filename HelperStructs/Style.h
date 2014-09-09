@@ -1,5 +1,3 @@
-/* Style.h */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,31 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * Style.h
- *
- *  Created on: Oct 27, 2011
- *      Author: luke
- */
-
 #ifndef STYLE_H_
 #define STYLE_H_
-
 
 #include <QString>
 #include <QPalette>
 
+namespace Style {
 
-
-namespace Style{
-
-	QString get_style(bool dark);
+    QString get_style(bool dark);
 
     QString get_tv_style(bool dark, QPalette* p=0);
 
     QString get_v_slider_style(bool dark, int percent = -1);
-
 
 };
 
