@@ -70,6 +70,8 @@ public slots:
     void showPlugin(PlayerPlugin* plugin);
     void hideAllPlugins();
 
+    void setRendererName(const QString& nm);
+
 signals:
 
     /* Player*/
@@ -178,6 +180,7 @@ private:
     GUI_Alternate_Covers*   m_alternate_covers;
 
     QString                 m_class_name;
+    QString m_renderer_friendly_name;
     quint32                 m_completeLength_ms;
     bool                    m_playing;
     bool                    m_mute;

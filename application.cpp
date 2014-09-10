@@ -107,6 +107,10 @@ bool Application::setupRenderer(const string& uid)
 
     rdco = new RenderingControlQO(rdc);
     avto = new AVTPlayer(avt);
+    QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
+    if (player) {
+        player->setRendererName(fn);
+    }
     return true;
 }
 
@@ -131,12 +135,10 @@ void Application::chooseRenderer()
         return;
     }
 
-    qDebug() << "Choosen: " << devices[row].friendlyName.c_str();
-
+    QString friendlyname = QString::fromUtf8(devices[row].friendlyName.c_str());
     if (!setupRenderer(devices[row].UDN)) {
-        QMessageBox::warning(
-            0, "Upplay", tr("Can't connect to ") + 
-            QString::fromUtf8(devices[row].friendlyName.c_str()));
+        QMessageBox::warning(0, "Upplay", tr("Can't connect to ") + 
+                             friendlyname);
         return;
     }
     set->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
@@ -175,15 +177,11 @@ Application::Application(QApplication* qapp, int,
 
     init_connections();
 
-    qDebug() << "setting up player";
     player->setWindowTitle("Upplay " + version);
     player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
-
     player->setPlaylist(ui_playlist);
-
     player->setStyle( set->getPlayerStyle() );
     player->show();
-    cdb->show();
 
     ui_playlist->resize(player->getParentOfPlaylist()->size());
 
@@ -259,31 +257,7 @@ void Application::init_connections()
 
 QString Application::getVersion()
 {
-
-    ifstream istr;
-    QString version_file = Helper::getSharePath() + "/VERSION";
-
-    istr.open(version_file.toUtf8()  );
-    if(!istr || !istr.is_open() ) return "0.3.1";
-
-    QMap<QString, int> map;
-
-    while(istr.good()){
-        string type;
-        int version;
-        istr >> type >> version;
-        if(type.size() > 0)
-            qDebug() << type.c_str() << ": " << version;
-
-        map[QString(type.c_str())] = version;
-    }
-
-    istr.close();
-
-    QString version_str = QString::number(map["MAJOR"]) + "." +
-        QString::number(map["MINOR"]) + "." +
-        QString::number(map["SUBMINOR"]) + " r" + QString::number(map["BUILD"]);
-    return version_str;
+    return UPPLAY_VERSION;
 }
 
 QMainWindow* Application::getMainWindow()

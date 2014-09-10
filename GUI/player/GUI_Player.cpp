@@ -70,7 +70,9 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->lab_album->hide();
 
     ui->lab_sayonara->setText(tr("Upplay Player"));
-    ui->lab_version->setText(m_settings->getVersion());
+    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ? 
+                             m_settings->getVersion() : 
+                             m_renderer_friendly_name);
     ui->lab_writtenby->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
     ui->lab_copyright->setText(tr("Copyright") + " 2011-2013");
 
@@ -138,6 +140,13 @@ GUI_Player::~GUI_Player()
     delete ui;
 }
 
+void GUI_Player::setRendererName(const QString& nm)
+{
+    m_renderer_friendly_name = nm;
+    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ? 
+                             m_settings->getVersion() : 
+                             m_renderer_friendly_name);
+}
 
 QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list)
 {
@@ -161,7 +170,6 @@ QAction* GUI_Player::createAction(QKeySequence seq)
 
 void GUI_Player::initGUI()
 {
-
     ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     ui->btn_rec->setIcon(QIcon(Helper::getIconPath() + "rec.png"));
@@ -184,7 +192,6 @@ void GUI_Player::initGUI()
 // new track
 void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 {
-
     m_metadata = md;
 
     m_completeLength_ms = md.length_ms;

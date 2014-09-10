@@ -3,7 +3,7 @@ LANGUAGE        = C++
 
 QT += webkit
 
-QMAKE_CXXFLAGS += -std=c++0x 
+QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"0.1.0\\\"
 
 CONFIG  += qt warn_on thread release 
 
