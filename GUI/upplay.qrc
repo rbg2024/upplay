@@ -1,0 +1,33 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+  <file>icons/append.png</file>
+  <file>icons/broom.png</file>
+  <file>icons/bwd.png</file>
+  <file>icons/close.png</file>
+  <file>icons/delete.png</file>
+  <file>icons/dynamic.png</file>
+  <file>icons/edit.png</file>
+  <file>icons/fwd.png</file>
+  <file>icons/fwd_orange.png</file>
+  <file>icons/id3.png</file>
+  <file>icons/import.png</file>
+  <file>icons/info_small.png</file>
+  <file>icons/logo.png</file>
+  <file>icons/numbers.png</file>
+  <file>icons/pause.png</file>
+  <file>icons/play.png</file>
+  <file>icons/rec.png</file>
+  <file>icons/rep1.png</file>
+  <file>icons/repAll.png</file>
+  <file>icons/shuffle.png</file>
+  <file>icons/stop.png</file>
+  <file>icons/vol_1_dark.png</file>
+  <file>icons/vol_1.png</file>
+  <file>icons/vol_2_dark.png</file>
+  <file>icons/vol_2.png</file>
+  <file>icons/vol_3_dark.png</file>
+  <file>icons/vol_3.png</file>
+  <file>icons/vol_mute_dark.png</file>
+  <file>icons/vol_mute.png</file>
+</qresource>
+</RCC>

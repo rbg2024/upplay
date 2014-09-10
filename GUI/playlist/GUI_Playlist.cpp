@@ -64,8 +64,6 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
 
     _info_dialog = dialog;
 
-    _radio_active = RADIO_OFF;
-
     _playlist_mode = settings->getPlaylistMode();
 
     ui->btn_append->setChecked(_playlist_mode.append);
@@ -158,14 +156,6 @@ void GUI_Playlist::initGUI()
     ui->btn_numbers->setIcon(QIcon(icon_path + "numbers.png"));
 }
 
-
-void GUI_Playlist::library_path_changed(QString path)
-{
-    Q_UNUSED(path);
-    check_dynamic_play_button();
-}
-
-
 void GUI_Playlist::check_dynamic_play_button()
 {
 }
@@ -177,13 +167,21 @@ void GUI_Playlist::metadata_dropped(const MetaDataList& v_md, int row)
 }
 
 // SLOT: fill all tracks in v_metadata into playlist
-void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int radio_mode)
+void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int)
 {
 
     ui->listView->fill(v_metadata, cur_play_idx);
     _total_msecs = 0;
-    _radio_active = radio_mode;
-    set_radio_active(radio_mode);
+
+    ui->btn_append->setVisible(true);
+    ui->btn_dynamic->setVisible(true);
+    ui->btn_repAll->setVisible(true);
+    ui->btn_shuffle->setVisible(true);
+
+    int actions = ENTRY_INFO | ENTRY_REMOVE | ENTRY_EDIT;
+
+    ui->listView->set_context_menu_actions(actions);
+    ui->listView->set_drag_enabled(true);
 
     foreach(MetaData md, v_metadata) {
         _total_msecs += md.length_ms;
@@ -208,10 +206,8 @@ void GUI_Playlist::clear_playlist_slot()
 // private SLOT: playlist item pressed (init drag & drop)
 void GUI_Playlist::selection_changed(MetaDataList&)
 {
-
 //    _info_dialog->setMetaData(v_md);
-
-//    this->_info_dialog->set_tag_edit_visible(_radio_active == RADIO_OFF);
+//    this->_info_dialog->set_tag_edit_visible(true);
 }
 
 
@@ -301,12 +297,6 @@ void GUI_Playlist::set_total_time_label()
 
     QString text = "";
 
-    if (_radio_active == RADIO_STATION) {
-
-        ui->lab_totalTime->setText(tr("Radio"));
-        return;
-    }
-
     ui->lab_totalTime->setContentsMargins(0, 2, 0, 2);
 
     int n_rows = ui->listView->get_num_rows();
@@ -322,33 +312,6 @@ void GUI_Playlist::set_total_time_label()
 
     ui->lab_totalTime->setText(playlist_string);
 }
-
-
-
-void GUI_Playlist::set_radio_active(int radio)
-{
-
-    _radio_active = radio;
-
-    ui->btn_append->setVisible(radio == RADIO_OFF);
-    ui->btn_dynamic->setVisible(radio == RADIO_OFF);
-    ui->btn_repAll->setVisible(radio == RADIO_OFF);
-    ui->btn_shuffle->setVisible(radio == RADIO_OFF);
-
-    int actions = 0;
-
-    if (radio != RADIO_OFF) {
-        actions = ENTRY_INFO;
-    }
-
-    else {
-        actions = (ENTRY_INFO | ENTRY_REMOVE | ENTRY_EDIT);
-    }
-
-    ui->listView->set_context_menu_actions(actions);
-    ui->listView->set_drag_enabled(radio != RADIO_LFM);
-}
-
 
 
 void GUI_Playlist::psl_show_small_playlist_items(bool small_playlist_items)

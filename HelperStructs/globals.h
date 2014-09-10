@@ -34,10 +34,6 @@
 #define LINK(n, t, d, s) if(d) s="<a href=\"t\">LIGHT_BLUE(n)</a>"; \
                          else  s="<a href=\"t\">DARK_BLUE(n)</a>";
 
-#define RADIO_OFF 0
-#define RADIO_LFM 1
-#define RADIO_STATION 2
-
 #define PLUGIN_NUM 5
 #define PLUGIN_NONE 0
 #define PLUGIN_LFM_RADIO 1

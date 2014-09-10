@@ -153,6 +153,14 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 static const QString init_container_page(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
+    "<style>"
+    "#browsepath {"
+    "  font-size: 80%;"
+    "  font-weight: bold;"
+    "  margin: 0px 0px 0px 0px;"
+    "}"
+    "#browsepath ul { list-style-type: none; margin: 0; padding: 0;}"
+    "#browsepath li { margin-left: 3px; float: left; }"
     "</head><body>"
     "</body></html>"
     );
@@ -173,12 +181,13 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
 
     m_curpath.push_back(pair<string,string>(ctid, cttitle));
 
-    QString htmlpath("<div class=\"browsepath\">");
+    QString htmlpath("<div id=\"browsepath\"><ul>");
     for (unsigned i = 0; i < m_curpath.size(); i++) {
         QString title = QString::fromUtf8(m_curpath[i].second.c_str());
-        htmlpath += QString("<a href=\"L%1\">%2</a>/").arg(i).arg(title);
+        htmlpath += 
+            QString("<li><a href=\"L%1\">%2</a> &gt;</li>").arg(i).arg(title);
     }
-    htmlpath += QString("</div>");
+    htmlpath += QString("</ul></div><br/>");
 
     setHtml(init_container_page);
     appendHtml(htmlpath);
@@ -251,7 +260,7 @@ static const string init_server_page(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
     "</head><body>"
-    "<h1>Content Directory Services</h1>"
+    "<h2 id=\"cdstitle\">Content Directory Services</h2>"
     "</body></html>"
     );
 

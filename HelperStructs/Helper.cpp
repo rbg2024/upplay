@@ -131,20 +131,7 @@ QString Helper::getSharePath()
 
 QString Helper::getIconPath()
 {
-    QDir dir;
-    if (QFile::exists(getSharePath()))
-        dir = QDir(getSharePath());
-    else
-        dir = QDir("GUI");
-
-    QString path = dir.absoluteFilePath("icons");
-
-    if (QFile::exists(path)) {
-        return path + "/";
-    } else {
-        qDebug() << "getIconPath: not found";
-        return "";
-    }
+    return ":/icons/";
 }
 
 QString Helper::get_cover_path(QString artist, QString album, QString extension)

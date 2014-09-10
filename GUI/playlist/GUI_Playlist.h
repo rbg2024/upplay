@@ -1,5 +1,3 @@
-/* GUI_Playlist.h */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -17,27 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-/*
- * GUI_Playlist.h
- *
- *  Created on: Apr 6, 2011
- *      Author: luke
- */
-
 #ifndef GUI_PLAYLIST_H_
 #define GUI_PLAYLIST_H_
 
-#include "GUI_Playlist.h"
-#include "ui_GUI_Playlist.h"
-#include "GUI/playlist/delegate/PlaylistItemDelegate.h"
-//#include "GUI/InfoDialog/GUI_InfoDialog.h"
-
-
-#include "playlist/Playlist.h"
-#include "HelperStructs/MetaData.h"
-#include "HelperStructs/PlaylistMode.h"
+#include <string>
 
 #include <QObject>
 #include <QMainWindow>
@@ -46,7 +27,14 @@
 #include <QTextEdit>
 #include <QList>
 #include <QFocusEvent>
-#include <string>
+
+#include "GUI_Playlist.h"
+#include "ui_GUI_Playlist.h"
+#include "GUI/playlist/delegate/PlaylistItemDelegate.h"
+#include "playlist/Playlist.h"
+#include "HelperStructs/MetaData.h"
+#include "HelperStructs/PlaylistMode.h"
+
 
 class GUI_InfoDialog;
 
@@ -62,7 +50,6 @@ public:
     void dropEvent(QDropEvent* event);
     void dragMoveEvent(QDragMoveEvent* event);
 
-
 signals:
     void selected_row_changed(int);
     void clear_playlist();
@@ -75,21 +62,14 @@ signals:
     void search_similar_artists(const QString&);
     void sig_no_focus();
 
-
-
 public slots:
     void fillPlaylist(MetaDataList&, int, int);
     void track_changed(int);
 
-    void library_path_changed(QString);
-    void set_radio_active(int radio);
     void psl_show_small_playlist_items(bool small_items);
     void language_changed();
 
-
-
 private slots:
-
     void selection_changed(MetaDataList&);
     void double_clicked(int);
     void clear_playlist_slot();
@@ -105,16 +85,13 @@ private slots:
 
 
 private:
-
     Ui::Playlist_Window*            ui;
     QWidget*                        _parent;
     GUI_InfoDialog*                 _info_dialog;
 
     Playlist_Mode                   _playlist_mode;
 
-    int         _radio_active;
     qint64      _total_msecs;
-
 
     void initGUI();
 

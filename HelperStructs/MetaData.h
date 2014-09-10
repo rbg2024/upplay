@@ -53,7 +53,6 @@ struct MetaData {
     int n_discs;
 
     bool is_extern;
-    int radio_mode;
 
     bool pl_selected;
     bool pl_playing;
@@ -78,7 +77,6 @@ struct MetaData {
         track_num = 0;
         bitrate = 0;
         is_extern = false;
-        radio_mode = RADIO_OFF;
         filesize = 0;
         comment = "";
         discnumber = 0;
@@ -133,7 +131,6 @@ struct MetaData {
         list.push_back(QString::number(n_discs));
         list.push_back(genres.join(","));
         list.push_back(QString::number(   (is_extern) ? 1 : 0  ));
-        list.push_back( QString::number(radio_mode) );
         list.push_back( (pl_playing) ? "1" : "0" );
         list.push_back( (pl_selected) ? "1" : "0" );
         list.push_back( (pl_dragged) ? "1" : "0" );
@@ -149,32 +146,31 @@ struct MetaData {
         QStringList list = v.toStringList();
 
         if(list.size() < 24) return false;
-
-        md.title =      list[0];
-        md.artist =     list[1];
-        md.album =      list[2];
-        md.rating =     list[3].toInt();
-        md.length_ms =  list[4].toULongLong();
-        md.year =       list[5].toInt();
-        md.filepath =   list[6];
-        md.track_num =  list[7].toInt();
-        md.bitrate =    list[8].toInt();
-        md.id =         list[9].toInt();
-        md.album_id =   list[10].toInt();
-        md.artist_id =  list[11].toInt();
-        md.filesize =   list[12].toInt();
-        md.comment =    list[13];
-        md.discnumber = list[14].toInt();
-        md.n_discs =    list[15].toInt();
-        md.genres =     list[16].split(",");
-        md.is_extern = ( list[17] == "1" );
-        md.radio_mode = list[18].toInt();
-        md.pl_playing = (list[19] == "1");
-        md.pl_selected = (list[20] == "1");
-        md.pl_dragged = (list[21] == "1");
-        md.is_lib_selected = (list[22] == "1");
-        md.is_disabled = (list[23] == "1");
-        md.didl = list[24];
+        unsigned int idx = 0;
+        md.title =      list[idx++];
+        md.artist =     list[idx++];
+        md.album =      list[idx++];
+        md.rating =     list[idx++].toInt();
+        md.length_ms =  list[idx++].toULongLong();
+        md.year =       list[idx++].toInt();
+        md.filepath =   list[idx++];
+        md.track_num =  list[idx++].toInt();
+        md.bitrate =    list[idx++].toInt();
+        md.id =         list[idx++].toInt();
+        md.album_id =   list[idx++].toInt();
+        md.artist_id =  list[idx++].toInt();
+        md.filesize =   list[idx++].toInt();
+        md.comment =    list[idx++];
+        md.discnumber = list[idx++].toInt();
+        md.n_discs =    list[idx++].toInt();
+        md.genres =     list[idx++].split(",");
+        md.is_extern = ( list[idx++] == "1" );
+        md.pl_playing = (list[idx++] == "1");
+        md.pl_selected = (list[idx++] == "1");
+        md.pl_dragged = (list[idx++] == "1");
+        md.is_lib_selected = (list[idx++] == "1");
+        md.is_disabled = (list[idx++] == "1");
+        md.didl = list[idx++];
 
         return true;
     }

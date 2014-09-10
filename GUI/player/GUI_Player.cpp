@@ -64,8 +64,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     m_settings = CSettingsStorage::getInstance();
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
-//    m_async_wa = new AsyncWebAccess(this);
-
     ui->lab_artist->hide();
     ui->lab_title->hide();
     ui->lab_rating->hide();
@@ -295,12 +293,23 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 
     this->setWindowTitle(QString("Upplay - ") + md.title);
 
-
     ui->btn_correct->setVisible(false);
 
     fetch_cover();
 
-    setRadioMode(md.radio_mode);
+    ui->btn_bw->setEnabled(true);
+    ui->btn_fw->setEnabled(true);
+
+    ui->btn_play->setVisible(true);
+    ui->btn_rec->setVisible(false);
+    ui->btn_play->setEnabled(true);
+
+    m_trayIcon->set_enable_play(true);
+    m_trayIcon->set_enable_fwd(true);
+    m_trayIcon->set_enable_bwd(true);
+
+    ui->songProgress->setEnabled(true);
+
     m_metadata_available = true;
 
     this->repaint();
@@ -310,34 +319,25 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 void GUI_Player::fetch_cover()
 {
 #if 0
-    QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
+    QString cover_path = 
+        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
 
-    if (! QFile::exists(cover_path)) {
-        if (m_metadata.radio_mode != RADIO_STATION) {
-
-            if (m_metadata.album.trimmed().size() == 0 && m_metadata.artist.size() == 0) {
-                cover_path = Helper::getIconPath() + "logo.png";
-            }
-
-            else if (m_metadata.album_id > -1) {
-                m_cov_lookup->fetch_cover_album(m_metadata.album_id);
-            }
-
-            else {
-                Album album;
-                album.name = m_metadata.album;
-                album.artists << m_metadata.artist;
-
-
-                m_cov_lookup->fetch_cover_album(album);
-            }
-
+    if (!QFile::exists(cover_path)) {
+        if (m_metadata.album.trimmed().size() == 0 && 
+            m_metadata.artist.size() == 0) {
             cover_path = Helper::getIconPath() + "logo.png";
+        } else if (m_metadata.album_id > -1) {
+            m_cov_lookup->fetch_cover_album(m_metadata.album_id);
+        } else {
+            Album album;
+            album.name = m_metadata.album;
+            album.artists << m_metadata.artist;
+
+
+            m_cov_lookup->fetch_cover_album(album);
         }
 
-        else {
-            cover_path = Helper::getIconPath() + "radio.png";
-        }
+        cover_path = Helper::getIconPath() + "logo.png";
     }
 
     ui->albumCover->setIcon(QIcon(cover_path));
@@ -507,79 +507,14 @@ void GUI_Player::stopped()
 /** LIBRARY AND PLAYLIST END **/
 
 
-// prvt fct
-void GUI_Player::setRadioMode(int radio)
-{
-
-    bool stream_ripper = false;//m_settings->getStreamRipper();
-    ui->btn_bw->setEnabled(radio == RADIO_OFF);
-    ui->btn_fw->setEnabled(radio != RADIO_STATION);
-
-    if (stream_ripper) {
-
-        bool btn_rec_visible = (radio != RADIO_OFF);
-
-        if (btn_rec_visible) {
-            ui->btn_play->setVisible(radio == RADIO_OFF);
-            ui->btn_rec->setVisible(radio != RADIO_OFF);
-        }
-
-        else {
-            ui->btn_rec->setVisible(radio != RADIO_OFF);
-            ui->btn_play->setVisible(radio == RADIO_OFF);
-        }
-
-        ui->btn_play->setEnabled(radio == RADIO_OFF);
-    }
-
-    else {
-
-        ui->btn_rec->setVisible(false);
-        ui->btn_play->setVisible(true);
-        ui->btn_play->setEnabled(radio == RADIO_OFF);
-    }
-
-    m_trayIcon->set_enable_play(radio == RADIO_OFF);
-    m_trayIcon->set_enable_fwd(radio != RADIO_STATION);
-    m_trayIcon->set_enable_bwd(radio == RADIO_OFF);
-
-    ui->songProgress->setEnabled(radio == RADIO_OFF);
-
-    emit sig_rec_button_toggled(ui->btn_rec->isChecked() && ui->btn_rec->isVisible());
-}
-
-
-// public slot
-void GUI_Player::psl_strrip_set_active(bool b)
-{
-
-    if (b) {
-        ui->btn_play->setVisible(m_metadata.radio_mode == RADIO_OFF);
-        ui->btn_rec->setVisible(m_metadata.radio_mode != RADIO_OFF);
-    }
-
-    else {
-        ui->btn_play->setVisible(true);
-        ui->btn_play->setEnabled(m_metadata.radio_mode == RADIO_OFF);
-        ui->btn_rec->setVisible(false);
-    }
-
-    emit sig_rec_button_toggled(ui->btn_rec->isChecked() && ui->btn_rec->isVisible());
-}
-
-
 void GUI_Player::ui_loaded()
 {
-
 #ifdef Q_OS_UNIX
     obj_ref = this;
-
     signal(SIGWINCH, signal_handler);
 #endif
 //    if(ui_libpath)
 //        ui_libpath->resize(this->ui->library_widget->size());
-
-
 
     changeSkin(m_settings->getPlayerStyle() == 1);
     this->ui->action_Fullscreen->setChecked(m_settings->getPlayerFullscreen());
@@ -660,24 +595,6 @@ void GUI_Player::really_close(bool)
 {
     m_min2tray = false;
     this->close();
-}
-
-
-void GUI_Player::async_wa_finished()
-{
-
-    QString new_version = "1.0";//m_async_wa->get_data();
-    QString cur_version = m_settings->getVersion();
-    new_version = new_version.trimmed();
-
-    qDebug() << "Newest Version: " << new_version;
-    qDebug() << "This Version:   " << cur_version;
-
-    if (new_version > cur_version && m_settings->getNotifyNewVersion()) {
-        QMessageBox::information(this,
-                                 tr("Info"),
-                                 tr("A new version is available!"));
-    }
 }
 
 void GUI_Player::sl_notify_new_version(bool b)

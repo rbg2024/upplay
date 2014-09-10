@@ -1,5 +1,3 @@
-/* GUI_Simpleplayer.h */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -33,18 +31,6 @@
 #include <QDebug>
 
 #include "ui_GUI_Player.h"
-//#include "GUI/playlist/GUI_Playlist.h"
-//#include "GUI/library/GUI_Library_windowed.h"
-//#include "GUI/playlist_chooser/GUI_PlaylistChooser.h"
-//#include "GUI/alternate_covers/GUI_Alternate_Covers.h"
-//#include "GUI/Notifications/GUI_Notifications.h"
-//#include "GUI/startup_dialog/GUI_Startup_Dialog.h"
-//#include "GUI/LanguageChooser/GUI_LanguageChooser.h"
-//#include "CoverLookup/CoverLookup.h"
-//#include "Notification/Notification.h"
-//#include "PlayerPlugin/PlayerPluginHandler.h"
-//#include "PlayerPlugin/PlayerPlugin.h"
-
 #include "GUI/player/GUI_TrayIcon.h"
 #include "HelperStructs/Helper.h"
 
@@ -59,7 +45,6 @@ class GUI_Startup_Dialog;
 class GUI_LanguageChooser;
 class CoverLookup;
 class GUI_Alternate_Covers;
-class AsyncWebAccess;
 
 class GUI_Player : public QMainWindow {
     Q_OBJECT
@@ -75,10 +60,6 @@ public slots:
 
     void really_close(bool=false);
 
-    /**
-      * Set current position in filestream
-      */
-    void psl_strrip_set_active(bool);
     void trayItemActivated (QSystemTrayIcon::ActivationReason reason);
     void stopped();
 
@@ -123,7 +104,6 @@ signals:
 
 
 private slots:
-
     void playClicked(bool b = true);
     void stopClicked(bool b = true);
     void backwardClicked(bool b = true);
@@ -164,9 +144,6 @@ private slots:
     void sl_alternate_cover_available(QString, QString);
     void sl_no_cover_available();
 
-    void async_wa_finished();
-
-
     void notification_changed(bool active, int ms);
     void language_changed(QString);
 
@@ -205,7 +182,6 @@ private:
     PlayerPluginHandler*    _pph;
 
     GUI_Alternate_Covers*   m_alternate_covers;
-    AsyncWebAccess*		m_async_wa;
 
     QString                 m_class_name;
     quint32                 m_completeLength_ms;
@@ -232,7 +208,6 @@ private:
     void setupVolButton(int percent);
     void initGUI();
     void setupConnections();
-    void setRadioMode(int);
     void total_time_changed(qint64);
     void fetch_cover();
     QAction* createAction(QKeySequence key_sequence);

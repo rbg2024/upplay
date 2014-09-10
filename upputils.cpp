@@ -68,7 +68,6 @@ bool udirentToMetadata(UPnPDirObject *dop, MetaData *mdp)
     mdp->track_num = uf2qs(dop, "upnp:originalTrackNumber", false).toInt();
     mdp->bitrate = uf2qs(dop, "bitrate", true).toInt();
     mdp->is_extern = false;
-    mdp->radio_mode = RADIO_OFF;
     mdp->filesize = uf2qs(dop, "size", true).toLongLong();;
     mdp->comment = "";
     mdp->discnumber = 0;

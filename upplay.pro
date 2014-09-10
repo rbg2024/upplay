@@ -7,6 +7,8 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 CONFIG  += qt warn_on thread release 
 
+RESOURCES += GUI/upplay.qrc
+
 HEADERS += \
         application.h \
         GUI/ContextMenu.h \
@@ -66,8 +68,6 @@ FORMS   = \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.ui \
         GUI/renderchoose/renderchoose.ui
-
-RESOURCES = 
 
 unix {
   UI_DIR = .ui
