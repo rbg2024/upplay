@@ -67,7 +67,6 @@ public slots:
     void track_changed(int);
 
     void psl_show_small_playlist_items(bool small_items);
-    void language_changed();
 
 private slots:
     void selection_changed(MetaDataList&);

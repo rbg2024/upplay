@@ -128,12 +128,6 @@ void GUI_Player::small_playlist_items_toggled(bool b)
     emit show_small_playlist_items(b);
 }
 
-void GUI_Player::sl_action_language_toggled(bool b)
-{
-    Q_UNUSED(b);
-//    ui_language_chooser->show();
-}
-
 /** PREFERENCES END **/
 
 void GUI_Player::help(bool)

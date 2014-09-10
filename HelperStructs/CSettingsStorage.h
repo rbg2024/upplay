@@ -135,9 +135,6 @@ public:
     bool getPlaylistNumbers();
     void setPlaylistNumbers(bool b);
 
-    QString getLanguage();
-    void setLanguage(QString lang);
-
     bool getNotifyNewVersion();
     void setNotifyNewVersion(bool b);
 };

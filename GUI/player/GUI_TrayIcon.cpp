@@ -115,18 +115,6 @@ GUI_TrayIcon::~GUI_TrayIcon()
     delete m_closeAction;
 }
 
-void GUI_TrayIcon::language_changed()
-{
-
-    m_playAction->setText(tr("Play"));
-    m_fwdAction->setText(tr("Next"));
-    m_bwdAction->setText(tr("Previous"));
-    m_stopAction->setText(tr("Stop"));
-    m_muteAction->setText(tr("Mute"));
-    m_closeAction->setText(tr("Close"));
-    m_showAction->setText(tr("Show"));
-}
-
 void GUI_TrayIcon::change_skin(QString stylesheet)
 {
     this->m_trayContextMenu->setStyleSheet(stylesheet);

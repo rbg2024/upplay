@@ -73,9 +73,6 @@ private:
 
     void clear_actions();
 
-protected:
-    void changeEvent(QEvent* e);
-    
 };
 
 #endif // CONTEXTMENU_H

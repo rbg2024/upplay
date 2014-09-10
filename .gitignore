@@ -5,3 +5,4 @@ Makefile
 .obj
 GUI/player/player
 \#*
+qrc_upplay.cpp

@@ -42,7 +42,6 @@ class PlayerPluginHandler;
 class GUI_LibraryPath;
 class GUI_Notifications;
 class GUI_Startup_Dialog;
-class GUI_LanguageChooser;
 class CoverLookup;
 class GUI_Alternate_Covers;
 
@@ -92,7 +91,6 @@ signals:
     void show_playlists();
     void show_small_playlist_items(bool);
     void sig_skin_changed(bool);
-    void sig_language_changed();
 
     /* Covers */
     void sig_want_cover(const MetaData &);
@@ -131,7 +129,6 @@ private slots:
     void show_fullscreen_toggled(bool);
 
     /* Preferences */
-    void sl_action_language_toggled(bool b=true);
 
     void load_pl_on_startup_toggled(bool);
     void min2tray_toggled(bool);
@@ -145,8 +142,6 @@ private slots:
     void sl_no_cover_available();
 
     void notification_changed(bool active, int ms);
-    void language_changed(QString);
-
 
 public:
     void setPlaylist(GUI_Playlist* playlist);
@@ -177,7 +172,6 @@ private:
     GUI_InfoDialog*         ui_info_dialog;
     GUI_Notifications*      ui_notifications;
     GUI_Startup_Dialog*     ui_startup_dialog;
-    GUI_LanguageChooser*    ui_language_chooser;
     CoverLookup*            m_cov_lookup;
     PlayerPluginHandler*    _pph;
 

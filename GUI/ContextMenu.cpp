@@ -53,22 +53,6 @@ ContextMenu::~ContextMenu(){
     delete _play_next_action;
 }
 
-void ContextMenu::changeEvent(QEvent* e){
-    if (e->type() == QEvent::LanguageChange) {
-        _info_action->setText(tr("Info"));
-        _edit_action->setText(tr("Edit"));
-        _remove_action->setText(tr("Remove"));
-        _delete_action->setText(tr("Delete"));
-        _play_next_action->setText(tr("Play next"));
-        return;
-    }
-
-    QMenu::changeEvent(e);
-
-
-}
-
-
 void ContextMenu::clear_actions(){
 
     QList<QAction*> actions = this->actions();

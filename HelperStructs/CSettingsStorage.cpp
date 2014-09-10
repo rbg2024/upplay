@@ -76,7 +76,6 @@ GENCODE_VARIABLE(NoShowLibrary, bool, Bool)
 GENCODE_VARIABLE(MinimizeToTray, bool, Bool)
 GENCODE_VARIABLE(ShowSmallPlaylist, bool, Bool)
 GENCODE_VARIABLE(PlaylistNumbers, bool, Bool)
-GENCODE_VARIABLE(Language, QString, String)
 GENCODE_VARIABLE(NotifyNewVersion, bool,  Bool)
 GENCODE_VARIABLE(PlayerUID, QString, String)
 

@@ -82,7 +82,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui_notifications = 0;//new GUI_Notifications(this);
     ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
-    ui_language_chooser = 0; //new GUI_LanguageChooser(this);
 
     m_skinSuffix = "";
     m_class_name = "Player";
@@ -137,46 +136,6 @@ GUI_Player::~GUI_Player()
 {
     qDebug() << "closing player...";
     delete ui;
-}
-
-
-void GUI_Player::language_changed(QString language)
-{
-
-    m_translator->load(language, Helper::getSharePath() + "/translations/");
-
-    this->ui->retranslateUi(this);
-
-    //ui_notifications->language_changed();
-    //ui_startup_dialog->language_changed();
-    //ui_language_chooser->language_changed(true);
-    //m_alternate_covers->language_changed();
-
-//    if(ui_libpath)
-//        ui_libpath->language_changed();
-
-//    QList<PlayerPlugin*> all_plugins = _pph->get_all_plugins();
-    QList<QAction*> actions = ui->menuView->actions();
-
-    foreach(QAction * action, actions) {
-        if (!action->data().isNull()) {
-            ui->menuView->removeAction(action);
-        }
-    }
-
-    actions.clear();
-#if 0
-    foreach(PlayerPlugin * p, all_plugins) {
-        QAction* action = p->getAction();
-        action->setData(p->getName());
-        actions << action;
-    }
-#endif
-
-    this->ui->menuView->insertActions(this->ui->action_Dark, actions);
-    this->ui->menuView->insertSeparator(this->ui->action_Dark);
-
-    emit sig_language_changed();
 }
 
 

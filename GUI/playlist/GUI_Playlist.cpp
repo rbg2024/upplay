@@ -130,14 +130,6 @@ void GUI_Playlist::no_focus()
     emit sig_no_focus();
 }
 
-void GUI_Playlist::language_changed()
-{
-
-    this->ui->retranslateUi(this);
-    set_total_time_label();
-    check_dynamic_play_button();
-}
-
 // initialize gui
 // maybe the button state (pressed/unpressed) should be loaded from db here
 void GUI_Playlist::initGUI()

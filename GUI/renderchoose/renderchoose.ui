@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>RenderChooseDLG</class>
- <widget class="QDialog" name="Dialog">
+ <widget class="QDialog" name="RenderChooseDLG">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Select Media Renderer for Upplay</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -34,7 +37,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>RenderChooseDLG</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -50,7 +53,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>RenderChooseDLG</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -60,6 +63,22 @@
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rndsLW</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>RenderChooseDLG</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>133</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>

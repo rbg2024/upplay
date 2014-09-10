@@ -57,8 +57,6 @@ void GUI_Player::setupConnections()
 
 
     // preferencesF
-    connect(ui->action_Language, SIGNAL(triggered(bool)), this,
-            SLOT(sl_action_language_toggled(bool)));
     connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
             SLOT(min2tray_toggled(bool)));
     connect(ui->action_only_one_instance, SIGNAL(toggled(bool)), this,

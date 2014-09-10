@@ -118,7 +118,7 @@ void Application::chooseRenderer()
                              tr("No Media Renderers found."));
         return;
     }
-    RenderChooseDLG dlg;
+    RenderChooseDLG dlg(player);
     for (auto it = devices.begin(); it != devices.end(); it++) {
         dlg.rndsLW->addItem(QString::fromUtf8(it->friendlyName.c_str()));
     }
@@ -165,10 +165,7 @@ Application::Application(QApplication* qapp, int,
 
     string uid = qs2utf8s(set->getPlayerUID());
     if (uid.empty()) {
-        chooseRenderer();
-        if (rdco == 0) {
-            exit(1);
-        }
+        QTimer::singleShot(0, this, SLOT(chooseRenderer()));
     } else {
         if (!setupRenderer(uid)) {
             cerr << "Can't connect to media renderer" << endl;
