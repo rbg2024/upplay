@@ -1,5 +1,3 @@
-/* GUI_Playlist.cpp */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,30 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * GUI_Playlist.cpp
- *
- *  Created on: Apr 6, 2011
- *      Author: luke
- */
-
-
-#include "HelperStructs/Helper.h"
-//#include "HelperStructs/Tagging/id3.h"
-#include "HelperStructs/PlaylistMode.h"
-#include "HelperStructs/CSettingsStorage.h"
-#include "HelperStructs/Style.h"
-#include "HelperStructs/globals.h"
-//#include "HelperStructs/CustomMimeData.h"
-//#include "HelperStructs/CDirectoryReader.h"
-
-#include "GUI/playlist/GUI_Playlist.h"
-#include "GUI/playlist/model/PlaylistItemModel.h"
-//#include "GUI/InfoDialog/GUI_InfoDialog.h"
-
-//#include "StreamPlugins/LastFM/LastFM.h"
-
 #include <QDebug>
 #include <QKeyEvent>
 #include <QFileDialog>
@@ -55,6 +29,14 @@
 #include <QMenu>
 #include <QUrl>
 #include <QFileInfo>
+
+#include "HelperStructs/Helper.h"
+#include "HelperStructs/PlaylistMode.h"
+#include "HelperStructs/CSettingsStorage.h"
+#include "HelperStructs/Style.h"
+#include "HelperStructs/globals.h"
+#include "GUI/playlist/GUI_Playlist.h"
+#include "GUI/playlist/model/PlaylistItemModel.h"
 
 class GUI_InfoDialog;
 
@@ -104,7 +86,7 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
     connect(ui->btn_dynamic, SIGNAL(released()), this, SLOT(playlist_mode_changed_slot()));
     connect(ui->btn_append, SIGNAL(released()), this, SLOT(playlist_mode_changed_slot()));
 
-    connect(ui->listView, SIGNAL(sig_metadata_dropped(const MetaDataList&,int)), this, SLOT(metadata_dropped(const MetaDataList&,int)));
+    connect(ui->listView, SIGNAL(sig_metadata_dropped(const MetaDataList&, int)), this, SLOT(metadata_dropped(const MetaDataList&, int)));
     connect(ui->listView, SIGNAL(sig_rows_removed(const QList<int>&, bool)), this, SLOT(rows_removed(const QList<int>&, bool)));
 
     connect(ui->listView, SIGNAL(sig_edit_clicked()), this, SLOT(psl_edit_tracks()));
@@ -120,32 +102,38 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
 
 
 // DTOR
-GUI_Playlist::~GUI_Playlist() {
+GUI_Playlist::~GUI_Playlist()
+{
     delete ui;
 }
 
-void GUI_Playlist::changeEvent(QEvent* e){
+void GUI_Playlist::changeEvent(QEvent* e)
+{
     e->accept();
 }
 
-void GUI_Playlist::resizeEvent(QResizeEvent* e){
+void GUI_Playlist::resizeEvent(QResizeEvent* e)
+{
 
     e->accept();
     this->ui->listView->update();
     this->ui->listView->reset();
 }
 
-void GUI_Playlist::focusInEvent(QFocusEvent *){
+void GUI_Playlist::focusInEvent(QFocusEvent *)
+{
 
     this->ui->listView->setFocus();
 }
 
-void GUI_Playlist::no_focus(){
+void GUI_Playlist::no_focus()
+{
     this->parentWidget()->setFocus();
     emit sig_no_focus();
 }
 
-void GUI_Playlist::language_changed(){
+void GUI_Playlist::language_changed()
+{
 
     this->ui->retranslateUi(this);
     set_total_time_label();
@@ -154,7 +142,8 @@ void GUI_Playlist::language_changed(){
 
 // initialize gui
 // maybe the button state (pressed/unpressed) should be loaded from db here
-void GUI_Playlist::initGUI(){
+void GUI_Playlist::initGUI()
+{
 
     QString icon_path = Helper::getIconPath();
 
@@ -170,29 +159,33 @@ void GUI_Playlist::initGUI(){
 }
 
 
-void GUI_Playlist::library_path_changed(QString path){
+void GUI_Playlist::library_path_changed(QString path)
+{
     Q_UNUSED(path);
     check_dynamic_play_button();
 }
 
 
-void GUI_Playlist::check_dynamic_play_button(){
+void GUI_Playlist::check_dynamic_play_button()
+{
 }
 
 // Slot: comes from listview
-void GUI_Playlist::metadata_dropped(const MetaDataList& v_md, int row){
+void GUI_Playlist::metadata_dropped(const MetaDataList& v_md, int row)
+{
     emit dropped_tracks(v_md, row);
 }
 
 // SLOT: fill all tracks in v_metadata into playlist
-void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int radio_mode){
+void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int radio_mode)
+{
 
     ui->listView->fill(v_metadata, cur_play_idx);
     _total_msecs = 0;
     _radio_active = radio_mode;
     set_radio_active(radio_mode);
 
-    foreach(MetaData md, v_metadata){
+    foreach(MetaData md, v_metadata) {
         _total_msecs += md.length_ms;
     }
 
@@ -200,7 +193,8 @@ void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int 
 }
 
 // private SLOT: clear button pressed
-void GUI_Playlist::clear_playlist_slot(){
+void GUI_Playlist::clear_playlist_slot()
+{
 
     _total_msecs = 0;
     ui->lab_totalTime->setText(tr("Playlist empty"));
@@ -212,7 +206,8 @@ void GUI_Playlist::clear_playlist_slot(){
 
 
 // private SLOT: playlist item pressed (init drag & drop)
-void GUI_Playlist::selection_changed(MetaDataList&){
+void GUI_Playlist::selection_changed(MetaDataList&)
+{
 
 //    _info_dialog->setMetaData(v_md);
 
@@ -220,16 +215,19 @@ void GUI_Playlist::selection_changed(MetaDataList&){
 }
 
 
-void GUI_Playlist::double_clicked(int row ){
+void GUI_Playlist::double_clicked(int row)
+{
     emit selected_row_changed(row);
 }
 
-void GUI_Playlist::track_changed(int row) {
+void GUI_Playlist::track_changed(int row)
+{
     ui->listView->set_current_track(row);
 }
 
 // private SLOT: rep1, repAll, shuffle or append has changed
-void GUI_Playlist::playlist_mode_changed_slot(){
+void GUI_Playlist::playlist_mode_changed_slot()
+{
 
     this->parentWidget()->setFocus();
 
@@ -244,17 +242,23 @@ void GUI_Playlist::playlist_mode_changed_slot(){
 }
 
 
-void GUI_Playlist::psl_edit_tracks(){
+void GUI_Playlist::psl_edit_tracks()
+{
 #if 0
-    if(!_info_dialog) return;
+    if (!_info_dialog) {
+        return;
+    }
     _info_dialog->setMode(INFO_MODE_TRACKS);
     _info_dialog->show(TAB_EDIT);
 #endif
 }
 
-void GUI_Playlist::psl_info_tracks(){
+void GUI_Playlist::psl_info_tracks()
+{
 #if 0
-    if(!_info_dialog) return;
+    if (!_info_dialog) {
+        return;
+    }
     _info_dialog->setMode(INFO_MODE_TRACKS);
     _info_dialog->show(TAB_INFO);
 #endif
@@ -263,33 +267,41 @@ void GUI_Playlist::psl_info_tracks(){
 
 
 
-void GUI_Playlist::dragLeaveEvent(QDragLeaveEvent* event){
+void GUI_Playlist::dragLeaveEvent(QDragLeaveEvent* event)
+{
     event->accept();
 }
 
 
-void GUI_Playlist::dragEnterEvent(QDragEnterEvent* event){
+void GUI_Playlist::dragEnterEvent(QDragEnterEvent* event)
+{
     event->accept();
 }
 
-void GUI_Playlist::dragMoveEvent(QDragMoveEvent* event){
-    if(event->pos().y() < this->ui->listView->y()) this->ui->listView->scrollUp();
-    else if(event->pos().y() > this->ui->listView->y() + this->ui->listView->height()) this->ui->listView->scrollDown();
+void GUI_Playlist::dragMoveEvent(QDragMoveEvent* event)
+{
+    if (event->pos().y() < this->ui->listView->y()) {
+        this->ui->listView->scrollUp();
+    } else if (event->pos().y() > this->ui->listView->y() + this->ui->listView->height()) {
+        this->ui->listView->scrollDown();
+    }
 
 }
 
 
-void GUI_Playlist::dropEvent(QDropEvent* event){
+void GUI_Playlist::dropEvent(QDropEvent* event)
+{
     this->ui->listView->dropEventFromOutside(event);
 }
 
 
 
-void GUI_Playlist::set_total_time_label(){
+void GUI_Playlist::set_total_time_label()
+{
 
     QString text = "";
 
-    if(_radio_active == RADIO_STATION){
+    if (_radio_active == RADIO_STATION) {
 
         ui->lab_totalTime->setText(tr("Radio"));
         return;
@@ -300,8 +312,11 @@ void GUI_Playlist::set_total_time_label(){
     int n_rows = ui->listView->get_num_rows();
     QString playlist_string = text + QString::number(n_rows);
 
-    if(n_rows == 1)	playlist_string += tr(" Track - ");
-    else playlist_string += tr(" Tracks - ");
+    if (n_rows == 1) {
+        playlist_string += tr(" Track - ");
+    } else {
+        playlist_string += tr(" Tracks - ");
+    }
 
     playlist_string += Helper::cvtMsecs2TitleLengthString(_total_msecs, false);
 
@@ -310,7 +325,8 @@ void GUI_Playlist::set_total_time_label(){
 
 
 
-void GUI_Playlist::set_radio_active(int radio){
+void GUI_Playlist::set_radio_active(int radio)
+{
 
     _radio_active = radio;
 
@@ -321,11 +337,13 @@ void GUI_Playlist::set_radio_active(int radio){
 
     int actions = 0;
 
-    if(radio != RADIO_OFF)
+    if (radio != RADIO_OFF) {
         actions = ENTRY_INFO;
+    }
 
-    else
+    else {
         actions = (ENTRY_INFO | ENTRY_REMOVE | ENTRY_EDIT);
+    }
 
     ui->listView->set_context_menu_actions(actions);
     ui->listView->set_drag_enabled(radio != RADIO_LFM);
@@ -333,19 +351,22 @@ void GUI_Playlist::set_radio_active(int radio){
 
 
 
-void GUI_Playlist::psl_show_small_playlist_items(bool small_playlist_items){
+void GUI_Playlist::psl_show_small_playlist_items(bool small_playlist_items)
+{
 
     ui->listView->show_big_items(!small_playlist_items);
 }
 
 
-void GUI_Playlist::btn_numbers_changed(bool b){
+void GUI_Playlist::btn_numbers_changed(bool b)
+{
     this->parentWidget()->setFocus();
     CSettingsStorage::getInstance()->setPlaylistNumbers(b);
     ui->listView->reset();
 }
 
 
-void GUI_Playlist::rows_removed(const QList<int>& lst, bool select_next_row){
+void GUI_Playlist::rows_removed(const QList<int>& lst, bool select_next_row)
+{
     emit sig_rows_removed(lst, select_next_row);
 }
