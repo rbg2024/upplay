@@ -49,7 +49,7 @@ class CDBrowser : public QWebView
     void onSliceAvailable(const UPnPDirContent *);
 
  signals:
-    void sig_tracks_for_playlist_available(MetaDataList&);
+    void sig_tracks_for_playlist_available(const MetaDataList&);
 
  protected:
 

@@ -29,6 +29,7 @@ HEADERS += \
         HelperStructs/PlaylistMode.h \
         HelperStructs/Style.h \
         playlist/Playlist.h \
+        playlist/PlaylistAVT.h \
         \
         upqo/cdirectory_qo.h \
         upqo/avtransport_qo.h \
@@ -56,8 +57,8 @@ SOURCES += \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
-        playlist/Playlist_GUI_slots.cpp \
         playlist/Playlist.cpp \
+        playlist/PlaylistAVT.cpp \
         cdbrowser.cpp \
         upplay.cpp \
         upputils.cpp

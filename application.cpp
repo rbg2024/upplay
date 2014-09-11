@@ -34,7 +34,7 @@ using namespace std;
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"
 #include "GUI/renderchoose/renderchoose.h"
-#include "playlist/Playlist.h"
+#include "playlist/PlaylistAVT.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
@@ -156,7 +156,7 @@ Application::Application(QApplication* qapp, int,
     set->setVersion(version);
 
     player = new GUI_Player(translator);
-    playlist = new Playlist();
+    playlist = new PlaylistAVT();
 
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
 
@@ -250,8 +250,8 @@ void Application::init_connections()
     CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
             playlist, psl_remove_rows(const QList<int>&, bool));
 
-    CONNECT(cdb, sig_tracks_for_playlist_available(MetaDataList&),
-            playlist, psl_append_tracks(MetaDataList&));
+    CONNECT(cdb, sig_tracks_for_playlist_available(const MetaDataList&),
+            playlist, psl_append_tracks(const MetaDataList&));
 }
 
 

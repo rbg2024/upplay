@@ -35,9 +35,11 @@ class Playlist : public QObject {
 
 public:
     Playlist(QObject * parent=0);
-    virtual ~Playlist();
+    virtual ~Playlist() {}
 
-    uint get_num_tracks();
+    virtual uint get_num_tracks() {
+        return _v_meta_data.size();
+    }
 
 signals:
     void sig_playlist_updated(MetaDataList&, int, int);
@@ -57,42 +59,42 @@ signals:
     void sig_resume_play();
 
 public slots:
-    // Create from scratch. Presently unconnected
-    void psl_create_playlist(MetaDataList&);
-    void psl_insert_tracks(const MetaDataList&, int idx);
-    void psl_append_tracks(MetaDataList&);
+    virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
+    // This is a abbrev for "insert at end"
+    virtual void psl_append_tracks(const MetaDataList&) = 0;
 
-    void psl_change_track(int);
-    void psl_next_track();
-    void psl_prepare_for_end_of_track();
-    void psl_new_transport_state(int);
-    void psl_ext_track_change(const QString& uri);
-    void psl_playlist_mode_changed(const Playlist_Mode&);
-    void psl_clear_playlist();
-    void psl_play();
-    void psl_pause();
-    void psl_stop();
-    void psl_forward();
-    void psl_backward();
-    void psl_remove_rows(const QList<int> &, bool select_next_row=true);
+    virtual void psl_change_track(int) = 0;
+    virtual void psl_next_track() = 0;
+    virtual void psl_prepare_for_end_of_track() = 0;
+    virtual void psl_new_transport_state(int) = 0;
+    virtual void psl_ext_track_change(const QString& uri) = 0;
+    virtual void psl_playlist_mode_changed(const Playlist_Mode&) = 0;
+    virtual void psl_clear_playlist() = 0;
+    virtual void psl_play() = 0;
+    virtual void psl_pause() = 0;
+    virtual void psl_stop() = 0;
+    virtual void psl_forward() = 0;
+    virtual void psl_backward() = 0;
+    virtual void psl_remove_rows(const QList<int> &, bool select_next=true) = 0;
 
-private:
+protected:
 
     MetaDataList _v_meta_data;
 
     int	 _cur_play_idx;
-    bool _is_playing;
     bool _pause;
 
     Playlist_Mode _playlist_mode;
 
     CSettingsStorage *_settings;
 
-    void send_cur_playing_signal(int);
-    void send_next_playing_signal(int);
+    virtual void set_for_playing(int row) = 0;
+    virtual void send_next_playing_signal() = 0;
 
-    bool checkTrack(const MetaData&) {return true;}
-    void remove_row(int row);
+    virtual void remove_row(int row);
+    virtual bool valid_row(int row) {
+        return row >= 0 && row < int(_v_meta_data.size());
+    }
 };
 
 #endif /* PLAYLIST_H_ */
