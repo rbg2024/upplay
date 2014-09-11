@@ -25,6 +25,9 @@ using namespace std;
 #include "HelperStructs/MetaData.h"
 #include "upputils.h"
 
+using namespace UPnPClient;
+using namespace UPnPP;
+
 // Upnp field to qstring
 static QString uf2qs(UPnPDirObject *dop, const char *nm, bool isres)
 {
@@ -52,7 +55,8 @@ bool udirentToMetadata(UPnPDirObject *dop, MetaData *mdp)
     mdp->rating = 0;
     QString dur = uf2qs(dop, "duration", true); 
     if (!dur.isEmpty()) {
-        mdp->length_ms = upnpdurationtos((const char*)dur.toUtf8()) * 1000;
+        string sdur((const char*)dur.toUtf8());
+        mdp->length_ms = upnpdurationtos(sdur) * 1000;
     } else {
         mdp->length_ms = 0;
     }

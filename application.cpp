@@ -206,15 +206,15 @@ void Application::renderer_connections()
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
     CONNECT(playlist, sig_play_now(const MetaData&, int, bool),
             avto, changeTrack(const MetaData&, int, bool));
-    CONNECT(avto, endOfTrackIsNear(), playlist, psl_prepare_for_the_end());
+    CONNECT(avto, endOfTrackIsNear(), playlist, psl_prepare_for_end_of_track());
     CONNECT(avto, tpStateChanged(int), playlist, psl_new_transport_state(int));
     CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
     CONNECT(avto, newTrackPlaying(const QString&), 
             playlist, psl_ext_track_change(const QString&));
     CONNECT(playlist, sig_next_track_to_play(const MetaData&),
             avto, infoNextTrack(const MetaData&));
-    CONNECT(playlist, sig_no_track_to_play(),  avto, stop());
-    CONNECT(playlist, sig_goon_playing(), avto, play());
+    CONNECT(playlist, sig_stopped(),  avto, stop());
+    CONNECT(playlist, sig_resume_play(), avto, play());
 }
 
 void Application::init_connections()
@@ -234,10 +234,10 @@ void Application::init_connections()
 
     CONNECT(playlist, sig_track_metadata(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
-    CONNECT(playlist, sig_no_track_to_play(),  player, stopped());
-    CONNECT(playlist, sig_selected_file_changed(int), 
+    CONNECT(playlist, sig_stopped(),  player, stopped());
+    CONNECT(playlist, sig_playing_track_changed(int), 
             ui_playlist, track_changed(int));
-    CONNECT(playlist, sig_playlist_created(MetaDataList&, int, int), 
+    CONNECT(playlist, sig_playlist_updated(MetaDataList&, int, int), 
             ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
     CONNECT(ui_playlist, selected_row_changed(int),  

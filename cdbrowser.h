@@ -33,6 +33,8 @@
 
 class ContentDirectoryQO;
 
+using namespace UPnPClient;
+
 class CDBrowser : public QWebView
 {
     Q_OBJECT;

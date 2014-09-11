@@ -1,5 +1,3 @@
-/* Playlist.h */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -21,19 +19,16 @@
 #define PLAYLIST_H_
 
 #include <iostream>
-using namespace std;
 
 #include <QObject>
 #include <QList>
 #include <QMap>
 #include <QStringList>
 
-#include "GUI/playlist/model/PlaylistItemModel.h"
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/PlaylistMode.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
-
 
 struct BackupPlaylist {
     bool is_valid;
@@ -49,28 +44,34 @@ public:
     Playlist(QObject * parent=0);
     virtual ~Playlist();
 
-    void load_old_playlist();
     uint get_num_tracks();
 
 signals:
-    void sig_playlist_created(MetaDataList&, int, int);
+    void sig_playlist_updated(MetaDataList&, int, int);
     // This is for player action
     void sig_play_now(const MetaData&, int pos=0, bool play=true);
     // This is for display
     void sig_track_metadata(const MetaData&, int pos=0, bool play=true);
+    // We send this when approaching the end of the current track, or
+    // if the following track changes. This allows the audio to
+    // prepare for gaplessness
     void sig_next_track_to_play(const MetaData&);
-    void sig_selected_file_changed(int row);
-    void sig_no_track_to_play();
-    void sig_goon_playing();
+    // Inform the GUI about what row to highlight
+    void sig_playing_track_changed(int row);
+    // Inform about not playing
+    void sig_stopped();
+    // Try to resume from pause
+    void sig_resume_play();
 
 public slots:
-    void psl_createPlaylist(MetaDataList&);
+    // Create from scratch. Presently unconnected
+    void psl_create_playlist(MetaDataList&);
     void psl_insert_tracks(const MetaDataList&, int idx);
     void psl_append_tracks(MetaDataList&);
 
     void psl_change_track(int);
     void psl_next_track();
-    void psl_prepare_for_the_end();
+    void psl_prepare_for_end_of_track();
     void psl_new_transport_state(int);
     void psl_ext_track_change(const QString& uri);
     void psl_playlist_mode_changed(const Playlist_Mode&);
@@ -81,8 +82,6 @@ public slots:
     void psl_forward();
     void psl_backward();
     void psl_remove_rows(const QList<int> &, bool select_next_row=true);
-    void psl_play_next_tracks(const MetaDataList&);
-    void psl_save_playlist_to_storage() {}
 
 private:
 
@@ -95,7 +94,6 @@ private:
     Playlist_Mode _playlist_mode;
 
     CSettingsStorage *_settings;
-    MetaDataList      _v_stream_playlist;
     BackupPlaylist    _backup_playlist;
 
     void send_cur_playing_signal(int);

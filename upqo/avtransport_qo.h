@@ -26,6 +26,8 @@
 
 #include "libupnpp/control/avtransport.hxx"
 
+using namespace UPnPClient;
+
 class AVTMetadata {
 public:
     virtual std::string getDidl() const = 0;

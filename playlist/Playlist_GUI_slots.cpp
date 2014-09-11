@@ -18,35 +18,26 @@
 
 #include <QString>
 
-#include "playlist/Playlist.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/MetaData.h"
-#include "HelperStructs/CSettingsStorage.h"
+#include "playlist/Playlist.h"
 
 // GUI -->
 void Playlist::psl_clear_playlist()
 {
     _v_meta_data.clear();
     _cur_play_idx = -1;
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
-// play a track
 void Playlist::psl_play()
 {
-    bool pause_old = _pause;
     _pause = false;
-
-    if (pause_old) {
-        emit sig_goon_playing();
-        return;
-    }
 
     if (_v_meta_data.size() == 0) {
         return;
     }
 
-    // state was stop until now
     if (_cur_play_idx < 0) {
         int track_num = 0;
         MetaData md = _v_meta_data[track_num];
@@ -55,7 +46,7 @@ void Playlist::psl_play()
             send_cur_playing_signal(track_num);
         }
     } else {
-        emit sig_goon_playing();
+        emit sig_resume_play();
     }
 }
 
@@ -68,8 +59,8 @@ void Playlist::psl_stop()
 {
     _cur_play_idx = -1;
     _is_playing = false;
-    emit sig_no_track_to_play();
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_stopped();
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
 // fwd was pressed -> next track
@@ -114,7 +105,7 @@ void Playlist::psl_change_track(int new_row)
         _v_meta_data.setCurPlayTrack(_cur_play_idx);
         remove_row(new_row);
         _is_playing = false;
-        emit sig_no_track_to_play();
+        emit sig_stopped();
     }
 }
 
@@ -139,8 +130,7 @@ void Playlist::psl_insert_tracks(const MetaDataList& v_metadata, int row)
         }
     }
 
-    psl_save_playlist_to_storage();
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
 void Playlist::psl_append_tracks(MetaDataList& v_md)
@@ -158,7 +148,7 @@ void Playlist::psl_append_tracks(MetaDataList& v_md)
         // We were playing the last track. Set new next track for gapless,
         send_next_playing_signal(_cur_play_idx + 1);
     }
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
 // remove one row
@@ -217,9 +207,7 @@ void Playlist::psl_remove_rows(const QList<int>& rows, bool select_next_row)
         _v_meta_data[first_row].pl_selected = true;
     }
 
-    psl_save_playlist_to_storage();
-
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
 

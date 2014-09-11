@@ -28,6 +28,8 @@
 
 #include "libupnpp/control/cdirectory.hxx"
 
+using namespace UPnPClient;
+
 class ContentDirectoryQO : public QThread {
     Q_OBJECT;
 

@@ -1,5 +1,3 @@
-/* Playlist.cpp */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -17,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  Created on: Apr 6, 2011
- *      Author: luke
  */
 
 #include <ctime>
@@ -57,7 +53,7 @@ Playlist::~Playlist()
 }
 
 // create a playlist, where metadata is already available
-void Playlist::psl_createPlaylist(MetaDataList& v_meta_data){
+void Playlist::psl_create_playlist(MetaDataList& v_meta_data){
 
     bool instant_play = ((_v_meta_data.size() == 0) && (!_is_playing));
 
@@ -69,7 +65,7 @@ void Playlist::psl_createPlaylist(MetaDataList& v_meta_data){
     // no tracks in new playlist
     if(v_meta_data.size() == 0) 
     {
-        emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+        emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
         return;
     }
 
@@ -77,12 +73,11 @@ void Playlist::psl_createPlaylist(MetaDataList& v_meta_data){
         _v_meta_data.push_back(md);
     }
 
-    emit sig_playlist_created(_v_meta_data, _cur_play_idx, 0);
+    emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 
     if(instant_play)
         send_cur_playing_signal(0);
 
-    psl_save_playlist_to_storage();
 }
 
 void Playlist::send_cur_playing_signal(int i) 
@@ -96,7 +91,7 @@ void Playlist::send_cur_playing_signal(int i)
     if(!checkTrack(_v_meta_data[i])) 
         return;
 
-    emit sig_selected_file_changed(i);
+    emit sig_playing_track_changed(i);
     emit sig_play_now(_v_meta_data[i]);
     emit sig_track_metadata(_v_meta_data[i]);
     _cur_play_idx = i;
@@ -111,7 +106,7 @@ void Playlist::psl_ext_track_change(const QString& uri)
         if (!uri.compare(_v_meta_data[i].filepath)) {
             qDebug() << "Playlist::psl_ext_track_change: index now " << i;
             _cur_play_idx = i;
-            emit sig_selected_file_changed(i);
+            emit sig_playing_track_changed(i);
             emit sig_track_metadata(_v_meta_data[i]);
             break;
         }
@@ -124,7 +119,7 @@ void Playlist::send_next_playing_signal(int i)
         emit sig_next_track_to_play(_v_meta_data[i]);
 }
 
-void Playlist::psl_prepare_for_the_end()
+void Playlist::psl_prepare_for_end_of_track()
 {
     if (_cur_play_idx < 0 || _cur_play_idx >= int(_v_meta_data.size()) - 1)
         return;
@@ -158,7 +153,7 @@ void Playlist::psl_next_track()
         qDebug() << "Playlist::psl_next_track(): empty playlist";
         _cur_play_idx = -1;
         _is_playing = false;
-        emit sig_no_track_to_play();
+        emit sig_stopped();
         return;
     }
 
@@ -179,7 +174,7 @@ void Playlist::psl_next_track()
             } else {
                 _is_playing = false;
                 _cur_play_idx = -1;
-                emit sig_no_track_to_play();
+                emit sig_stopped();
                 return;
             }
         } else {
@@ -200,11 +195,6 @@ void Playlist::psl_next_track()
             psl_next_track();
         }
     }    
-}
-
-void Playlist::psl_play_next_tracks(const MetaDataList& v_md)
-{
-    psl_insert_tracks(v_md, _cur_play_idx);
 }
 
 uint Playlist::get_num_tracks()

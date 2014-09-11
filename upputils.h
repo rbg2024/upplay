@@ -30,9 +30,8 @@ inline std::string qs2utf8s(const QString& qs)
 }
 
 struct MetaData;
-class UPnPDirObject;
 
-extern bool udirentToMetadata(UPnPDirObject *, MetaData *);
+extern bool udirentToMetadata(UPnPClient::UPnPDirObject *, MetaData *);
 
 
 
