@@ -30,13 +30,6 @@
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
 
-struct BackupPlaylist {
-    bool is_valid;
-    int cur_play_idx;
-
-    MetaDataList v_md;
-};
-
 class Playlist : public QObject {
     Q_OBJECT
 
@@ -94,7 +87,6 @@ private:
     Playlist_Mode _playlist_mode;
 
     CSettingsStorage *_settings;
-    BackupPlaylist    _backup_playlist;
 
     void send_cur_playing_signal(int);
     void send_next_playing_signal(int);
