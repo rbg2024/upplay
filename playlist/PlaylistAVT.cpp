@@ -262,7 +262,7 @@ void PlaylistAVT::psl_append_tracks(const MetaDataList& v_md)
 
 void PlaylistAVT::psl_remove_rows(const QList<int>& rows, bool select_next_row)
 {
-    if (rows.empty())
+    if (rows.empty()) {
         return;
     }
 

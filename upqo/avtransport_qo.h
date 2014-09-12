@@ -25,6 +25,7 @@
 #include <QTimer>
 
 #include "libupnpp/control/avtransport.hxx"
+#include "libupnpp/control/cdircontent.hxx"
 
 using namespace UPnPClient;
 
@@ -47,19 +48,20 @@ public:
         m_timer = new QTimer(this);
         connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
         m_timer->start(1000);
+        qRegisterMetaType<UPnPClient::UPnPDirObject>("UPnPClient::UPnPDirObject");
     }
 
     virtual void changed(const char *nm, int value)
     {
         if (!strcmp(nm, "CurrentTrackDuration")) {
-            qDebug() << "AVT: Changed: " << nm << " (int): " << value;
+            //qDebug() << "AVT: Changed: " << nm << " (int): " << value;
             m_cursecs = value;
         } else if (!strcmp(nm, "TransportState")) {
-            qDebug() << "AVT: Changed: " << nm << " (int): " << value;
+            //qDebug() << "AVT: Changed: " << nm << " (int): " << value;
             emit tpStateChanged(value);
             if (value == UPnPClient::AVTransport::Stopped && m_in_ending) {
                 m_in_ending = false;
-                qDebug() << "AVT: stoppedAtEOT";
+                // qDebug() << "AVT: stoppedAtEOT";
                 emit stoppedAtEOT();
             }
         } else if (!strcmp(nm, "CurrentTransportActions")) {
@@ -88,17 +90,18 @@ public:
             //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
             if (m_cururi.compare(value)) {
                 setcururi(value);
-                qDebug() << "AVT: ext track change";
+                //qDebug() << "AVT: ext track change";
                 emit newTrackPlaying(QString::fromUtf8(value));
             }
         }
     }
 
-    virtual void changed(const char *nm, UPnPDirObject meta)
+    virtual void changed(const char *nm, UPnPClient::UPnPDirObject meta)
     {
-        std::string s = meta.dump();
         if (!strcmp(nm, "AVTransportURIMetaData")) {
-            //qDebug() << "AVT: Changed: " << nm << " (dirc): " << s.c_str();
+            //qDebug() << "AVT: Changed: " << nm << " (dirc): " << 
+            // meta.dump().c_str();
+            emit currentMetadata(meta);
         }
     }
 
@@ -169,6 +172,7 @@ signals:
     void tpStateChanged(int);
     void tpActionsChanged(int);
     void stoppedAtEOT();
+    void currentMetadata(UPnPClient::UPnPDirObject);
 
 private:
     UPnPClient::AVTH m_srv;
