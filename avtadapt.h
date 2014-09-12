@@ -27,8 +27,6 @@ using namespace std;
 #include "upqo/avtransport_qo.h"
 #include "upputils.h"
 
-using namespace UPnPClient;
-
 class MetaDataAdaptor : public AVTMetadata {
 public:
     MetaDataAdaptor(const MetaData &md)

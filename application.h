@@ -35,6 +35,7 @@
 #include "cdbrowser.h"
 #include "upqo/renderingcontrol_qo.h"
 #include "avtadapt.h"
+#include "ohpladapt.h"
 
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"
@@ -64,16 +65,18 @@ private:
     Playlist     *playlist;
     CDBrowser    *cdb;
     RenderingControlQO *rdco;
-    AVTPlayer  *avto;
+    AVTPlayer    *avto;
+    OHPlayer     *ohplo;
     GUI_Playlist *ui_playlist;
 
-    CSettingsStorage *set;
+    CSettingsStorage *settings;
     QApplication *app;
 
     bool		 _initialized;
 
     void init_connections();
     void renderer_connections();
+    void playlist_connections();
     bool setupRenderer(const std::string& uid);
 
 public:

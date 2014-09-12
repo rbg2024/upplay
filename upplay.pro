@@ -5,7 +5,7 @@ QT += webkit
 
 QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"0.1.0\\\"
 
-CONFIG  += qt warn_on thread release 
+CONFIG  += qt warn_on thread release debug
 
 RESOURCES += GUI/upplay.qrc
 
@@ -30,12 +30,15 @@ HEADERS += \
         HelperStructs/Style.h \
         playlist/Playlist.h \
         playlist/PlaylistAVT.h \
+        playlist/PlaylistOH.h \
         \
         upqo/cdirectory_qo.h \
         upqo/avtransport_qo.h \
         upqo/renderingcontrol_qo.h \
+        upqo/ohplaylist_qo.h \
         cdbrowser.h \
-        avtadapt.h
+        avtadapt.h \
+        ohpladapt.h
 
 SOURCES += \
         GUI/ContextMenu.cpp \
@@ -59,6 +62,7 @@ SOURCES += \
         HelperStructs/Style.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
+        playlist/PlaylistOH.cpp \
         cdbrowser.cpp \
         upplay.cpp \
         upputils.cpp

@@ -194,23 +194,19 @@ public:
     }
 
     bool contains(const MetaData& md, bool cs=false) {
-        QString filepath;
-
         if(cs) {
-            filepath = md.filepath.trimmed();
+            QString filepath = md.filepath.trimmed();
 
             for(uint i = 0; i < size(); i++){
-                MetaData md = at(i);
-                QString filepath2 = md.filepath.trimmed();
+                QString filepath2 = at(i).filepath.trimmed();
                 if(!filepath.compare(filepath2)) 
                     return true;
             }
         } else {
-            filepath = md.filepath.toLower().trimmed();
+            QString filepath = md.filepath.toLower().trimmed();
 
             for (uint i = 0; i < size(); i++){
-                MetaData md =  vector<MetaData>::at(i);
-                QString filepath2 = md.filepath.toLower().trimmed();
+                QString filepath2 = at(i).filepath.toLower().trimmed();
                 if(!filepath.compare(filepath2)) 
                     return true;
             }

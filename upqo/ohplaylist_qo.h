@@ -26,6 +26,7 @@
 #include <QTimer>
 
 #include "libupnpp/control/ohplaylist.hxx"
+#include "libupnpp/control/cdircontent.hxx"
 #include "libupnpp/soaphelp.hxx"
 
 class OHPLMetadata {
@@ -38,7 +39,7 @@ Q_OBJECT
 
 public:
     OHPlaylistQO(UPnPClient::OHPLH ohp, QObject *parent = 0)
-        : QObject(parent), m_srv(ohp), m_timer(0)
+        : QObject(parent), m_curid(-1), m_srv(ohp), m_timer(0)
     {
         m_srv->installReporter(this);
         m_timer = new QTimer(this);
@@ -53,19 +54,23 @@ public:
     // TransportState, Repeat, Shuffle, Id, TracksMax
     virtual void changed(const char *nm, int value)
     {
-        qDebug() << "OHPL: Changed: " << nm << " (int): " << value;
+        //qDebug() << "OHPL: Changed: " << nm << " (int): " << value;
+        if (!strcmp(nm, "Id")) {
+            emit newTrackPlaying(value);
+            m_curid = value;
+        }
     }
 
     // ProtocolInfo
-    virtual void changed(const char *nm, const char *value)
+    virtual void changed(const char */*nm*/, const char */*value*/)
     {
-        qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
+        //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
     }
 
     // IdArray
     virtual void changed(const char *nm, std::vector<int> ids)
     {
-        qDebug() << "OHPL: Changed: " << nm << " (vector<int>)";
+        //qDebug() << "OHPL: Changed: " << nm << " (vector<int>)";
         emit idArrayChanged(ids);
     }
 
@@ -86,12 +91,11 @@ public slots:
     virtual void update() {}
 
 signals:
-    void secsInSongChanged(quint32);
-    void newTrackPlaying(QString);
-    void tpStateChanged(int);
-    void tpActionsChanged(int);
+    void newTrackPlaying(qint32);
+    void newTrackArrayReady();
     void idArrayChanged(std::vector<int>);
-
+                                         
+                                         
 private slots:
     std::string vtos(std::vector<int> nids) {
         std::string sids;
@@ -102,7 +106,10 @@ private slots:
 
     void onIdArrayChanged(std::vector<int> nids) {
         qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
-
+        if (nids == m_idsv) {
+            qDebug() << "OHPL::onIdArrayChanged: unchanged";
+            return;
+        }
         // Clean up metapool entries not in ids
         for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
             if (find(nids.begin(), nids.end(), it->first) == nids.end()) {
@@ -130,7 +137,7 @@ private slots:
                 small.push_back(unids[i+j]);
             }
 
-            qDebug() << "Requesting metadata for " << vtos(small).c_str();
+            //qDebug() << "Requesting metadata for " << vtos(small).c_str();
             std::vector<UPnPClient::OHPlaylist::TrackListEntry> entries;
             int ret;
             if ((ret = m_srv->readList(small, &entries))) {
@@ -138,22 +145,31 @@ private slots:
                 goto out;
             }
             for (auto it = entries.begin(); it != entries.end(); it++) {
-                qDebug() << "Data for " << it->id << " " << 
-                    it->dirent.m_title.c_str();
+                //qDebug() << "Data for " << it->id << " " << 
+                //    it->dirent.m_title.c_str();
                 m_metapool[it->id] = it->dirent;
             }
 
             i += j;
         }
+
+        m_idsv = nids;
+        qDebug() << "EMITTING newTrackArrayReady(). idsv size" 
+                 << m_idsv.size() << " pool size " << m_metapool.size();
+        emit newTrackArrayReady();
+
     out:
         return;
     }
 
+protected:
+    std::vector<int> m_idsv;
+    std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
+    int m_curid;
+
 private:
     UPnPClient::OHPLH m_srv;
     QTimer *m_timer;
-    std::vector<int> m_ids;
-    std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
 };
 
 #endif // _OHPLAYLIST_QO_INCLUDED

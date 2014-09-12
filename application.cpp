@@ -35,6 +35,7 @@ using namespace std;
 #include "GUI/playlist/GUI_Playlist.h"
 #include "GUI/renderchoose/renderchoose.h"
 #include "playlist/PlaylistAVT.h"
+#include "playlist/PlaylistOH.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
@@ -81,9 +82,11 @@ bool Application::is_initialized()
 bool Application::setupRenderer(const string& uid)
 {
     delete rdco;
-    delete avto;
     rdco = 0;
+    delete avto;
     avto = 0;
+    delete ohplo;
+    ohplo = 0;
 
     MRDH rdr = getRenderer(uid, false);
     if (!rdr) {
@@ -107,6 +110,18 @@ bool Application::setupRenderer(const string& uid)
 
     rdco = new RenderingControlQO(rdc);
     avto = new AVTPlayer(avt);
+
+    OHPLH ohpl = rdr->ohpl();
+    if (ohpl) {
+        ohplo = new OHPlayer(ohpl);
+        qDebug() << "setupRenderer: deleting old playlist, creating OH one";
+        delete playlist;
+        playlist = new PlaylistOH();
+        playlist_connections();
+    } else {
+        ohplo = 0;
+    }
+
     QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
     if (player) {
         player->setRendererName(fn);
@@ -141,19 +156,20 @@ void Application::chooseRenderer()
                              friendlyname);
         return;
     }
-    set->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
+    settings->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
     renderer_connections();
 }
 
 Application::Application(QApplication* qapp, int, 
                          QTranslator* translator, QObject *parent)
-  : QObject(parent)
+    : QObject(parent), player(0), playlist(0), cdb(0), rdco(0),
+      avto(0), ohplo(0), ui_playlist(0), settings(0), app(qapp),
+      _initialized(false)
 {
-    app = qapp;
-    set = CSettingsStorage::getInstance();
+    settings = CSettingsStorage::getInstance();
 
     QString version = getVersion();
-    set->setVersion(version);
+    settings->setVersion(version);
 
     player = new GUI_Player(translator);
     playlist = new PlaylistAVT();
@@ -165,7 +181,7 @@ Application::Application(QApplication* qapp, int,
     rdco = 0;
     avto = 0;
 
-    string uid = qs2utf8s(set->getPlayerUID());
+    string uid = qs2utf8s(settings->getPlayerUID());
     if (uid.empty()) {
         QTimer::singleShot(0, this, SLOT(chooseRenderer()));
     } else {
@@ -180,7 +196,7 @@ Application::Application(QApplication* qapp, int,
     player->setWindowTitle("Upplay " + version);
     player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
     player->setPlaylist(ui_playlist);
-    player->setStyle( set->getPlayerStyle() );
+    player->setStyle(settings->getPlayerStyle() );
     player->show();
 
     ui_playlist->resize(player->getParentOfPlaylist()->size());
@@ -196,42 +212,42 @@ Application::~Application()
 
 void Application::renderer_connections()
 {
-    CONNECT(player, pause(), avto, pause());
-    // the search (actually seek) param is in percent
-    CONNECT(player, search(int), avto, seekPC(int));
-    CONNECT(avto, secsInSongChanged(quint32), 
-            player, setCurrentPosition(quint32));
+    if (ohplo) {
+        qDebug() << "Connecting ohplo::metaDataReady(MetaDataList& mdv)";
+        CONNECT(ohplo, metaDataReady(const MetaDataList&),
+                playlist, psl_new_ohpl(const MetaDataList&));
+    } else {
+        CONNECT(player, pause(), avto, pause());
+        // the search (actually seek) param is in percent
+        CONNECT(player, search(int), avto, seekPC(int));
+        CONNECT(avto, secsInSongChanged(quint32), 
+                player, setCurrentPosition(quint32));
 
-    CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
-    CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
-    CONNECT(playlist, sig_play_now(const MetaData&, int, bool),
-            avto, changeTrack(const MetaData&, int, bool));
-    CONNECT(avto, endOfTrackIsNear(), playlist, psl_prepare_for_end_of_track());
-    CONNECT(avto, tpStateChanged(int), playlist, psl_new_transport_state(int));
-    CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
-    CONNECT(avto, newTrackPlaying(const QString&), 
-            playlist, psl_ext_track_change(const QString&));
-    CONNECT(playlist, sig_next_track_to_play(const MetaData&),
-            avto, infoNextTrack(const MetaData&));
-    CONNECT(playlist, sig_stopped(),  avto, stop());
-    CONNECT(playlist, sig_resume_play(), avto, play());
+        CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
+        CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
+        CONNECT(playlist, sig_play_now(const MetaData&, int, bool),
+                avto, changeTrack(const MetaData&, int, bool));
+        CONNECT(avto, endOfTrackIsNear(), playlist, 
+                psl_prepare_for_end_of_track());
+        CONNECT(avto, tpStateChanged(int), playlist, 
+                psl_new_transport_state(int));
+        CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
+        CONNECT(avto, newTrackPlaying(const QString&), 
+                playlist, psl_ext_track_change(const QString&));
+        CONNECT(playlist, sig_next_track_to_play(const MetaData&),
+                avto, infoNextTrack(const MetaData&));
+        CONNECT(playlist, sig_stopped(),  avto, stop());
+        CONNECT(playlist, sig_resume_play(), avto, play());
+    }
 }
 
-void Application::init_connections()
+void Application::playlist_connections()
 {
-    if (avto && rdco)
-        renderer_connections();
-
     CONNECT(player, play(), playlist, psl_play());
     CONNECT(player, pause(), playlist, psl_pause());
     CONNECT(player, stop(), playlist, psl_stop());
     CONNECT(player, forward(), playlist, psl_forward());
     CONNECT(player, backward(), playlist, psl_backward());
-
-    CONNECT(player, show_small_playlist_items(bool), 
-            ui_playlist, psl_show_small_playlist_items(bool));
-    CONNECT(player, sig_choose_renderer(), this, chooseRenderer());
-
     CONNECT(playlist, sig_track_metadata(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
     CONNECT(playlist, sig_stopped(),  player, stopped());
@@ -240,9 +256,6 @@ void Application::init_connections()
     CONNECT(playlist, sig_playlist_updated(MetaDataList&, int, int), 
             ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
-    CONNECT(ui_playlist, selected_row_changed(int),  
-            playlist, psl_change_track(int));
-    CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
     CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), 
             playlist, psl_playlist_mode_changed(const Playlist_Mode&));
     CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
@@ -252,6 +265,22 @@ void Application::init_connections()
 
     CONNECT(cdb, sig_tracks_for_playlist_available(const MetaDataList&),
             playlist, psl_append_tracks(const MetaDataList&));
+}
+
+void Application::init_connections()
+{
+    playlist_connections();
+    if (avto && rdco) {
+        renderer_connections();
+    }
+
+    CONNECT(player, show_small_playlist_items(bool), 
+            ui_playlist, psl_show_small_playlist_items(bool));
+    CONNECT(player, sig_choose_renderer(), this, chooseRenderer());
+
+    CONNECT(ui_playlist, selected_row_changed(int),  
+            playlist, psl_change_track(int));
+    CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 }
 
 
