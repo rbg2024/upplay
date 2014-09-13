@@ -45,7 +45,7 @@ void PlaylistAVT::set_for_playing(int row)
 
     emit sig_playing_track_changed(row);
     emit sig_play_now(m_meta[row]);
-    emit sig_track_metadata(m_meta[row]);
+    emit sig_track_metadata(m_meta[row], 0, true);
 
     m_play_idx = row;
     m_meta.setCurPlayTrack(row);
@@ -63,7 +63,7 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             m_play_idx = i;
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
-            emit sig_track_metadata(m_meta[i]);
+            emit sig_track_metadata(m_meta[i], -1, true);
             break;
         }
     }
@@ -81,24 +81,6 @@ void PlaylistAVT::psl_prepare_for_end_of_track()
     if (!valid_row(m_play_idx))
         return;
     send_next_playing_signal();
-}
-
-void PlaylistAVT::psl_new_transport_state(int tps)
-{
-    string s;
-    switch (tps) {
-    case UPnPClient::AVTransport::Stopped: s = "Stopped"; break;
-    case UPnPClient::AVTransport::Playing: s = "Playing"; break;
-    case UPnPClient::AVTransport::Transitioning: s = "Transitioning"; break;
-    case UPnPClient::AVTransport::PausedPlayback: s = "PausedPlayback"; break;
-    case UPnPClient::AVTransport::PausedRecording: s = "PausedRecording"; break;
-    case UPnPClient::AVTransport::Recording: s = "Recording"; break;
-    case UPnPClient::AVTransport::NoMediaPresent: s = "NoMediaPresent"; break;
-    case UPnPClient::AVTransport::Unknown: 
-    default:
-        s = "Unknown"; break;
-    }
-    qDebug() << "psl_new_transport_state: " << s.c_str();
 }
 
 void PlaylistAVT::psl_next_track()
@@ -310,13 +292,4 @@ void PlaylistAVT::psl_remove_rows(const QList<int>& rows, bool select_next_row)
     }
 
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
-}
-
-
-// GUI -->
-void PlaylistAVT::psl_playlist_mode_changed(const Playlist_Mode& playlist_mode)
-{
-    _settings->setPlaylistMode(playlist_mode);
-    _playlist_mode = playlist_mode;
-    _playlist_mode.print();
 }

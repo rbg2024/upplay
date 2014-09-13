@@ -23,6 +23,7 @@ using namespace std;
 
 #include <QDebug>
 #include "HelperStructs/MetaData.h"
+#include "HelperStructs/globals.h"
 
 #include "upqo/avtransport_qo.h"
 #include "upputils.h"
@@ -49,6 +50,8 @@ public:
     AVTPlayer(UPnPClient::AVTH avt, QObject *parent = 0)
         : AVTransportQO(avt, parent)
         {
+            connect(this, SIGNAL(tpStateChanged(int)), 
+                    this, SLOT(playerState(int)));
         }
 
 public slots:
@@ -65,6 +68,36 @@ public slots:
         MetaDataAdaptor mad(md);
         AVTransportQO::prepareNextTrack(qs2utf8s(md.filepath), &mad);
     }
+
+    void playerState(int tps) {
+        std::string s;
+        AudioState as = AUDIO_UNKNOWN;
+        switch (tps) {
+        case UPnPClient::AVTransport::Stopped: 
+            s = "Stopped"; as = AUDIO_STOPPED; break;
+        case UPnPClient::AVTransport::Playing: 
+            s = "Playing"; as = AUDIO_PLAYING; break;
+        case UPnPClient::AVTransport::Transitioning: 
+            s = "Transitioning"; break;
+        case UPnPClient::AVTransport::PausedPlayback: 
+            s = "PausedPlayback"; as = AUDIO_PAUSED; break;
+        case UPnPClient::AVTransport::PausedRecording: 
+            s = "PausedRecording"; as = AUDIO_PAUSED; break;
+        case UPnPClient::AVTransport::Recording: 
+            s = "Recording"; break;
+        case UPnPClient::AVTransport::NoMediaPresent: 
+            s = "NoMediaPresent"; as = AUDIO_STOPPED; break;
+        case UPnPClient::AVTransport::Unknown: 
+        default:
+            s = "Unknown"; break;
+        }
+        if (as != AUDIO_UNKNOWN) {
+            emit sig_audioState(as, s.c_str());
+        }
+    }
+
+signals:
+    void sig_audioState(int as, const char *);
 };
 
 

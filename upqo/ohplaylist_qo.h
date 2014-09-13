@@ -58,6 +58,8 @@ public:
         if (!strcmp(nm, "Id")) {
             emit currentTrack(value);
             m_curid = value;
+        } else if (!strcmp(nm, "TransportState")) {
+            emit tpStateChanged(value);
         }
     }
 
@@ -81,12 +83,13 @@ public slots:
     virtual void pause() {m_srv->pause();}
     virtual void next() {m_srv->next();}
     virtual void previous() {m_srv->previous();}
-    virtual void setRepat(bool b) {m_srv->setRepeat(b);}
+    virtual void setRepeat(bool b) {m_srv->setRepeat(b);}
     virtual void setShuffle(bool b) {m_srv->setShuffle(b);}
     virtual void seekSecondAbsolute(int s) {m_srv->seekSecondAbsolute(s);}
     virtual void seekSecondRelative(int s) {m_srv->seekSecondRelative(s);}
     virtual void seekId(int i) {m_srv->seekId(i);}
     virtual void seekIndex(int i) {m_srv->seekIndex(i);}
+    virtual void clear() {m_srv->deleteAll();}
 
     // Called by timer every sec. Do we need it ?
     virtual void update() {}
@@ -95,7 +98,7 @@ signals:
     void currentTrack(int);
     void newTrackArrayReady();
     void idArrayChanged(std::vector<int>);
-                                         
+    void tpStateChanged(int);
                                          
 private slots:
     std::string vtos(std::vector<int> nids) {

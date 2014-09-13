@@ -16,11 +16,14 @@
  */
 #ifndef _OHPLADAPT_H_INCLUDED_
 #define _OHPLADAPT_H_INCLUDED_
+#include <string>
 #include <iostream>
 using namespace std;
 
 #include <QDebug>
 #include "HelperStructs/MetaData.h"
+#include "HelperStructs/globals.h"
+#include "HelperStructs/PlaylistMode.h"
 
 #include "upqo/ohplaylist_qo.h"
 #include "upputils.h"
@@ -30,9 +33,14 @@ Q_OBJECT
 
 public:
     OHPlayer(UPnPClient::OHPLH ohpl, QObject *parent = 0)
-        : OHPlaylistQO(ohpl, parent) {
+        : OHPlaylistQO(ohpl, parent), m_id(-1), m_songsecs(-1) {
         connect(this, SIGNAL(newTrackArrayReady()),
                 this, SLOT(translateMetaData()));
+        connect(this, SIGNAL(tpStateChanged(int)), 
+                this, SLOT(playerState(int)));
+        connect(this, SIGNAL(currentTrack(int)),
+                this, SLOT(currentTrack(int)));
+
     }
 
     QString u8s2qs(const std::string us) {
@@ -40,6 +48,31 @@ public:
     }
 
 private slots:
+
+    // Seek to time in percent
+    void seekPC(int pc) {
+        if (m_songsecs == -1) {
+            auto poolit = m_metapool.find(m_id);
+            if (poolit != m_metapool.end()) {
+                UPnPClient::UPnPDirObject& ude = poolit->second;
+                std::string sval;
+                if (ude.getrprop(0, "duration", sval)) {
+                    m_songsecs = UPnPP::upnpdurationtos(sval);
+                }
+            }
+        }
+
+        if (m_songsecs == -1) {
+            return;
+        }
+        int seeksecs = (m_songsecs * pc) / 100;
+        seekSecondAbsolute(seeksecs);
+    }
+
+    void currentTrack(int id) {
+        m_id = id;
+        m_songsecs = -1;
+    }
 
     void translateMetaData() {
         qDebug() << "OHPlayer::translateMetaData()";
@@ -98,14 +131,47 @@ private slots:
             
             mdv.push_back(md);
         }
-        qDebug() << "EMITTING metaDataReady with " << mdv.size() << " entries";
         emit metaDataReady(mdv);
     }
 
+    void playerState(int ps) {
+        std::string s;
+        AudioState as = AUDIO_UNKNOWN;
+        switch (ps) {
+        case UPnPClient::OHPlaylist::TPS_Unknown:
+        case UPnPClient::OHPlaylist::TPS_Buffering:
+        default:
+            s = "Unknown";
+            break;
+        case UPnPClient::OHPlaylist::TPS_Paused:
+            as = AUDIO_PAUSED;
+            s = "Paused";
+            break;
+        case UPnPClient::OHPlaylist::TPS_Playing:
+            as = AUDIO_PLAYING;
+            s = "Playing";
+            break;
+        case UPnPClient::OHPlaylist::TPS_Stopped:
+            as = AUDIO_STOPPED;
+            s = "Stopped";
+            break;
+        }
+        if (as != AUDIO_UNKNOWN) {
+            emit sig_audioState(as, s.c_str());
+        }
+    }
+
+    void  changeMode(Playlist_Mode mode) {
+        setRepeat(mode.repAll);
+        setShuffle(mode.shuffle);
+    }
+
 signals:
-
+    void sig_audioState(int as, const char *);
     void metaDataReady(const MetaDataList& mdv);
-
+private:
+    int m_id; // Current playing track
+    int m_songsecs;
 };
 
 

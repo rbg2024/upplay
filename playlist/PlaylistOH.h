@@ -36,16 +36,16 @@ class PlaylistOH : public Playlist {
 
 public:
     PlaylistOH(QObject * parent = 0)
-        : Playlist(parent)
-        {
-        }
-    virtual ~PlaylistOH() 
-        {
-        }
+        : Playlist(parent) {}
+
+    virtual ~PlaylistOH() {}
+
+signals:
+    // Connected to the OHPlaylist object
+    void sig_clear_playlist();
 
 public slots:
     // Insert after idx. Use -1 to insert at start
-    void psl_new_ohpl(const MetaDataList&);
     virtual void psl_insert_tracks(const MetaDataList&, int) {}
     void psl_append_tracks(const MetaDataList&) {}
 
@@ -55,25 +55,15 @@ public slots:
     // user actions.
     void psl_change_track(int) {}
     void psl_next_track() {}
-    void psl_prepare_for_end_of_track() {}
-    void psl_new_transport_state(int) {}
-    void psl_ext_track_change(const QString&) {}
-    void psl_playlist_mode_changed(const Playlist_Mode&) {}
-    void psl_clear_playlist() {}
+    void psl_clear_playlist();
     void psl_play();
     void psl_pause();
     void psl_stop(); 
     void psl_forward();
     void psl_backward();
-    void psl_remove_rows(const QList<int> &, bool = true)
-        {
-        }
+    void psl_remove_rows(const QList<int> &, bool = true) {}
 
-protected:
-
-    void set_for_playing(int) {}
-    void send_next_playing_signal() {}
-
+    void psl_new_ohpl(const MetaDataList&);
 };
 
 #endif /* PLAYLISTOH_H_ */

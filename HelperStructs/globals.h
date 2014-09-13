@@ -22,6 +22,13 @@
 #include <QDebug>
 
 
+enum AudioState {
+    AUDIO_UNKNOWN,
+    AUDIO_STOPPED,
+    AUDIO_PLAYING,
+    AUDIO_PAUSED
+};
+
 #define DARK_BLUE(x) QString("<font color=#0000FF>") + x + QString("</font>")
 #define LIGHT_BLUE(x) QString("<font color=#8888FF>") + x + QString("</font>")
 

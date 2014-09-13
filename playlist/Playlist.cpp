@@ -44,3 +44,30 @@ void Playlist::remove_row(int row)
     remove_list << row;
     psl_remove_rows(remove_list);
 }
+
+void Playlist::psl_new_transport_state(int tps, const char *s)
+{
+    qDebug() << "void Playlist::psl_new_transport_state " << s;
+    switch (tps) {
+    case AUDIO_UNKNOWN:
+    case AUDIO_STOPPED:
+    default:
+        emit sig_stopped();
+        break;
+    case AUDIO_PLAYING:
+        emit sig_playing();
+        break;
+    case AUDIO_PAUSED:
+        emit sig_paused();
+        break;
+    }
+}
+
+// GUI -->
+void Playlist::psl_change_mode(const Playlist_Mode& mode)
+{
+    _settings->setPlaylistMode(mode);
+    _playlist_mode = mode;
+    mode.print();
+    emit sig_mode_changed(mode);
+}

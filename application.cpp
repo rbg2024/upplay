@@ -219,16 +219,40 @@ void Application::renderer_connections()
             cerr << "OpenHome player but Playlist not openhome!";
             abort();
         }
+        CONNECT(ploh, sig_clear_playlist(), ohplo, clear());
+
         CONNECT(ohplo, metaDataReady(const MetaDataList&),
                 playlist, psl_new_ohpl(const MetaDataList&));
         CONNECT(ohplo, currentTrack(int), ploh, psl_currentTrack(int));
+        CONNECT(playlist, sig_mode_changed(Playlist_Mode),
+                ohplo, changeMode(Playlist_Mode));
         CONNECT(playlist, sig_pause(), ohplo, pause());
         CONNECT(playlist, sig_stop(),  ohplo, stop());
         CONNECT(playlist, sig_resume_play(), ohplo, play());
         CONNECT(playlist, sig_forward(), ohplo, next());
         CONNECT(playlist, sig_backward(), ohplo, previous());
 
+        CONNECT(player, search(int), ohplo, seekPC(int));
+
+        CONNECT(avto, secsInSongChanged(quint32), 
+                player, setCurrentPosition(quint32));
+        CONNECT(ohplo, sig_audioState(int, const char *), playlist, 
+                psl_new_transport_state(int, const char *));
+
     } else {
+        PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);
+        if (plavt == 0) {
+            cerr << "!OpenHome player but Playlist not AVT !";
+            abort();
+        }
+        CONNECT(plavt, sig_play_now(const MetaData&, int, bool),
+                avto, changeTrack(const MetaData&, int, bool));
+        CONNECT(plavt, sig_next_track_to_play(const MetaData&),
+                avto, infoNextTrack(const MetaData&));
+        CONNECT(avto, endOfTrackIsNear(), 
+                plavt, psl_prepare_for_end_of_track());
+        CONNECT(avto, newTrackPlaying(const QString&), 
+                plavt, psl_ext_track_change(const QString&));
 
         // the search (actually seek) param is in percent
         CONNECT(player, search(int), avto, seekPC(int));
@@ -236,20 +260,11 @@ void Application::renderer_connections()
 
         CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
 
-        CONNECT(playlist, sig_play_now(const MetaData&, int, bool),
-                avto, changeTrack(const MetaData&, int, bool));
-
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
-        CONNECT(avto, endOfTrackIsNear(), playlist, 
-                psl_prepare_for_end_of_track());
-        CONNECT(avto, tpStateChanged(int), playlist, 
+        CONNECT(avto, sig_audioState(int), playlist, 
                 psl_new_transport_state(int));
         CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
-        CONNECT(avto, newTrackPlaying(const QString&), 
-                playlist, psl_ext_track_change(const QString&));
-        CONNECT(playlist, sig_next_track_to_play(const MetaData&),
-                avto, infoNextTrack(const MetaData&));
 
         CONNECT(playlist, sig_stop(),  avto, stop());
         CONNECT(playlist, sig_resume_play(), avto, play());
@@ -278,14 +293,14 @@ void Application::init_connections()
 
     CONNECT(playlist, sig_track_metadata(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
-    CONNECT(playlist, sig_stop(),  player, stopped());
+    CONNECT(playlist, sig_stopped(),  player, stopped());
     CONNECT(playlist, sig_playing_track_changed(int), 
             ui_playlist, track_changed(int));
     CONNECT(playlist, sig_playlist_updated(MetaDataList&, int, int), 
             ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
     CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), 
-            playlist, psl_playlist_mode_changed(const Playlist_Mode&));
+            playlist, psl_playlist_change_mode(const Playlist_Mode&));
     CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
             playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 

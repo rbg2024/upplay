@@ -31,13 +31,18 @@ void PlaylistOH::psl_currentTrack(int id)
     qDebug() << "PlaylistOH::psl_currentTrack: " << id;
     for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
         if (it->id == id) {
-            emit sig_track_metadata(*it);
+            emit sig_track_metadata(*it, -1, it->pl_playing);
             qDebug() << " new track index " << it - m_meta.begin();
             emit sig_playing_track_changed(it - m_meta.begin());
             return;
         }
     }
     qDebug() << " Track id not found in array";
+}
+
+void PlaylistOH::psl_clear_playlist()
+{
+    emit sig_clear_playlist();
 }
 
 void PlaylistOH::psl_play() 

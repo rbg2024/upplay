@@ -42,23 +42,25 @@ public:
     }
 
 signals:
-    void sig_playlist_updated(MetaDataList&, int, int);
-    // This is for player action
-    void sig_play_now(const MetaData&, int pos=0, bool play=true);
-    // This is for display
-    void sig_track_metadata(const MetaData&, int pos=0, bool play=true);
-    // We send this when approaching the end of the current track, or
-    // if the following track changes. This allows the audio to
-    // prepare for gaplessness
-    void sig_next_track_to_play(const MetaData&);
-    // Inform the GUI about what row to highlight
+    // New playlist (for displaying in ui_playlist)
+    void sig_playlist_updated(MetaDataList&, int playidx, int/*unused*/);
+    // Inform the ui_playlist about what row to highlight
     void sig_playing_track_changed(int row);
+    // Current track info for displaying in the control area
+    void sig_track_metadata(const MetaData&, int pos_sec=-1, bool play=true);
 
+    // These request action from the audio part
     void sig_stop();
     void sig_pause();
     void sig_resume_play();
     void sig_forward();
     void sig_backward();
+    void sig_mode_changed(Playlist_Mode);
+
+    // These report a state transition of the audio part
+    void sig_stopped();
+    void sig_paused();
+    void sig_playing();
 
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
@@ -67,10 +69,8 @@ public slots:
 
     virtual void psl_change_track(int) = 0;
     virtual void psl_next_track() = 0;
-    virtual void psl_prepare_for_end_of_track() = 0;
-    virtual void psl_new_transport_state(int) = 0;
-    virtual void psl_ext_track_change(const QString& uri) = 0;
-    virtual void psl_playlist_mode_changed(const Playlist_Mode&) = 0;
+    virtual void psl_new_transport_state(int, const char *);
+    virtual void psl_change_mode(const Playlist_Mode&);
     virtual void psl_clear_playlist() = 0;
     virtual void psl_play() = 0;
     virtual void psl_pause() = 0;
@@ -89,9 +89,6 @@ protected:
     Playlist_Mode _playlist_mode;
 
     CSettingsStorage *_settings;
-
-    virtual void set_for_playing(int row) = 0;
-    virtual void send_next_playing_signal() = 0;
 
     virtual void remove_row(int row);
     virtual bool valid_row(int row) {

@@ -198,7 +198,8 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
     m_playing = playing;
     m_trayIcon->setPlaying(playing);
 
-    setCurrentPosition(pos_sec);
+    if (pos_sec > 0)
+        setCurrentPosition(pos_sec);
 
     ui->lab_sayonara->hide();
     ui->lab_title->show();

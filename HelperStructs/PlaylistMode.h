@@ -18,12 +18,9 @@
 #ifndef PLAYLISTMODE_H_
 #define PLAYLISTMODE_H_
 
-#include <iostream>
-#include <QList>
-#include <QVariant>
+#include <QDebug>
+#include <QString>
 #include <QStringList>
-
-using namespace std;
 
 struct Playlist_Mode {
 
@@ -42,8 +39,8 @@ struct Playlist_Mode {
         shuffle = false;
     }
 
-    void print() {
-        cout << "rep1 = " << rep1 << ", "
+    void print() const {
+        qDebug() << "rep1 = " << rep1 << ", "
              << "repAll = " << repAll << ", "
              << "repNone = " << repNone << ", "
              << "append = " << append <<", "
