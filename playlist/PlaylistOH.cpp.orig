@@ -23,7 +23,7 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOH::psl_new_ohpl: " << mdv.size() << " entries";
     m_meta = mdv;
-    emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    emit sig_playlist_updated(m_meta, _cur_play_idx, 0);
 }
 
 void PlaylistOH::psl_currentTrack(int id)

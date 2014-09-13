@@ -62,8 +62,9 @@ public:
     bool is_selected(int row) const ;
 
 protected:
-    MetaDataList		m_meta;
+    MetaDataList		_v_meta_data;
     QList<int>          _selected_rows;
+    int					_cur_play_idx;
 
 };
 

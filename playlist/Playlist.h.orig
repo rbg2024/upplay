@@ -83,7 +83,7 @@ protected:
 
     MetaDataList m_meta;
 
-    int	 m_play_idx;
+    int	 _cur_play_idx;
     bool _pause;
 
     Playlist_Mode _playlist_mode;

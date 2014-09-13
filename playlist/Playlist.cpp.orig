@@ -32,7 +32,7 @@ Playlist::Playlist(QObject * parent)
     _settings = CSettingsStorage::getInstance();
     _playlist_mode = _settings->getPlaylistMode();
     m_meta.clear();
-    m_play_idx = -1;
+    _cur_play_idx = -1;
     _pause = false;
 }
 
