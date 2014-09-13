@@ -47,14 +47,15 @@ private slots:
         for (auto idit = m_idsv.begin(); idit != m_idsv.end(); idit++) {
             auto poolit = m_metapool.find(*idit);
             if (poolit == m_metapool.end()) {
-                qDebug() << "No data found for " << *idit;
+                qDebug() << "OHPlayer::translateMetaData: "
+                    "no data found for " << *idit << "!!!";
                 continue;
             }
             UPnPClient::UPnPDirObject& ude = poolit->second;
             if (ude.m_resources.empty())
                 continue;
             MetaData md;
-            md.id = m_idsv[*idit];
+            md.id = *idit;
             md.title = u8s2qs(ude.m_title);
             md.artist = u8s2qs(ude.m_props["upnp:album"]);
             md.album = u8s2qs(ude.m_props["upnp:artist"].c_str());

@@ -141,7 +141,7 @@ out:
         }
     } else {
         set_for_playing(-1);
-        emit sig_stopped();
+        emit sig_stop();
         return;
     }
 }
@@ -174,12 +174,13 @@ void PlaylistAVT::psl_play()
 void PlaylistAVT::psl_pause()
 {
     _pause = true;
+    emit sig_pause();
 }
 
 void PlaylistAVT::psl_stop()
 {
     set_for_playing(-1);
-    emit sig_stopped();
+    emit sig_stop();
     emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
 
@@ -215,7 +216,7 @@ void PlaylistAVT::psl_change_track(int new_row)
     } else {
         set_for_playing(-1);
         remove_row(new_row);
-        emit sig_stopped();
+        emit sig_stop();
         emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
     }
 }

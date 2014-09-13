@@ -53,10 +53,12 @@ signals:
     void sig_next_track_to_play(const MetaData&);
     // Inform the GUI about what row to highlight
     void sig_playing_track_changed(int row);
-    // Inform about not playing
-    void sig_stopped();
-    // Try to resume from pause
+
+    void sig_stop();
+    void sig_pause();
     void sig_resume_play();
+    void sig_forward();
+    void sig_backward();
 
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;

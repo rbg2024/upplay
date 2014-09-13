@@ -25,8 +25,6 @@
 
 #include <QObject>
 
-#define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d))
-
 #include <QApplication>
 #include <QStringList>
 #include <QMainWindow>
@@ -45,6 +43,9 @@
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
+
+#define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d), \
+                                      Qt::UniqueConnection)
 
 class Application : public QObject
 {
@@ -76,7 +77,6 @@ private:
 
     void init_connections();
     void renderer_connections();
-    void playlist_connections();
     bool setupRenderer(const std::string& uid);
 
 public:

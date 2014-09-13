@@ -56,7 +56,7 @@ public:
     {
         //qDebug() << "OHPL: Changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "Id")) {
-            emit newTrackPlaying(value);
+            emit currentTrack(value);
             m_curid = value;
         }
     }
@@ -70,6 +70,7 @@ public:
     // IdArray
     virtual void changed(const char *nm, std::vector<int> ids)
     {
+        Q_UNUSED(nm);
         //qDebug() << "OHPL: Changed: " << nm << " (vector<int>)";
         emit idArrayChanged(ids);
     }
@@ -91,7 +92,7 @@ public slots:
     virtual void update() {}
 
 signals:
-    void newTrackPlaying(qint32);
+    void currentTrack(int);
     void newTrackArrayReady();
     void idArrayChanged(std::vector<int>);
                                          

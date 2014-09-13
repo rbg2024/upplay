@@ -39,6 +39,7 @@ Playlist::Playlist(QObject * parent)
 // remove one row
 void Playlist::remove_row(int row)
 {
+    qDebug() << "Playlist::remove_row";
     QList<int> remove_list;
     remove_list << row;
     psl_remove_rows(remove_list);

@@ -25,3 +25,38 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
     _v_meta_data = mdv;
     emit sig_playlist_updated(_v_meta_data, _cur_play_idx, 0);
 }
+
+void PlaylistOH::psl_currentTrack(int id)
+{
+    qDebug() << "PlaylistOH::psl_currentTrack: " << id;
+    for (auto it = _v_meta_data.begin(); it != _v_meta_data.end(); it++) {
+        if (it->id == id) {
+            emit sig_track_metadata(*it);
+            qDebug() << " new track index " << it - _v_meta_data.begin();
+            emit sig_playing_track_changed(it - _v_meta_data.begin());
+            return;
+        }
+    }
+    qDebug() << " Track id not found in array";
+}
+
+void PlaylistOH::psl_play() 
+{
+    emit sig_resume_play();
+}
+void PlaylistOH::psl_pause() 
+{
+    emit sig_pause();
+}
+void PlaylistOH::psl_stop() 
+{
+    emit sig_stop();
+}
+void PlaylistOH::psl_forward() 
+{
+    emit sig_forward();
+}
+void PlaylistOH::psl_backward() 
+{
+    emit sig_backward();
+}

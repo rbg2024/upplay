@@ -49,6 +49,8 @@ public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int) {}
     void psl_append_tracks(const MetaDataList&) {}
 
+    void psl_currentTrack(int id);
+
     // The following are connected to GUI signals, for responding to
     // user actions.
     void psl_change_track(int) {}
@@ -58,11 +60,11 @@ public slots:
     void psl_ext_track_change(const QString&) {}
     void psl_playlist_mode_changed(const Playlist_Mode&) {}
     void psl_clear_playlist() {}
-    void psl_play() {}
-    void psl_pause() {}
-    void psl_stop() {}
-    void psl_forward() {}
-    void psl_backward() {}
+    void psl_play();
+    void psl_pause();
+    void psl_stop(); 
+    void psl_forward();
+    void psl_backward();
     void psl_remove_rows(const QList<int> &, bool = true)
         {
         }
