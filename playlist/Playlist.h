@@ -84,12 +84,14 @@ public slots:
     // because an insert may immediatly follow (d&d), before we get
     // the updated list from the player.
     virtual void psl_remove_rows(const QList<int> &, bool select_next=true);
-
+    virtual void psl_selection_min_row(int);
 protected:
 
     MetaDataList m_meta;
 
     int	 m_play_idx;
+    int  m_selection_min_row;
+    int  m_tpstate;
     bool _pause;
 
     Playlist_Mode _playlist_mode;

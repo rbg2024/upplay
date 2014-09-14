@@ -52,7 +52,7 @@ public:
 
 signals:
     // Bad name, emitted on dbl-click, should be row_activated()
-    void row_activated(int);
+    void selected_row_changed(int);
 
     // Inform about first row in selection (might want to start there
     // if play is requested)

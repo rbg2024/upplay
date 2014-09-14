@@ -45,6 +45,8 @@ signals:
     void sig_clear_playlist();
     // Idem
     void sig_insert_tracks(const MetaDataList&, int);
+    // Idem: change the current id
+    void sig_row_activated(int);
 
 public slots:
     void psl_currentTrack(int id);

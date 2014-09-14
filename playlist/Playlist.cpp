@@ -33,6 +33,8 @@ Playlist::Playlist(QObject * parent)
     _playlist_mode = _settings->getPlaylistMode();
     m_meta.clear();
     m_play_idx = -1;
+    m_selection_min_row = 0;
+    m_tpstate = AUDIO_UNKNOWN;
     _pause = false;
 }
 
@@ -53,6 +55,7 @@ void Playlist::psl_new_transport_state(int tps, const char *s)
         qDebug() << "     meta[idx].pl_playing " << 
             m_meta[m_play_idx].pl_playing;
 
+    m_tpstate = tps;
     switch (tps) {
     case AUDIO_UNKNOWN:
     case AUDIO_STOPPED:
@@ -89,6 +92,11 @@ void Playlist::psl_append_tracks(const MetaDataList& v_md)
     psl_insert_tracks(v_md, m_meta.size() - 1);
 }
 
+void Playlist::psl_selection_min_row(int row)
+{
+    qDebug() << "Playlist::psl_selection_min_row: " << row;
+    m_selection_min_row = row;
+}
 
 void Playlist::psl_remove_rows(const QList<int>& rows, bool select_next_row)
 {
@@ -140,3 +148,4 @@ void Playlist::psl_remove_rows(const QList<int>& rows, bool select_next_row)
 
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
 }
+

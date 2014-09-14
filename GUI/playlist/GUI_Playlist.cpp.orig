@@ -214,7 +214,7 @@ void GUI_Playlist::selection_changed(MetaDataList&)
 
 void GUI_Playlist::double_clicked(int row)
 {
-    emit row_activated(row);
+    emit selected_row_changed(row);
 }
 
 void GUI_Playlist::track_changed(int row)

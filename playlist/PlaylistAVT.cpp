@@ -147,7 +147,9 @@ void PlaylistAVT::psl_play()
     }
 
     if (m_play_idx < 0) {
-        if (checkTrack(m_meta[0])) {
+        if (valid_row(m_selection_min_row)) {
+            set_for_playing(m_selection_min_row);
+        } else {
             set_for_playing(0);
         }
     } else {

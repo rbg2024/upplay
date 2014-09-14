@@ -1,5 +1,3 @@
-/* PlaylistView.h */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,23 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-/*
- * PlaylistView.h
- *
- *  Created on: Jun 27, 2011
- *      Author: luke
- */
-
 #ifndef PLAYLISTVIEW_H_
 #define PLAYLISTVIEW_H_
-
-#include "HelperStructs/MetaData.h"
-//#include "HelperStructs/CustomMimeData.h"
-#include "GUI/playlist/model/PlaylistItemModel.h"
-#include "GUI/playlist/delegate/PlaylistItemDelegate.h"
-#include "GUI/ContextMenu.h"
-
 
 #include <QEvent>
 #include <QPoint>
@@ -45,7 +28,10 @@
 #include <QMouseEvent>
 #include <QListView>
 
-
+#include "HelperStructs/MetaData.h"
+#include "GUI/playlist/model/PlaylistItemModel.h"
+#include "GUI/playlist/delegate/PlaylistItemDelegate.h"
+#include "GUI/ContextMenu.h"
 
 class PlaylistView : public QListView {
 
@@ -59,6 +45,7 @@ signals:
     void sig_remove_clicked();
     void sig_edit_clicked();
     void sig_selection_changed(MetaDataList&);
+    void sig_selection_min_row(int);
     void sig_double_clicked(int);
     void sig_no_focus();
 

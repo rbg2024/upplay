@@ -51,23 +51,31 @@ void PlaylistOH::psl_clear_playlist()
 
 void PlaylistOH::psl_play() 
 {
+    if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
+        emit sig_row_activated(m_selection_min_row);
+    } else {
+        emit sig_resume_play();
+    }
     _pause = false;
-    emit sig_resume_play();
 }
+
 void PlaylistOH::psl_pause() 
 {
     _pause = true;
     emit sig_pause();
 }
+
 void PlaylistOH::psl_stop() 
 {
     _pause = true;
     emit sig_stop();
 }
+
 void PlaylistOH::psl_forward() 
 {
     emit sig_forward();
 }
+
 void PlaylistOH::psl_backward() 
 {
     emit sig_backward();

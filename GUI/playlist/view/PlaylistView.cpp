@@ -1,5 +1,3 @@
-/* PlaylistView.cpp */
-
 /* Copyright (C) 2011  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -17,25 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <QDebug>
+#include <QUrl>
+#include <QScrollBar>
 
-
-/*
- * PlaylistView.cpp
- *
- *  Created on: Jun 26, 2011
- *      Author: luke
- */
 #include "HelperStructs/CustomMimeData.h"
-//#include "HelperStructs/CDirectoryReader.h"
 #include "HelperStructs/Helper.h"
-
 #include "GUI/ContextMenu.h"
 #include "GUI/playlist/view/PlaylistView.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
 
-#include <QDebug>
-#include <QUrl>
-#include <QScrollBar>
 
 PlaylistView::PlaylistView(QWidget* parent) : QListView(parent)
 {
@@ -517,6 +506,10 @@ QList<int> PlaylistView::calc_selections()
 
     _cur_selected_rows = selections;
 
+    if (selections.empty())
+        emit sig_selection_min_row(-1);
+    else 
+        emit sig_selection_min_row(get_min_selected());
     return selections;
 }
 

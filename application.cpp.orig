@@ -230,16 +230,12 @@ void Application::renderer_connections()
                 ui_playlist, setMode(Playlist_Mode));
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
-        // seekIndex() is directly connected to an ui double-click,
-        // this is for changing the current title to the first
-        // selected when clicking play in stopped mode
-        CONNECT(ploh, sig_row_activated(int), ohplo, seekIndex(int));
 
         CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
                 ohplo, removeTracks(const QList<int>&, bool));
-        CONNECT(ui_playlist, row_activated(int),  
+        CONNECT(ui_playlist, selected_row_changed(int),  
                 ohplo, seekIndex(int));
-
+        
         CONNECT(playlist, sig_mode_changed(Playlist_Mode),
                 ohplo, changeMode(Playlist_Mode));
         CONNECT(playlist, sig_pause(), ohplo, pause());
@@ -323,7 +319,7 @@ void Application::init_connections()
             playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
             playlist, psl_remove_rows(const QList<int>&, bool));
-    CONNECT(ui_playlist, row_activated(int),  
+    CONNECT(ui_playlist, selected_row_changed(int),  
             playlist, psl_change_track(int));
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 
