@@ -30,10 +30,10 @@
 #include <QMainWindow>
 #include <QTranslator>
 
-#include "cdbrowser.h"
+#include "dirbrowser/cdbrowser.h"
 #include "upqo/renderingcontrol_qo.h"
-#include "avtadapt.h"
-#include "ohpladapt.h"
+#include "upadapt/avtadapt.h"
+#include "upadapt/ohpladapt.h"
 
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"

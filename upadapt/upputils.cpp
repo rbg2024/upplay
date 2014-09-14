@@ -23,7 +23,7 @@ using namespace std;
 #include <libupnpp/control/cdircontent.hxx>
 
 #include "HelperStructs/MetaData.h"
-#include "upputils.h"
+#include "upadapt/upputils.h"
 
 using namespace UPnPClient;
 using namespace UPnPP;

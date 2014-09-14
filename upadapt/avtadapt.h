@@ -26,7 +26,7 @@ using namespace std;
 #include "HelperStructs/globals.h"
 
 #include "upqo/avtransport_qo.h"
-#include "upputils.h"
+#include "upadapt/upputils.h"
 
 class MetaDataAdaptor : public AVTMetadata {
 public:

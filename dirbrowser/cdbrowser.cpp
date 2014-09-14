@@ -24,8 +24,8 @@ using namespace std;
 
 #include "libupnpp/log.hxx"
 
-#include "cdbrowser.h"
-#include "upputils.h"
+#include "dirbrowser/cdbrowser.h"
+#include "upadapt/upputils.h"
 #include "upqo/cdirectory_qo.h"
 
 using namespace UPnPClient;

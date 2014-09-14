@@ -10,7 +10,6 @@ CONFIG  += qt warn_on thread release debug
 RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
-        application.h \
         GUI/ContextMenu.h \
         GUI/player/GUI_Player.h \
         GUI/player/GUI_TrayIcon.h \
@@ -28,17 +27,17 @@ HEADERS += \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
         HelperStructs/Style.h \
+        application.h \
+        dirbrowser/cdbrowser.h \
         playlist/Playlist.h \
         playlist/PlaylistAVT.h \
         playlist/PlaylistOH.h \
-        \
-        upqo/cdirectory_qo.h \
+        upadapt/avtadapt.h \
+        upadapt/ohpladapt.h \
         upqo/avtransport_qo.h \
-        upqo/renderingcontrol_qo.h \
+        upqo/cdirectory_qo.h \
         upqo/ohplaylist_qo.h \
-        cdbrowser.h \
-        avtadapt.h \
-        ohpladapt.h
+        upqo/renderingcontrol_qo.h
 
 SOURCES += \
         GUI/ContextMenu.cpp \
@@ -56,16 +55,16 @@ SOURCES += \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.cpp \
         GUI/playlist/model/PlaylistItemModel.cpp \
         GUI/playlist/view/PlaylistView.cpp \
-        application.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
+        application.cpp \
+        dirbrowser/cdbrowser.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
         playlist/PlaylistOH.cpp \
-        cdbrowser.cpp \
-        upplay.cpp \
-        upputils.cpp
+        upadapt/upputils.cpp \
+        upplay.cpp 
 
 FORMS   = \
         GUI/player/GUI_Player.ui \

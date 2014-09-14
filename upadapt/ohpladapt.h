@@ -26,7 +26,7 @@ using namespace std;
 #include "HelperStructs/PlaylistMode.h"
 
 #include "upqo/ohplaylist_qo.h"
-#include "upputils.h"
+#include "upadapt/upputils.h"
 
 class OHPlayer : public OHPlaylistQO {
 Q_OBJECT
