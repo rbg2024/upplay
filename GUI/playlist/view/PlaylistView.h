@@ -47,100 +47,100 @@
 
 
 
-class PlaylistView :public QListView{
+class PlaylistView : public QListView {
 
-	Q_OBJECT
+    Q_OBJECT
 
-	signals:
-		void context_menu_emitted(const QPoint&);
-        void sig_metadata_dropped(const MetaDataList&, int);
-        void sig_rows_removed(const QList<int> &, bool);
-        void sig_info_clicked();
-        void sig_remove_clicked();
-        void sig_edit_clicked();
-        void sig_selection_changed(MetaDataList&);
-        void sig_double_clicked(int);
-        void sig_no_focus();
+signals:
+    void context_menu_emitted(const QPoint&);
+    void sig_metadata_dropped(const MetaDataList&, int);
+    void sig_rows_removed(const QList<int>&, bool);
+    void sig_info_clicked();
+    void sig_remove_clicked();
+    void sig_edit_clicked();
+    void sig_selection_changed(MetaDataList&);
+    void sig_double_clicked(int);
+    void sig_no_focus();
 
-    private slots:
-        void forbid_mimedata_destroyable();
-        void edit_clicked();
-        void info_clicked();
-        void remove_clicked();
+private slots:
+    void forbid_mimedata_destroyable();
+    void edit_clicked();
+    void info_clicked();
+    void remove_clicked();
 
-        void row_pressed(const QModelIndex&);
-        void row_double_clicked(const QModelIndex&);
-        void row_released(const QModelIndex&);
+    void row_pressed(const QModelIndex&);
+    void row_double_clicked(const QModelIndex&);
+    void row_released(const QModelIndex&);
 
-	public:
-        PlaylistView(QWidget* parent=0);
-        virtual ~PlaylistView();
+public:
+    PlaylistView(QWidget* parent = 0);
+    virtual ~PlaylistView();
 
-        void set_context_menu_actions(int actions);
-        void set_drag_enabled(bool b);
-        void set_mimedata(MetaDataList& v_md, QString text);
-        void clear();
-        void fill(MetaDataList& v_metadata, int cur_play_idx);
-        void scrollUp();
-        void scrollDown();
-        void dropEventFromOutside(QDropEvent* event);
-        void set_current_track(int row);
-        int get_num_rows();
-        void show_big_items(bool);
-
-
-
-	protected:
-        // overloaded stuff
-		void mousePressEvent(QMouseEvent* event);
-		void mouseReleaseEvent(QMouseEvent* event);
-		void mouseMoveEvent(QMouseEvent* event);
-        void keyPressEvent(QKeyEvent *event);
-        void resizeEvent(QResizeEvent *e);
-
-    private:
-
-        void clear_selection();
-        QList<int> calc_selections();
-        void select_all();
-        int calc_dd_line(QPoint pos);
-        void set_delegate_max_width(int n_items);
-
-        void clear_drag_lines(int row);
-        void dragLeaveEvent(QDragLeaveEvent* event);
-        void dragEnterEvent(QDragEnterEvent* event);
-        void dragMoveEvent(QDragMoveEvent* event);
-        void dropEvent(QDropEvent* event);
-        void handle_drop(QDropEvent* event, bool from_outside=false);
-
-        void remove_cur_selected_rows(bool select_next_row=true);
-        void select_rows(QList<int> lst);
-        void goto_row(int row);
-        int get_min_selected();
-
-        void init_rc_menu();
+    void set_context_menu_actions(int actions);
+    void set_drag_enabled(bool b);
+    void set_mimedata(MetaDataList& v_md, QString text);
+    void clear();
+    void fill(MetaDataList& v_metadata, int cur_play_idx);
+    void scrollUp();
+    void scrollDown();
+    void dropEventFromOutside(QDropEvent* event);
+    void set_current_track(int row);
+    int get_num_rows();
+    void show_big_items(bool);
 
 
 
+protected:
+    // overloaded stuff
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
+    void mouseMoveEvent(QMouseEvent* event);
+    void keyPressEvent(QKeyEvent *event);
+    void resizeEvent(QResizeEvent *e);
 
-	private:
-        QWidget*        _parent;
+private:
 
-        bool            _drag;
-        bool            _drag_allowed;
-        bool            _inner_drag_drop;
+    void clear_selection();
+    QList<int> calc_selections();
+    void select_all();
+    int calc_dd_line(QPoint pos);
+    void set_delegate_max_width(int n_items);
 
-        QPoint          _drag_pos;
-        QDrag*          _qDrag;
-        int             _last_known_drag_row;
+    void clear_drag_lines(int row);
+    void dragLeaveEvent(QDragLeaveEvent* event);
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dragMoveEvent(QDragMoveEvent* event);
+    void dropEvent(QDropEvent* event);
+    void handle_drop(QDropEvent* event, bool from_outside = false);
 
-        QList<int>      _cur_selected_rows;
+    void remove_cur_selected_rows(bool select_next_row = true);
+    void select_rows(QList<int> lst);
+    void goto_row(int row);
+    int get_min_selected();
+
+    void init_rc_menu();
 
 
-        ContextMenu* 	_rc_menu;
 
-        PlaylistItemModel*              _model;
-        PlaylistItemDelegate* 	        _delegate;
+
+private:
+    QWidget*        _parent;
+
+    bool            _drag;
+    bool            _drag_allowed;
+    bool            _inner_drag_drop;
+
+    QPoint          _drag_pos;
+    QDrag*          _qDrag;
+    int             _last_known_drag_row;
+
+    QList<int>      _cur_selected_rows;
+
+
+    ContextMenu*    _rc_menu;
+
+    PlaylistItemModel*              _model;
+    PlaylistItemDelegate*           _delegate;
 
 };
 

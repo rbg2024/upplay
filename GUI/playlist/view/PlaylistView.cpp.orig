@@ -37,8 +37,7 @@
 #include <QUrl>
 #include <QScrollBar>
 
-PlaylistView::PlaylistView(QWidget* parent) : QListView(parent)
-{
+PlaylistView::PlaylistView(QWidget* parent) : QListView(parent) {
 
     _drag_allowed = true;
     _inner_drag_drop = false;
@@ -61,16 +60,14 @@ PlaylistView::PlaylistView(QWidget* parent) : QListView(parent)
     connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(row_released(const QModelIndex&)));
 }
 
-PlaylistView::~PlaylistView()
-{
+PlaylistView::~PlaylistView() {
 
     delete _rc_menu;
     delete _model;
 }
 
 
-void PlaylistView::mousePressEvent(QMouseEvent* event)
-{
+void PlaylistView::mousePressEvent(QMouseEvent* event) {
 
     QPoint pos_org = event->pos();
     QPoint pos = QWidget::mapToGlobal(pos_org);
@@ -78,15 +75,12 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
     switch (event->button()) {
 
     case Qt::LeftButton:
-        if (!_drag_allowed) {
-            break;
-        }
+        if(!_drag_allowed) break;
 
         QListView::mousePressEvent(event);
 
-        if ((this->model()->rowCount()) * 33 > event->pos().y()) {
+        if ((this->model()->rowCount()) * 33 > event->pos().y())
             _drag_pos = event->pos();
-        }
 
         else {
             _drag_pos.setY(-10);
@@ -113,11 +107,10 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
 }
 
 
-void PlaylistView::mouseMoveEvent(QMouseEvent* event)
-{
+void PlaylistView::mouseMoveEvent(QMouseEvent* event) {
 
     QPoint pos = event->pos();
-    int distance =  abs(pos.x() - _drag_pos.x()) +  abs(pos.y() - _drag_pos.y());
+    int distance =  abs(pos.x() - _drag_pos.x()) +	abs(pos.y() - _drag_pos.y());
 
     if (_drag && _qDrag && (distance > 10) && _drag_allowed) {
         _qDrag->exec(Qt::CopyAction);
@@ -125,43 +118,38 @@ void PlaylistView::mouseMoveEvent(QMouseEvent* event)
 }
 
 
-void PlaylistView::mouseReleaseEvent(QMouseEvent* event)
-{
+void PlaylistView::mouseReleaseEvent(QMouseEvent* event) {
 
     switch (event->button()) {
 
-    case Qt::LeftButton:
+        case Qt::LeftButton:
 
-        if (_qDrag) {
-            delete _qDrag;
-            _qDrag = NULL;
-        }
+            if(_qDrag) {
+                delete _qDrag;
+                _qDrag = NULL;
+            }
 
-        QListView::mouseReleaseEvent(event);
-        event->accept();
+            QListView::mouseReleaseEvent(event);
+            event->accept();
 
-        _drag = false;
-        break;
+            _drag = false;
+            break;
 
-    default:
-        break;
+        default: break;
     }
 }
 
 
 // get the min index of selected rows
-int PlaylistView::get_min_selected()
-{
+int PlaylistView::get_min_selected(){
 
     QModelIndexList lst = this->selectedIndexes();
     int min_row = 5000000;
 
-    if (lst.size() == 0) {
-        return 0;
-    }
+    if(lst.size() == 0) return 0;
 
-    foreach(QModelIndex i, lst) {
-        if (i.row() < min_row) {
+    foreach(QModelIndex i, lst){
+        if(i.row() < min_row){
             min_row = i.row();
         }
     }
@@ -170,11 +158,8 @@ int PlaylistView::get_min_selected()
 }
 
 // mark row as currently pressed
-void PlaylistView::goto_row(int row)
-{
-    if ((row >= _model->rowCount()) || (row < 0)) {
-        return;
-    }
+void PlaylistView::goto_row(int row){
+    if( (row >= _model->rowCount()) || (row < 0) ) return;
 
     this->clearSelection();
 
@@ -187,8 +172,7 @@ void PlaylistView::goto_row(int row)
 }
 
 
-void PlaylistView::keyPressEvent(QKeyEvent* event)
-{
+void PlaylistView::keyPressEvent(QKeyEvent* event){
 
     int key = event->key();
 
@@ -197,93 +181,70 @@ void PlaylistView::keyPressEvent(QKeyEvent* event)
     int new_row = -1;
 
 
-    switch (key) {
-    case Qt::Key_A:
-        if (modifiers & Qt::ControlModifier) {
-            select_all();
-        }
-        break;
-
-    case Qt::Key_Delete:
-        remove_cur_selected_rows();
-        break;
-
-    case Qt::Key_Up:
-        if (modifiers & Qt::ControlModifier) {
+    switch(key){
+        case Qt::Key_A:
+            if( modifiers & Qt::ControlModifier ) select_all();
             break;
-        }
 
-        if (min_row > 0) {
-            new_row = min_row - 1;
-        } else {
-            new_row = 0;
-        }
-        break;
-
-    case Qt::Key_Down:
-        if (modifiers & Qt::ControlModifier) {
+        case Qt::Key_Delete:
+            remove_cur_selected_rows();
             break;
-        }
 
-        if (min_row < _model->rowCount() - 1) {
-            new_row = min_row + 1;
-        } else {
+        case Qt::Key_Up:
+            if( modifiers & Qt::ControlModifier ) break;
+
+            if(min_row > 0) new_row = min_row - 1;
+            else new_row = 0;
+            break;
+
+        case Qt::Key_Down:
+            if( modifiers & Qt::ControlModifier ) break;
+
+            if(min_row < _model->rowCount() - 1) new_row = min_row + 1;
+            else new_row = _model->rowCount() - 1;
+            break;
+
+        case Qt::Key_PageUp:
+            if(min_row > 10) new_row = min_row - 10;
+            else new_row = 0;
+            break;
+
+        case Qt::Key_PageDown:
+            if(min_row < _model->rowCount() - 10) new_row = min_row + 10;
+            else new_row =  _model->rowCount() - 1;
+            break;
+
+        case Qt::Key_End:
             new_row = _model->rowCount() - 1;
-        }
-        break;
+            break;
 
-    case Qt::Key_PageUp:
-        if (min_row > 10) {
-            new_row = min_row - 10;
-        } else {
+        case Qt::Key_Home:
             new_row = 0;
-        }
-        break;
+            break;
 
-    case Qt::Key_PageDown:
-        if (min_row < _model->rowCount() - 10) {
-            new_row = min_row + 10;
-        } else {
-            new_row =  _model->rowCount() - 1;
-        }
-        break;
+        case Qt::Key_Return:
+        case Qt::Key_Enter:
+            this->sig_double_clicked(min_row);
+            break;
 
-    case Qt::Key_End:
-        new_row = _model->rowCount() - 1;
-        break;
+        case Qt::Key_Tab:
+            emit sig_no_focus();
+            break;
 
-    case Qt::Key_Home:
-        new_row = 0;
-        break;
-
-    case Qt::Key_Return:
-    case Qt::Key_Enter:
-        this->sig_double_clicked(min_row);
-        break;
-
-    case Qt::Key_Tab:
-        emit sig_no_focus();
-        break;
-
-    default:
-        break;
+        default: break;
     }
 
-    if (new_row != -1) {
-        goto_row(new_row);
-    }
+    if(new_row != -1) goto_row(new_row);
 }
 
-void PlaylistView::resizeEvent(QResizeEvent *e)
-{
+void PlaylistView::resizeEvent(QResizeEvent *e){
 
     this->set_delegate_max_width(_model->rowCount());
     e->accept();
 
 }
 
-void PlaylistView::init_rc_menu()
-{
+void PlaylistView::init_rc_menu(){
 
     _rc_menu = new ContextMenu(this);
 
@@ -292,29 +253,21 @@ void PlaylistView::init_rc_menu()
     connect(_rc_menu, SIGNAL(sig_remove_clicked()), this, SLOT(remove_clicked()));
 }
 
-void PlaylistView::set_context_menu_actions(int actions)
-{
-    if (!_rc_menu) {
-        init_rc_menu();
-    }
+void PlaylistView::set_context_menu_actions(int actions){
+    if(!_rc_menu) init_rc_menu();
     _rc_menu->setup_entries(actions);
 }
 
 
-void PlaylistView::set_mimedata(MetaDataList& v_md, QString text)
-{
+void PlaylistView::set_mimedata(MetaDataList& v_md, QString text) {
 
-    if (!_drag_allowed) {
-        return;
-    }
-    if (_qDrag) {
-        delete _qDrag;
-    }
+    if(!_drag_allowed) return;
+    if(_qDrag) delete _qDrag;
 
     CustomMimeData* mimedata = new CustomMimeData();
 
     QList<QUrl> urls;
-    foreach(MetaData md, v_md) {
+    foreach(MetaData md, v_md){
         QUrl url(QString("file://") + md.filepath);
         urls << url;
     }
@@ -331,32 +284,26 @@ void PlaylistView::set_mimedata(MetaDataList& v_md, QString text)
     _drag = true;
 }
 
-void PlaylistView::forbid_mimedata_destroyable()
-{
+void PlaylistView::forbid_mimedata_destroyable(){
     _qDrag = NULL;
 }
 
-void PlaylistView::set_drag_enabled(bool b)
-{
+void PlaylistView::set_drag_enabled(bool b){
     _drag_allowed = b;
 }
 
 
-int PlaylistView::get_num_rows()
-{
+int PlaylistView::get_num_rows(){
     return _model->rowCount();
 }
 
-void PlaylistView::set_current_track(int row)
-{
+void PlaylistView::set_current_track(int row){
 
-    for (int i = 0; i < _model->rowCount(); i++) {
+    for(int i=0; i<_model->rowCount(); i++){
         QModelIndex idx = _model->index(i);
         MetaData md;
         QVariant v = _model->data(idx, Qt::WhatsThisRole);
-        if (!MetaData::fromVariant(v, md)) {
-            continue;
-        }
+        if(!MetaData::fromVariant(v, md)) continue;
         md.pl_playing = (row == i);
 
         _model->setData(idx, md.toVariant(), Qt::EditRole);
@@ -367,56 +314,46 @@ void PlaylistView::set_current_track(int row)
 }
 
 
-void PlaylistView::edit_clicked()
-{
+void PlaylistView::edit_clicked(){
     emit sig_edit_clicked();
 }
 
 
-void PlaylistView::info_clicked()
-{
+void PlaylistView::info_clicked(){
     emit sig_info_clicked();
 }
 
-void PlaylistView::remove_clicked()
-{
+void PlaylistView::remove_clicked(){
     remove_cur_selected_rows();
 }
 
-void PlaylistView::clear()
-{
+void PlaylistView::clear(){
     clear_selection();
     _model->removeRows(0, _model->rowCount());
 }
 
 
-void PlaylistView::fill(MetaDataList& v_metadata, int cur_play_idx)
-{
+void PlaylistView::fill(MetaDataList &v_metadata, int cur_play_idx){
 
     this->set_delegate_max_width((int) v_metadata.size());
 
     _model->removeRows(0, _model->rowCount());
-    if (v_metadata.size() == 0) {
-        return;
-    }
+    if(v_metadata.size() == 0) return;
 
     _model->insertRows(0, v_metadata.size());
     _cur_selected_rows.clear();
 
     QModelIndex idx_cur_playing = _model->index(0);
-    for (uint i = 0; i < v_metadata.size(); i++) {
+    for(uint i=0; i<v_metadata.size(); i++){
         MetaData md = v_metadata[i];
 
         QModelIndex model_idx = _model->index(i, 0);
 
         md.pl_playing = (cur_play_idx == int(i));
-        if (md.pl_playing) {
-            idx_cur_playing = model_idx;
-        }
+        if(md.pl_playing) idx_cur_playing = model_idx;
 
-        if (md.pl_selected) {
+        if(md.pl_selected)
             _cur_selected_rows << i;
-        }
 
         _model->setData(model_idx, md.toVariant(), Qt::EditRole);
     }
@@ -428,21 +365,18 @@ void PlaylistView::fill(MetaDataList& v_metadata, int cur_play_idx)
 
 }
 
-void PlaylistView::row_pressed(const QModelIndex&)
-{
+void PlaylistView::row_pressed(const QModelIndex&){
 
     QList<int> selected_rows = calc_selections();
     _inner_drag_drop = true;
 
     MetaDataList v_md;
-    foreach(int row, selected_rows) {
+    foreach(int row, selected_rows){
         QVariant mdvariant = _model->data(_model->index(row), Qt::WhatsThisRole);
 
         MetaData md;
 
-        if (!MetaData::fromVariant(mdvariant, md)) {
-            continue;
-        }
+        if(!MetaData::fromVariant(mdvariant, md)) continue;
 
         v_md.push_back(md);
     }
@@ -451,23 +385,18 @@ void PlaylistView::row_pressed(const QModelIndex&)
     emit sig_selection_changed(v_md);
 }
 
-void PlaylistView::row_released(const QModelIndex&)
-{
+void PlaylistView::row_released(const QModelIndex&){
     calc_selections();
     _inner_drag_drop = false;
 }
 
-void PlaylistView::row_double_clicked(const QModelIndex& idx)
-{
+void PlaylistView::row_double_clicked(const QModelIndex& idx){
     _inner_drag_drop = false;
 
-    if (idx.isValid()) {
-        emit sig_double_clicked(idx.row());
-    }
+    if(idx.isValid()) emit sig_double_clicked(idx.row());
 }
 
-void PlaylistView::clear_selection()
-{
+void PlaylistView::clear_selection(){
 
     MetaDataList v_md;
     this->selectionModel()->clearSelection();
@@ -476,14 +405,13 @@ void PlaylistView::clear_selection()
 
 }
 
-void PlaylistView::select_rows(QList<int> lst)
-{
+void PlaylistView::select_rows(QList<int> lst){
 
     QItemSelectionModel* sm = this->selectionModel();
     QItemSelection sel;
 
 
-    foreach(int row, lst) {
+    foreach(int row, lst){
         QModelIndex idx = _model->index(row);
 
         sm->select(idx, QItemSelectionModel::Select);
@@ -491,25 +419,23 @@ void PlaylistView::select_rows(QList<int> lst)
     }
 
     sm->clearSelection();
-    sm->select(sel, QItemSelectionModel::Select);
+    sm->select(sel,QItemSelectionModel::Select);
 
     _cur_selected_rows = calc_selections();
 }
 
-void PlaylistView::select_all()
-{
+void PlaylistView::select_all(){
     selectAll();
     calc_selections();
 }
 
-QList<int> PlaylistView::calc_selections()
-{
+QList<int> PlaylistView::calc_selections(){
 
     QList<int> selections;
 
     QModelIndexList idx_list = this->selectionModel()->selectedRows();
 
-    foreach(QModelIndex model_idx, idx_list) {
+    foreach(QModelIndex model_idx, idx_list){
         selections.push_back(model_idx.row());
     }
 
@@ -522,19 +448,17 @@ QList<int> PlaylistView::calc_selections()
 
 
 // remove the black line under the titles
-void  PlaylistView::clear_drag_lines(int row)
-{
+void  PlaylistView::clear_drag_lines(int row){
 
-    for (int i = row - 3; i <= row + 3; i++) {
+    for(int i=row-3; i<=row+3; i++){
 
         QModelIndex idx = _model->index(i, 0);
-        if (!idx.isValid() || idx.row() < 0 || idx.row() >= _model->rowCount()) {
+        if(!idx.isValid() || idx.row() < 0 || idx.row() >= _model->rowCount())
             continue;
-        }
 
-        QVariant mdVariant = _model->data(idx, Qt::WhatsThisRole);
+        QVariant mdVariant =_model->data(idx, Qt::WhatsThisRole);
         MetaData md;
-        if (MetaData::fromVariant(mdVariant, md)) {
+        if(MetaData::fromVariant(mdVariant, md)){
 
             md.pl_dragged = false;
             _model->setData(idx, md.toVariant(), Qt::EditRole);
@@ -545,36 +469,29 @@ void  PlaylistView::clear_drag_lines(int row)
 
 
 
-int PlaylistView::calc_dd_line(QPoint pos)
-{
+int PlaylistView::calc_dd_line(QPoint pos){
 
-    if (pos.y() < 0) {
+    if(pos.y() < 0) {
         return -1;
     }
     int row = this->indexAt(pos).row();
 
-    if (row <= -1) {
-        row = _model->rowCount() - 1;
-    }
+    if(row <= -1) row = _model->rowCount()-1;
     return row;
 }
 
 
 // the drag comes, if there's data --> accept it
-void PlaylistView::dragEnterEvent(QDragEnterEvent* event)
-{
+void PlaylistView::dragEnterEvent(QDragEnterEvent* event){
     event->accept();
 }
 
-void PlaylistView::dragMoveEvent(QDragMoveEvent* event)
-{
+void PlaylistView::dragMoveEvent(QDragMoveEvent* event){
 
-    if (!event->mimeData()) {
-        return;
-    }
+    if( !event->mimeData() )  return;
     event->accept();
 
-    int row = calc_dd_line(event->pos());
+    int row = calc_dd_line(event->pos() );
 
     _last_known_drag_row = row;
     clear_drag_lines(row);
@@ -583,9 +500,7 @@ void PlaylistView::dragMoveEvent(QDragMoveEvent* event)
     QModelIndex cur_idx = _model->index(row, 0);
     QVariant mdVariant = _model->data(cur_idx, Qt::WhatsThisRole);
     MetaData md;
-    if (!MetaData::fromVariant(mdVariant, md)) {
-        return;
-    }
+    if(!MetaData::fromVariant(mdVariant, md)) return;
 
     md.pl_dragged = true;
     _model->setData(cur_idx, md.toVariant(), Qt::EditRole);
@@ -593,58 +508,51 @@ void PlaylistView::dragMoveEvent(QDragMoveEvent* event)
 
 
 // we start the drag action, all lines has to be cleared
-void PlaylistView::dragLeaveEvent(QDragLeaveEvent* event)
-{
+void PlaylistView::dragLeaveEvent(QDragLeaveEvent* event){
     event->accept();
 
     clear_drag_lines(_last_known_drag_row);
 }
 
 
-void PlaylistView::dropEventFromOutside(QDropEvent* event)
-{
-    if (event->pos().y() < this->y()) {
+void PlaylistView::dropEventFromOutside(QDropEvent* event){
+    if(event->pos().y() < this->y())
         handle_drop(event, true);
-    }
 
 }
 
 // finally drop it
-void PlaylistView::dropEvent(QDropEvent* event)
-{
+void PlaylistView::dropEvent(QDropEvent* event){
 
     event->accept();
 
-    if (!event->mimeData()) {
-        return;
-    }
+    if(!event->mimeData()) return;
     handle_drop(event, false);
 
 }
 
-void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
-{
+void PlaylistView::handle_drop(QDropEvent* event, bool from_outside){
 
 
     QList<int> affected_rows;
 
     QPoint pos = event->pos();
-    if (from_outside) {
+    if(from_outside){
         pos.setY(pos.y() - this->y());
     }
 
     // where did i drop?
     int row = calc_dd_line(pos);
 
-    if (_inner_drag_drop) {
+    if(_inner_drag_drop){
         _inner_drag_drop = false;
-        if (_cur_selected_rows.contains(row)) {
+        if( _cur_selected_rows.contains(row) ){
             event->ignore();
             clear_drag_lines(row);
             return;
         }
 
-        if (_cur_selected_rows.first() < row) {
+        if(_cur_selected_rows.first() < row ) {
             row -= _cur_selected_rows.size();
         }
 
@@ -656,15 +564,13 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
     MetaDataList v_metadata;
 
     QString text = "";
-    if (d->hasText()) {
-        text = d->text();
-    }
+    if(d->hasText()) text = d->text();
 
     // extern
-    if (d->hasUrls() && text.compare("tracks", Qt::CaseInsensitive)) {
+    if( d->hasUrls() && text.compare("tracks", Qt::CaseInsensitive) ){
 
         QStringList filelist;
-        foreach(QUrl url, d->urls()) {
+        foreach(QUrl url, d->urls()){
             QString path;
             QString url_str = url.toString();
             path =  url_str.right(url_str.length() - 7).trimmed();
@@ -679,27 +585,23 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
 
         reader.getMetadataFromFileList(filelist, v_metadata);
 #endif
-        if (v_metadata.size() == 0) {
-            return;
-        }
+        if(v_metadata.size() == 0) return;
     }
 
-    else if (d->hasHtml()) {}
-    else if (d->hasImage()) {}
+    else if(d->hasHtml()){}
+    else if(d->hasImage()){}
 
-    else if (d->hasText() && d->hasMetaData()) {
+    else if(d->hasText() && d->hasMetaData()){
 
         uint sz = d->getMetaData(v_metadata);
-        if (sz == 0) {
-            return;
-        }
+        if(sz == 0) return;
 
     }
 
-    else if (d->hasText()) {}
+    else if(d->hasText()){}
     else {}
 
-    for (uint i = 0; i < v_metadata.size(); i++) {
+    for(uint i=0; i<v_metadata.size(); i++){
         affected_rows << i + row + 1;
     }
 
@@ -707,40 +609,30 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
 }
 
 
-void PlaylistView::scrollUp()
-{
+void PlaylistView::scrollUp(){
     QPoint p(5, 5);
     int cur_row = this->indexAt(p).row();
-    if (cur_row <= 0) {
-        return;
-    }
+    if(cur_row <= 0) return;
 
     this->scrollTo(_model->index(cur_row - 1));
 }
 
-void PlaylistView::scrollDown()
-{
+void PlaylistView::scrollDown(){
     QPoint p(5, this->y() + this->height() - 5);
     int cur_row = this->indexAt(p).row();
-    if (cur_row <= 0) {
-        return;
-    }
+    if(cur_row <= 0) return;
 
     this->scrollTo(_model->index(cur_row - 1));
 }
 
-void PlaylistView::remove_cur_selected_rows(bool select_next_row)
-{
+void PlaylistView::remove_cur_selected_rows(bool select_next_row){
     emit sig_rows_removed(_cur_selected_rows, select_next_row);
 }
 
 
-void PlaylistView::show_big_items(bool big)
-{
+void PlaylistView::show_big_items(bool big){
 
-    if (_delegate) {
-        delete _delegate;
-    }
+    if(_delegate) delete _delegate;
     _delegate = new PlaylistItemDelegate(this, !big);
 
     this->set_delegate_max_width(_model->rowCount());
@@ -750,15 +642,13 @@ void PlaylistView::show_big_items(bool big)
 }
 
 
-void PlaylistView::set_delegate_max_width(int n_items)
-{
+void PlaylistView::set_delegate_max_width(int n_items){
 
-    bool scrollbar_visible = ((n_items * _delegate->rowHeight()) >= this->height());
+    bool scrollbar_visible = (( n_items * _delegate->rowHeight() ) >= this->height());
 
     int max_width = this->width();
-    if (scrollbar_visible) {
+    if(scrollbar_visible)
         max_width -= verticalScrollBar()->width();
-    }
 
     _delegate->setMaxWidth(max_width);
 }
