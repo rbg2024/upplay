@@ -43,18 +43,15 @@ public:
 signals:
     // Connected to the OHPlaylist object
     void sig_clear_playlist();
+    // Idem
+    void sig_insert_tracks(const MetaDataList&, int);
 
 public slots:
-    // Insert after idx. Use -1 to insert at start
-    virtual void psl_insert_tracks(const MetaDataList&, int) {}
-    void psl_append_tracks(const MetaDataList&) {}
-
     void psl_currentTrack(int id);
 
     // The following are connected to GUI signals, for responding to
     // user actions.
     void psl_change_track(int) {}
-    void psl_next_track() {}
     void psl_clear_playlist();
     void psl_play();
     void psl_pause();
@@ -62,7 +59,10 @@ public slots:
     void psl_forward();
     void psl_backward();
     void psl_remove_rows(const QList<int> &, bool = true) {}
+    // Insert after idx. Use -1 to insert at start
+    void psl_insert_tracks(const MetaDataList&, int);
 
+    // Set from scratch after reading changes from device
     void psl_new_ohpl(const MetaDataList&);
 };
 

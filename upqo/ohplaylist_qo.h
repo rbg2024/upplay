@@ -60,6 +60,10 @@ public:
             m_curid = value;
         } else if (!strcmp(nm, "TransportState")) {
             emit tpStateChanged(value);
+        } else if (!strcmp(nm, "Shuffle")) {
+            emit sig_shuffleState(value!=0);
+        } else if (!strcmp(nm, "Repeat")) {
+            emit sig_repeatState(value!=0);
         }
     }
 
@@ -78,18 +82,31 @@ public:
     }
 
 public slots:
-    virtual void play() {m_srv->play();}
-    virtual void stop() {m_srv->stop();}
-    virtual void pause() {m_srv->pause();}
-    virtual void next() {m_srv->next();}
-    virtual void previous() {m_srv->previous();}
-    virtual void setRepeat(bool b) {m_srv->setRepeat(b);}
-    virtual void setShuffle(bool b) {m_srv->setShuffle(b);}
-    virtual void seekSecondAbsolute(int s) {m_srv->seekSecondAbsolute(s);}
-    virtual void seekSecondRelative(int s) {m_srv->seekSecondRelative(s);}
-    virtual void seekId(int i) {m_srv->seekId(i);}
-    virtual void seekIndex(int i) {m_srv->seekIndex(i);}
-    virtual void clear() {m_srv->deleteAll();}
+    virtual bool play() {return m_srv->play() == 0;}
+    virtual bool stop() {return m_srv->stop() == 0;}
+    virtual bool pause() {return m_srv->pause() == 0;}
+    virtual bool next() {return m_srv->next() == 0;}
+    virtual bool previous() {return m_srv->previous() == 0;}
+    virtual bool setRepeat(bool b) {return m_srv->setRepeat(b) == 0;}
+    virtual bool setShuffle(bool b) {return m_srv->setShuffle(b) == 0;}
+    virtual bool seekSecondAbsolute(int s) {
+        return m_srv->seekSecondAbsolute(s) == 0;}
+    virtual bool seekSecondRelative(int s) {
+        return m_srv->seekSecondRelative(s) == 0;}
+    virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
+    virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
+    virtual bool clear() {return m_srv->deleteAll() == 0;}
+    virtual bool insert(int afterid, const std::string& uri, 
+                        const std::string& didl, int *nid) {
+        qDebug() << "OHPlaylistQO: insert after " << afterid;
+        int ret = m_srv->insert(afterid, uri, didl, nid);
+        if (ret == 0)
+            return true;
+        qDebug() << "OHPlaylistQO: insert failed: " << ret;
+        return false;
+    }
+    virtual bool deleteId(int id) {return m_srv->deleteId(id) == 0;}
+
 
     // Called by timer every sec. Do we need it ?
     virtual void update() {}
@@ -99,6 +116,8 @@ signals:
     void newTrackArrayReady();
     void idArrayChanged(std::vector<int>);
     void tpStateChanged(int);
+    void sig_shuffleState(bool);
+    void sig_repeatState(bool);
                                          
 private slots:
     std::string vtos(std::vector<int> nids) {
@@ -130,7 +149,8 @@ private slots:
                 unids.push_back(*it);
         }
         if (!unids.empty())
-            qDebug() << "OHPL: no meta for: " << vtos(unids).c_str();
+            qDebug() << "OHPL::onIdArrayChanged: need metadata for: " 
+                     << vtos(unids).c_str();
 
         // Fetch needed metadata, 10 entries at a time
         const unsigned int batchsize(10);
@@ -141,7 +161,8 @@ private slots:
                 small.push_back(unids[i+j]);
             }
 
-            //qDebug() << "Requesting metadata for " << vtos(small).c_str();
+            qDebug() << "OHPL::onIdArrayChanged: Requesting metadata for " 
+                     << vtos(small).c_str();
             std::vector<UPnPClient::OHPlaylist::TrackListEntry> entries;
             int ret;
             if ((ret = m_srv->readList(small, &entries))) {
@@ -152,14 +173,14 @@ private slots:
                 //qDebug() << "Data for " << it->id << " " << 
                 //    it->dirent.m_title.c_str();
                 m_metapool[it->id] = it->dirent;
+                qDebug() << "OHPL::onIdArrayChanged: got meta for " << it->id;
             }
-
             i += j;
         }
 
         m_idsv = nids;
-        qDebug() << "EMITTING newTrackArrayReady(). idsv size" 
-                 << m_idsv.size() << " pool size " << m_metapool.size();
+        qDebug() << "OHPL::onIdArrayChanged: emit newTrackArrayReady(). " <<
+            "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit newTrackArrayReady();
 
     out:

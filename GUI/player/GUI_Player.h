@@ -60,7 +60,11 @@ public slots:
     void really_close(bool=false);
 
     void trayItemActivated (QSystemTrayIcon::ActivationReason reason);
+
+    // Reflect externally triggered audio changes in ui
     void stopped();
+    void playing();
+    void paused();
 
     void setVolume(int vol);
     void setVolumeUi(int volume_percent);

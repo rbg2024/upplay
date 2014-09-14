@@ -34,21 +34,19 @@ using namespace std;
 
 void PlaylistAVT::set_for_playing(int row)
 {
+    qDebug() << "PlaylistAVT::set_for_playing " << row;
     if (row < 0 || row >= int(m_meta.size())) {
         m_play_idx = -1;
         m_meta.setCurPlayTrack(-1);
         return;
     }
 
-    if(!checkTrack(m_meta[row]))
-        return;
-
+    m_play_idx = row;
+    m_meta.setCurPlayTrack(row);
+    
     emit sig_playing_track_changed(row);
     emit sig_play_now(m_meta[row]);
     emit sig_track_metadata(m_meta[row], 0, true);
-
-    m_play_idx = row;
-    m_meta.setCurPlayTrack(row);
 }
 
 // Player switched tracks under us. Hopefully the uri matches a further track
@@ -210,7 +208,7 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
     ++row;
 
     qDebug() << "PlaylistAVT::psl_insert_tracks: cur size" << 
-        m_meta.size() << " before row " << row;
+        m_meta.size() << ". " << nmeta.size() << " rows before row " << row;
     if (m_meta.empty()) {
         if (row != 0) {
             return;
@@ -233,14 +231,10 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
         }
     }
 
+    // Prepare following track
     send_next_playing_signal();
 
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
-}
-
-void PlaylistAVT::psl_append_tracks(const MetaDataList& v_md)
-{
-    psl_insert_tracks(v_md, m_meta.size() - 1);
 }
 
 void PlaylistAVT::psl_remove_rows(const QList<int>& rows, bool select_next_row)

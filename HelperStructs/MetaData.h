@@ -189,7 +189,8 @@ public:
         for (uint i = 0; i < size(); i++) {
             if ((int) i == idx) 
                 at(i).pl_playing = true;
-            at(i).pl_playing = false;
+            else
+                at(i).pl_playing = false;
         }
     }
 

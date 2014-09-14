@@ -46,11 +46,8 @@ public:
 public slots:
     // Insert after idx. Use -1 to insert at start
     void psl_insert_tracks(const MetaDataList&, int idx);
-    void psl_append_tracks(const MetaDataList&);
-
 
     void psl_change_track(int);
-    void psl_next_track();
     void psl_prepare_for_end_of_track();
     void psl_ext_track_change(const QString& uri);
     void psl_clear_playlist();
@@ -71,10 +68,9 @@ signals:
     void sig_next_track_to_play(const MetaData&);
 
 protected:
-
     void set_for_playing(int row);
     void send_next_playing_signal();
-
+    void psl_next_track();
     bool checkTrack(const MetaData&) {return true;}
 };
 

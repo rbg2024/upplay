@@ -51,7 +51,9 @@ public:
     void dragMoveEvent(QDragMoveEvent* event);
 
 signals:
+    // Bad name, emitted on dbl-click, should be row_activated()
     void selected_row_changed(int);
+
     void clear_playlist();
     void save_playlist(const QString&);
     void playlist_mode_changed(const Playlist_Mode&);
@@ -65,7 +67,7 @@ signals:
 public slots:
     void fillPlaylist(MetaDataList&, int, int);
     void track_changed(int);
-
+    void setMode(Playlist_Mode mode);
     void psl_show_small_playlist_items(bool small_items);
 
 private slots:

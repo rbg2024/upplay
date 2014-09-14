@@ -36,7 +36,7 @@ Playlist::Playlist(QObject * parent)
     _pause = false;
 }
 
-// remove one row
+// Remove one row
 void Playlist::remove_row(int row)
 {
     qDebug() << "Playlist::remove_row";
@@ -47,7 +47,10 @@ void Playlist::remove_row(int row)
 
 void Playlist::psl_new_transport_state(int tps, const char *s)
 {
-    qDebug() << "void Playlist::psl_new_transport_state " << s;
+    qDebug() << "Playlist::psl_new_transport_state " << s <<
+        " play_idx " << m_play_idx;
+    if (m_play_idx >= 0 && m_play_idx < m_meta.size()) 
+        qDebug() << "     meta[idx].pl_playing " << m_meta[m_play_idx].pl_playing;
     switch (tps) {
     case AUDIO_UNKNOWN:
     case AUDIO_STOPPED:
@@ -70,4 +73,16 @@ void Playlist::psl_change_mode(const Playlist_Mode& mode)
     _playlist_mode = mode;
     mode.print();
     emit sig_mode_changed(mode);
+}
+
+// Audio -->
+void Playlist::psl_mode_changed(Playlist_Mode mode)
+{
+    _playlist_mode = mode;
+}
+
+void Playlist::psl_append_tracks(const MetaDataList& v_md)
+{
+    qDebug() << "Playlist::psl_append_tracks()";
+    psl_insert_tracks(v_md, m_meta.size() - 1);
 }

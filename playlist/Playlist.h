@@ -55,6 +55,7 @@ signals:
     void sig_resume_play();
     void sig_forward();
     void sig_backward();
+    // Only connect in OHPlaylist mode
     void sig_mode_changed(Playlist_Mode);
 
     // These report a state transition of the audio part
@@ -65,12 +66,14 @@ signals:
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
     // This is a abbrev for "insert at end"
-    virtual void psl_append_tracks(const MetaDataList&) = 0;
+    virtual void psl_append_tracks(const MetaDataList&);
 
     virtual void psl_change_track(int) = 0;
-    virtual void psl_next_track() = 0;
     virtual void psl_new_transport_state(int, const char *);
+    // Mode change requested by UI
     virtual void psl_change_mode(const Playlist_Mode&);
+    // Mode change reported by audio (OH)
+    virtual void psl_mode_changed(Playlist_Mode);
     virtual void psl_clear_playlist() = 0;
     virtual void psl_play() = 0;
     virtual void psl_pause() = 0;

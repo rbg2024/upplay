@@ -64,12 +64,8 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
 
     _info_dialog = dialog;
 
-    _playlist_mode = settings->getPlaylistMode();
+    setMode(settings->getPlaylistMode());
 
-    ui->btn_append->setChecked(_playlist_mode.append);
-    ui->btn_repAll->setChecked(_playlist_mode.repAll);
-    ui->btn_dynamic->setChecked(_playlist_mode.dynamic);
-    ui->btn_shuffle->setChecked(_playlist_mode.shuffle);
     ui->btn_numbers->setChecked(settings->getPlaylistNumbers());
     ui->btn_import->setVisible(false);
 
@@ -103,6 +99,16 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
 GUI_Playlist::~GUI_Playlist()
 {
     delete ui;
+}
+
+void GUI_Playlist::setMode(Playlist_Mode mode)
+{
+    _playlist_mode = mode;
+
+    ui->btn_append->setChecked(_playlist_mode.append);
+    ui->btn_repAll->setChecked(_playlist_mode.repAll);
+    ui->btn_dynamic->setChecked(_playlist_mode.dynamic);
+    ui->btn_shuffle->setChecked(_playlist_mode.shuffle);
 }
 
 void GUI_Playlist::changeEvent(QEvent* e)

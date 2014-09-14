@@ -224,6 +224,20 @@ void Application::renderer_connections()
         CONNECT(ohplo, metaDataReady(const MetaDataList&),
                 playlist, psl_new_ohpl(const MetaDataList&));
         CONNECT(ohplo, currentTrack(int), ploh, psl_currentTrack(int));
+        CONNECT(ohplo, sig_PLModeChanged(Playlist_Mode),
+                playlist, psl_mode_changed(Playlist_Mode));
+        CONNECT(ohplo, sig_PLModeChanged(Playlist_Mode),
+                ui_playlist, setMode(Playlist_Mode));
+        CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
+                ohplo, insertTracks(const MetaDataList&, int));
+
+        CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
+                ohplo, insertTracks(const MetaDataList&, int));
+        CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
+                ohplo, removeTracks(const QList<int>&, bool));
+        CONNECT(ui_playlist, selected_row_changed(int),  
+                ohplo, seekIndex(int));
+        
         CONNECT(playlist, sig_mode_changed(Playlist_Mode),
                 ohplo, changeMode(Playlist_Mode));
         CONNECT(playlist, sig_pause(), ohplo, pause());
@@ -262,9 +276,9 @@ void Application::renderer_connections()
 
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
-        CONNECT(avto, sig_audioState(int), playlist, 
-                psl_new_transport_state(int));
-        CONNECT(avto, stoppedAtEOT(), playlist, psl_next_track());
+        CONNECT(avto, sig_audioState(int, const char*), playlist, 
+                psl_new_transport_state(int, const char *));
+        CONNECT(avto, stoppedAtEOT(), playlist, psl_forward());
 
         CONNECT(playlist, sig_stop(),  avto, stop());
         CONNECT(playlist, sig_resume_play(), avto, play());
@@ -294,13 +308,15 @@ void Application::init_connections()
     CONNECT(playlist, sig_track_metadata(const MetaData&, int, bool),
             player, update_track(const MetaData&, int, bool));
     CONNECT(playlist, sig_stopped(),  player, stopped());
+    CONNECT(playlist, sig_paused(),  player, paused());
+    CONNECT(playlist, sig_playing(),  player, playing());
     CONNECT(playlist, sig_playing_track_changed(int), 
             ui_playlist, track_changed(int));
     CONNECT(playlist, sig_playlist_updated(MetaDataList&, int, int), 
             ui_playlist, fillPlaylist(MetaDataList&, int, int));
 
     CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), 
-            playlist, psl_playlist_change_mode(const Playlist_Mode&));
+            playlist, psl_change_mode(const Playlist_Mode&));
     CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
             playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 

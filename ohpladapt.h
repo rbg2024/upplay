@@ -40,7 +40,10 @@ public:
                 this, SLOT(playerState(int)));
         connect(this, SIGNAL(currentTrack(int)),
                 this, SLOT(currentTrack(int)));
-
+        connect(this, SIGNAL(sig_shuffleState(bool)), 
+                this, SLOT(onShuffleState(bool)));
+        connect(this, SIGNAL(sig_repeatState(bool)), 
+                this, SLOT(onRepeatState(bool)));
     }
 
     QString u8s2qs(const std::string us) {
@@ -134,6 +137,31 @@ private slots:
         emit metaDataReady(mdv);
     }
 
+    // Insert after idx
+    void insertTracks(const MetaDataList& meta, int idx) {
+        if (idx < -1 || idx >= int(m_idsv.size())) {
+            return;
+        }
+        int afterid = idx == -1 ? 0 : m_idsv[idx];
+        for (vector<MetaData>::const_iterator it = meta.begin();
+             it != meta.end(); it++) {
+            
+            if (!insert(afterid, qs2utf8s(it->filepath),
+                        qs2utf8s(it->didl), &afterid)) {
+                break;
+            }
+        }
+    }
+
+    void removeTracks(const QList<int>& lidx, bool) {
+        for (QList<int>::const_iterator it = lidx.begin(); 
+             it != lidx.end(); it++) {
+            if (*it >= 0 && *it < int(m_idsv.size())) {
+                deleteId(m_idsv[*it]);
+            }
+        }
+    }
+
     void playerState(int ps) {
         std::string s;
         AudioState as = AUDIO_UNKNOWN;
@@ -164,14 +192,26 @@ private slots:
     void  changeMode(Playlist_Mode mode) {
         setRepeat(mode.repAll);
         setShuffle(mode.shuffle);
+        m_mode = mode;
     }
 
+    void onShuffleState(bool st) {
+        m_mode.shuffle = st;
+        emit sig_PLModeChanged(m_mode);
+    }
+    void onRepeatState(bool st) {
+        m_mode.repAll = st;
+        emit sig_PLModeChanged(m_mode);
+    }
 signals:
     void sig_audioState(int as, const char *);
     void metaDataReady(const MetaDataList& mdv);
+    void sig_PLModeChanged(Playlist_Mode);
+
 private:
     int m_id; // Current playing track
     int m_songsecs;
+    Playlist_Mode m_mode;
 };
 
 

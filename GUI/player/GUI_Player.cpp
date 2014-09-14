@@ -467,8 +467,23 @@ void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph)
 
 void GUI_Player::stopped()
 {
+    qDebug() << "void GUI_Player::stopped()";
     m_metadata_available = false;
     stopClicked(false);
+}
+void GUI_Player::playing()
+{
+    qDebug() << "void GUI_Player::playing()";
+    ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+    m_playing = true;
+    m_trayIcon->setPlaying(m_playing);
+}
+void GUI_Player::paused()
+{
+    qDebug() << "void GUI_Player::paused()";
+    ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    m_playing = false;
+    m_trayIcon->setPlaying(m_playing);
 }
 
 /** LIBRARY AND PLAYLIST END **/
