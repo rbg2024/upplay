@@ -35,8 +35,7 @@
 #define ENTRY_APPEND (1 << 5)
 
 
-class ContextMenu : public QMenu
-{
+class ContextMenu : public QMenu {
     Q_OBJECT
 
 public:
@@ -44,7 +43,7 @@ public:
     virtual ~ContextMenu();
     void setup_entries(int entries);
 
-    
+
 signals:
     void sig_info_clicked();
     void sig_edit_clicked();
@@ -64,10 +63,10 @@ private slots:
 public slots:
 
 private:
-    QAction* 			_info_action;
-    QAction* 			_edit_action;
-    QAction* 			_remove_action;
-    QAction* 			_delete_action;
+    QAction*            _info_action;
+    QAction*            _edit_action;
+    QAction*            _remove_action;
+    QAction*            _delete_action;
     QAction*            _play_next_action;
     QAction*            _append_action;
 
