@@ -80,7 +80,10 @@ public slots:
     virtual void psl_stop() = 0;
     virtual void psl_forward() = 0;
     virtual void psl_backward() = 0;
-    virtual void psl_remove_rows(const QList<int> &, bool select_next=true) = 0;
+    // Note: this needs to be implemented locally even in the OH case
+    // because an insert may immediatly follow (d&d), before we get
+    // the updated list from the player.
+    virtual void psl_remove_rows(const QList<int> &, bool select_next=true);
 
 protected:
 

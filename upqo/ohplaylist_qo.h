@@ -39,7 +39,8 @@ Q_OBJECT
 
 public:
     OHPlaylistQO(UPnPClient::OHPLH ohp, QObject *parent = 0)
-        : QObject(parent), m_curid(-1), m_srv(ohp), m_timer(0)
+        : QObject(parent), m_curid(-1), m_forceUpdate(false), 
+          m_srv(ohp), m_timer(0)
     {
         m_srv->installReporter(this);
         m_timer = new QTimer(this);
@@ -96,17 +97,45 @@ public slots:
     virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
     virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
     virtual bool clear() {return m_srv->deleteAll() == 0;}
+
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
         qDebug() << "OHPlaylistQO: insert after " << afterid;
         int ret = m_srv->insert(afterid, uri, didl, nid);
-        if (ret == 0)
+        if (ret == 0) {
+            std::vector<int>::iterator it = 
+                find(m_idsv.begin(), m_idsv.end(), afterid);
+            // Keep local ids vector updated 
+            if (it != m_idsv.end()) {
+                it++;
+                m_idsv.insert(it, *nid);
+            }
+            // Make sure we get the real stuff
+            m_forceUpdate = true;
             return true;
+        }
         qDebug() << "OHPlaylistQO: insert failed: " << ret;
         return false;
     }
-    virtual bool deleteId(int id) {return m_srv->deleteId(id) == 0;}
 
+    virtual bool deleteId(int id) {
+        int ret = m_srv->deleteId(id);
+        if (ret == 0) {
+            // Update local state at once in case we get an insert
+            // before we get the changed array from the device
+            // (drag&drop).
+            for (unsigned int i = 0; i < m_idsv.size(); i++) {
+                if (m_idsv[i] == id) {
+                    m_idsv.erase(m_idsv.begin()+i);
+                    break;
+                }
+            }
+            m_metapool.erase(id);
+            // Make sure we get the real stuff
+            m_forceUpdate = true;
+        }
+        return ret == 0;
+    }
 
     // Called by timer every sec. Do we need it ?
     virtual void update() {}
@@ -129,10 +158,11 @@ private slots:
 
     void onIdArrayChanged(std::vector<int> nids) {
         qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
-        if (nids == m_idsv) {
+        if (!m_forceUpdate && nids == m_idsv) {
             qDebug() << "OHPL::onIdArrayChanged: unchanged";
             return;
         }
+        m_forceUpdate = false;
         // Clean up metapool entries not in ids
         for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
             if (find(nids.begin(), nids.end(), it->first) == nids.end()) {
@@ -191,7 +221,7 @@ protected:
     std::vector<int> m_idsv;
     std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
     int m_curid;
-
+    bool m_forceUpdate;
 private:
     UPnPClient::OHPLH m_srv;
     QTimer *m_timer;

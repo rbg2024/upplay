@@ -29,13 +29,14 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 void PlaylistOH::psl_currentTrack(int id)
 {
     qDebug() << "PlaylistOH::psl_currentTrack: " << id;
-    if (id >= 0)
+    if (id <= 0)
         return;
 
     for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
         if (it->id == id) {
-            emit sig_track_metadata(*it, -1, it->pl_playing);
-            qDebug() << " new track index " << it - m_meta.begin();
+            m_play_idx = it -m_meta.begin();
+            qDebug() << " new track index " << m_play_idx;
+            emit sig_track_metadata(*it, -1, !_pause);
             emit sig_playing_track_changed(it - m_meta.begin());
             return;
         }
@@ -50,14 +51,17 @@ void PlaylistOH::psl_clear_playlist()
 
 void PlaylistOH::psl_play() 
 {
+    _pause = false;
     emit sig_resume_play();
 }
 void PlaylistOH::psl_pause() 
 {
+    _pause = true;
     emit sig_pause();
 }
 void PlaylistOH::psl_stop() 
 {
+    _pause = true;
     emit sig_stop();
 }
 void PlaylistOH::psl_forward() 
@@ -71,5 +75,6 @@ void PlaylistOH::psl_backward()
 
 void PlaylistOH::psl_insert_tracks(const MetaDataList& meta, int afteridx)
 {
+    qDebug() << "PlaylistOH::psl_insert_tracks afteridx" << afteridx;
     emit sig_insert_tracks(meta, afteridx);
 }

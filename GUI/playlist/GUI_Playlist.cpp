@@ -176,7 +176,7 @@ void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int)
     ui->btn_repAll->setVisible(true);
     ui->btn_shuffle->setVisible(true);
 
-    int actions = ENTRY_INFO | ENTRY_REMOVE | ENTRY_EDIT;
+    int actions = ENTRY_REMOVE;
 
     ui->listView->set_context_menu_actions(actions);
     ui->listView->set_drag_enabled(true);

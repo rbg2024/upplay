@@ -231,8 +231,6 @@ void Application::renderer_connections()
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
 
-        CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
-                ohplo, insertTracks(const MetaDataList&, int));
         CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
                 ohplo, removeTracks(const QList<int>&, bool));
         CONNECT(ui_playlist, selected_row_changed(int),  
@@ -270,9 +268,6 @@ void Application::renderer_connections()
 
         // the search (actually seek) param is in percent
         CONNECT(player, search(int), avto, seekPC(int));
-        CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
-
-        CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
 
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
@@ -284,6 +279,8 @@ void Application::renderer_connections()
         CONNECT(playlist, sig_resume_play(), avto, play());
         CONNECT(playlist, sig_pause(), avto, pause());
     }
+    CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
+    CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
 }
 
 // Establish the connections we can do without a renderer, and call

@@ -139,13 +139,13 @@ private slots:
 
     // Insert after idx
     void insertTracks(const MetaDataList& meta, int idx) {
+        qDebug() << "OHPlayer::insertTracks: afteridx " << idx;
         if (idx < -1 || idx >= int(m_idsv.size())) {
             return;
         }
         int afterid = idx == -1 ? 0 : m_idsv[idx];
         for (vector<MetaData>::const_iterator it = meta.begin();
              it != meta.end(); it++) {
-            
             if (!insert(afterid, qs2utf8s(it->filepath),
                         qs2utf8s(it->didl), &afterid)) {
                 break;
@@ -154,10 +154,14 @@ private slots:
     }
 
     void removeTracks(const QList<int>& lidx, bool) {
+        qDebug() << "OHPlayer::removeTracks";
         for (QList<int>::const_iterator it = lidx.begin(); 
              it != lidx.end(); it++) {
             if (*it >= 0 && *it < int(m_idsv.size())) {
+                qDebug() << "OHPlayer::removeTracks: " << m_idsv[*it];
                 deleteId(m_idsv[*it]);
+            } else {
+                qDebug() << "OHPlayer::removeTracks: bad index" << *it;
             }
         }
     }
