@@ -26,6 +26,7 @@ using namespace std;
 #include "HelperStructs/Helper.h"
 
 #include "libupnpp/log.hxx"
+#include "libupnpp/control/discovery.hxx"
 
 #include "dirbrowser/cdbrowser.h"
 #include "upadapt/upputils.h"
@@ -323,6 +324,12 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
 void CDBrowser::serversPage()
 {
     vector<UPnPDeviceDesc> msdescs;
+    int secs = UPnPDeviceDirectory::getTheDir()->getRemainingDelay();
+    if (secs > 1) {
+        qDebug() << "CDBrowser::serversPage: waiting " << secs;
+        m_timer.start(secs * 1000);
+        return;
+    }
     if (!MediaServer::getDeviceDescs(msdescs)) {
         LOGERR("CDBrowser::serversPage: getDeviceDescs failed" << endl);
         return;

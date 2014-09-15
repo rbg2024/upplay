@@ -47,6 +47,10 @@ using namespace std;
 #include "libupnpp/control/discovery.hxx"
 using namespace UPnPClient;
 
+#ifndef deleteZ
+#define deleteZ(X) {delete X; X = 0;}
+#endif
+
 UPnPDeviceDirectory *superdir;
 
 static MRDH getRenderer(const string& name, bool isfriendlyname)
@@ -81,12 +85,9 @@ bool Application::is_initialized()
 
 bool Application::setupRenderer(const string& uid)
 {
-    delete rdco;
-    rdco = 0;
-    delete avto;
-    avto = 0;
-    delete ohplo;
-    ohplo = 0;
+    deleteZ(rdco);
+    deleteZ(avto);
+    deleteZ(ohplo);
 
     MRDH rdr = getRenderer(uid, false);
     if (!rdr) {
@@ -111,14 +112,16 @@ bool Application::setupRenderer(const string& uid)
     rdco = new RenderingControlQO(rdc);
     avto = new AVTPlayer(avt);
 
+    deleteZ(playlist);
+
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
         ohplo = new OHPlayer(ohpl);
         qDebug() << "setupRenderer: deleting old playlist, creating OH one";
-        delete playlist;
         playlist = new PlaylistOH();
     } else {
         ohplo = 0;
+        playlist = new PlaylistAVT();
     }
 
     QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
