@@ -83,8 +83,12 @@ unix {
   }
   message("Prefix is $$PREFIX")
   DEFINES += PREFIX=\\\"$$PREFIX\\\"
+
+
   target.path = "$$PREFIX/bin"
-  data.files = GUI/player/GUI_Player.ui
-  data.path = $$PREFIX/share/upplay
-  INSTALLS += target data
+
+  #data.files = GUI/player/GUI_Player.ui
+  #data.path = $$PREFIX/share/upplay
+
+  INSTALLS += target # data
 }
