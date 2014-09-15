@@ -66,7 +66,7 @@ signals:
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
     // This is a abbrev for "insert at end"
-    virtual void psl_append_tracks(const MetaDataList&);
+    virtual void psl_add_tracks(PlaylistAddMode, bool, const MetaDataList&);
 
     virtual void psl_change_track(int) = 0;
     virtual void psl_new_transport_state(int, const char *);

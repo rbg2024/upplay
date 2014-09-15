@@ -21,6 +21,9 @@ using namespace std;
 #include <QWebFrame>
 #include <QWebSettings>
 #include <QUrl>
+#include <QWebElement>
+
+#include "HelperStructs/Helper.h"
 
 #include "libupnpp/log.hxx"
 
@@ -35,11 +38,23 @@ CDBrowser::CDBrowser(QWidget* parent)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
+
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+
     settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-    setHtml("<html><head><title>Hello World !</title></head>"
+
+    setHtml("<html><head><title>Upplay directory browser !</title></head>"
             "<body><p>Looking for servers...</p>"
             "</body></html>");
+
+    QString cssurl = QString("file://") + Helper::getSharePath() + 
+        "cdbrowser/cdbrowser.css";
+    settings()->setUserStyleSheetUrl(cssurl);
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+	    this, SLOT(createPopupMenu(const QPoint&)));
+
     m_timer.setSingleShot(1);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(serversPage()));
     m_timer.start(0);
@@ -50,7 +65,8 @@ CDBrowser::~CDBrowser()
     delete m_reader;
 }
 
-void CDBrowser::appendHtml(const QString& html)
+void CDBrowser::appendHtml(const QString& elt_id, 
+                           const QString& html)
 {
     //LOGDEB("CDBrowser::appendHtml: " << qs2utf8s(html) << endl);
     
@@ -59,7 +75,12 @@ void CDBrowser::appendHtml(const QString& html)
 
     mainframe->addToJavaScriptWindowObject("morehtml", &morehtml, 
                                            QScriptEngine::ScriptOwnership);
-    QString js("document.body.innerHTML += morehtml.text");
+    QString js;
+    if (elt_id.isEmpty()) {
+        js = QString("document.body.innerHTML += morehtml.text");
+    } else {
+        js = QString("document.getElementById(\"%1\").innerHTML += morehtml.text").arg(elt_id);
+    }
     mainframe->evaluateJavaScript(js);
 }
 
@@ -103,7 +124,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
         MetaDataList mdl;
         mdl.resize(1);
         udirentToMetadata(&m_entries[i], &mdl[0]);
-        emit sig_tracks_for_playlist_available(mdl);
+        emit sig_tracks_to_playlist(PADM_PLAYLATER, false, mdl);
     }
     break;
 
@@ -153,14 +174,6 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 static const QString init_container_page(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
-    "<style>"
-    "#browsepath {"
-    "  font-size: 80%;"
-    "  font-weight: bold;"
-    "  margin: 0px 0px 0px 0px;"
-    "}"
-    "#browsepath ul { list-style-type: none; margin: 0; padding: 0;}"
-    "#browsepath li { margin-left: 3px; float: left; }"
     "</head><body>"
     "</body></html>"
     );
@@ -190,7 +203,8 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
     htmlpath += QString("</ul></div><br/>");
 
     setHtml(init_container_page);
-    appendHtml(htmlpath);
+    appendHtml(QString(), htmlpath);
+    appendHtml(QString(), "<div id=\"entrylist\"></div>");
 
     if (m_reader) {
         delete m_reader;
@@ -217,7 +231,7 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
     out += QString("<div class=\"container\" objid=\"%1\">").arg(idx);
-    out += QString("<a href=\"C%1\">").arg(idx);
+    out += QString("<a class=\"ct_title\" href=\"C%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
     out += QString("</a></div>");
     return out;
@@ -226,15 +240,47 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
+    string val;
+
     out += QString("<div class=\"item\" objid=\"%1\">").arg(idx);
-    string tnum;
-    e.getprop("upnp:originalTrackNumber", tnum);
-    out += QString::fromUtf8((tnum.c_str()));
-    for (unsigned int i = tnum.size(); i < 5; i++)
-        out += QString("&nbsp;");
+
+    e.getprop("upnp:originalTrackNumber", val);
+    out += QString("<span class=\"tracknum\">") + 
+        val.c_str() + "</span>";
+
+    out += "<span class=\"tk_title\">";
     out += QString("<a href=\"I%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
-    out += QString("</a></div>");
+    out += "</a>";
+    out += "</span>";
+
+    val.clear();
+    e.getprop("upnp:artist", val);
+    out += "<span class=\"tk_artist\">";
+    out += QString::fromUtf8(val.c_str());
+    out += "</span>";
+    
+    val.clear();
+    e.getprop("upnp:album", val);
+    out += "<span class=\"tk_album\">";
+    out += QString::fromUtf8(val.c_str());
+    out += "</span>";
+    
+    val.clear();
+    e.getrprop(0, "duration", val);
+    int seconds = upnpdurationtos(val);
+    // Format as mm:ss
+    int mins = seconds / 60;
+    int secs = seconds % 60;
+    char sdur[100];
+    sprintf(sdur, "%02d:%02d", mins, secs);
+    out += "<span class=\"tk_duration\">";
+    out += sdur;
+    out += "</span>";
+   
+
+    out += "</div>";
+
     return out;
 }
 
@@ -253,7 +299,7 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
         m_entries.push_back(entry);
         html += ItemToHtml(m_entries.size()-1, entry);
     }
-    appendHtml(html);
+    appendHtml("entrylist", html);
 }
 
 static const string init_server_page(
@@ -302,7 +348,32 @@ void CDBrowser::serversPage()
     m_msdescs = msdescs;
     setHtml(QString::fromUtf8(init_server_page.c_str()));
     for (unsigned i = 0; i < msdescs.size(); i++) {
-        appendHtml(DSToHtml(i, msdescs[i]));
+        appendHtml("", DSToHtml(i, msdescs[i]));
     }
     m_timer.start(5000);
 }
+
+void CDBrowser::createPopupMenu(const QPoint& pos)
+{
+    QWebHitTestResult htr = page()->mainFrame()->hitTestContent(pos);
+    if (htr.isNull())
+	return;
+    QWebElement el = htr.enclosingBlockElement();
+    while (!el.isNull() && !el.hasAttribute("objid"))
+	el = el.parent();
+    if (el.isNull())
+	return;
+
+    QString objid = el.attribute("objid");
+    QString otype = el.attribute("class");
+    qDebug() << "Popup: " << " class " << otype << " objid " << objid ;
+
+#if 0
+    int options =  ResultPopup::showSaveOne;
+    if (m_ismainres)
+	options |= ResultPopup::isMain;
+    QMenu *popup = ResultPopup::create(this, options, m_source, doc);
+    popup->popup(mapToGlobal(pos));
+#endif
+}
+

@@ -30,6 +30,7 @@
 #include "libupnpp/control/cdirectory.hxx"
 
 #include "HelperStructs/MetaData.h"
+#include "HelperStructs/globals.h"
 
 class ContentDirectoryQO;
 
@@ -49,14 +50,15 @@ class CDBrowser : public QWebView
     void onSliceAvailable(const UPnPDirContent *);
 
  signals:
-    void sig_tracks_for_playlist_available(const MetaDataList&);
+    void sig_tracks_to_playlist(PlaylistAddMode, bool replace, 
+                                const MetaDataList&);
 
  protected:
 
  protected slots:
-    virtual void appendHtml(const QString& html);
+    virtual void appendHtml(const QString&, const QString& html);
     virtual void onLinkClicked(const QUrl &);
-
+    virtual void createPopupMenu(const QPoint&);
  private:
     void browseContainer(std::string, std::string);
 

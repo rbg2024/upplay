@@ -31,6 +31,12 @@ enum AudioState {
     AUDIO_PAUSED
 };
 
+enum PlaylistAddMode {
+    PADM_PLAYNOW = 1, 
+    PADM_PLAYNEXT = 2,
+    PADM_PLAYLATER = 3,
+};
+
 #define DARK_BLUE(x) QString("<font color=#0000FF>") + x + QString("</font>")
 #define LIGHT_BLUE(x) QString("<font color=#8888FF>") + x + QString("</font>")
 

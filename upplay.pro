@@ -87,8 +87,8 @@ unix {
 
   target.path = "$$PREFIX/bin"
 
-  #data.files = GUI/player/GUI_Player.ui
-  #data.path = $$PREFIX/share/upplay
+  data.files = dirbrowser/cdbrowser.css
+  data.path = $$PREFIX/share/upplay/cdbrowser
 
-  INSTALLS += target # data
+  INSTALLS += target data
 }

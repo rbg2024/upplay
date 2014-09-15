@@ -86,9 +86,11 @@ void Playlist::psl_mode_changed(Playlist_Mode mode)
     _playlist_mode = mode;
 }
 
-void Playlist::psl_append_tracks(const MetaDataList& v_md)
+void Playlist::psl_add_tracks(PlaylistAddMode mode, bool replace, 
+                              const MetaDataList& v_md)
 {
-    qDebug() << "Playlist::psl_append_tracks()";
+    qDebug() << "Playlist::psl_add_tracks() mode " << mode << 
+        " repl " << replace;
     psl_insert_tracks(v_md, m_meta.size() - 1);
 }
 

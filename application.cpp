@@ -328,8 +328,10 @@ void Application::init_connections()
             playlist, psl_change_track(int));
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 
-    CONNECT(cdb, sig_tracks_for_playlist_available(const MetaDataList&),
-            playlist, psl_append_tracks(const MetaDataList&));
+    CONNECT(cdb, 
+            sig_tracks_to_playlist(PlaylistAddMode, bool, const MetaDataList&),
+            playlist, psl_add_tracks(PlaylistAddMode, bool,
+                                     const MetaDataList&));
 }
 
 
