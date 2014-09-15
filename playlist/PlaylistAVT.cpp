@@ -49,10 +49,14 @@ void PlaylistAVT::set_for_playing(int row)
     emit sig_track_metadata(m_meta[row], 0, true);
 }
 
-// Player switched tracks under us. Hopefully the uri matches a further track
+// Player switched tracks under us. Hopefully the uri matches another
+// track.  We first look ahead, because the normal situation is that
+// the device switched to the nextURI track
 void PlaylistAVT::psl_ext_track_change(const QString& uri)
 {
-    if (!valid_row(m_play_idx))
+    qDebug() << "PlaylistAVT::psl_ext_track_change " << uri;
+
+    if (m_play_idx < -1) // ??
         return;
 
     for (unsigned int i = m_play_idx + 1; i < m_meta.size(); i++) {
@@ -62,7 +66,17 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
             emit sig_track_metadata(m_meta[i], -1, true);
-            break;
+            return;
+        }
+    }
+    for (unsigned int i = 0; i <= m_play_idx && i < m_meta.size(); i++) {
+        if (!uri.compare(m_meta[i].filepath)) {
+            qDebug() << "PlaylistAVT::psl_ext_track_change: index now " << i;
+            m_play_idx = i;
+            m_meta.setCurPlayTrack(i);
+            emit sig_playing_track_changed(i);
+            emit sig_track_metadata(m_meta[i], -1, true);
+            return;
         }
     }
 }
