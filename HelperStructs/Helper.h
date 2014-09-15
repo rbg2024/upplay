@@ -34,6 +34,7 @@ namespace Helper {
 
     QString getIconPath();
     QString getSharePath();
+    QString getHomeDataPath();
     QString createLink(QString name, QString target="", bool underline=true);
 
     QString get_cover_path(QString artist, QString album, 

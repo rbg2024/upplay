@@ -24,10 +24,10 @@ using namespace std;
 
 #include <QString>
 #include <QStringList>
-#include <QPair>
 #include <QDebug>
 #include <QVariant>
-#include <QMap>
+#include <QFile>
+#include <QDataStream>
 
 #include "HelperStructs/globals.h"
 
@@ -81,7 +81,6 @@ struct MetaData {
         comment = "";
         discnumber = 0;
         n_discs = -1;
-
 
         pl_selected = false;
         pl_playing = false;
@@ -174,6 +173,64 @@ struct MetaData {
 
         return true;
     }
+
+    bool serialize(QDataStream& strm) {
+        strm <<
+            title << 
+            artist << 
+            album  << 
+            rating << 
+            length_ms << 
+            year << 
+            filepath << 
+            track_num << 
+            bitrate << 
+            id << 
+            album_id << 
+            artist_id << 
+            filesize << 
+            comment << 
+            discnumber << 
+            n_discs << 
+            genres << 
+            is_extern << 
+            pl_playing << 
+            pl_selected << 
+            pl_dragged << 
+            is_lib_selected << 
+            is_disabled << 
+            didl;
+        return true;
+    }
+    bool unSerialize(QDataStream& strm) {
+        strm >> 
+            title >> 
+            artist >> 
+            album  >> 
+            rating >> 
+            length_ms >> 
+            year >> 
+            filepath >> 
+            track_num >> 
+            bitrate >> 
+            id >> 
+            album_id >> 
+            artist_id >> 
+            filesize >> 
+            comment >> 
+            discnumber >> 
+            n_discs >> 
+            genres >> 
+            is_extern >> 
+            pl_playing >> 
+            pl_selected >> 
+            pl_dragged >> 
+            is_lib_selected >> 
+            is_disabled >> 
+            didl;
+        return strm.status() == QDataStream::Ok;
+    }
+
 };
 
 class MetaDataList : public vector<MetaData> {
@@ -214,9 +271,30 @@ public:
         }
         return false;
     }
+
+    bool serialize(const QString& fn) {
+         QFile file(fn);
+         file.open(QIODevice::WriteOnly);
+         QDataStream out(&file);
+         for (unsigned int i = 0; i < size(); i++) {
+             at(i).serialize(out);
+         }
+         return true;
+    }
+
+    bool unSerialize(const QString& fn) {
+         QFile file(fn);
+         file.open(QIODevice::ReadOnly);
+         QDataStream in(&file);
+         MetaData md;
+         while (md.unSerialize(in)) {
+             push_back(md);
+         }
+         return true;
+    }
 };
 
-struct CustomPlaylist{
+struct CustomPlaylist {
     QString name;
     qint32 id;
     MetaDataList tracks;
@@ -262,7 +340,7 @@ struct LastTrack{
         return str;
     }
 
-    static LastTrack fromString(QString str){
+    static LastTrack fromString(QString str) {
         QStringList lst = str.split(",");
         LastTrack tr;
         if(lst.size() < 3) return tr;

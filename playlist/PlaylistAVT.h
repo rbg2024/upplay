@@ -35,13 +35,8 @@ class PlaylistAVT : public Playlist {
     Q_OBJECT
 
 public:
-    PlaylistAVT(QObject * parent = 0)
-        : Playlist(parent)
-        {
-        }
-    virtual ~PlaylistAVT() 
-        {
-        }
+    PlaylistAVT(QObject * parent = 0);
+    virtual ~PlaylistAVT() {}
 
 public slots:
     // Insert after idx. Use -1 to insert at start
@@ -72,6 +67,11 @@ protected:
     void send_next_playing_signal();
     void psl_next_track();
     bool checkTrack(const MetaData&) {return true;}
+
+private slots:
+    void playlist_updated();
+private:
+    QString m_savefile;
 };
 
 #endif /* PLAYLISTAVT_H_ */

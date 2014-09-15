@@ -20,6 +20,7 @@
 #include <ctime>
 
 using namespace std;
+
 #include <QFile>
 #include <QList>
 #include <QObject>
@@ -27,10 +28,20 @@ using namespace std;
 #include <QTime>
 #include <QDebug>
 #include <QDir>
+#include <QTimer>
 
 #include <libupnpp/control/avtransport.hxx>
 
 #include "PlaylistAVT.h"
+#include "HelperStructs/Helper.h"
+
+PlaylistAVT::PlaylistAVT(QObject *parent)
+  : Playlist(parent)
+{
+    m_savefile = Helper::getHomeDataPath() + "savedQueue";
+    m_meta.unSerialize(m_savefile);
+    QTimer::singleShot(0, this, SLOT(playlist_updated()));
+}
 
 void PlaylistAVT::set_for_playing(int row)
 {
@@ -69,7 +80,7 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             return;
         }
     }
-    for (unsigned int i = 0; i <= m_play_idx && i < m_meta.size(); i++) {
+    for (int i = 0; i <= m_play_idx && i < int(m_meta.size()); i++) {
         if (!uri.compare(m_meta[i].filepath)) {
             qDebug() << "PlaylistAVT::psl_ext_track_change: index now " << i;
             m_play_idx = i;
@@ -85,7 +96,7 @@ void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
 {
     if (!m_meta.contains(md, true)) {
         m_meta.push_back(md);
-        emit sig_playlist_updated(m_meta, m_meta.size()-1, -1);
+        playlist_updated();
     }
     emit sig_track_metadata(md, -1, true);
 }
@@ -158,7 +169,7 @@ void PlaylistAVT::psl_clear_playlist()
 {
     m_meta.clear();
     m_play_idx = -1;
-    emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    playlist_updated();
 }
 
 void PlaylistAVT::psl_play()
@@ -190,7 +201,7 @@ void PlaylistAVT::psl_stop()
 {
     set_for_playing(-1);
     emit sig_stop();
-    emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    playlist_updated();
 }
 
 // fwd was pressed -> next track
@@ -226,7 +237,7 @@ void PlaylistAVT::psl_change_track(int new_row)
         set_for_playing(-1);
         remove_row(new_row);
         emit sig_stop();
-        emit sig_playlist_updated(m_meta, m_play_idx, 0);
+        playlist_updated();
     }
 }
 
@@ -263,5 +274,14 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
     // Prepare following track
     send_next_playing_signal();
 
+    playlist_updated();
+}
+
+void PlaylistAVT::playlist_updated()
+{
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    QString tmp(m_savefile + "-");
+    m_meta.serialize(tmp);
+    rename((const char *)tmp.toLocal8Bit(), 
+           (const char *)m_savefile.toLocal8Bit());
 }

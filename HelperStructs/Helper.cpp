@@ -111,11 +111,10 @@ QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
 
 QString Helper::getSharePath()
 {
-#warning must use config prefix
     QString path;
 #ifndef Q_OS_WIN
-    if(QFile::exists("/usr/share/upplay")) 
-        path = "/usr/share/upplay/";
+    if(QFile::exists(PREFIX "/share/upplay")) 
+        path = PREFIX "/share/upplay/";
     else 
         path = "";
 #else
@@ -134,19 +133,26 @@ QString Helper::getIconPath()
     return ":/icons/";
 }
 
+QString Helper::getHomeDataPath()
+{
+    QString mydatadir = QDir::homePath() + "/.local/share/upplay";
+    if(!QFile::exists(mydatadir)) {
+        QDir().mkdir(mydatadir);
+    }
+    return mydatadir + "/";
+}
+
 QString Helper::get_cover_path(QString artist, QString album, QString extension)
 {
-    QString cover_token = calc_cover_token(artist, album);
-    QString cover_path =  QDir::homePath() + QDir::separator() + 
-        ".upplay" + QDir::separator() + "covers" + QDir::separator() + 
-        cover_token + "." + extension;
+    QString cover_dir = getHomeDataPath() + QDir::separator() + "covers";
 
-    if(!QFile::exists(QDir::homePath() + QDir::separator() +".upplay" + 
-                      QDir::separator() + "covers")){
-        QDir().mkdir(QDir::homePath() + QDir::separator() + ".upplay" + 
-                     QDir::separator() + "covers");
+    if(!QFile::exists(cover_dir)) {
+        QDir().mkdir(cover_dir);
     }
 
+    QString cover_token = calc_cover_token(artist, album);
+    QString cover_path =  cover_dir + QDir::separator() + cover_token + 
+        "." + extension;
     return cover_path;
 }
 
