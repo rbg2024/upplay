@@ -19,6 +19,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include <QObject>
 #include <QThread>
@@ -163,12 +164,20 @@ private slots:
             return;
         }
         m_forceUpdate = false;
-        // Clean up metapool entries not in ids
-        for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
-            if (find(nids.begin(), nids.end(), it->first) == nids.end()) {
-                it = m_metapool.erase(it);
-            } else {
-                it++;
+
+        // Clean up metapool entries not in ids. We build a set with
+        // the new ids list first. For small lists it does not matter,
+        // for big ones, this will prevent what would otherwise be a
+        // linear search the repeated search to make this
+        // quadratic. We're sort of O(n * log(n)) instead.
+        {
+            std::unordered_set<int> tmpset(nids.begin(), nids.end());
+            for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
+                if (tmpset.find(it->first) == tmpset.end()) {
+                    it = m_metapool.erase(it);
+                } else {
+                    it++;
+                }
             }
         }
 

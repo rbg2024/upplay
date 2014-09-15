@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     if (argc > 0)
         Usage();
 
-    if (Logger::getTheLog("/tmp/upplay.log") == 0) {
+    if (Logger::getTheLog("stderr") == 0) {
         cerr << "Can't initialize log" << endl;
         return 1;
     }

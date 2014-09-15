@@ -29,10 +29,15 @@ inline std::string qs2utf8s(const QString& qs)
     return std::string((const char *)qs.toUtf8());
 }
 
+inline QString u8s2qs(const std::string us) 
+{
+    return QString::fromUtf8(us.c_str());
+}
+
+
 struct MetaData;
 
 extern bool udirentToMetadata(UPnPClient::UPnPDirObject *, MetaData *);
-
 
 
 #endif /* _UPPUTILS_H_INCLUDED_ */

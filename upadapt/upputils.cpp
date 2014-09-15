@@ -49,7 +49,7 @@ bool udirentToMetadata(UPnPDirObject *dop, MetaData *mdp)
     mdp->artist_id = -1;
     mdp->album_id = -1;
 
-    mdp->title = QString::fromUtf8(dop->m_title.c_str());
+    mdp->title = u8s2qs(dop->m_title);
     mdp->artist = uf2qs(dop, "upnp:artist", false);
     mdp->album = uf2qs(dop, "upnp:album", false);
     mdp->rating = 0;
@@ -75,10 +75,14 @@ bool udirentToMetadata(UPnPDirObject *dop, MetaData *mdp)
     mdp->filesize = uf2qs(dop, "size", true).toLongLong();;
     mdp->comment = "";
     mdp->discnumber = 0;
+    mdp->genres << uf2qs(dop, "upnp:genre", false);
     mdp->n_discs = -1;
-
-    mdp->didl = QString::fromUtf8(dop->getdidl().c_str());
-
+    mdp->is_extern = false;
+    mdp->pl_selected = false;
+    mdp->pl_dragged = false;
+    mdp->pl_playing = false;
+    mdp->is_lib_selected = false;
+    mdp->is_disabled = false;
+    mdp->didl = u8s2qs(dop->getdidl());
     return true;
 }
-

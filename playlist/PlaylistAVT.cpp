@@ -67,6 +67,15 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
     }
 }
 
+void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
+{
+    if (!m_meta.contains(md, true)) {
+        m_meta.push_back(md);
+        emit sig_playlist_updated(m_meta, m_meta.size()-1, -1);
+    }
+    emit sig_track_metadata(md, -1, true);
+}
+
 void PlaylistAVT::send_next_playing_signal()
 {
     // Do not do this in shuffle mode: makes no sense + as we never go

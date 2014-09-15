@@ -90,7 +90,7 @@ public:
             //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
             if (m_cururi.compare(value)) {
                 setcururi(value);
-                //qDebug() << "AVT: ext track change";
+                qDebug() << "AVT: ext track change: " << value;
                 emit newTrackPlaying(QString::fromUtf8(value));
             }
         }
@@ -99,7 +99,7 @@ public:
     virtual void changed(const char *nm, UPnPClient::UPnPDirObject meta)
     {
         if (!strcmp(nm, "AVTransportURIMetaData")) {
-            //qDebug() << "AVT: Changed: " << nm << " (dirc): " << 
+            qDebug() << "AVT: Changed: " << nm << " (dirc): ";
             // meta.dump().c_str();
             emit currentMetadata(meta);
         }

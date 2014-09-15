@@ -50,6 +50,7 @@ public slots:
     void psl_change_track(int);
     void psl_prepare_for_end_of_track();
     void psl_ext_track_change(const QString& uri);
+    void psl_onCurrentMetadata(const MetaData&);
     void psl_clear_playlist();
     void psl_play();
     void psl_pause();

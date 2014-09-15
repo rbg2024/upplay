@@ -85,6 +85,7 @@ public slots:
     // the updated list from the player.
     virtual void psl_remove_rows(const QList<int> &, bool select_next=true);
     virtual void psl_selection_min_row(int);
+
 protected:
 
     MetaDataList m_meta;

@@ -52,9 +52,17 @@ public:
         {
             connect(this, SIGNAL(tpStateChanged(int)), 
                     this, SLOT(playerState(int)));
+            connect(this, SIGNAL(currentMetadata(UPnPClient::UPnPDirObject)),
+                    this, SLOT(onCurrentMetadata(UPnPClient::UPnPDirObject)));
         }
 
 public slots:
+
+    void onCurrentMetadata(UPnPClient::UPnPDirObject ude) {
+        MetaData md;
+        udirentToMetadata(&ude, &md);
+        emit sig_currentMetadata(md);
+    }
     void changeTrack(const MetaData& md, int /*pos_secs*/, bool /*playnow*/)
     {
         MetaDataAdaptor mad(md);
@@ -98,6 +106,7 @@ public slots:
 
 signals:
     void sig_audioState(int as, const char *);
+    void sig_currentMetadata(const MetaData&);
 };
 
 

@@ -269,7 +269,8 @@ void Application::renderer_connections()
                 plavt, psl_prepare_for_end_of_track());
         CONNECT(avto, newTrackPlaying(const QString&), 
                 plavt, psl_ext_track_change(const QString&));
-
+        CONNECT(avto, sig_currentMetadata(const MetaData&),
+                plavt, psl_onCurrentMetadata(const MetaData&));
         // the search (actually seek) param is in percent
         CONNECT(player, search(int), avto, seekPC(int));
 

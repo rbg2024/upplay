@@ -46,10 +46,6 @@ public:
                 this, SLOT(onRepeatState(bool)));
     }
 
-    QString u8s2qs(const std::string us) {
-        return QString::fromUtf8(us.c_str());
-    }
-
 private slots:
 
     // Seek to time in percent
@@ -90,47 +86,11 @@ private slots:
             UPnPClient::UPnPDirObject& ude = poolit->second;
             if (ude.m_resources.empty())
                 continue;
+
             MetaData md;
+            udirentToMetadata(&ude, &md);
             md.id = *idit;
-            md.title = u8s2qs(ude.m_title);
-            md.artist = u8s2qs(ude.m_props["upnp:album"]);
-            md.album = u8s2qs(ude.m_props["upnp:artist"].c_str());
-            md.rating = 0;
-            md.length_ms = 0;
-            std::string sval;
-            if (ude.getrprop(0, "duration", sval)) {
-                md.length_ms = 1000 * UPnPP::upnpdurationtos(sval);
-            }
-            md.year = 0;
-            md.filepath = 
-                QString::fromLocal8Bit(ude.m_resources[0].m_uri.c_str());
-            md.track_num =  0;
-            if (ude.getprop("upnp:originalTrackNumber", sval)) {
-                md.track_num = atoi(sval.c_str());
-            }
-            md.bitrate = 0;
-            if (ude.getrprop(0, "bitrate", sval)) {
-                md.bitrate = atoi(sval.c_str());
-            }
-            md.album_id = -1;
-            md.artist_id = -1; 
-            md.filesize = 0;
-            if (ude.getrprop(0, "size", sval)) {
-                md.filesize = atoi(sval.c_str());
-            }
-            md.comment = "";
-            md.discnumber = 0;
-            sval.clear();
-            ude.getprop("upnp:genre", sval);
-            md.genres << u8s2qs(sval);
-            md.n_discs =  -1;
-            md.is_extern = false;
             md.pl_playing = md.id == m_curid;
-            md.pl_selected = false;
-            md.pl_dragged = false;
-            md.is_lib_selected = false;
-            md.is_disabled = false;
-            md.didl = u8s2qs(ude.getdidl());
             
             mdv.push_back(md);
         }
