@@ -1119,6 +1119,9 @@
      <pointsize>9</pointsize>
     </font>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
   <action name="action_ViewEqualizer">
    <property name="checkable">
