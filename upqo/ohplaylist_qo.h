@@ -98,6 +98,7 @@ public slots:
         return m_srv->idArray(ids, tokp) == 0;
     }
     virtual void sync() {
+        //qDebug() << "OHPL::sync";
         std::vector<int> ids;
         int tp;
         if (idArray(&ids, &tp)) {
@@ -106,7 +107,7 @@ public slots:
     }
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
-        //qDebug() << "OHPlaylistQO: insert after " << afterid;
+        //qDebug() << "OHPL:: insert after " << afterid;
         int ret = m_srv->insert(afterid, uri, didl, nid);
         if (ret == 0) {
             std::vector<int>::iterator it = 
@@ -120,7 +121,7 @@ public slots:
             m_forceUpdate = true;
             return true;
         }
-        qDebug() << "OHPlaylistQO: insert failed: " << ret;
+        //qDebug() << "OHPL: insert failed: " << ret;
         return false;
     }
 
@@ -160,9 +161,9 @@ private slots:
     }
 
     void onIdArrayChanged(std::vector<int> nids) {
-        qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
+        //qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
         if (!m_forceUpdate && nids == m_idsv) {
-            qDebug() << "OHPL::onIdArrayChanged: unchanged";
+            //qDebug() << "OHPL::onIdArrayChanged: unchanged";
             return;
         }
         m_forceUpdate = false;
@@ -211,7 +212,7 @@ private slots:
                 goto out;
             }
             for (auto it = entries.begin(); it != entries.end(); it++) {
-                //qDebug() << "Data for " << it->id << " " << 
+                //qDebug() << "OHPL: data for " << it->id << " " << 
                 //    it->dirent.m_title.c_str();
                 m_metapool[it->id] = it->dirent;
                 //qDebug() << "OHPL::onIdArrayChanged: got meta for " << it->id;
