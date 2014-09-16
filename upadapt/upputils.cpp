@@ -29,7 +29,7 @@ using namespace UPnPClient;
 using namespace UPnPP;
 
 // Upnp field to qstring
-static QString uf2qs(UPnPDirObject *dop, const char *nm, bool isres)
+static QString uf2qs(const UPnPDirObject *dop, const char *nm, bool isres)
 {
     string val;
     bool ret = isres? dop->getrprop(0, nm, val) : dop->getprop(nm, val);
@@ -39,7 +39,7 @@ static QString uf2qs(UPnPDirObject *dop, const char *nm, bool isres)
         return QString();
 }
 
-bool udirentToMetadata(UPnPDirObject *dop, MetaData *mdp)
+bool udirentToMetadata(const UPnPDirObject *dop, MetaData *mdp)
 {
     if (dop == 0 || mdp == 0)
         return false;

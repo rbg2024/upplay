@@ -53,7 +53,9 @@ public slots:
 
     // The following are connected to GUI signals, for responding to
     // user actions.
-    void psl_change_track(int) {}
+    void psl_change_track(int idx) {
+        emit sig_row_activated(idx);
+    }
     void psl_clear_playlist();
     void psl_play();
     void psl_pause();

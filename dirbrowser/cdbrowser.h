@@ -33,8 +33,7 @@
 #include "HelperStructs/globals.h"
 
 class ContentDirectoryQO;
-
-using namespace UPnPClient;
+class RecursiveReaper;
 
 class CDBrowser : public QWebView
 {
@@ -47,33 +46,48 @@ class CDBrowser : public QWebView
  public slots:
     virtual void serversPage();
     void onDone(int);
-    void onSliceAvailable(const UPnPDirContent *);
+    void onSliceAvailable(const UPnPClient::UPnPDirContent *);
+    void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
 
  signals:
     void sig_tracks_to_playlist(PlaylistAddMode, bool replace, 
                                 const MetaDataList&);
-
+    void sig_open_multi_insert(PlaylistAddMode);
+    void sig_close_multi_insert();
  protected:
 
  protected slots:
     virtual void appendHtml(const QString&, const QString& html);
     virtual void onLinkClicked(const QUrl &);
     virtual void createPopupMenu(const QPoint&);
+    virtual void simpleAdd(QAction *);
+    virtual void recursiveAdd(QAction *);
+    virtual void rreaperDone(int);
+
  private:
     void browseContainer(std::string, std::string);
 
     // The currently seen Media Server descriptions
-    std::vector<UPnPDeviceDesc> m_msdescs;
-    int m_cdsidx;
+    std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
+    // Handle for the currently active media server
     UPnPClient::MSRH m_ms;
 
-    // Current path: vector of objid/title pairs
+    // Current path inside current server: vector of objid/title pairs
     std::vector<std::pair<std::string, std::string> > m_curpath;
 
+    // We periodically check the server pool state.
     QTimer m_timer;
 
     ContentDirectoryQO *m_reader;
-    std::vector<UPnPDirObject> m_entries;
+    RecursiveReaper    *m_reaper;
+
+    // Content of the currently visited container
+    std::vector<UPnPClient::UPnPDirObject> m_entries;
+
+    // Objid and index in entreis for the last popup menu click
+    std::string m_popupobjid;
+    int m_popupidx;
+    int m_popupmode; // now, next, at end
 };
 
 // A QObject to hold a QString. Maybe there would be a simpler way to

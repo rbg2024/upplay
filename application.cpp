@@ -45,6 +45,7 @@ using namespace std;
 #include "libupnpp/control/mediarenderer.hxx"
 #include "libupnpp/control/renderingcontrol.hxx"
 #include "libupnpp/control/discovery.hxx"
+
 using namespace UPnPClient;
 
 #ifndef deleteZ
@@ -233,18 +234,15 @@ void Application::renderer_connections()
                 ui_playlist, setMode(Playlist_Mode));
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
-        // seekIndex() is directly connected to an ui double-click,
-        // this is for changing the current title to the first
-        // selected when clicking play in stopped mode
+
         CONNECT(ploh, sig_row_activated(int), ohplo, seekIndex(int));
 
         CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
                 ohplo, removeTracks(const QList<int>&, bool));
-        CONNECT(ui_playlist, row_activated(int),  
-                ohplo, seekIndex(int));
 
         CONNECT(playlist, sig_mode_changed(Playlist_Mode),
                 ohplo, changeMode(Playlist_Mode));
+        CONNECT(playlist, sig_sync(), ohplo, sync());
         CONNECT(playlist, sig_pause(), ohplo, pause());
         CONNECT(playlist, sig_stop(),  ohplo, stop());
         CONNECT(playlist, sig_resume_play(), ohplo, play());
@@ -335,6 +333,9 @@ void Application::init_connections()
             sig_tracks_to_playlist(PlaylistAddMode, bool, const MetaDataList&),
             playlist, psl_add_tracks(PlaylistAddMode, bool,
                                      const MetaDataList&));
+    CONNECT(cdb, sig_open_multi_insert(PlaylistAddMode),
+            playlist, psl_open_multi_insert(PlaylistAddMode));
+    CONNECT(cdb, sig_close_multi_insert(), playlist, psl_close_multi_insert());
 }
 
 

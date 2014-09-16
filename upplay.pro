@@ -29,6 +29,7 @@ HEADERS += \
         HelperStructs/Style.h \
         application.h \
         dirbrowser/cdbrowser.h \
+        dirbrowser/rreaper.h \
         playlist/Playlist.h \
         playlist/PlaylistAVT.h \
         playlist/PlaylistOH.h \

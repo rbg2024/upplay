@@ -28,8 +28,6 @@
 
 #include "libupnpp/control/cdirectory.hxx"
 
-using namespace UPnPClient;
-
 class ContentDirectoryQO : public QThread {
     Q_OBJECT;
 
@@ -42,8 +40,8 @@ class ContentDirectoryQO : public QThread {
 
     ~ContentDirectoryQO()
     {
-        for (auto& entry: m_slices)
-            delete entry;
+        for (auto entry = m_slices.begin(); entry != m_slices.end(); entry++)
+            delete *entry;
     }
 
     virtual void run() 
@@ -54,7 +52,8 @@ class ContentDirectoryQO : public QThread {
         int count;
 
 	while (offset < total) {
-            UPnPDirContent *slice = new UPnPDirContent();
+            UPnPClient::UPnPDirContent *slice = 
+                new UPnPClient::UPnPDirContent();
             if (slice == 0) {
                 m_status = UPNP_E_OUTOF_MEMORY;
                 emit done(m_status);
@@ -79,7 +78,7 @@ class ContentDirectoryQO : public QThread {
     }
 
 signals:
-    void sliceAvailable(const UPnPDirContent *);
+    void sliceAvailable(const  UPnPClient::UPnPDirContent *);
     void done(int);
 
 private:
@@ -87,7 +86,7 @@ private:
     std::string m_objid;
     // We use a list (vs vector) so that existing element addresses
     // are unchanged when we append
-    std::list<UPnPDirContent*> m_slices;
+    std::list< UPnPClient::UPnPDirContent*> m_slices;
     int m_status;
 };
 

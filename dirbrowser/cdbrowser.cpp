@@ -22,20 +22,22 @@ using namespace std;
 #include <QWebSettings>
 #include <QUrl>
 #include <QWebElement>
+#include <QMenu>
 
 #include "HelperStructs/Helper.h"
 
 #include "libupnpp/log.hxx"
 #include "libupnpp/control/discovery.hxx"
 
-#include "dirbrowser/cdbrowser.h"
-#include "upadapt/upputils.h"
 #include "upqo/cdirectory_qo.h"
+#include "upadapt/upputils.h"
+#include "cdbrowser.h"
+#include "rreaper.h"
 
 using namespace UPnPClient;
 
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_cdsidx(-1), m_reader(0)
+    : QWebView(parent), m_reader(0), m_reaper(0)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
@@ -89,7 +91,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 {
     m_timer.stop();
     string scurl = qs2utf8s(url.toString());
-    LOGDEB("CDBrowser::onLinkClicked: " << scurl << endl);
+    //LOGDEB("CDBrowser::onLinkClicked: " << scurl << endl);
 
     int what = scurl[0];
 
@@ -98,17 +100,20 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     // Browse server root
     case 'S':
     {
-	unsigned int i = atoi(scurl.c_str()+1);
-        if (i > m_msdescs.size()) {
-	    LOGERR("CDBrowser::onLinkClicked: bad link index: " << i 
+	unsigned int cdsidx = atoi(scurl.c_str()+1);
+        if (cdsidx > m_msdescs.size()) {
+	    LOGERR("CDBrowser::onLinkClicked: bad link index: " << cdsidx 
                    << " cd count: " << m_msdescs.size() << endl);
 	    return;
 	}
-        m_cdsidx = i;
         m_curpath.clear();
         m_curpath.push_back(pair<string,string>("0", "(servers)"));
-        m_ms = MSRH(new MediaServer(m_msdescs[m_cdsidx]));
-	browseContainer("0", m_msdescs[m_cdsidx].friendlyName);
+        m_ms = MSRH(new MediaServer(m_msdescs[cdsidx]));
+        if (!m_ms) {
+            qDebug() << "MediaServer connect failed";
+            return;
+        }
+	browseContainer("0", m_msdescs[cdsidx].friendlyName);
     }
     break;
 
@@ -181,7 +186,7 @@ static const QString init_container_page(
 
 void CDBrowser::browseContainer(string ctid, string cttitle)
 {
-    LOGDEB("CDBrowser::browseContainer: " << " ctid " << ctid << endl);
+    qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
     if (!m_ms) {
         LOGERR("CDBrowser::browseContainer: server not set" << endl);
         return;
@@ -213,25 +218,26 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
     }
     m_reader = new ContentDirectoryQO(cds, ctid, this);
 
-    connect(m_reader, SIGNAL(sliceAvailable(const UPnPDirContent *)),
-            this, SLOT(onSliceAvailable(const UPnPDirContent *)));
+    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
+            this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
     connect(m_reader, SIGNAL(done(int)), this, SLOT(onDone(int)));
     m_reader->start();
 }
 
 void CDBrowser::onDone(int)
 {
-    LOGDEB("CDBrowser::onDone" << endl);
+    //qDebug() <<"CDBrowser::onDone";
     if (m_reader) {
         m_reader->wait();
     }
-    LOGDEB("CDBrowser::onDone done" << endl);
+    //qDebug() << "CDBrowser::onDone done";
 }
 
 static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
-    out += QString("<div class=\"container\" objid=\"%1\">").arg(idx);
+    out += QString("<div class=\"container\" objid=\"%1\" objidx=\"%2\">").
+        arg(e.m_id.c_str());
     out += QString("<a class=\"ct_title\" href=\"C%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
     out += QString("</a></div>");
@@ -243,7 +249,8 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
     QString out;
     string val;
 
-    out += QString("<div class=\"item\" objid=\"%1\">").arg(idx);
+    out += QString("<div class=\"item\" objid=\"%1\" objidx=\"%2\">").
+        arg(e.m_id.c_str()).arg(idx);
 
     e.getprop("upnp:originalTrackNumber", val);
     out += QString("<span class=\"tracknum\">") + 
@@ -289,7 +296,7 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
 {
     QString html;
 
-    LOGDEB("CDBrowser::onSliceAvailable" << endl);
+    qDebug() << "CDBrowser::onSliceAvailable";
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
     for (auto& entry: dc->m_containers) {
@@ -334,7 +341,7 @@ void CDBrowser::serversPage()
         LOGERR("CDBrowser::serversPage: getDeviceDescs failed" << endl);
         return;
     }
-    LOGDEB("CDBrowser::serversPage: " << msdescs.size() << " servers" << endl);
+    //qDebug() << "CDBrowser::serversPage: " << msdescs.size() << " servers";
     
     bool same = msdescs.size() == m_msdescs.size();
     if (same) {
@@ -350,7 +357,7 @@ void CDBrowser::serversPage()
         m_timer.start(5000);
         return;
     } else {
-        LOGDEB1("CDBrowser::serversPage: updating" << endl);
+        //qDebug() << "CDBrowser::serversPage: updating";
     }
     m_msdescs = msdescs;
     setHtml(QString::fromUtf8(init_server_page.c_str()));
@@ -371,16 +378,111 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     if (el.isNull())
 	return;
 
-    QString objid = el.attribute("objid");
-    QString otype = el.attribute("class");
-    qDebug() << "Popup: " << " class " << otype << " objid " << objid ;
+    m_popupobjid = qs2utf8s(el.attribute("objid"));
+    m_popupidx = el.attribute("objidx").toInt();
 
-#if 0
-    int options =  ResultPopup::showSaveOne;
-    if (m_ismainres)
-	options |= ResultPopup::isMain;
-    QMenu *popup = ResultPopup::create(this, options, m_source, doc);
+    QString otype = el.attribute("class");
+    qDebug() << "Popup: " << " class " << otype << " objid " << 
+        m_popupobjid.c_str();
+
+    QMenu *popup = new QMenu(this);
+    QAction *act;
+    QVariant v;
+    act = new QAction(tr("Play Now"), this);
+    v = QVariant(int(PADM_PLAYNOW));
+    act->setData(v);
+    popup->addAction(act);
+
+    act = new QAction(tr("Play Next"), this);
+    v = QVariant(int(PADM_PLAYNEXT));
+    act->setData(v);
+    popup->addAction(act);
+
+    act = new QAction(tr("Play Later"), this);
+    v = QVariant(int(PADM_PLAYLATER));
+    act->setData(v);
+    popup->addAction(act);
+
+    if (!otype.compare("container")) {
+        popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
+                       SLOT(recursiveAdd(QAction *)));
+    } else if (!otype.compare("item")) {
+        popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
+                       SLOT(simpleAdd(QAction *)));
+    } else {
+        // ??
+        qDebug() << "CDBrowser::createPopup: obj type neither ct nor it: " <<
+            otype;
+        return;
+    }
     popup->popup(mapToGlobal(pos));
-#endif
 }
 
+void CDBrowser::simpleAdd(QAction *act)
+{
+    qDebug() << "CDBrowser::simpleAdd";
+    m_popupmode = act->data().toInt();
+
+    if (m_popupidx < 0 || m_popupidx > int(m_entries.size())) {
+        LOGERR("CDBrowser::simpleAdd: bad obj index: " << m_popupidx
+               << " id count: " << m_entries.size() << endl);
+        return;
+    }
+    MetaDataList mdl;
+    mdl.resize(1);
+    udirentToMetadata(&m_entries[m_popupidx], &mdl[0]);
+    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
+}
+
+void CDBrowser::recursiveAdd(QAction *act)
+{
+    qDebug() << "CDBrowser::recursiveAdd";
+    m_popupmode = act->data().toInt();
+
+    if (!m_ms) {
+        qDebug() << "CDBrowser::browseContainer: server not set" ;
+        return;
+    }
+    CDSH cds = m_ms->cds();
+    if (!cds) {
+        qDebug() << "Cant reach content directory service";
+        return;
+    }
+
+    if (m_reaper) {
+        delete m_reaper;
+        m_reaper = 0;
+    }
+
+    m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
+    emit sig_open_multi_insert(PlaylistAddMode(m_popupmode));
+    connect(m_reaper, 
+            SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
+            this, 
+            SLOT(onReaperSliceAvailable(const UPnPClient::UPnPDirContent *)));
+    connect(m_reaper, SIGNAL(done(int)), this, SLOT(rreaperDone(int)));
+    m_reaper->start();
+}
+
+void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
+{
+    qDebug() << "CDBrowser::onReaperSliceAvailable: got " << 
+        dc->m_items.size() << " items";
+    MetaDataList mdl;
+    mdl.resize(dc->m_items.size());
+    for (unsigned int i = 0; i < dc->m_items.size(); i++) {
+        udirentToMetadata(&dc->m_items[i], &mdl[i]);
+    }
+    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
+}
+
+void CDBrowser::rreaperDone(int status)
+{
+    if (!m_reaper)
+        return;
+    qDebug() << "CDBrowser::rreaperDone: status: " << status;
+    m_reaper->wait();
+    delete m_reaper;
+    m_reaper = 0;
+    emit sig_close_multi_insert();
+}

@@ -21,6 +21,8 @@
 using namespace std;
 
 #include <QDebug>
+#include <QApplication>
+
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/PlaylistMode.h"
@@ -99,13 +101,21 @@ private slots:
 
     // Insert after idx
     void insertTracks(const MetaDataList& meta, int idx) {
-        qDebug() << "OHPlayer::insertTracks: afteridx " << idx;
+        qDebug() << "OHPlayer::insertTracks: afteridx " << idx << 
+            " idsv size " << m_idsv.size();
         if (idx < -1 || idx >= int(m_idsv.size())) {
+            qDebug() << "OHPlayer::insertTracks: bad afteridx " << idx << 
+                " idsv size " << m_idsv.size();
             return;
         }
         int afterid = idx == -1 ? 0 : m_idsv[idx];
+        int counter = 0;
         for (vector<MetaData>::const_iterator it = meta.begin();
              it != meta.end(); it++) {
+            if (counter++ > 10) {
+                qApp->processEvents();
+                counter = 0;
+            }
             if (!insert(afterid, qs2utf8s(it->filepath),
                         qs2utf8s(it->didl), &afterid)) {
                 break;
@@ -115,8 +125,13 @@ private slots:
 
     void removeTracks(const QList<int>& lidx, bool) {
         qDebug() << "OHPlayer::removeTracks";
+        int counter = 0;
         for (QList<int>::const_iterator it = lidx.begin(); 
              it != lidx.end(); it++) {
+            if (counter++ > 10) {
+                //qApp->processEvents();
+                counter = 0;
+            }
             if (*it >= 0 && *it < int(m_idsv.size())) {
                 qDebug() << "OHPlayer::removeTracks: " << m_idsv[*it];
                 deleteId(m_idsv[*it]);

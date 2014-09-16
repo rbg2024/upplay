@@ -50,7 +50,7 @@ public:
 public slots:
     void setVolume(int vol)
         {
-            qDebug() << "RDR::setVolume " << vol;
+            //qDebug() << "RDR::setVolume " << vol;
             m_srv->setVolume(vol);
         }
     void setMute(bool mute)

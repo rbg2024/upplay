@@ -24,7 +24,6 @@
 #include <QObject>
 #include <QThread>
 #include <QDebug>
-#include <QTimer>
 
 #include "libupnpp/control/ohplaylist.hxx"
 #include "libupnpp/control/cdircontent.hxx"
@@ -41,12 +40,9 @@ Q_OBJECT
 public:
     OHPlaylistQO(UPnPClient::OHPLH ohp, QObject *parent = 0)
         : QObject(parent), m_curid(-1), m_forceUpdate(false), 
-          m_srv(ohp), m_timer(0)
+          m_srv(ohp)
     {
         m_srv->installReporter(this);
-        m_timer = new QTimer(this);
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-        m_timer->start(1000);
         qRegisterMetaType<std::vector<int> >("std::vector<int>");
         connect(this, SIGNAL(idArrayChanged(std::vector<int>)),
                 this, SLOT(onIdArrayChanged(std::vector<int>)),
@@ -98,10 +94,19 @@ public slots:
     virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
     virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
     virtual bool clear() {return m_srv->deleteAll() == 0;}
-
+    virtual bool idArray(std::vector<int> *ids, int *tokp) {
+        return m_srv->idArray(ids, tokp) == 0;
+    }
+    virtual void sync() {
+        std::vector<int> ids;
+        int tp;
+        if (idArray(&ids, &tp)) {
+            onIdArrayChanged(ids);
+        }
+    }
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
-        qDebug() << "OHPlaylistQO: insert after " << afterid;
+        //qDebug() << "OHPlaylistQO: insert after " << afterid;
         int ret = m_srv->insert(afterid, uri, didl, nid);
         if (ret == 0) {
             std::vector<int>::iterator it = 
@@ -137,9 +142,6 @@ public slots:
         }
         return ret == 0;
     }
-
-    // Called by timer every sec. Do we need it ?
-    virtual void update() {}
 
 signals:
     void currentTrack(int);
@@ -187,10 +189,10 @@ private slots:
             if (m_metapool.find(*it) == m_metapool.end())
                 unids.push_back(*it);
         }
-        if (!unids.empty())
-            qDebug() << "OHPL::onIdArrayChanged: need metadata for: " 
-                     << vtos(unids).c_str();
-
+        if (!unids.empty()) {
+            //qDebug() << "OHPL::onIdArrayChanged: need metadata for: " 
+            //       << vtos(unids).c_str();
+        }
         // Fetch needed metadata, 10 entries at a time
         const unsigned int batchsize(10);
         for (unsigned int i = 0; i < unids.size();) {
@@ -200,8 +202,8 @@ private slots:
                 small.push_back(unids[i+j]);
             }
 
-            qDebug() << "OHPL::onIdArrayChanged: Requesting metadata for " 
-                     << vtos(small).c_str();
+            //qDebug() << "OHPL::onIdArrayChanged: Requesting metadata for " 
+            //<< vtos(small).c_str();
             std::vector<UPnPClient::OHPlaylist::TrackListEntry> entries;
             int ret;
             if ((ret = m_srv->readList(small, &entries))) {
@@ -212,14 +214,14 @@ private slots:
                 //qDebug() << "Data for " << it->id << " " << 
                 //    it->dirent.m_title.c_str();
                 m_metapool[it->id] = it->dirent;
-                qDebug() << "OHPL::onIdArrayChanged: got meta for " << it->id;
+                //qDebug() << "OHPL::onIdArrayChanged: got meta for " << it->id;
             }
             i += j;
         }
 
         m_idsv = nids;
-        qDebug() << "OHPL::onIdArrayChanged: emit newTrackArrayReady(). " <<
-            "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
+        //qDebug() << "OHPL::onIdArrayChanged: emit newTrackArrayReady(). " <<
+        // "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit newTrackArrayReady();
 
     out:
@@ -233,7 +235,6 @@ protected:
     bool m_forceUpdate;
 private:
     UPnPClient::OHPLH m_srv;
-    QTimer *m_timer;
 };
 
 #endif // _OHPLAYLIST_QO_INCLUDED

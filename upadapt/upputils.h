@@ -37,7 +37,7 @@ inline QString u8s2qs(const std::string us)
 
 struct MetaData;
 
-extern bool udirentToMetadata(UPnPClient::UPnPDirObject *, MetaData *);
+extern bool udirentToMetadata(const UPnPClient::UPnPDirObject *, MetaData *);
 
 
 #endif /* _UPPUTILS_H_INCLUDED_ */

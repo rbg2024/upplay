@@ -83,7 +83,10 @@ private:
 
         while (offset < total) {
             UPnPClient::UPnPDirContent& slice = *m_slices.back();
+
             unsigned int lastctidx = slice.m_containers.size();
+
+            // Read entries
             m_status = m_serv->readDirSlice(objid, offset, toread,
                                             slice,  &count, &total);
             if (m_status != UPNP_E_SUCCESS) {
@@ -92,6 +95,7 @@ private:
             }
             offset += count;
 
+            // Put containers aside for later exploration
             for (auto it = slice.m_containers.begin() + lastctidx;
                  it != slice.m_containers.end(); it++) {
                 if (m_allctobjids.find(it->m_id) != m_allctobjids.end()) {
@@ -101,11 +105,16 @@ private:
                 m_allctobjids.insert(it->m_id);
                 m_ctobjids.insert(it->m_id);
             }
-            toread = m_serv->goodSliceSize();
-
             slice.m_containers.clear();
-            emit sliceAvailable(&slice);
-            m_slices.push_back(new UPnPClient::UPnPDirContent());
+
+            // Make items available
+            if (!slice.m_items.empty()) {
+                qDebug() << "RecursiveReaper::scanCT got " << 
+                    slice.m_items.size() << " items";
+                emit sliceAvailable(&slice);
+                m_slices.push_back(new UPnPClient::UPnPDirContent());
+            }
+            toread = m_serv->goodSliceSize();
         }
         
         m_ctobjids.erase(thisct);

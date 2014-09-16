@@ -26,7 +26,9 @@ using namespace std;
 
 #include "Playlist.h"
 
-Playlist::Playlist(QObject * parent) 
+const int Playlist::o_multi_insert_idx_none = -2;
+
+Playlist::Playlist(QObject* parent) 
     : QObject (parent)
 {
     _settings = CSettingsStorage::getInstance();
@@ -36,6 +38,8 @@ Playlist::Playlist(QObject * parent)
     m_selection_min_row = 0;
     m_tpstate = AUDIO_UNKNOWN;
     _pause = false;
+    m_multi_insert_idx = o_multi_insert_idx_none;
+    m_multi_insert_just_opened = false;
 }
 
 // Remove one row
@@ -47,10 +51,10 @@ void Playlist::remove_row(int row)
     psl_remove_rows(remove_list);
 }
 
-void Playlist::psl_new_transport_state(int tps, const char *s)
+void Playlist::psl_new_transport_state(int tps, const char *)
 {
-    qDebug() << "Playlist::psl_new_transport_state " << s <<
-        " play_idx " << m_play_idx;
+//    qDebug() << "Playlist::psl_new_transport_state " << s <<
+//        " play_idx " << m_play_idx;
     if (m_play_idx >= 0 && m_play_idx < int(m_meta.size())) 
         qDebug() << "     meta[idx].pl_playing " << 
             m_meta[m_play_idx].pl_playing;
@@ -86,12 +90,45 @@ void Playlist::psl_mode_changed(Playlist_Mode mode)
     _playlist_mode = mode;
 }
 
-void Playlist::psl_add_tracks(PlaylistAddMode mode, bool replace, 
+void Playlist::psl_add_tracks(PlaylistAddMode mode, bool, 
                               const MetaDataList& v_md)
 {
     qDebug() << "Playlist::psl_add_tracks() mode " << mode << 
-        " repl " << replace;
-    psl_insert_tracks(v_md, m_meta.size() - 1);
+        " multi_insert " << m_multi_insert_idx;
+    emit sig_sync();
+
+    switch (mode) {
+    case PADM_PLAYNOW: 
+    {
+        int playpoint = (m_play_idx < 0) ? 0 : m_play_idx;
+        if (m_multi_insert_idx == o_multi_insert_idx_none) {
+            psl_insert_tracks(v_md, playpoint - 1);
+            psl_change_track(playpoint);
+        } else {
+            psl_insert_tracks(v_md, m_multi_insert_idx);
+            m_multi_insert_idx += v_md.size();
+            qDebug() << "Playlist::psl_add_tracks() multi_insert now " <<
+                m_multi_insert_idx;
+            if (m_multi_insert_just_opened) {
+                psl_change_track(playpoint);
+                m_multi_insert_just_opened = false;
+            }
+        }            
+    }
+    break;
+    case PADM_PLAYNEXT:
+        if (m_multi_insert_idx == o_multi_insert_idx_none) {
+            psl_insert_tracks(v_md, m_play_idx);
+        } else {
+            psl_insert_tracks(v_md, m_multi_insert_idx);
+            m_multi_insert_idx += v_md.size();
+        }            
+        break;
+    case PADM_PLAYLATER:
+    default:
+        psl_insert_tracks(v_md, m_meta.size() - 1);
+        break;
+    }
 }
 
 void Playlist::psl_selection_min_row(int row)

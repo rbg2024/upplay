@@ -48,6 +48,8 @@ signals:
     void sig_playing_track_changed(int row);
     // Current track info for displaying in the control area
     void sig_track_metadata(const MetaData&, int pos_sec=-1, bool play=true);
+    // Make sure we have the latest state of the world
+    void sig_sync();
 
     // These request action from the audio part
     void sig_stop();
@@ -64,6 +66,30 @@ signals:
     void sig_playing();
 
 public slots:
+    virtual void psl_open_multi_insert(PlaylistAddMode mode) {
+        m_multi_insert_just_opened = true;
+        switch (mode) {
+        case PADM_PLAYNOW:
+            qDebug() << "psl_open_multi_insert: playnow. insertidx" << 
+                m_multi_insert_idx;
+            m_multi_insert_idx = m_play_idx >= 0 ? m_play_idx -1 : -1;
+            break;
+        case PADM_PLAYNEXT:
+            m_multi_insert_idx = m_play_idx;
+            qDebug() << "psl_open_multi_insert: playnext. insertidx" << 
+                m_multi_insert_idx;
+            break;
+        case PADM_PLAYLATER:
+            qDebug() << "psl_open_multi_insert: playlater";
+        default:
+            // append is always append
+        break;
+        }
+    }
+    virtual void psl_close_multi_insert() {
+        qDebug() << "psl_close_multi_insert";
+        m_multi_insert_idx = o_multi_insert_idx_none;
+    }
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
     // This is a abbrev for "insert at end"
     virtual void psl_add_tracks(PlaylistAddMode, bool, const MetaDataList&);
@@ -87,13 +113,15 @@ public slots:
     virtual void psl_selection_min_row(int);
 
 protected:
-
+    static const int o_multi_insert_idx_none;
     MetaDataList m_meta;
 
     int	 m_play_idx;
     int  m_selection_min_row;
     int  m_tpstate;
     bool _pause;
+    int  m_multi_insert_idx;
+    bool m_multi_insert_just_opened;
 
     Playlist_Mode _playlist_mode;
 
