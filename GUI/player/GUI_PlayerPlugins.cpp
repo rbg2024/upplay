@@ -1,5 +1,3 @@
-/* GUI_PlayerPlugins.cpp */
-
 /* Copyright (C) 2013  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,17 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-
-/*
- * GUI_PlayerPlugins.cpp
- *
- *  Created on: 10.10.2012
- *      Author: lugmair
- */
-
 #include "GUI/player/GUI_Player.h"
-
 
 /** PLUGINS **/
 QWidget* GUI_Player::getParentOfPlugin()
@@ -38,62 +26,16 @@ QWidget* GUI_Player::getParentOfPlugin()
 
 void GUI_Player::setInfoDialog(GUI_InfoDialog* /*dialog*/)
 {
-//    ui_info_dialog = dialog;
-//    ui_info_dialog->setMode(INFO_MODE_TRACKS);
 }
 
 
 void GUI_Player::hideAllPlugins()
 {
-#if 0
-    m_settings->setShownPlugin("");
-    if (ui->plugin_widget->isHidden()) {
-        return;
-    }
-
-    int old_h = this->ui->plugin_widget->minimumHeight();
-    QSize pl_size = ui_playlist->size();
-
-    pl_size.setHeight(pl_size.height() + old_h);
-    ui->plugin_widget->setMinimumHeight(0);
-
-    ui_playlist->resize(pl_size);
-#endif
 }
 
 
 void GUI_Player::showPlugin(PlayerPlugin* /*plugin*/)
 {
-#if 0
-    hideAllPlugins();
-
-    if (!plugin) {
-        return;
-    }
-    if (!ui_playlist) {
-        return;
-    }
-
-    QSize pl_size;
-    QSize widget_size = plugin->getSize();
-
-    int old_h = this->ui->plugin_widget->minimumHeight();
-    ui->plugin_widget->show();
-
-    _pph->showPlugin(plugin);
-
-
-    pl_size = ui_playlist->size();
-
-    widget_size.setWidth(ui->plugin_widget->width());
-    pl_size.setHeight(pl_size.height() - widget_size.height() + old_h);
-
-    ui->plugin_widget->setMinimumHeight(plugin->getSize().height());
-    _pph->resize(ui->plugin_widget->size());
-
-    ui_playlist->resize(pl_size);
-    m_settings->setShownPlugin(plugin->getName());
-#endif
 }
 
 

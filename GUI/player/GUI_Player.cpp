@@ -27,6 +27,7 @@
 #include "ui_GUI_Player.h"
 #include "GUI/player/GUI_Player.h"
 #include "GUI/player/GUI_TrayIcon.h"
+#include "GUI/playlist/GUI_Playlist.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
@@ -402,14 +403,12 @@ QWidget* GUI_Player::getParentOfLibrary()
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 {
     ui_playlist = playlist;
-#if 0
     if (ui_playlist) {
         ui_playlist->show();
         ui_playlist->resize(ui->playlist_widget->size());
         QAction* action = createAction(QKeySequence(tr("Ctrl+P")));
         connect(action, SIGNAL(triggered()), ui_playlist, SLOT(setFocus()));
     }
-#endif
 }
 
 
@@ -511,27 +510,11 @@ void GUI_Player::moveEvent(QMoveEvent *e)
     m_settings->setPlayerPos(p);
 }
 
-void GUI_Player::resizeEvent(QResizeEvent*)
+void GUI_Player::resizeEvent(QResizeEvent*e)
 {
-#if 0
     QMainWindow::resizeEvent(e);
-
-//    ui_playlist->resize(ui->playlist_widget->size());
-
-//    if(ui->library_widget->isVisible()){
-
-//        if(ui_libpath)
-//            ui_libpath->resize(ui->library_widget->size());
-//        else
-//            ui_library->resize(ui->library_widget->size());
-//    }
-
-    QSize sz = ui->plugin_widget->size();
-
-    _pph->resize(sz);
     m_settings->setPlayerSize(this->size());
-#endif
-    this->update();
+    ui_playlist->resize(ui->playlist_widget->size());
 }
 
 

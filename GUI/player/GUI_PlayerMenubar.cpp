@@ -59,14 +59,14 @@ void GUI_Player::showLibrary(bool b, bool resize)
 
         m_library_width = lib_width;
         new_width = old_width - lib_width;
-        this->setMinimumSize(300, 500);
+        this->setMinimumSize(300, 400);
     } else {
         // visible
         QSizePolicy p = this->ui->library_widget->sizePolicy();
         p.setHorizontalStretch(m_library_stretch_factor);
         this->ui->library_widget->setSizePolicy(p);
         new_width = old_width + m_library_width;
-        this->setMinimumSize(850, 500);
+        this->setMinimumSize(650, 400);
     }
 
     if (resize) {
