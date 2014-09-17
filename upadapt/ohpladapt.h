@@ -35,20 +35,21 @@ Q_OBJECT
 
 public:
     OHPlayer(UPnPClient::OHPLH ohpl, QObject *parent = 0)
-        : OHPlaylistQO(ohpl, parent), m_id(-1), m_songsecs(-1) {
-        connect(this, SIGNAL(newTrackArrayReady()),
+        : OHPlaylistQO(ohpl, parent), m_id(-1), m_songsecs(-1),
+          m_ininsert(false) {
+        connect(this, SIGNAL(trackArrayChanged()),
                 this, SLOT(translateMetaData()));
         connect(this, SIGNAL(tpStateChanged(int)), 
                 this, SLOT(playerState(int)));
-        connect(this, SIGNAL(currentTrack(int)),
-                this, SLOT(currentTrack(int)));
-        connect(this, SIGNAL(sig_shuffleState(bool)), 
+        connect(this, SIGNAL(trackIdChanged(int)),
+                this, SLOT(onTrackIdChanged(int)));
+        connect(this, SIGNAL(shuffleChanged(bool)), 
                 this, SLOT(onShuffleState(bool)));
-        connect(this, SIGNAL(sig_repeatState(bool)), 
+        connect(this, SIGNAL(repeatChanged(bool)), 
                 this, SLOT(onRepeatState(bool)));
     }
 
-private slots:
+public slots:
 
     // Seek to time in percent
     void seekPC(int pc) {
@@ -70,77 +71,82 @@ private slots:
         seekSecondAbsolute(seeksecs);
     }
 
-    void currentTrack(int id) {
-        m_id = id;
-        m_songsecs = -1;
-    }
-
-    void translateMetaData() {
-        qDebug() << "OHPlayer::translateMetaData()";
-        MetaDataList mdv;
-        for (auto idit = m_idsv.begin(); idit != m_idsv.end(); idit++) {
-            auto poolit = m_metapool.find(*idit);
-            if (poolit == m_metapool.end()) {
-                qDebug() << "OHPlayer::translateMetaData: "
-                    "no data found for " << *idit << "!!!";
-                continue;
-            }
-            UPnPClient::UPnPDirObject& ude = poolit->second;
-            if (ude.m_resources.empty())
-                continue;
-
-            MetaData md;
-            udirentToMetadata(&ude, &md);
-            md.id = *idit;
-            md.pl_playing = md.id == m_curid;
-            
-            mdv.push_back(md);
-        }
-        emit metaDataReady(mdv);
-    }
-
     // Insert after idx
     void insertTracks(const MetaDataList& meta, int idx) {
+        while (m_ininsert) {
+            qDebug() << "OHPlayer::insertTracks: already active";
+            return;
+        }
+        m_ininsert = true;
+
+        asyncArrayUpdates(false);
         qDebug() << "OHPlayer::insertTracks: afteridx " << idx << 
             " idsv size " << m_idsv.size();
         if (idx < -1 || idx >= int(m_idsv.size())) {
-            qDebug() << "OHPlayer::insertTracks: bad afteridx " << idx << 
+            qDebug() << "OHPlayer::insertTracks: BAD AFTERIDX " << idx << 
                 " idsv size " << m_idsv.size();
-            return;
+            if (idx > 0) {
+                idx = int(m_idsv.size()-1);
+            } else {
+                m_ininsert = false;
+                emit insertDone();
+                return;
+            }
         }
         int afterid = idx == -1 ? 0 : m_idsv[idx];
         int counter = 0;
         for (vector<MetaData>::const_iterator it = meta.begin();
              it != meta.end(); it++) {
             if (counter++ > 10) {
+                sync();
                 qApp->processEvents();
                 counter = 0;
             }
             if (!insert(afterid, qs2utf8s(it->filepath),
                         qs2utf8s(it->didl), &afterid)) {
+                qDebug() << "OHPlayer::insertTracks: insert failed";
                 break;
             }
         }
+        qDebug() << "OHPlayer::insertTracks: sync at end";
+        sync();
+        asyncArrayUpdates(true);
+        m_ininsert = false;
+        emit insertDone();
     }
 
     void removeTracks(const QList<int>& lidx, bool) {
-        qDebug() << "OHPlayer::removeTracks";
-        int counter = 0;
+        //qDebug() << "OHPlayer::removeTracks";
+        std::vector<int> ids;
+        ids.reserve(lidx.size());
         for (QList<int>::const_iterator it = lidx.begin(); 
              it != lidx.end(); it++) {
-            if (counter++ > 10) {
-                //qApp->processEvents();
-                counter = 0;
-            }
             if (*it >= 0 && *it < int(m_idsv.size())) {
-                qDebug() << "OHPlayer::removeTracks: " << m_idsv[*it];
-                deleteId(m_idsv[*it]);
+                //qDebug() << "OHPlayer::removeTracks: " << m_idsv[*it];
+                ids.push_back(m_idsv[*it]);
             } else {
                 qDebug() << "OHPlayer::removeTracks: bad index" << *it;
             }
         }
+        int counter = 0;
+        for (std::vector<int>::const_iterator it = ids.begin(); 
+             it != ids.end(); it++) {
+            if (counter++ > 10) {
+                qApp->processEvents();
+                counter = 0;
+            }
+            deleteId(*it);
+        }
     }
 
+    void  changeMode(Playlist_Mode mode) {
+        setRepeat(mode.repAll);
+        setShuffle(mode.shuffle);
+        m_mode = mode;
+    }
+
+
+private slots:
     void playerState(int ps) {
         std::string s;
         AudioState as = AUDIO_UNKNOWN;
@@ -164,34 +170,59 @@ private slots:
             break;
         }
         if (as != AUDIO_UNKNOWN) {
-            emit sig_audioState(as, s.c_str());
+            emit audioStateChanged(as, s.c_str());
         }
-    }
-
-    void  changeMode(Playlist_Mode mode) {
-        setRepeat(mode.repAll);
-        setShuffle(mode.shuffle);
-        m_mode = mode;
     }
 
     void onShuffleState(bool st) {
         m_mode.shuffle = st;
-        emit sig_PLModeChanged(m_mode);
+        emit playlistModeChanged(m_mode);
     }
     void onRepeatState(bool st) {
         m_mode.repAll = st;
-        emit sig_PLModeChanged(m_mode);
+        emit playlistModeChanged(m_mode);
     }
+    void onTrackIdChanged(int id) {
+        m_id = id;
+        m_songsecs = -1;
+    }
+
+    void translateMetaData() {
+        //qDebug() << "OHPlayer::translateMetaData()";
+        MetaDataList mdv;
+        for (auto idit = m_idsv.begin(); idit != m_idsv.end(); idit++) {
+            auto poolit = m_metapool.find(*idit);
+            if (poolit == m_metapool.end()) {
+                qDebug() << "OHPlayer::translateMetaData: "
+                    "no data found for " << *idit << "!!!";
+                continue;
+            }
+            UPnPClient::UPnPDirObject& ude = poolit->second;
+            if (ude.m_resources.empty())
+                continue;
+
+            MetaData md;
+            udirentToMetadata(&ude, &md);
+            md.id = *idit;
+            md.pl_playing = md.id == m_curid;
+            
+            mdv.push_back(md);
+        }
+        emit metadataArrayChanged(mdv);
+    }
+
+
 signals:
-    void sig_audioState(int as, const char *);
-    void metaDataReady(const MetaDataList& mdv);
-    void sig_PLModeChanged(Playlist_Mode);
+    void audioStateChanged(int as, const char *);
+    void metadataArrayChanged(const MetaDataList& mdv);
+    void playlistModeChanged(Playlist_Mode);
+    void insertDone();
 
 private:
     int m_id; // Current playing track
     int m_songsecs;
     Playlist_Mode m_mode;
+    bool m_ininsert;
 };
-
 
 #endif /* _OHPLADAPT_H_INCLUDED_ */

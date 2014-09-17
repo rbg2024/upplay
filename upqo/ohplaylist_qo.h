@@ -40,11 +40,12 @@ Q_OBJECT
 public:
     OHPlaylistQO(UPnPClient::OHPLH ohp, QObject *parent = 0)
         : QObject(parent), m_curid(-1), m_forceUpdate(false), 
+          m_discardArrayEvents(false),
           m_srv(ohp)
     {
         m_srv->installReporter(this);
         qRegisterMetaType<std::vector<int> >("std::vector<int>");
-        connect(this, SIGNAL(idArrayChanged(std::vector<int>)),
+        connect(this, SIGNAL(__idArrayChanged(std::vector<int>)),
                 this, SLOT(onIdArrayChanged(std::vector<int>)),
                 Qt::QueuedConnection);
     }
@@ -54,14 +55,14 @@ public:
     {
         //qDebug() << "OHPL: Changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "Id")) {
-            emit currentTrack(value);
+            emit trackIdChanged(value);
             m_curid = value;
         } else if (!strcmp(nm, "TransportState")) {
             emit tpStateChanged(value);
         } else if (!strcmp(nm, "Shuffle")) {
-            emit sig_shuffleState(value!=0);
+            emit shuffleChanged(value!=0);
         } else if (!strcmp(nm, "Repeat")) {
-            emit sig_repeatState(value!=0);
+            emit repeatChanged(value!=0);
         }
     }
 
@@ -75,11 +76,26 @@ public:
     virtual void changed(const char *nm, std::vector<int> ids)
     {
         Q_UNUSED(nm);
-        //qDebug() << "OHPL: Changed: " << nm << " (vector<int>)";
-        emit idArrayChanged(ids);
+        if (!m_discardArrayEvents) {
+            //qDebug() << "OHPL: Changed: " << nm << " (vector<int>)";
+            emit __idArrayChanged(ids);
+        }
     }
 
 public slots:
+    virtual void sync() {
+        //qDebug() << "OHPL::sync";
+        std::vector<int> ids;
+        int tp;
+        if (idArray(&ids, &tp)) {
+            onIdArrayChanged(ids);
+        }
+    }
+
+    virtual void asyncArrayUpdates(bool onoff) {
+        m_discardArrayEvents = !onoff;
+    }
+
     virtual bool play() {return m_srv->play() == 0;}
     virtual bool stop() {return m_srv->stop() == 0;}
     virtual bool pause() {return m_srv->pause() == 0;}
@@ -97,21 +113,16 @@ public slots:
     virtual bool idArray(std::vector<int> *ids, int *tokp) {
         return m_srv->idArray(ids, tokp) == 0;
     }
-    virtual void sync() {
-        //qDebug() << "OHPL::sync";
-        std::vector<int> ids;
-        int tp;
-        if (idArray(&ids, &tp)) {
-            onIdArrayChanged(ids);
-        }
-    }
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
         //qDebug() << "OHPL:: insert after " << afterid;
         int ret = m_srv->insert(afterid, uri, didl, nid);
         if (ret == 0) {
-            std::vector<int>::iterator it = 
-                find(m_idsv.begin(), m_idsv.end(), afterid);
+            std::vector<int>::iterator it;
+            if (afterid == 0)
+                it = m_idsv.begin();
+            else 
+                it = find(m_idsv.begin(), m_idsv.end(), afterid);
             // Keep local ids vector updated 
             if (it != m_idsv.end()) {
                 it++;
@@ -145,20 +156,16 @@ public slots:
     }
 
 signals:
-    void currentTrack(int);
-    void newTrackArrayReady();
-    void idArrayChanged(std::vector<int>);
+    void trackIdChanged(int);
+    void trackArrayChanged();
     void tpStateChanged(int);
-    void sig_shuffleState(bool);
-    void sig_repeatState(bool);
+    void shuffleChanged(bool);
+    void repeatChanged(bool);
+
+    // This is an internal signal. Use trackArrayChanged()
+    void __idArrayChanged(std::vector<int>);
                                          
 private slots:
-    std::string vtos(std::vector<int> nids) {
-        std::string sids;
-        for (auto it = nids.begin(); it != nids.end(); it++)
-            sids += UPnPP::SoapHelp::i2s(*it) + " ";
-        return sids;
-    }
 
     void onIdArrayChanged(std::vector<int> nids) {
         //qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
@@ -221,9 +228,9 @@ private slots:
         }
 
         m_idsv = nids;
-        //qDebug() << "OHPL::onIdArrayChanged: emit newTrackArrayReady(). " <<
+        //qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
         // "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
-        emit newTrackArrayReady();
+        emit trackArrayChanged();
 
     out:
         return;
@@ -234,6 +241,16 @@ protected:
     std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
     int m_curid;
     bool m_forceUpdate;
+    bool m_discardArrayEvents;
+
+    std::string vtos(std::vector<int> nids) {
+        std::string sids;
+        for (auto it = nids.begin(); it != nids.end(); it++)
+            sids += UPnPP::SoapHelp::i2s(*it) + " ";
+        return sids;
+    }
+
+
 private:
     UPnPClient::OHPLH m_srv;
 };

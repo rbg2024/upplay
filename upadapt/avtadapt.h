@@ -100,12 +100,12 @@ public slots:
             s = "Unknown"; break;
         }
         if (as != AUDIO_UNKNOWN) {
-            emit sig_audioState(as, s.c_str());
+            emit audioStateChanged(as, s.c_str());
         }
     }
 
 signals:
-    void sig_audioState(int as, const char *);
+    void audioStateChanged(int as, const char *);
     void sig_currentMetadata(const MetaData&);
 };
 

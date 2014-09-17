@@ -37,7 +37,7 @@ using namespace std;
 using namespace UPnPClient;
 
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_reader(0), m_reaper(0)
+    : QWebView(parent), m_reader(0), m_reaper(0), m_insertactive(false)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
@@ -369,6 +369,9 @@ void CDBrowser::serversPage()
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
 {
+    if (m_insertactive)
+        return;
+
     QWebHitTestResult htr = page()->mainFrame()->hitTestContent(pos);
     if (htr.isNull())
 	return;
@@ -437,6 +440,7 @@ void CDBrowser::simpleAdd(QAction *act)
 void CDBrowser::recursiveAdd(QAction *act)
 {
     qDebug() << "CDBrowser::recursiveAdd";
+    m_insertactive = true;
     m_popupmode = act->data().toInt();
 
     if (!m_ms) {
@@ -453,9 +457,9 @@ void CDBrowser::recursiveAdd(QAction *act)
         delete m_reaper;
         m_reaper = 0;
     }
-
+    
+    m_recwalkentries.clear();
     m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
-    emit sig_open_multi_insert(PlaylistAddMode(m_popupmode));
     connect(m_reaper, 
             SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
             this, 
@@ -468,12 +472,9 @@ void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
 {
     qDebug() << "CDBrowser::onReaperSliceAvailable: got " << 
         dc->m_items.size() << " items";
-    MetaDataList mdl;
-    mdl.resize(dc->m_items.size());
     for (unsigned int i = 0; i < dc->m_items.size(); i++) {
-        udirentToMetadata(&dc->m_items[i], &mdl[i]);
+        m_recwalkentries.push_back(dc->m_items[i]);
     }
-    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
 }
 
 void CDBrowser::rreaperDone(int status)
@@ -484,5 +485,11 @@ void CDBrowser::rreaperDone(int status)
     m_reaper->wait();
     delete m_reaper;
     m_reaper = 0;
-    emit sig_close_multi_insert();
+
+    MetaDataList mdl;
+    mdl.resize(m_recwalkentries.size());
+    for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
+        udirentToMetadata(&m_recwalkentries[i], &mdl[i]);
+    }
+    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
 }

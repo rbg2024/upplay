@@ -26,8 +26,6 @@ using namespace std;
 
 #include "Playlist.h"
 
-const int Playlist::o_multi_insert_idx_none = -2;
-
 Playlist::Playlist(QObject* parent) 
     : QObject (parent)
 {
@@ -38,8 +36,6 @@ Playlist::Playlist(QObject* parent)
     m_selection_min_row = 0;
     m_tpstate = AUDIO_UNKNOWN;
     _pause = false;
-    m_multi_insert_idx = o_multi_insert_idx_none;
-    m_multi_insert_just_opened = false;
 }
 
 // Remove one row
@@ -93,36 +89,25 @@ void Playlist::psl_mode_changed(Playlist_Mode mode)
 void Playlist::psl_add_tracks(PlaylistAddMode mode, bool, 
                               const MetaDataList& v_md)
 {
-    qDebug() << "Playlist::psl_add_tracks() mode " << mode << 
-        " multi_insert " << m_multi_insert_idx;
+    qDebug() << "Playlist::psl_add_tracks() mode " << mode <<
+        " ninserttracks " <<  v_md.size() << 
+        " m_meta.size() " << m_meta.size();
+
     emit sig_sync();
+
+    qDebug() << "Playlist::psl_add_tracks() after sync m_meta.size() " << 
+        m_meta.size();
 
     switch (mode) {
     case PADM_PLAYNOW: 
     {
         int playpoint = (m_play_idx < 0) ? 0 : m_play_idx;
-        if (m_multi_insert_idx == o_multi_insert_idx_none) {
-            psl_insert_tracks(v_md, playpoint - 1);
-            psl_change_track(playpoint);
-        } else {
-            psl_insert_tracks(v_md, m_multi_insert_idx);
-            m_multi_insert_idx += v_md.size();
-            qDebug() << "Playlist::psl_add_tracks() multi_insert now " <<
-                m_multi_insert_idx;
-            if (m_multi_insert_just_opened) {
-                psl_change_track(playpoint);
-                m_multi_insert_just_opened = false;
-            }
-        }            
+        psl_insert_tracks(v_md, playpoint - 1);
+        psl_change_track(playpoint);
     }
     break;
     case PADM_PLAYNEXT:
-        if (m_multi_insert_idx == o_multi_insert_idx_none) {
-            psl_insert_tracks(v_md, m_play_idx);
-        } else {
-            psl_insert_tracks(v_md, m_multi_insert_idx);
-            m_multi_insert_idx += v_md.size();
-        }            
+        psl_insert_tracks(v_md, m_play_idx);
         break;
     case PADM_PLAYLATER:
     default:

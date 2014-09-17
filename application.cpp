@@ -217,7 +217,7 @@ Application::~Application()
 void Application::renderer_connections()
 {
     if (ohplo) {
-        qDebug() << "Connecting ohplo::metaDataReady(MetaDataList& mdv)";
+        qDebug() << "Connecting ohplo::metadataArrayChanged(MetaDataList& mdv)";
         PlaylistOH *ploh = dynamic_cast<PlaylistOH*>(playlist);
         if (ploh == 0) {
             cerr << "OpenHome player but Playlist not openhome!";
@@ -225,12 +225,12 @@ void Application::renderer_connections()
         }
         CONNECT(ploh, sig_clear_playlist(), ohplo, clear());
 
-        CONNECT(ohplo, metaDataReady(const MetaDataList&),
+        CONNECT(ohplo, metadataArrayChanged(const MetaDataList&),
                 playlist, psl_new_ohpl(const MetaDataList&));
-        CONNECT(ohplo, currentTrack(int), ploh, psl_currentTrack(int));
-        CONNECT(ohplo, sig_PLModeChanged(Playlist_Mode),
+        CONNECT(ohplo, trackIdChanged(int), ploh, psl_trackIdChanged(int));
+        CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
                 playlist, psl_mode_changed(Playlist_Mode));
-        CONNECT(ohplo, sig_PLModeChanged(Playlist_Mode),
+        CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
                 ui_playlist, setMode(Playlist_Mode));
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
@@ -243,6 +243,8 @@ void Application::renderer_connections()
         CONNECT(playlist, sig_mode_changed(Playlist_Mode),
                 ohplo, changeMode(Playlist_Mode));
         CONNECT(playlist, sig_sync(), ohplo, sync());
+        CONNECT(playlist, sig_async_playlist_updates(bool), 
+                ohplo, asyncArrayUpdates(bool));
         CONNECT(playlist, sig_pause(), ohplo, pause());
         CONNECT(playlist, sig_stop(),  ohplo, stop());
         CONNECT(playlist, sig_resume_play(), ohplo, play());
@@ -253,8 +255,9 @@ void Application::renderer_connections()
 
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
-        CONNECT(ohplo, sig_audioState(int, const char *), playlist, 
+        CONNECT(ohplo, audioStateChanged(int, const char *), playlist, 
                 psl_new_transport_state(int, const char *));
+        CONNECT(ohplo, insertDone(), cdb, onInsertDone());
 
     } else {
         PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);
@@ -277,7 +280,7 @@ void Application::renderer_connections()
 
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
-        CONNECT(avto, sig_audioState(int, const char*), playlist, 
+        CONNECT(avto, audioStateChanged(int, const char*), playlist, 
                 psl_new_transport_state(int, const char *));
         CONNECT(avto, stoppedAtEOT(), playlist, psl_forward());
 
@@ -333,9 +336,6 @@ void Application::init_connections()
             sig_tracks_to_playlist(PlaylistAddMode, bool, const MetaDataList&),
             playlist, psl_add_tracks(PlaylistAddMode, bool,
                                      const MetaDataList&));
-    CONNECT(cdb, sig_open_multi_insert(PlaylistAddMode),
-            playlist, psl_open_multi_insert(PlaylistAddMode));
-    CONNECT(cdb, sig_close_multi_insert(), playlist, psl_close_multi_insert());
 }
 
 

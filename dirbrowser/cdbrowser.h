@@ -48,6 +48,7 @@ class CDBrowser : public QWebView
     void onDone(int);
     void onSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
+    void onInsertDone() { m_insertactive = false;}
 
  signals:
     void sig_tracks_to_playlist(PlaylistAddMode, bool replace, 
@@ -83,6 +84,10 @@ class CDBrowser : public QWebView
 
     // Content of the currently visited container
     std::vector<UPnPClient::UPnPDirObject> m_entries;
+
+    // Content of recursive explore
+    std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
+    bool m_insertactive;
 
     // Objid and index in entreis for the last popup menu click
     std::string m_popupobjid;

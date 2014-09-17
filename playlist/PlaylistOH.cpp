@@ -26,9 +26,9 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
 }
 
-void PlaylistOH::psl_currentTrack(int id)
+void PlaylistOH::psl_trackIdChanged(int id)
 {
-    qDebug() << "PlaylistOH::psl_currentTrack: " << id;
+    qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
     if (id <= 0)
         return;
 
@@ -83,6 +83,7 @@ void PlaylistOH::psl_backward()
 
 void PlaylistOH::psl_insert_tracks(const MetaDataList& meta, int afteridx)
 {
-    qDebug() << "PlaylistOH::psl_insert_tracks afteridx" << afteridx;
+    qDebug() << "PlaylistOH::psl_insert_tracks ntracks " << meta.size() << 
+        " afteridx" << afteridx;
     emit sig_insert_tracks(meta, afteridx);
 }

@@ -49,7 +49,7 @@ signals:
     void sig_row_activated(int);
 
 public slots:
-    void psl_currentTrack(int id);
+    void psl_trackIdChanged(int id);
 
     // The following are connected to GUI signals, for responding to
     // user actions.
