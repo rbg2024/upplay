@@ -272,6 +272,8 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 
     if (!md.albumArtURI.isEmpty()) {
         fetch_cover(md.albumArtURI);
+    } else {
+        ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
     }
 
     ui->btn_bw->setEnabled(true);
