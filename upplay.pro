@@ -1,7 +1,7 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-QT += webkit
+QT += webkit network
 
 QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"0.1.0\\\"
 

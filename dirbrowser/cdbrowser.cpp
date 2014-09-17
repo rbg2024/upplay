@@ -300,10 +300,12 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
     for (auto& entry: dc->m_containers) {
+//        qDebug() << "Container: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += CTToHtml(m_entries.size()-1, entry);
     }
     for (auto& entry: dc->m_items) {
+//        qDebug() << "Item: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += ItemToHtml(m_entries.size()-1, entry);
     }

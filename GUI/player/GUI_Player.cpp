@@ -21,6 +21,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPalette>
+#include <QUrl>
+#include <QtNetwork/QNetworkRequest>
 
 #include "ui_GUI_Player.h"
 #include "GUI/player/GUI_Player.h"
@@ -62,6 +64,10 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     initGUI();
     m_translator = translator;
     m_settings = CSettingsStorage::getInstance();
+    m_netmanager = new QNetworkAccessManager(this);
+    connect(m_netmanager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(sl_cover_fetch_done(QNetworkReply*)));
+
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
     ui->lab_artist->hide();
@@ -70,8 +76,8 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->lab_album->hide();
 
     ui->lab_sayonara->setText(tr("Upplay Player"));
-    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ? 
-                             m_settings->getVersion() : 
+    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ?
+                             m_settings->getVersion() :
                              m_renderer_friendly_name);
     ui->lab_writtenby->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
     ui->lab_copyright->setText(tr("Copyright") + " 2011-2013");
@@ -143,8 +149,8 @@ GUI_Player::~GUI_Player()
 void GUI_Player::setRendererName(const QString& nm)
 {
     m_renderer_friendly_name = nm;
-    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ? 
-                             m_settings->getVersion() : 
+    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ?
+                             m_settings->getVersion() :
                              m_renderer_friendly_name);
 }
 
@@ -188,18 +194,21 @@ void GUI_Player::initGUI()
 }
 
 
-
 // new track
 void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 {
+    if (!m_metadata.compare(md)) {
+        return;
+    }
     m_metadata = md;
 
     m_completeLength_ms = md.length_ms;
     m_playing = playing;
     m_trayIcon->setPlaying(playing);
 
-    if (pos_sec > 0)
+    if (pos_sec > 0) {
         setCurrentPosition(pos_sec);
+    }
 
     ui->lab_sayonara->hide();
     ui->lab_title->show();
@@ -216,11 +225,10 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
     // sometimes ignore the date
     if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
         ui->lab_album->setText(Helper::get_album_w_disc(md));
-    }
-
-    else
+    } else {
         ui->lab_album->setText(
             Helper::get_album_w_disc(md) + " (" + QString::number(md.year) + ")");
+    }
 
     ui->lab_artist->setText(md.artist);
     ui->lab_title->setText(md.title);
@@ -262,7 +270,9 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 
     ui->btn_correct->setVisible(false);
 
-    fetch_cover();
+    if (!md.albumArtURI.isEmpty()) {
+        fetch_cover(md.albumArtURI);
+    }
 
     ui->btn_bw->setEnabled(true);
     ui->btn_fw->setEnabled(true);
@@ -283,33 +293,12 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 }
 
 
-void GUI_Player::fetch_cover()
+void GUI_Player::fetch_cover(const QString& URI)
 {
-#if 0
-    QString cover_path = 
-        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-
-    if (!QFile::exists(cover_path)) {
-        if (m_metadata.album.trimmed().size() == 0 && 
-            m_metadata.artist.size() == 0) {
-            cover_path = Helper::getIconPath() + "logo.png";
-        } else if (m_metadata.album_id > -1) {
-            m_cov_lookup->fetch_cover_album(m_metadata.album_id);
-        } else {
-            Album album;
-            album.name = m_metadata.album;
-            album.artists << m_metadata.artist;
-
-
-            m_cov_lookup->fetch_cover_album(album);
-        }
-
-        cover_path = Helper::getIconPath() + "logo.png";
+    if (!m_netmanager) {
+        return;
     }
-
-    ui->albumCover->setIcon(QIcon(cover_path));
-    ui->albumCover->repaint();
-#endif
+    m_netmanager->get(QNetworkRequest(QUrl(URI)));
 }
 
 void GUI_Player::setStyle(int style)

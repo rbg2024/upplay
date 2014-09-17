@@ -1,10 +1,3 @@
-/*
- * GUI_PlayerCover.cpp
- *
- *  Created on: 07.12.2012
- *      Author: luke
- */
-
 /* Copyright (C) 2012  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -23,8 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "GUI/player/GUI_Player.h"
+
+#include <QtNetwork/QNetworkReply>
+#include <QIcon>
+#include <QImageReader>
+#include <QImage>
 
 /** COVERS **/
 void GUI_Player::coverClicked()
@@ -57,6 +54,45 @@ void GUI_Player::sl_alternate_cover_available(QString /*target_class*/,
 
     ui->albumCover->setIcon(QIcon(coverpath));
 }
+
+void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
+{
+    qDebug() << "GUI_Player::sl_cover_fetch_done";
+    if (reply->error() != QNetworkReply::NoError)
+        return;
+
+    QString smime = 
+        reply->header(QNetworkRequest::ContentTypeHeader).toString();
+
+    QByteArray imtype;
+    if (!smime.compare("image/png", Qt::CaseInsensitive)) {
+        imtype = "PNG";
+    } else     if (!smime.compare("image/jpeg", Qt::CaseInsensitive)) {
+        imtype = "JPG";
+    } else     if (!smime.compare("image/gif", Qt::CaseInsensitive)) {
+        imtype = "GIF";
+    } else {
+        qDebug() << "GUI_Player::sl_cover_fetch_done: unsupported mime type: "<<
+            smime;
+        return;
+    }
+    QImageReader reader((QIODevice*)reply, imtype);
+    reader.setAutoDetectImageFormat(false);
+
+    QImage image;
+    if (!reader.read(&image)) {
+        qDebug() << "GUI_Player::sl_vover_fetch_done: image read failed " << 
+            reader.errorString();
+        return;
+    }
+
+    QPixmap pixmap;
+    pixmap.convertFromImage(image);
+    ui->albumCover->setIcon(QIcon(pixmap));
+    ui->albumCover->repaint();
+    reply->deleteLater();
+}
+
 
 void GUI_Player::sl_no_cover_available()
 {

@@ -29,6 +29,7 @@
 #include <QWidget>
 #include <QAction>
 #include <QDebug>
+#include <QtNetwork/QNetworkAccessManager>
 
 #include "ui_GUI_Player.h"
 #include "GUI/player/GUI_TrayIcon.h"
@@ -146,6 +147,7 @@ private slots:
 
     void sl_alternate_cover_available(QString, QString);
     void sl_no_cover_available();
+    void sl_cover_fetch_done(QNetworkReply*);
 
     void notification_changed(bool active, int ms);
 
@@ -180,7 +182,7 @@ private:
     GUI_Startup_Dialog*     ui_startup_dialog;
     CoverLookup*            m_cov_lookup;
     PlayerPluginHandler*    _pph;
-
+    QNetworkAccessManager  *m_netmanager;
     GUI_Alternate_Covers*   m_alternate_covers;
 
     QString                 m_class_name;
@@ -210,7 +212,7 @@ private:
     void initGUI();
     void setupConnections();
     void total_time_changed(qint64);
-    void fetch_cover();
+    void fetch_cover(const QString&);
     QAction* createAction(QKeySequence key_sequence);
     QAction* createAction(QList<QKeySequence>& key_sequences);
 };

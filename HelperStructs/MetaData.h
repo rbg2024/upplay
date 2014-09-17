@@ -62,6 +62,7 @@ struct MetaData {
     bool is_disabled;
 
     QString didl;
+    QString albumArtURI;
 
     inline MetaData () {
         id = -1;
@@ -136,6 +137,7 @@ struct MetaData {
         list.push_back( (is_lib_selected) ? "1" : "0" );
         list.push_back( (is_disabled) ? "1" : "0");
         list.push_back(didl);
+        list.push_back(albumArtURI);
 
         return list;
     }
@@ -170,8 +172,37 @@ struct MetaData {
         md.is_lib_selected = (list[idx++] == "1");
         md.is_disabled = (list[idx++] == "1");
         md.didl = list[idx++];
-
+        md.albumArtURI = list[idx++];
         return true;
+    }
+
+    bool compare(const MetaData& other) {
+        bool same = title == other.title &&
+            artist == other.artist &&
+            album == other.album &&
+            rating == other.rating &&
+            length_ms == other.length_ms &&
+            year == other.year &&
+            filepath == other.filepath &&
+            track_num == other.track_num &&
+            bitrate == other.bitrate &&
+            id == other.id &&
+            album_id == other.album_id &&
+            artist_id == other.artist_id &&
+            filesize == other.filesize &&
+            comment == other.comment &&
+            discnumber == other.discnumber &&
+            n_discs == other.n_discs &&
+            genres == other.genres &&
+            is_extern == other.is_extern &&
+            pl_playing == other.pl_playing &&
+            pl_selected == other.pl_selected &&
+            pl_dragged == other.pl_dragged &&
+            is_lib_selected == other.is_lib_selected &&
+            is_disabled == other.is_disabled &&
+            didl == other.didl &&
+            albumArtURI == other.albumArtURI;
+        return !same;
     }
 
     bool serialize(QDataStream& strm) {
@@ -199,7 +230,8 @@ struct MetaData {
             pl_dragged << 
             is_lib_selected << 
             is_disabled << 
-            didl;
+            didl << 
+            albumArtURI;
         return true;
     }
     bool unSerialize(QDataStream& strm) {
@@ -227,7 +259,8 @@ struct MetaData {
             pl_dragged >> 
             is_lib_selected >> 
             is_disabled >> 
-            didl;
+            didl >>
+            albumArtURI;
         return strm.status() == QDataStream::Ok;
     }
 
