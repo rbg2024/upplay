@@ -89,7 +89,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui_playlist = 0;
 
-    ui_notifications = 0;//new GUI_Notifications(this);
     ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
 
     m_skinSuffix = "";
@@ -111,9 +110,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->action_viewLibrary->setChecked(show_library);
     this->showLibrary(show_library);
 
-    bool notify_new_version = m_settings->getNotifyNewVersion();
-    this->ui->action_notifyNewVersion->setChecked(notify_new_version);
-
     bool is_fullscreen = m_settings->getPlayerFullscreen();
     if (!is_fullscreen) {
         QSize size = m_settings->getPlayerSize();
@@ -134,7 +130,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     /* SIGNALS AND SLOTS */
     this->setupConnections();
-    ui->plugin_widget->resize(ui->plugin_widget->width(), 0);
     ui_info_dialog = 0;
 
     changeSkin(m_settings->getPlayerStyle() == 1);
@@ -179,19 +174,15 @@ void GUI_Player::initGUI()
 {
     ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
-    ui->btn_rec->setIcon(QIcon(Helper::getIconPath() + "rec.png"));
     ui->btn_stop->setIcon(QIcon(Helper::getIconPath() + "stop.png"));
     ui->btn_fw->setIcon(QIcon(Helper::getIconPath() + "fwd.png"));
     ui->btn_bw->setIcon(QIcon(Helper::getIconPath() + "bwd.png"));
-    ui->btn_correct->setIcon(QIcon(Helper::getIconPath() + "edit.png"));
 
     ui->action_viewLibrary->setText(tr("&Library"));
-    ui->btn_rec->setVisible(false);
 
     ui->action_Fullscreen->setShortcut(QKeySequence("F11"));
     ui->action_Dark->setShortcut(QKeySequence("F10"));
 
-    ui->btn_correct->setVisible(false);
 }
 
 
@@ -269,8 +260,6 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 
     this->setWindowTitle(QString("Upplay - ") + md.title);
 
-    ui->btn_correct->setVisible(false);
-
     if (!md.albumArtURI.isEmpty()) {
         fetch_cover(md.albumArtURI);
     } else {
@@ -281,7 +270,6 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
     ui->btn_fw->setEnabled(true);
 
     ui->btn_play->setVisible(true);
-    ui->btn_rec->setVisible(false);
     ui->btn_play->setEnabled(true);
 
     m_trayIcon->set_enable_play(true);
@@ -387,7 +375,6 @@ void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
 /** TRAY ICON END **/
 
 
-
 /** LIBRARY AND PLAYLIST **/
 
 QWidget* GUI_Player::getParentOfPlaylist()
@@ -409,50 +396,6 @@ void GUI_Player::setPlaylist(GUI_Playlist* playlist)
         QAction* action = createAction(QKeySequence(tr("Ctrl+P")));
         connect(action, SIGNAL(triggered()), ui_playlist, SLOT(setFocus()));
     }
-}
-
-
-void GUI_Player::setLibrary(GUI_Library_windowed* library)
-{
-    ui_library = library;
-#if 0
-    if (ui_library && !ui_libpath) {
-        ui_library->show();
-        ui_library->resize(ui->library_widget->size());
-        QAction* action = createAction(QKeySequence(tr("Ctrl+L")));
-        connect(action, SIGNAL(triggered()), ui_library, SLOT(setFocus()));
-    }
-
-    else if (ui_libpath) {
-        ui_library->hide();
-        ui_libpath->show();
-        ui_libpath->resize(ui->library_widget->size());
-    }
-#endif
-}
-
-void GUI_Player::setPlayerPluginHandler(PlayerPluginHandler* pph)
-{
-    _pph = pph;
-#if 0
-
-    QList<PlayerPlugin*> lst = _pph->get_all_plugins();
-    QList<QAction*> actions;
-
-    foreach(PlayerPlugin * p, lst) {
-        QAction* action = p->getAction();
-        action->setData(p->getName());
-        // action is connected in Plugin itself
-        actions << action;
-    }
-
-
-    this->ui->menuView->insertActions(this->ui->action_Dark, actions);
-    this->ui->menuView->insertSeparator(this->ui->action_Dark);
-
-    connect(_pph, SIGNAL(sig_show_plugin(PlayerPlugin*)), this, SLOT(showPlugin(PlayerPlugin*)));
-    connect(_pph, SIGNAL(sig_hide_all_plugins()), this, SLOT(hideAllPlugins()));
-#endif
 }
 
 void GUI_Player::stopped()
@@ -485,22 +428,10 @@ void GUI_Player::ui_loaded()
     obj_ref = this;
     signal(SIGWINCH, signal_handler);
 #endif
-//    if(ui_libpath)
-//        ui_libpath->resize(this->ui->library_widget->size());
 
     changeSkin(m_settings->getPlayerStyle() == 1);
     this->ui->action_Fullscreen->setChecked(m_settings->getPlayerFullscreen());
-
-//    this->ui_playlist->resize(this->ui->playlist_widget->size());
 }
-
-
-void GUI_Player::notification_changed(bool /*active*/, int /*timeout_ms*/)
-{
-//    m_trayIcon->set_timeout(timeout_ms);
-//    m_trayIcon->set_notification_active(active);
-}
-
 
 void GUI_Player::moveEvent(QMoveEvent *e)
 {
@@ -516,7 +447,6 @@ void GUI_Player::resizeEvent(QResizeEvent*e)
     m_settings->setPlayerSize(this->size());
     ui_playlist->resize(ui->playlist_widget->size());
 }
-
 
 void GUI_Player::keyPressEvent(QKeyEvent* e)
 {
@@ -540,7 +470,6 @@ void GUI_Player::keyPressEvent(QKeyEvent* e)
 
 void GUI_Player::closeEvent(QCloseEvent* e)
 {
-
     if (m_min2tray) {
         e->ignore();
         this->hide();
@@ -552,10 +481,3 @@ void GUI_Player::really_close(bool)
     m_min2tray = false;
     this->close();
 }
-
-void GUI_Player::sl_notify_new_version(bool b)
-{
-    m_settings->setNotifyNewVersion(b);
-}
-
-

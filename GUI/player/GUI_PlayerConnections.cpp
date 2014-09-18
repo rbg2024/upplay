@@ -32,8 +32,6 @@ void GUI_Player::setupConnections()
             SLOT(stopClicked()));
     connect(ui->btn_mute, SIGNAL(released()), this,
             SLOT(muteButtonPressed()));
-    connect(ui->btn_rec, SIGNAL(toggled(bool)), this,
-            SLOT(sl_rec_button_toggled(bool)));
     connect(ui->albumCover, SIGNAL(clicked()), this, SLOT(coverClicked()));
 
     // file
@@ -59,8 +57,6 @@ void GUI_Player::setupConnections()
     // preferencesF
     connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
             SLOT(min2tray_toggled(bool)));
-    connect(ui->action_only_one_instance, SIGNAL(toggled(bool)), this,
-            SLOT(only_one_instance_toggled(bool)));
 
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));

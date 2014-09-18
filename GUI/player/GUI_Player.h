@@ -36,10 +36,8 @@
 #include "HelperStructs/Helper.h"
 
 class GUI_Playlist;
-class PlayerPlugin;
 class GUI_Library_windowed;
 class GUI_InfoDialog;
-class PlayerPluginHandler;
 class GUI_LibraryPath;
 class GUI_Notifications;
 class GUI_Startup_Dialog;
@@ -54,7 +52,6 @@ public:
 
 public slots:
 
-    void covers_found(const QStringList& lst, QString call_id);
     void update_track (const MetaData & in, int pos=0, bool playing=true);
     void setCurrentPosition (quint32 pos_sec);
 
@@ -70,11 +67,6 @@ public slots:
     void setVolume(int vol);
     void setVolumeUi(int volume_percent);
 
-    /* Plugins */
-
-    void showPlugin(PlayerPlugin* plugin);
-    void hideAllPlugins();
-
     void setRendererName(const QString& nm);
 
 signals:
@@ -86,7 +78,6 @@ signals:
     void backward();
     void forward();
     void mute();
-    void sig_rec_button_toggled(bool);
     void sig_volume_changed (int);
     void search(int pos_percent);
 
@@ -113,7 +104,6 @@ private slots:
     void stopClicked(bool b = true);
     void backwardClicked(bool b = true);
     void forwardClicked(bool b = true);
-    void sl_rec_button_toggled(bool b);
     void coverClicked();
     void setProgressJump(int percent);
     void jump_forward();
@@ -140,26 +130,17 @@ private slots:
     void load_pl_on_startup_toggled(bool);
     void min2tray_toggled(bool);
     void only_one_instance_toggled(bool);
-    void sl_notify_new_version(bool);
 
     void about(bool b=false);
     void help(bool b=false);
 
-    void sl_alternate_cover_available(QString, QString);
     void sl_no_cover_available();
     void sl_cover_fetch_done(QNetworkReply*);
 
-    void notification_changed(bool active, int ms);
-
 public:
     void setPlaylist(GUI_Playlist* playlist);
-    void setLibrary(GUI_Library_windowed* library);
-    void setInfoDialog(GUI_InfoDialog* info_dialog);
-    void setPlayerPluginHandler(PlayerPluginHandler* pph);
-
     QWidget* getParentOfPlaylist();
     QWidget* getParentOfLibrary();
-    QWidget* getParentOfPlugin();
 
     void ui_loaded();
     void setStyle(int);
@@ -181,7 +162,6 @@ private:
     GUI_Notifications*      ui_notifications;
     GUI_Startup_Dialog*     ui_startup_dialog;
     CoverLookup*            m_cov_lookup;
-    PlayerPluginHandler*    _pph;
     QNetworkAccessManager  *m_netmanager;
     GUI_Alternate_Covers*   m_alternate_covers;
 

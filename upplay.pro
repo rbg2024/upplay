@@ -50,7 +50,6 @@ SOURCES += \
         GUI/player/GUI_PlayerControls.cpp \
         GUI/player/GUI_PlayerCover.cpp \
         GUI/player/GUI_PlayerMenubar.cpp \
-        GUI/player/GUI_PlayerPlugins.cpp \
         GUI/player/GUI_TrayIcon.cpp \
         GUI/player/SearchSlider.cpp \
         GUI/playlist/GUI_Playlist.cpp \

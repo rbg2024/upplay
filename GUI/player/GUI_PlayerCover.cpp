@@ -23,7 +23,6 @@
 #include <QImageReader>
 #include <QImage>
 
-/** COVERS **/
 void GUI_Player::coverClicked()
 {
     QString searchstring;
@@ -43,23 +42,13 @@ void GUI_Player::coverClicked()
     this->setFocus();
 }
 
-void GUI_Player::sl_alternate_cover_available(QString /*target_class*/,
-                                              QString coverpath)
-{
-    QString own_coverpath = 
-        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-    if (coverpath != own_coverpath) {
-        return;
-    }
-
-    ui->albumCover->setIcon(QIcon(coverpath));
-}
-
 void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 {
     qDebug() << "GUI_Player::sl_cover_fetch_done";
-    if (reply->error() != QNetworkReply::NoError)
+    if (reply->error() != QNetworkReply::NoError) {
+        sl_no_cover_available();
         return;
+    }
 
     QString smime = 
         reply->header(QNetworkRequest::ContentTypeHeader).toString();
@@ -74,6 +63,7 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     } else {
         qDebug() << "GUI_Player::sl_cover_fetch_done: unsupported mime type: "<<
             smime;
+        sl_no_cover_available();
         return;
     }
     QImageReader reader((QIODevice*)reply, imtype);
@@ -83,6 +73,7 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     if (!reader.read(&image)) {
         qDebug() << "GUI_Player::sl_vover_fetch_done: image read failed " << 
             reader.errorString();
+        sl_no_cover_available();
         return;
     }
 
@@ -99,23 +90,3 @@ void GUI_Player::sl_no_cover_available()
     QString coverpath = Helper::getIconPath() + "logo.png";
     ui->albumCover->setIcon(QIcon(coverpath));
 }
-
-// public slot
-// cover was found by CoverLookup
-void GUI_Player::covers_found(const QStringList& cover_paths, QString call_id)
-{
-    Q_UNUSED(cover_paths);
-    Q_UNUSED(call_id);
-    QString cover_path = Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-
-    /*if(!cover_paths.contains(cover_path)) return;*/
-    if (!QFile::exists(cover_path)) {
-        return;
-    }
-
-    ui->albumCover->setIcon(QIcon(cover_path));
-    ui->albumCover->repaint();
-}
-
-/** COVER END **/
-

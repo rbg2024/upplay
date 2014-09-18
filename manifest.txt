@@ -77,7 +77,6 @@ GUI/player/GUI_PlayerConnections.cpp
 GUI/player/GUI_PlayerControls.cpp
 GUI/player/GUI_PlayerCover.cpp
 GUI/player/GUI_PlayerMenubar.cpp
-GUI/player/GUI_PlayerPlugins.cpp
 GUI/player/GUI_TrayIcon.cpp
 GUI/player/GUI_TrayIcon.h
 GUI/player/SearchSlider.cpp

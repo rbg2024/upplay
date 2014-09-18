@@ -70,11 +70,6 @@ void GUI_Player::stopClicked(bool b)
 
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
-    if (ui->btn_rec->isVisible() && ui->btn_rec->isChecked()) {
-        ui->btn_rec->setChecked(false);
-        emit sig_rec_button_toggled(false);
-    }
-
     if (b) {
         emit stop();
     }
@@ -98,11 +93,6 @@ void GUI_Player::forwardClicked(bool)
     emit forward();
 }
 
-void GUI_Player::sl_rec_button_toggled(bool b)
-{
-
-    emit sig_rec_button_toggled(b);
-}
 
 /** PROGRESS BAR **/
 
