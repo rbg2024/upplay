@@ -3,7 +3,10 @@ LANGUAGE        = C++
 
 QT += webkit network
 
-QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"0.1.0\\\"
+# VERSION is ^egrepped and must stay in the first column
+VERSION = 0.1.0
+
+QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"$$VERSION\\\"
 
 CONFIG  += qt warn_on thread release debug
 
@@ -85,11 +88,12 @@ unix {
   message("Prefix is $$PREFIX")
   DEFINES += PREFIX=\\\"$$PREFIX\\\"
 
-
+ # Installation stuff
   target.path = "$$PREFIX/bin"
 
   data.files = dirbrowser/cdbrowser.css
   data.path = $$PREFIX/share/upplay/cdbrowser
-
-  INSTALLS += target data
+  desktop.files += upplay.desktop
+  desktop.path = /usr/share/applications/
+  INSTALLS += target data desktop
 }

@@ -1,0 +1,7 @@
+.moc
+.ui
+.obj
+.git
+.gitignore
+core
+manifest.txt
