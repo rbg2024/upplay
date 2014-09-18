@@ -1,5 +1,5 @@
 Source: upplay
-Section: audio
+Section: sound
 Priority: optional
 Maintainer: Jean-Francois Dockes <jf@dockes.org>
 Build-Depends: debhelper (>=9.0.0), libqt4-dev, libupnp6-dev,
