@@ -257,7 +257,6 @@ void Application::renderer_connections()
                 player, setCurrentPosition(quint32));
         CONNECT(ohplo, audioStateChanged(int, const char *), playlist, 
                 psl_new_transport_state(int, const char *));
-        CONNECT(ohplo, insertDone(), cdb, onInsertDone());
 
     } else {
         PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);
@@ -290,6 +289,7 @@ void Application::renderer_connections()
     }
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
+    CONNECT(playlist, insertDone(), cdb, onInsertDone());
 }
 
 // Establish the connections we can do without a renderer, and call

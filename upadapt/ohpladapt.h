@@ -89,7 +89,6 @@ public slots:
                 idx = int(m_idsv.size()-1);
             } else {
                 m_ininsert = false;
-                emit insertDone();
                 return;
             }
         }
@@ -112,7 +111,6 @@ public slots:
         sync();
         asyncArrayUpdates(true);
         m_ininsert = false;
-        emit insertDone();
     }
 
     void removeTracks(const QList<int>& lidx, bool) {
@@ -216,7 +214,6 @@ signals:
     void audioStateChanged(int as, const char *);
     void metadataArrayChanged(const MetaDataList& mdv);
     void playlistModeChanged(Playlist_Mode);
-    void insertDone();
 
 private:
     int m_id; // Current playing track

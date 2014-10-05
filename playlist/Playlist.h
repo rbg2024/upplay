@@ -65,6 +65,9 @@ signals:
     void sig_paused();
     void sig_playing();
 
+    // Done inserting tracks in the playlist
+    void insertDone();
+
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
     virtual void psl_add_tracks(PlaylistAddMode, bool, const MetaDataList&);

@@ -447,11 +447,13 @@ void CDBrowser::recursiveAdd(QAction *act)
 
     if (!m_ms) {
         qDebug() << "CDBrowser::browseContainer: server not set" ;
+        m_insertactive = false;
         return;
     }
     CDSH cds = m_ms->cds();
     if (!cds) {
         qDebug() << "Cant reach content directory service";
+        m_insertactive = false;
         return;
     }
 

@@ -114,6 +114,7 @@ void Playlist::psl_add_tracks(PlaylistAddMode mode, bool,
         psl_insert_tracks(v_md, m_meta.size() - 1);
         break;
     }
+    emit insertDone();
 }
 
 void Playlist::psl_selection_min_row(int row)
