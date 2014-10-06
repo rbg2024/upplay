@@ -1,3 +1,9 @@
+upplay (0.1.1-1) unstable; urgency=low
+
+  * Fixed disappearing popup menu (happened with non-openhome renderers).
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 05 Oct 2014 18:50:02 +0100
+
 upplay (0.1.0-1) unstable; urgency=low
 
   * Initial release
