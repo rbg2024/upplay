@@ -136,7 +136,7 @@ public slots:
     {
         qDebug() << "AVT: seekPC " << pc << " %" << " m_cursecs " << m_cursecs;
         if (m_cursecs > 0) {
-            m_srv->seek(UPnPClient::AVTransport::SEEK_ABS_TIME, 
+            m_srv->seek(UPnPClient::AVTransport::SEEK_REL_TIME, 
                         (float(pc)/100.0) * m_cursecs); 
         }
     }
