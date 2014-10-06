@@ -189,8 +189,8 @@ Application::Application(QApplication* qapp, int,
         QTimer::singleShot(0, this, SLOT(chooseRenderer()));
     } else {
         if (!setupRenderer(uid)) {
-            cerr << "Can't connect to media renderer" << endl;
-            exit(1);
+            cerr << "Can't connect to previous media renderer" << endl;
+            QTimer::singleShot(0, this, SLOT(chooseRenderer()));
         }
     }
 
