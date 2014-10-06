@@ -42,7 +42,8 @@ public:
         : QObject(parent), m_srv(avt), m_timer(0), 
           m_cursecs(-1),
           m_sent_end_of_track_sig(false),
-          m_in_ending(false)
+          m_in_ending(false),
+          m_tpstate(AVTransport::Unknown)
     {
         m_srv->installReporter(this);
         m_timer = new QTimer(this);
@@ -54,6 +55,9 @@ public:
     virtual void changed(const char *nm, int value)
     {
         if (!strcmp(nm, "CurrentTrackDuration")) {
+            // This is normally part of LastChange? but some renderers
+            // apparently don't send it (bubble?). So use the value
+            // from GetPositionInfo
             //qDebug() << "AVT: Changed: " << nm << " (int): " << value;
             m_cursecs = value;
         } else if (!strcmp(nm, "TransportState")) {
@@ -87,7 +91,6 @@ public:
     {
         //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
         if (!strcmp(nm, "AVTransportURI")) {
-            //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
             if (m_cururi.compare(value)) {
                 setcururi(value);
                 qDebug() << "AVT: ext track change: " << value;
@@ -144,9 +147,12 @@ public slots:
     // Called by timer every sec
     virtual void update() {
         UPnPClient::AVTransport::PositionInfo info;
-        if (m_srv->getPositionInfo(info) == 0) {
-            emit secsInSongChanged(info.reltime);
+        int error;
+        if ((error = m_srv->getPositionInfo(info)) != 0) {
+            qDebug() << "getPositionInfo failed with error " << error;
+            return;
         }
+        emit secsInSongChanged(info.reltime);
         m_cursecs = info.trackduration;
         if (m_cursecs > 0) {
             if (info.reltime > m_cursecs - 10) {
@@ -163,6 +169,20 @@ public slots:
                     emit newTrackPlaying(QString::fromUtf8(info.trackuri.c_str()));
                 }
             }
+        }
+        UPnPClient::AVTransport::TransportInfo tinfo;
+        if ((error = m_srv->getTransportInfo(tinfo)) != 0) {
+            qDebug() << "getTransportInfo failed with error " << error;
+            return;
+        }
+        if (tinfo.tpstate != m_tpstate) {
+            emit tpStateChanged(tinfo.tpstate);
+            m_tpstate = tinfo.tpstate;
+        }
+        if (tinfo.tpstate == UPnPClient::AVTransport::Stopped && m_in_ending) {
+            m_in_ending = false;
+            // qDebug() << "AVT: stoppedAtEOT";
+            emit stoppedAtEOT();
         }
     }
 
@@ -182,6 +202,7 @@ private:
     bool m_sent_end_of_track_sig;
     bool m_in_ending;
     std::string m_cururi;
+    AVTransport::TransportState m_tpstate;
 
     void setcururi(const std::string& uri) {
         qDebug() << "setcururi: " << uri.c_str();
