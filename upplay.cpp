@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include <string>
 #include <iostream>
@@ -89,6 +90,11 @@ int main(int argc, char **argv)
     if (Logger::getTheLog("stderr") == 0) {
         cerr << "Can't initialize log" << endl;
         return 1;
+    }
+
+    const char *cp;
+    if ((cp = getenv("UPPLAY_LOGLEVEL"))) {
+        Logger::getTheLog("")->setLogLevel(Logger::LogLevel(atoi(cp)));
     }
 
     LibUPnP *mylib = LibUPnP::getLibUPnP();
