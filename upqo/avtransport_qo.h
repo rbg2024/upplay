@@ -134,7 +134,7 @@ public slots:
     // Seek to point. Parameter in percent.
     virtual void seekPC(int pc) 
     {
-        qDebug() << "AVT: seekPC " << pc << " %";
+        qDebug() << "AVT: seekPC " << pc << " %" << " m_cursecs " << m_cursecs;
         if (m_cursecs > 0) {
             m_srv->seek(UPnPClient::AVTransport::SEEK_ABS_TIME, 
                         (float(pc)/100.0) * m_cursecs); 
@@ -147,6 +147,7 @@ public slots:
         if (m_srv->getPositionInfo(info) == 0) {
             emit secsInSongChanged(info.reltime);
         }
+        m_cursecs = info.trackduration;
         if (m_cursecs > 0) {
             if (info.reltime > m_cursecs - 10) {
                 if (!m_sent_end_of_track_sig) {
