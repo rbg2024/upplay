@@ -290,6 +290,8 @@ void Application::renderer_connections()
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
     CONNECT(playlist, insertDone(), cdb, onInsertDone());
+    // Set up the initial volume from the renderer value
+    player->setVolumeUi(rdco->volume());
 }
 
 // Establish the connections we can do without a renderer, and call
