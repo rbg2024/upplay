@@ -1,3 +1,12 @@
+upplay (0.1.2-1) unstable; urgency=low
+
+  * Improve geometries and resizing behaviour, add horizontal splitter.
+  * Tweaked the avtransport interface to work with more renderers: tested
+    with XBMC and Bubble UPnP.
+  * Open renderer choice dialog when previous renderer not available
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Tue, 07 Oct 2014 15:00:02 +0100
+
 upplay (0.1.1-1) unstable; urgency=low
 
   * Fixed disappearing popup menu (happened with non-openhome renderers).
