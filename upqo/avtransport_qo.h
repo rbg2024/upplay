@@ -87,24 +87,27 @@ public:
     // detection (there is infortunately no sequential "tracks played"
     // counter in UPnP). If the time goes back more than a few seconds
     // without a command from us, then we have a track change.
-    virtual void changed(const char *nm, const char *value)
-    {
+    virtual void changed(const char *nm, const char *value) {
         //qDebug() << "AVT: Changed: " << nm << " (char*): " << value;
         if (!strcmp(nm, "AVTransportURI")) {
             if (m_cururi.compare(value)) {
+                //qDebug() << "AVT: ext track change: cur [" << m_cururi.c_str()
+                //         << "] new [" << value << "]";
                 setcururi(value);
-                qDebug() << "AVT: ext track change: " << value;
                 emit newTrackPlaying(QString::fromUtf8(value));
             }
         }
     }
 
-    virtual void changed(const char *nm, UPnPClient::UPnPDirObject meta)
-    {
+    virtual void changed(const char *nm, UPnPClient::UPnPDirObject meta) {
         if (!strcmp(nm, "AVTransportURIMetaData")) {
-            qDebug() << "AVT: Changed: " << nm << " (dirc): ";
-            // meta.dump().c_str();
-            emit currentMetadata(meta);
+            //qDebug() << "AVT: Changed: " << nm << " (dirc): " << 
+            //    meta.dump().c_str();
+            // Don't use this if no resources are set. XBMC does this
+            // for some reason.
+            if (!meta.m_resources.empty()) {
+                emit currentMetadata(meta);
+            }
         }
     }
 
@@ -121,22 +124,21 @@ public slots:
         m_srv->pause();
     }
 
-    virtual void changeTrack(const std::string& uri, const AVTMetadata* md)
-    {
+    virtual void changeTrack(const std::string& uri, const AVTMetadata* md) {
         qDebug() << "AVT:changeTrack: " << uri.c_str();
         m_srv->setAVTransportURI(uri, md->getDidl());
-        setcururi(uri);
+        // Don't do this: wait for the renderer data, else we risk
+        // flickering if an event reports the old track.
+        // setcururi(uri);
     }
 
-    virtual void prepareNextTrack(const std::string& uri, const AVTMetadata* md)
-    {
+    virtual void prepareNextTrack(const std::string& uri,const AVTMetadata* md){
         qDebug() << "AVT:prepareNextTrack: " << uri.c_str();
         m_srv->setNextAVTransportURI(uri, md->getDidl());
     }
 
     // Seek to point. Parameter in percent.
-    virtual void seekPC(int pc) 
-    {
+    virtual void seekPC(int pc) {
         qDebug() << "AVT: seekPC " << pc << " %" << " m_cursecs " << m_cursecs;
         if (m_cursecs > 0) {
             m_srv->seek(UPnPClient::AVTransport::SEEK_REL_TIME, 
@@ -152,8 +154,20 @@ public slots:
             qDebug() << "getPositionInfo failed with error " << error;
             return;
         }
+        //qDebug() << "AVT: update: posinfo: reltime " << info.reltime << 
+        //    " tdur " << info.trackduration << " meta " << 
+        //    info.trackmeta.dump().c_str();
         emit secsInSongChanged(info.reltime);
         m_cursecs = info.trackduration;
+        if (m_cururi.compare(info.trackuri)) {
+            if (m_cururi.compare(info.trackuri)) {
+                qDebug() << "AVT: update: ext track change: cur [" << 
+                    m_cururi.c_str() << "] new [" <<                     
+                    info.trackuri.c_str() << "]";
+                setcururi(info.trackuri);
+                emit newTrackPlaying(u8s2qs(info.trackuri));
+            }
+        }
         if (m_cursecs > 0) {
             if (info.reltime > m_cursecs - 10) {
                 if (!m_sent_end_of_track_sig) {
@@ -163,10 +177,13 @@ public slots:
                 }
                 m_in_ending = true;
             } else if (info.reltime > 0 && info.reltime < 5) {
+                // This is for the case where we are playing 2
+                // consecutive identical URIs: heuristic try to detect
+                // the change
                 if (m_in_ending == true) {
                     qDebug() << "Was in end, seeing start: trackswitch";
                     setcururi(info.trackuri);
-                    emit newTrackPlaying(QString::fromUtf8(info.trackuri.c_str()));
+                    emit newTrackPlaying(u8s2qs(info.trackuri));
                 }
             }
         }
@@ -209,6 +226,9 @@ private:
         m_cururi = uri;
         m_sent_end_of_track_sig = false;
         m_in_ending = false;
+    }
+    QString u8s2qs(const std::string us) {
+        return QString::fromUtf8(us.c_str());
     }
 
 };
