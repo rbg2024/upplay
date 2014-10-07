@@ -91,7 +91,6 @@ int main(int argc, char **argv)
         cerr << "Can't initialize log" << endl;
         return 1;
     }
-
     const char *cp;
     if ((cp = getenv("UPPLAY_LOGLEVEL"))) {
         Logger::getTheLog("")->setLogLevel(Logger::LogLevel(atoi(cp)));
@@ -107,7 +106,20 @@ int main(int argc, char **argv)
             mylib->errAsString("main", mylib->getInitError()) << endl;
         return 1;
     }
-    //mylib->setLogFileName("/tmp/libupnp.log");
+    if ((cp = getenv("UPPLAY_UPNPLOGFILENAME"))) {
+        char *cp1 = getenv("UPPLAY_UPNPLOGLEVEL");
+        int loglevel = LibUPnP::LogLevelNone;
+        if (cp1) {
+            loglevel = atoi(cp1);
+        }
+        loglevel = loglevel < 0 ? 0: loglevel;
+        loglevel = loglevel > int(LibUPnP::LogLevelDebug) ? 
+            int(LibUPnP::LogLevelDebug) : loglevel;
+
+        if (loglevel != LibUPnP::LogLevelNone) {
+            mylib->setLogFileName(cp, LibUPnP::LogLevel(loglevel));
+        }
+    }
 
     QFont font("DejaVu Sans", 9, 55,  false);
     font.setHintingPreference(QFont::PreferNoHinting);
