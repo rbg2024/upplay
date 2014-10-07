@@ -178,6 +178,7 @@ Application::Application(QApplication* qapp, int,
     playlist = new PlaylistAVT();
 
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
+    player->setPlaylistWidget(ui_playlist);
 
     cdb = new CDBrowser(player->getParentOfLibrary());
     player->setLibraryWidget(cdb);

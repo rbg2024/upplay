@@ -379,19 +379,38 @@ void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
 
 QWidget* GUI_Player::getParentOfPlaylist()
 {
-    return ui->playlist_widget;
+    return ui->playlist_widget ? ui->playlist_widget->parentWidget() : 
+        this->centralWidget();
 }
 
 QWidget* GUI_Player::getParentOfLibrary()
 {
-    return this->centralWidget();
+    return ui->library_widget ? ui->library_widget->parentWidget() : 
+        this->centralWidget();
+}
+
+void GUI_Player::setPlaylistWidget(QWidget* w)
+{
+    delete ui->playlist_widget;
+    ui->playlist_widget = w;
+    ui->verticalLayout->addWidget(ui->playlist_widget);
 }
 
 void GUI_Player::setLibraryWidget(QWidget* w)
 {
+    if (ui->library_widget) {
+        w->setSizePolicy(ui->library_widget->sizePolicy());
+    } else {
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(2);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(w->sizePolicy().hasHeightForWidth());
+        w->setSizePolicy(sizePolicy);
+    }
+
     delete ui->library_widget;
     ui->library_widget = w;
-    ui->horizontalLayout->addWidget(w);
+    ui->splitter->addWidget(w);
 }
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
