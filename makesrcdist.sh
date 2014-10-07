@@ -95,7 +95,7 @@ fi
 make distclean
 yes | clean.O
 rm -f lib/*.dep
-# Possibly clean up the cmake stuff
+rm -f upplay qrc_upplay.cpp
 
 $TAR chfX - excludefile .  | (cd $topdir;$TAR xf -)
 if test $snap = "yes" ; then
