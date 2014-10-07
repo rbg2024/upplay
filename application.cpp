@@ -180,7 +180,8 @@ Application::Application(QApplication* qapp, int,
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
 
     cdb = new CDBrowser(player->getParentOfLibrary());
-    
+    player->setLibraryWidget(cdb);
+
     rdco = 0;
     avto = 0;
 

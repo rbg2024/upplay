@@ -384,7 +384,14 @@ QWidget* GUI_Player::getParentOfPlaylist()
 
 QWidget* GUI_Player::getParentOfLibrary()
 {
-    return ui->library_widget;
+    return this->centralWidget();
+}
+
+void GUI_Player::setLibraryWidget(QWidget* w)
+{
+    delete ui->library_widget;
+    ui->library_widget = w;
+    ui->horizontalLayout->addWidget(w);
 }
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)

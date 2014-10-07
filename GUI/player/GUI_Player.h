@@ -141,6 +141,7 @@ public:
     void setPlaylist(GUI_Playlist* playlist);
     QWidget* getParentOfPlaylist();
     QWidget* getParentOfLibrary();
+    void setLibraryWidget(QWidget* );
 
     void ui_loaded();
     void setStyle(int);
