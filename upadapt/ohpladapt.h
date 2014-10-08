@@ -129,11 +129,14 @@ public slots:
         int counter = 0;
         for (std::vector<int>::const_iterator it = ids.begin(); 
              it != ids.end(); it++) {
-            if (counter++ > 10) {
+            if (counter++ > 50) {
                 qApp->processEvents();
                 counter = 0;
             }
-            deleteId(*it);
+            if (!deleteId(*it)) {
+                qDebug() << "OHPlayer::removeTracks: retrying delete " << *it;
+                deleteId(*it);
+            }
         }
     }
 
