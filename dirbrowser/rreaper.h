@@ -51,14 +51,16 @@ class RecursiveReaper : public QThread {
         m_slices.push_back(new UPnPClient::UPnPDirContent());
 	m_status = UPNP_E_SUCCESS;
         while (!m_ctobjids.empty()) {
-            if (!scanContainer(*m_ctobjids.begin()))
-                break;
+            // We don't stop on a container scan error, minimserver for one 
+            // sometimes has dialog hiccups with libupnp, this is not fatal.
+            scanContainer(*m_ctobjids.begin());
         }
         if (!m_slices.empty() && !m_slices.back()->m_items.empty()) {
             emit sliceAvailable(&*m_slices.back());
         }
 
         emit done(m_status);
+        qDebug() << "RecursiveReaper::done";
     }
 
 signals:
@@ -102,6 +104,8 @@ private:
                     qDebug() << "scanContainer: loop detected";
                     continue;
                 }
+                //qDebug()<< "scanContainer: pushing objid " << it->m_id.c_str()
+                // << " title " << it->m_title.c_str();
                 m_allctobjids.insert(it->m_id);
                 m_ctobjids.insert(it->m_id);
             }

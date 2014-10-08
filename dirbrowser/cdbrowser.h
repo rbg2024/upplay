@@ -20,6 +20,7 @@
 
 #include <vector>
 #include <iostream>
+#include <unordered_set>
 
 #include <QtWebKit/QWebView>
 #include <QVariant>
@@ -87,6 +88,8 @@ class CDBrowser : public QWebView
 
     // Content of recursive explore
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
+    // Store of seen urls hashes for deduplication while walking the tree
+    std::unordered_set<std::string> m_recwalkdedup;
     bool m_insertactive;
 
     // Objid and index in entreis for the last popup menu click

@@ -31,6 +31,7 @@ using namespace std;
 
 #include "upqo/cdirectory_qo.h"
 #include "upadapt/upputils.h"
+#include "upadapt/md5.hxx"
 #include "cdbrowser.h"
 #include "rreaper.h"
 
@@ -296,16 +297,16 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
 {
     QString html;
 
-    qDebug() << "CDBrowser::onSliceAvailable";
+    // qDebug() << "CDBrowser::onSliceAvailable";
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
     for (auto& entry: dc->m_containers) {
-//        qDebug() << "Container: " << entry.dump().c_str();;
+        // qDebug() << "Container: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += CTToHtml(m_entries.size()-1, entry);
     }
     for (auto& entry: dc->m_items) {
-//        qDebug() << "Item: " << entry.dump().c_str();;
+        // qDebug() << "Item: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += ItemToHtml(m_entries.size()-1, entry);
     }
@@ -425,7 +426,7 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
 
 void CDBrowser::simpleAdd(QAction *act)
 {
-    qDebug() << "CDBrowser::simpleAdd";
+    //qDebug() << "CDBrowser::simpleAdd";
     m_popupmode = act->data().toInt();
 
     if (m_popupidx < 0 || m_popupidx > int(m_entries.size())) {
@@ -441,7 +442,7 @@ void CDBrowser::simpleAdd(QAction *act)
 
 void CDBrowser::recursiveAdd(QAction *act)
 {
-    qDebug() << "CDBrowser::recursiveAdd";
+    //qDebug() << "CDBrowser::recursiveAdd";
     m_insertactive = true;
     m_popupmode = act->data().toInt();
 
@@ -463,6 +464,7 @@ void CDBrowser::recursiveAdd(QAction *act)
     }
     
     m_recwalkentries.clear();
+    m_recwalkdedup.clear();
     m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
     connect(m_reaper, 
             SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
@@ -474,10 +476,23 @@ void CDBrowser::recursiveAdd(QAction *act)
 
 void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
 {
-    qDebug() << "CDBrowser::onReaperSliceAvailable: got " << 
-        dc->m_items.size() << " items";
+    LOGDEB1("CDBrowser::onReaperSliceAvailable: got " << 
+            dc->m_items.size() << " items" << endl);
     for (unsigned int i = 0; i < dc->m_items.size(); i++) {
-        m_recwalkentries.push_back(dc->m_items[i]);
+        if (dc->m_items[i].m_resources.empty()) {
+            LOGDEB("CDBrowser::onReaperSlice: entry has no resources??"<< endl);
+            continue;
+        }
+        //LOGDEB1("CDBrowser::onReaperSlice: uri: " << 
+        //       dc->m_items[i].m_resources[0].m_uri << endl);
+        string md5;
+        MD5String(dc->m_items[i].m_resources[0].m_uri, md5);
+        auto res = m_recwalkdedup.insert(md5);
+        if (res.second) {
+            m_recwalkentries.push_back(dc->m_items[i]);
+        } else {
+            LOGDEB("CDBrowser::onReaperSlice: dup found" << endl);
+        }
     }
 }
 
@@ -485,7 +500,7 @@ void CDBrowser::rreaperDone(int status)
 {
     if (!m_reaper)
         return;
-    qDebug() << "CDBrowser::rreaperDone: status: " << status;
+    LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
     m_reaper->wait();
     delete m_reaper;
     m_reaper = 0;
