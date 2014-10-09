@@ -19,7 +19,8 @@
 #define _RREAPER_H_INCLUDED_
 
 #include <string>
-#include <vector>
+#include <list>
+#include <queue>
 #include <iostream>
 #include <unordered_set>
 
@@ -38,7 +39,7 @@ class RecursiveReaper : public QThread {
                        QObject *parent = 0)
         : QThread(parent), m_serv(server)
     {
-        m_ctobjids.insert(objid);
+        m_ctobjids.push(objid);
         m_allctobjids.insert(objid);
     }
 
@@ -53,7 +54,8 @@ class RecursiveReaper : public QThread {
         while (!m_ctobjids.empty()) {
             // We don't stop on a container scan error, minimserver for one 
             // sometimes has dialog hiccups with libupnp, this is not fatal.
-            scanContainer(*m_ctobjids.begin());
+            scanContainer(m_ctobjids.front());
+            m_ctobjids.pop();
         }
         if (!m_slices.empty() && !m_slices.back()->m_items.empty()) {
             emit sliceAvailable(&*m_slices.back());
@@ -72,12 +74,6 @@ private:
     virtual bool scanContainer(const std::string& objid) {
         //qDebug() << "RecursiveReaper::scanCT: objid:" << objid.c_str();
 
-        std::unordered_set<std::string>::iterator thisct = 
-            m_ctobjids.find(objid);
-        if (thisct == m_ctobjids.end()) {
-            qDebug() << "RecursiveReaper::scanCT: dir not found in set";
-        }
-
         int offset = 0;
         int toread = 20; // read small count the first time
         int total = 1000;// Updated on first read.
@@ -92,7 +88,6 @@ private:
             m_status = m_serv->readDirSlice(objid, offset, toread,
                                             slice,  &count, &total);
             if (m_status != UPNP_E_SUCCESS) {
-                m_ctobjids.erase(thisct);
                 return false;
             }
             offset += count;
@@ -100,6 +95,14 @@ private:
             // Put containers aside for later exploration
             for (auto it = slice.m_containers.begin() + lastctidx;
                  it != slice.m_containers.end(); it++) {
+                if (it->m_title.empty())
+                    continue;
+                if (m_serv->getKind() == 
+                    UPnPClient::ContentDirectory::CDSKIND_MINIM &&
+                    it->m_title.size() >= 2 && it->m_title[0] == '>' && 
+                    it->m_title[1] == '>') {
+                    continue;
+                }
                 if (m_allctobjids.find(it->m_id) != m_allctobjids.end()) {
                     qDebug() << "scanContainer: loop detected";
                     continue;
@@ -107,7 +110,7 @@ private:
                 //qDebug()<< "scanContainer: pushing objid " << it->m_id.c_str()
                 // << " title " << it->m_title.c_str();
                 m_allctobjids.insert(it->m_id);
-                m_ctobjids.insert(it->m_id);
+                m_ctobjids.push(it->m_id);
             }
             slice.m_containers.clear();
 
@@ -121,12 +124,11 @@ private:
             toread = m_serv->goodSliceSize();
         }
         
-        m_ctobjids.erase(thisct);
         return true;
     }
 
     UPnPClient::CDSH m_serv;
-    std::unordered_set<std::string> m_ctobjids;
+    std::queue<std::string> m_ctobjids;
     std::unordered_set<std::string> m_allctobjids;
     int m_status;
 
