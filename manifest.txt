@@ -140,6 +140,8 @@ playlist/PlaylistOH.cpp
 playlist/PlaylistOH.h
 upadapt/
 upadapt/avtadapt.h
+upadapt/md5.cxx
+upadapt/md5.hxx
 upadapt/ohpladapt.h
 upadapt/upputils.cpp
 upadapt/upputils.h
