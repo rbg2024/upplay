@@ -406,6 +406,16 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     act->setData(v);
     popup->addAction(act);
 
+    act = new QAction(tr("Replace and Play"), this);
+    v = QVariant(int(PADM_REPLACE_AND_PLAY));
+    act->setData(v);
+    popup->addAction(act);
+
+    act = new QAction(tr("Replace"), this);
+    v = QVariant(int(PADM_REPLACE));
+    act->setData(v);
+    popup->addAction(act);
+
     if (!otype.compare("container")) {
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
                        SLOT(recursiveAdd(QAction *)));

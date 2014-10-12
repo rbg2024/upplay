@@ -117,6 +117,15 @@ void Playlist::psl_add_tracks(PlaylistAddMode mode, bool,
     case PADM_PLAYNEXT:
         psl_insert_tracks(v_md, m_play_idx);
         break;
+    case PADM_REPLACE_AND_PLAY:
+        psl_clear_playlist();
+        psl_insert_tracks(v_md, -1);
+        psl_play();
+        break;
+    case PADM_REPLACE:
+        psl_clear_playlist();
+        psl_insert_tracks(v_md, -1);
+        break;
     case PADM_PLAYLATER:
     default:
         psl_insert_tracks(v_md, m_meta.size() - 1);

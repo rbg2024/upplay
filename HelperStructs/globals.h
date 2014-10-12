@@ -35,6 +35,8 @@ enum PlaylistAddMode {
     PADM_PLAYNOW = 1, 
     PADM_PLAYNEXT = 2,
     PADM_PLAYLATER = 3,
+    PADM_REPLACE_AND_PLAY = 4,
+    PADM_REPLACE = 5
 };
 
 #define DARK_BLUE(x) QString("<font color=#0000FF>") + x + QString("</font>")
