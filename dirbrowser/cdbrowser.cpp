@@ -69,8 +69,7 @@ CDBrowser::~CDBrowser()
     delete m_reader;
 }
 
-void CDBrowser::appendHtml(const QString& elt_id, 
-                           const QString& html)
+void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 {
     //LOGDEB("CDBrowser::appendHtml: " << qs2utf8s(html) << endl);
     
@@ -211,7 +210,7 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
 
     setHtml(init_container_page);
     appendHtml(QString(), htmlpath);
-    appendHtml(QString(), "<div id=\"entrylist\"></div>");
+    appendHtml(QString(), "<table id=\"entrylist\"></table>");
 
     if (m_reader) {
         delete m_reader;
@@ -219,7 +218,7 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
     }
     m_reader = new ContentDirectoryQO(cds, ctid, this);
 
-    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
+    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
     connect(m_reader, SIGNAL(done(int)), this, SLOT(onDone(int)));
     m_reader->start();
@@ -237,11 +236,11 @@ void CDBrowser::onDone(int)
 static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
-    out += QString("<div class=\"container\" objid=\"%1\" objidx=\"%2\">").
+    out += QString("<tr class=\"container\" objid=\"%1\" objidx=\"%2\"><td></td><td>").
         arg(e.m_id.c_str());
     out += QString("<a class=\"ct_title\" href=\"C%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
-    out += QString("</a></div>");
+    out += QString("</a></td></tr>");
     return out;
 }
 
@@ -250,30 +249,29 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
     QString out;
     string val;
 
-    out += QString("<div class=\"item\" objid=\"%1\" objidx=\"%2\">").
+    out = QString("<tr class=\"item\" objid=\"%1\" objidx=\"%2\">").
         arg(e.m_id.c_str()).arg(idx);
 
     e.getprop("upnp:originalTrackNumber", val);
-    out += QString("<span class=\"tracknum\">") + 
-        val.c_str() + "</span>";
+    out += QString("<td class=\"tk_tracknum\">") + val.c_str() + "</td>";
 
-    out += "<span class=\"tk_title\">";
+    out += "<td class=\"tk_title\">";
     out += QString("<a href=\"I%1\">").arg(idx);
     out += QString::fromUtf8(e.m_title.c_str());
     out += "</a>";
-    out += "</span>";
+    out += "</td>";
 
     val.clear();
     e.getprop("upnp:artist", val);
-    out += "<span class=\"tk_artist\">";
+    out += "<td class=\"tk_artist\">";
     out += QString::fromUtf8(val.c_str());
-    out += "</span>";
+    out += "</td>";
     
     val.clear();
     e.getprop("upnp:album", val);
-    out += "<span class=\"tk_album\">";
+    out += "<td class=\"tk_album\">";
     out += QString::fromUtf8(val.c_str());
-    out += "</span>";
+    out += "</td>";
     
     val.clear();
     e.getrprop(0, "duration", val);
@@ -283,12 +281,11 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
     int secs = seconds % 60;
     char sdur[100];
     sprintf(sdur, "%02d:%02d", mins, secs);
-    out += "<span class=\"tk_duration\">";
+    out += "<td class=\"tk_duration\">";
     out += sdur;
-    out += "</span>";
-   
+    out += "</td>";
 
-    out += "</div>";
+    out += "</tr>";
 
     return out;
 }
@@ -324,10 +321,10 @@ static const string init_server_page(
 static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
 {
     QString out;
-    out += QString("<div class=\"cdserver\" cdsid=\"%1\">").arg(idx);
+    out += QString("<p class=\"cdserver\" cdsid=\"%1\">").arg(idx);
     out += QString("<a href=\"S%1\">").arg(idx);
     out += QString::fromUtf8(dev.friendlyName.c_str());
-    out += QString("</a></div>");
+    out += QString("</a></p>");
     return out;
 }
 

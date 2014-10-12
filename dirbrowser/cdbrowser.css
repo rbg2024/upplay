@@ -1,4 +1,9 @@
 
+/* Servers page. Each is a p */
+p.cdserver {
+    margin: 7px 0px 0px 0px;
+}
+
 /* The current path indicator is an ul */
 #browsepath {
     font-size: 80%;
@@ -18,37 +23,27 @@
 }
 
 
-#entrylist div:nth-child(even) {
+#entrylist tr:nth-child(even) {
     background: #eee;
 }
 
-#entrylist div:nth-child(odd) {
+#entrylist tr:nth-child(odd) {
     background: #fff;
 }
 
-.tracknum {
-    display: inline-block;
+.tk_tracknum {
     width: 1em;
-    visibility: hidden;
 }
-
 .tk_artist {
-    display: inline-block;
-    width: 8em;
     align: left;
     margin-left: 5px;
 }
 .tk_album {
-    display: inline-block;
-    width: 8em;
     margin-left: 5px;
 }
 .tk_title {
-    display: inline-block;
-    width: 10em;
     margin-left: 5px;
 }
 .tk_duration {
-    display: inline-block;
     margin-left: 5px;
 }
