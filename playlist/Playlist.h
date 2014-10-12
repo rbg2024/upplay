@@ -78,7 +78,8 @@ public slots:
     virtual void psl_change_mode(const Playlist_Mode&);
     // Mode change reported by audio (OH)
     virtual void psl_mode_changed(Playlist_Mode);
-    virtual void psl_clear_playlist() = 0;
+    virtual void psl_clear_playlist();
+    virtual void psl_clear_playlist_impl() = 0;
     virtual void psl_play() = 0;
     virtual void psl_pause() = 0;
     virtual void psl_stop() = 0;

@@ -44,8 +44,9 @@ void PlaylistOH::psl_trackIdChanged(int id)
     qDebug() << " Track id not found in array";
 }
 
-void PlaylistOH::psl_clear_playlist()
+void PlaylistOH::psl_clear_playlist_impl()
 {
+    // Tell the Open Home Playlist to do it.
     emit sig_clear_playlist();
 }
 

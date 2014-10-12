@@ -38,6 +38,14 @@ Playlist::Playlist(QObject* parent)
     _pause = false;
 }
 
+// GUI -->
+void Playlist::psl_clear_playlist()
+{
+    m_meta.clear();
+    m_play_idx = -1;
+    psl_clear_playlist_impl();
+}
+
 // Remove one row
 void Playlist::remove_row(int row)
 {

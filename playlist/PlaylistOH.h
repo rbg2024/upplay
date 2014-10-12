@@ -56,7 +56,7 @@ public slots:
     void psl_change_track(int idx) {
         emit sig_row_activated(idx);
     }
-    void psl_clear_playlist();
+    void psl_clear_playlist_impl();
     void psl_play();
     void psl_pause();
     void psl_stop(); 

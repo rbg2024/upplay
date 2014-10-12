@@ -164,11 +164,9 @@ out:
     }
 }
 
-// GUI -->
-void PlaylistAVT::psl_clear_playlist()
+void PlaylistAVT::psl_clear_playlist_impl()
 {
-    m_meta.clear();
-    m_play_idx = -1;
+    emit sig_stop();
     playlist_updated();
 }
 
