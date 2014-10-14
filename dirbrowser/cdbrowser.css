@@ -4,7 +4,7 @@ p.cdserver {
     margin: 7px 0px 0px 0px;
 }
 
-/* The current path indicator is an ul */
+/* The current path indicator is an ul inside a browsepath div */
 #browsepath {
     font-size: 80%;
     font-weight: bold;
@@ -22,15 +22,24 @@ p.cdserver {
     float: left;
 }
 
+/* Directory listing */
 
+#entrylist {
+    clear: both;
+}
+
+/* Alternate colours for the directory list table */
 #entrylist tr:nth-child(even) {
-    background: #eee;
+    background: #dddddd;
 }
-
+#entrylist td:empty {
+    background: white;
+}
 #entrylist tr:nth-child(odd) {
-    background: #fff;
+    background: white;
 }
 
+/* Styles for the directory list cells */
 .tk_tracknum {
     width: 1em;
 }
