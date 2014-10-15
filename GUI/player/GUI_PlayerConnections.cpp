@@ -65,16 +65,9 @@ void GUI_Player::setupConnections()
     connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)), 
             this, SLOT(volumeChangedByTick(int)));
 
-    connect(ui->volumeSlider, SIGNAL(searchSliderMoved(int)), this,
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this,
             SLOT(volumeChanged(int)));
-    connect(ui->volumeSlider, SIGNAL(searchSliderReleased(int)), this,
-            SLOT(volumeChanged(int)));
-    connect(ui->volumeSlider, SIGNAL(searchSliderPressed(int)), this,
-            SLOT(volumeChanged(int)));
-
-    connect(ui->songProgress, SIGNAL(searchSliderReleased(int)), this,
-            SLOT(setProgressJump(int)));
-    connect(ui->songProgress, SIGNAL(searchSliderMoved(int)), this,
+    connect(ui->songProgress, SIGNAL(valueChanged(int)), this,
             SLOT(setProgressJump(int)));
 
     QList<QKeySequence> lst;
@@ -107,6 +100,4 @@ void GUI_Player::setupConnections()
     QAction* two_perc_minus_action = createAction(QKeySequence(Qt::AltModifier | Qt::Key_Left));
     connect(two_perc_minus_action, SIGNAL(triggered()), this, SLOT(jump_backward()));
 
-    qDebug() << "connections done";
 }
-

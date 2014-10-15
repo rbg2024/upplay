@@ -120,8 +120,10 @@ void GUI_Player::jump_backward()
     this->ui->songProgress->setValue(percent);
 }
 
+// This is called from the slider when the user wans a jump
 void GUI_Player::setProgressJump(int percent)
 {
+    //qDebug() << "GUI_Player::setProgressJump: " << percent << " %";
     if (percent > 100 || percent < 0) {
         percent = 0;
     }
@@ -132,28 +134,19 @@ void GUI_Player::setProgressJump(int percent)
     emit search(percent);
 }
 
+// This is called from the external world to update the position
 void GUI_Player::setCurrentPosition(quint32 pos_sec)
 {
+    //qDebug() << "GUI_Player::setCurrentPosition: " << pos_sec << " S" <<
+    // "song len " << m_completeLength_ms << " mS";
     if (m_completeLength_ms != 0) {
         int newSliderVal = (pos_sec * 100000) / (m_completeLength_ms);
-
-        if (!ui->songProgress->isSearching() &&
-                newSliderVal < ui->songProgress->maximum()) {
-            ui->songProgress->setValue(newSliderVal);
-        }
-    } else if (pos_sec > m_completeLength_ms / 1000) {
-        ui->songProgress->setValue(0);
+        ui->songProgress->blockSignals(true);
+        ui->songProgress->setValue(newSliderVal);
+        ui->songProgress->blockSignals(false);
     }
-
-    if (!ui->songProgress->isSearching()) {
-        if (m_completeLength_ms != 0 && pos_sec > m_completeLength_ms) {
-            pos_sec = 0;
-        }
-
-        QString curPosString =
-            Helper::cvtMsecs2TitleLengthString(pos_sec * 1000);
-        ui->curTime->setText(curPosString);
-    }
+    QString curPosString = Helper::cvtMsecs2TitleLengthString(pos_sec * 1000);
+    ui->curTime->setText(curPosString);
 }
 
 /** PROGRESS BAR END **/
@@ -173,21 +166,41 @@ void GUI_Player::setVolume(int volume_percent)
 // Called from audio when volume has been changed by another player.
 void GUI_Player::setVolumeUi(int volume_percent)
 {
-    setVolume(volume_percent, false, false);
+    // qDebug() << "GUI_Player::setVolumeUi: mute " << m_mute << 
+    // " volumepc " << volume_percent;
+    // Don't do it if mute is set
+    if (!m_mute)
+        setVolume(volume_percent, false, false);
+}
+void GUI_Player::setMuteUi(bool ismute)
+{
+    //qDebug() << "setMuteUi: " << ismute;
+    m_mute = ismute;
+    if (ismute) {
+        ui->volumeSlider->setEnabled(false);
+        ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
+
+        setupVolButton(0);
+    } else {
+        ui->volumeSlider->setEnabled(true);
+        setupVolButton(ui->volumeSlider->value());
+    }
 }
 
 // Connected to the GUI signals: user tweaked a control
 void GUI_Player::volumeChanged(int volume_percent)
 {
+    //qDebug() << "GUI_PLayer::volumeChanged " << volume_percent;
     setVolume(volume_percent, true, true);
 }
 
 void GUI_Player::setVolume(int volume_percent, bool dostore, bool doemit)
 {
+    //qDebug() << "GUI_PLayer::setVolume " << volume_percent;
     setupVolButton(volume_percent);
-    ui->volumeSlider->blockSignals(true);
+    ui->songProgress->blockSignals(true);
     ui->volumeSlider->setValue(volume_percent);
-    ui->volumeSlider->blockSignals(false);
+    ui->songProgress->blockSignals(false);
     if (doemit) {
         emit sig_volume_changed(volume_percent);
     }
@@ -198,6 +211,7 @@ void GUI_Player::setVolume(int volume_percent, bool dostore, bool doemit)
 
 void GUI_Player::volumeChangedByTick(int val)
 {
+    //qDebug() << "GUI_PLayer::volumeChangedByTick ";
     int currentVolumeOrig_perc = this -> ui->volumeSlider->value();
     int currentVolume_perc = currentVolumeOrig_perc;
     int vol_step = m_trayIcon->get_vol_step();
@@ -225,17 +239,18 @@ void GUI_Player::volumeChangedByTick(int val)
 
 void GUI_Player::volumeHigher()
 {
+    //qDebug() << "GUI_PLayer::volumeHigher";
     volumeChangedByTick(5);
 }
 
 void GUI_Player::volumeLower()
 {
+    //qDebug() << "GUI_PLayer::volumeLower";
     volumeChangedByTick(-5);
 }
 
 void GUI_Player::setupVolButton(int percent)
 {
-
     QString butFilename = Helper::getIconPath() + "vol_";
 
     if (percent <= 1) {
@@ -253,21 +268,12 @@ void GUI_Player::setupVolButton(int percent)
 
 void GUI_Player::muteButtonPressed()
 {
-
     if (m_mute) {
-        m_mute = false;
-
-        ui->volumeSlider->setEnabled(true);
-        setupVolButton(ui->volumeSlider->value());
-
-        emit sig_volume_changed(ui->volumeSlider->value());
+        setMuteUi(false);
+        emit sig_mute(false);
     } else {
-        m_mute = true;
-        ui->volumeSlider->setEnabled(false);
-        ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
-
-        setupVolButton(0);
-        emit sig_volume_changed(0);
+        setMuteUi(true);
+        emit sig_mute(true);
     }
 
     m_trayIcon->setMute(m_mute);

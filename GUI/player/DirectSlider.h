@@ -1,5 +1,4 @@
-/* SearchSlider.h
-
+/*
  * Copyright (C) 2012  
  *
  * This file is part of sayonara-player
@@ -22,38 +21,30 @@
  *
  */
 
-#ifndef SEARCHSLIDER_H_
-#define SEARCHSLIDER_H_
+#ifndef DIRECTSLIDER_H_
+#define DIRECTSLIDER_H_
 
 #include <QWidget>
 #include <QSlider>
 
-class SearchSlider: public QSlider {
+class QMouseEvent;
 
-	Q_OBJECT
+// A slider where a click sets the position to the click location
+// instead of moving by a fixed amount as does the standard widget.
+// http://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
+class DirectSlider: public QSlider {
 
-	signals:
-	void searchSliderPressed(int);
-	void searchSliderReleased(int);
-	void searchSliderMoved(int);
-
+    Q_OBJECT
 
 public:
-	SearchSlider(QWidget* parent=0);
-	virtual ~SearchSlider();
+    DirectSlider(QWidget* parent=0)
+        : QSlider(parent)
+        {}
 
-	bool isSearching();
-
-
+    virtual ~DirectSlider() {}
 
 protected:
-	virtual bool event(QEvent* e);
-
-private:
-	bool	_searching;
-
-
-
+    virtual void mousePressEvent ( QMouseEvent * event );
 };
 
-#endif /* SEARCHSLIDER_H_ */
+#endif /* DIRECTSLIDER_H_ */

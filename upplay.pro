@@ -16,7 +16,7 @@ HEADERS += \
         GUI/ContextMenu.h \
         GUI/player/GUI_Player.h \
         GUI/player/GUI_TrayIcon.h \
-        GUI/player/SearchSlider.h  \
+        GUI/player/DirectSlider.h  \
         GUI/playlist/GUI_Playlist.h \
         GUI/playlist/delegate/PlaylistItemDelegate.h \
         GUI/playlist/delegate/PlaylistItemDelegateInterface.h \
@@ -51,7 +51,7 @@ SOURCES += \
         GUI/player/GUI_PlayerCover.cpp \
         GUI/player/GUI_PlayerMenubar.cpp \
         GUI/player/GUI_TrayIcon.cpp \
-        GUI/player/SearchSlider.cpp \
+        GUI/player/DirectSlider.cpp \
         GUI/playlist/GUI_Playlist.cpp \
         GUI/playlist/delegate/PlaylistItemDelegate.cpp \
         GUI/playlist/entry/GUI_PlaylistEntryBig.cpp \

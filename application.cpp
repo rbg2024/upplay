@@ -290,7 +290,9 @@ void Application::renderer_connections()
         CONNECT(playlist, sig_pause(), avto, pause());
     }
     CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
+    CONNECT(player, sig_mute(bool), rdco, setMute(bool));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
+    CONNECT(rdco, muteChanged(bool), player, setMuteUi(bool));
     CONNECT(playlist, insertDone(), cdb, onInsertDone());
     // Set up the initial volume from the renderer value
     player->setVolumeUi(rdco->volume());

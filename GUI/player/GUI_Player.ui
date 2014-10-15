@@ -209,7 +209,7 @@
            </widget>
           </item>
           <item row="7" column="1" colspan="2">
-           <widget class="SearchSlider" name="songProgress">
+           <widget class="DirectSlider" name="songProgress">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
               <horstretch>1</horstretch>
@@ -403,15 +403,18 @@
            </layout>
           </item>
           <item row="1" column="3" rowspan="6">
-           <widget class="SearchSlider" name="volumeSlider">
+           <widget class="DirectSlider" name="volumeSlider">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
+            </property>
+            <property name="maximum">
+             <number>100</number>
             </property>
             <property name="value">
              <number>50</number>
             </property>
             <property name="tracking">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="invertedAppearance">
              <bool>false</bool>
@@ -778,7 +781,7 @@
      <x>0</x>
      <y>0</y>
      <width>550</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <property name="font">
@@ -970,9 +973,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SearchSlider</class>
+   <class>DirectSlider</class>
    <extends>QSlider</extends>
-   <header>GUI/player/SearchSlider.h</header>
+   <header>GUI/player/DirectSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

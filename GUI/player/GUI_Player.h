@@ -66,6 +66,7 @@ public slots:
 
     void setVolume(int vol);
     void setVolumeUi(int volume_percent);
+    void setMuteUi(bool);
 
     void setRendererName(const QString& nm);
 
@@ -77,7 +78,7 @@ signals:
     void stop();
     void backward();
     void forward();
-    void mute();
+    void sig_mute(bool ison);
     void sig_volume_changed (int);
     void search(int pos_percent);
 

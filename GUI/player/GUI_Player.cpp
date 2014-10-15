@@ -59,7 +59,7 @@ void signal_handler(int sig)
 #endif
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Upplay)
+    QMainWindow(parent), ui(new Ui::Upplay), m_completeLength_ms(0)
 {
     ui->setupUi(this);
     initGUI();
@@ -186,7 +186,8 @@ void GUI_Player::initGUI()
 }
 
 
-// new track
+// This is called from the playlist when new track info is known
+// (possibly up from the audio player)
 void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
 {
     if (!m_metadata.compare(md)) {
