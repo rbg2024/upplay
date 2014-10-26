@@ -120,7 +120,7 @@ void GUI_Player::jump_backward()
     this->ui->songProgress->setValue(percent);
 }
 
-// This is called from the slider when the user wans a jump
+// This is called from the slider when the user wants a jump
 void GUI_Player::setProgressJump(int percent)
 {
     //qDebug() << "GUI_Player::setProgressJump: " << percent << " %";
