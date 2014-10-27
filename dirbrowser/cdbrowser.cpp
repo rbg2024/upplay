@@ -25,6 +25,7 @@ using namespace std;
 #include <QMenu>
 
 #include "HelperStructs/Helper.h"
+#include "HelperStructs/CSettingsStorage.h"
 
 #include "libupnpp/log.hxx"
 #include "libupnpp/control/discovery.hxx"
@@ -36,6 +37,8 @@ using namespace std;
 #include "rreaper.h"
 
 using namespace UPnPClient;
+
+static const string minimFoldersViewPrefix("0$folders");
 
 CDBrowser::CDBrowser(QWidget* parent)
     : QWebView(parent), m_reader(0), m_reaper(0), m_insertactive(false)
@@ -184,6 +187,21 @@ static const QString init_container_page(
     "</body></html>"
     );
 
+void CDBrowser::initContainerHtml()
+{
+    QString htmlpath("<div id=\"browsepath\"><ul>");
+    for (unsigned i = 0; i < m_curpath.size(); i++) {
+        QString title = QString::fromUtf8(m_curpath[i].second.c_str());
+        htmlpath += 
+            QString("<li><a href=\"L%1\">%2</a> &gt;</li>").arg(i).arg(title);
+    }
+    htmlpath += QString("</ul></div><br/>");
+
+    setHtml(init_container_page);
+    appendHtml(QString(), htmlpath);
+    appendHtml(QString(), "<table id=\"entrylist\"></table>");
+}
+
 void CDBrowser::browseContainer(string ctid, string cttitle)
 {
     qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
@@ -200,17 +218,7 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
 
     m_curpath.push_back(pair<string,string>(ctid, cttitle));
 
-    QString htmlpath("<div id=\"browsepath\"><ul>");
-    for (unsigned i = 0; i < m_curpath.size(); i++) {
-        QString title = QString::fromUtf8(m_curpath[i].second.c_str());
-        htmlpath += 
-            QString("<li><a href=\"L%1\">%2</a> &gt;</li>").arg(i).arg(title);
-    }
-    htmlpath += QString("</ul></div><br/>");
-
-    setHtml(init_container_page);
-    appendHtml(QString(), htmlpath);
-    appendHtml(QString(), "<table id=\"entrylist\"></table>");
+    initContainerHtml();
 
     if (m_reader) {
         delete m_reader;
@@ -220,18 +228,10 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
 
     connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
-    connect(m_reader, SIGNAL(done(int)), this, SLOT(onDone(int)));
+    connect(m_reader, SIGNAL(done(int)), this, SLOT(onBrowseDone(int)));
     m_reader->start();
 }
 
-void CDBrowser::onDone(int)
-{
-    //qDebug() <<"CDBrowser::onDone";
-    if (m_reader) {
-        m_reader->wait();
-    }
-    //qDebug() << "CDBrowser::onDone done";
-}
 
 static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 {
@@ -244,6 +244,22 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
     return out;
 }
 
+// Escape things that would look like HTML markup
+static string escapeHtml(const string &in)
+{
+    string out;
+    for (string::size_type pos = 0; pos < in.length(); pos++) {
+	switch(in.at(pos)) {
+	case '<': out += "&lt;"; break;
+	case '>': out += "&gt;"; break;
+	case '&': out += "&amp;"; break;
+	case '"': out += "&quot;"; break;
+	default: out += in.at(pos); break;
+	}
+    }
+    return out;
+}
+
 static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
@@ -253,24 +269,24 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
         arg(e.m_id.c_str()).arg(idx);
 
     e.getprop("upnp:originalTrackNumber", val);
-    out += QString("<td class=\"tk_tracknum\">") + val.c_str() + "</td>";
+    out += QString("<td class=\"tk_tracknum\">") + escapeHtml(val).c_str() + "</td>";
 
     out += "<td class=\"tk_title\">";
     out += QString("<a href=\"I%1\">").arg(idx);
-    out += QString::fromUtf8(e.m_title.c_str());
+    out += QString::fromUtf8(escapeHtml(e.m_title).c_str());
     out += "</a>";
     out += "</td>";
 
     val.clear();
     e.getprop("upnp:artist", val);
     out += "<td class=\"tk_artist\">";
-    out += QString::fromUtf8(val.c_str());
+    out += QString::fromUtf8(escapeHtml(val).c_str());
     out += "</td>";
     
     val.clear();
     e.getprop("upnp:album", val);
     out += "<td class=\"tk_album\">";
-    out += QString::fromUtf8(val.c_str());
+    out += QString::fromUtf8(escapeHtml(val).c_str());
     out += "</td>";
     
     val.clear();
@@ -309,6 +325,48 @@ void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
     }
     appendHtml("entrylist", html);
 }
+
+static bool dirObjCmpByURI(const UPnPDirObject& o1, const UPnPDirObject& o2)
+{
+    if (o1.m_resources.size() == 0 && o2.m_resources.size() == 0) {
+        return o1.m_title < o2.m_title;
+    } else if (o1.m_resources.size() == 0 && o2.m_resources.size() != 0) {
+        return true;
+    } else if (o1.m_resources.size() != 0 && o2.m_resources.size() == 0) {
+        return false;
+    } else {
+        return o1.m_resources[0].m_uri < o2.m_resources[0].m_uri;
+    }
+}
+
+void CDBrowser::onBrowseDone(int)
+{
+    //qDebug() <<"CDBrowser::onBrowseDone";
+    if (m_reader) {
+        ContentDirectory::ServiceKind kind = m_reader->getKind();
+        if (kind == ContentDirectory::CDSKIND_MINIM && 
+            CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
+            m_reader->getObjid().compare(0, minimFoldersViewPrefix.size(),
+                                         minimFoldersViewPrefix) == 0) {
+                
+            sort(m_entries.begin(), m_entries.end(), dirObjCmpByURI);
+            initContainerHtml();
+            QString html;
+            for (unsigned i = 0; i < m_entries.size(); i++) {
+                if (m_entries[i].m_type == UPnPDirObject::container) {
+                    html += CTToHtml(i, m_entries[i]);
+                } else {
+                    html += ItemToHtml(i, m_entries[i]);
+                }
+            }
+            appendHtml("entrylist", html);
+        }
+
+        m_reader->wait();
+    }
+    //qDebug() << "CDBrowser::onBrowseDone done";
+}
+
 
 static const string init_server_page(
     "<html><head>"
@@ -367,6 +425,18 @@ void CDBrowser::serversPage()
     m_timer.start(5000);
 }
 
+enum PopupMode {
+    PUP_PLAYNOW,
+    PUP_PLAYNEXT,
+    PUP_PLAYLATER,
+    PUP_REPLACEANDPLAY,
+    PUP_REPLACE,
+    PUP_ALL_REPLACEANDPLAY,
+    PUP_ALL_PLAYLATER,
+    PUP_FROMHERE_REPLACEANDPLAY,
+    PUP_FROMHERE_PLAYLATER
+};
+
 void CDBrowser::createPopupMenu(const QPoint& pos)
 {
     if (m_insertactive)
@@ -380,7 +450,6 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
 	el = el.parent();
     if (el.isNull())
 	return;
-
     m_popupobjid = qs2utf8s(el.attribute("objid"));
     m_popupidx = el.attribute("objidx").toInt();
 
@@ -392,29 +461,51 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     QAction *act;
     QVariant v;
     act = new QAction(tr("Play Now"), this);
-    v = QVariant(int(PADM_PLAYNOW));
+    v = QVariant(int(PUP_PLAYNOW));
     act->setData(v);
     popup->addAction(act);
 
     act = new QAction(tr("Play Next"), this);
-    v = QVariant(int(PADM_PLAYNEXT));
+    v = QVariant(int(PUP_PLAYNEXT));
     act->setData(v);
     popup->addAction(act);
 
     act = new QAction(tr("Play Later"), this);
-    v = QVariant(int(PADM_PLAYLATER));
+    v = QVariant(int(PUP_PLAYLATER));
     act->setData(v);
     popup->addAction(act);
 
     act = new QAction(tr("Replace and Play"), this);
-    v = QVariant(int(PADM_REPLACE_AND_PLAY));
+    v = QVariant(int(PUP_REPLACEANDPLAY));
     act->setData(v);
     popup->addAction(act);
 
     act = new QAction(tr("Replace"), this);
-    v = QVariant(int(PADM_REPLACE));
+    v = QVariant(int(PUP_REPLACE));
     act->setData(v);
     popup->addAction(act);
+
+    if (!otype.compare("item")) {
+        act = new QAction(tr("Play all now"), this);
+        v = QVariant(int(PUP_ALL_REPLACEANDPLAY));
+        act->setData(v);
+        popup->addAction(act);
+
+        act = new QAction(tr("Play all later"), this);
+        v = QVariant(int(PUP_ALL_PLAYLATER));
+        act->setData(v);
+        popup->addAction(act);
+
+        act = new QAction(tr("Play from here now"), this);
+        v = QVariant(int(PUP_FROMHERE_REPLACEANDPLAY));
+        act->setData(v);
+        popup->addAction(act);
+
+        act = new QAction(tr("Play from here later"), this);
+        v = QVariant(int(PUP_FROMHERE_PLAYLATER));
+        act->setData(v);
+        popup->addAction(act);
+    }
 
     if (!otype.compare("container")) {
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
@@ -431,22 +522,64 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     popup->popup(mapToGlobal(pos));
 }
 
+static PlaylistAddMode pupModeToPadMode(int pupm)
+{
+    PlaylistAddMode plmode;
+    switch (pupm) {
+    case PUP_PLAYNOW: plmode = PADM_PLAYNOW; break;
+    case PUP_PLAYNEXT: plmode = PADM_PLAYNEXT; break;
+    case PUP_PLAYLATER: plmode = PADM_PLAYLATER; break;
+    case PUP_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
+    case PUP_REPLACE: plmode = PADM_REPLACE; break;
+    case PUP_ALL_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
+    case PUP_ALL_PLAYLATER: plmode = PADM_PLAYLATER; break;
+    case PUP_FROMHERE_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
+    case PUP_FROMHERE_PLAYLATER: plmode = PADM_PLAYLATER; break;
+    default: // ??
+        plmode = PADM_PLAYNOW;
+    }
+    return plmode;
+}
+    
+// Add a single track or a section of the current container. This
+// maybe triggered by a link click or a popup on an item entry
 void CDBrowser::simpleAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::simpleAdd";
     m_popupmode = act->data().toInt();
-
     if (m_popupidx < 0 || m_popupidx > int(m_entries.size())) {
         LOGERR("CDBrowser::simpleAdd: bad obj index: " << m_popupidx
                << " id count: " << m_entries.size() << endl);
         return;
     }
     MetaDataList mdl;
-    mdl.resize(1);
-    udirentToMetadata(&m_entries[m_popupidx], &mdl[0]);
-    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
+    unsigned int starti = 0;
+    switch (m_popupmode) {
+    case PUP_FROMHERE_REPLACEANDPLAY: 
+    case PUP_FROMHERE_PLAYLATER: 
+        starti = m_popupidx;
+        /* FALLTHROUGH */
+    case PUP_ALL_REPLACEANDPLAY:
+    case PUP_ALL_PLAYLATER:
+        for (unsigned int i = 0; i < m_entries.size() - starti; i++) {
+            unsigned int ei = starti + i;
+            if (m_entries[ei].m_type == UPnPDirObject::item && 
+                m_entries[ei].m_iclass == 
+                UPnPDirObject::ITC_audioItem_musicTrack) {
+                mdl.resize(mdl.size()+1);
+                udirentToMetadata(&m_entries[ei], &mdl[i]);
+            }
+        }
+        break;
+    default:
+        mdl.resize(1);
+        udirentToMetadata(&m_entries[m_popupidx], &mdl[0]);
+    }
+
+    emit sig_tracks_to_playlist(pupModeToPadMode(m_popupmode), false, mdl);
 }
 
+// Recursive add. This is triggered popup on a container
 void CDBrowser::recursiveAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::recursiveAdd";
@@ -464,21 +597,48 @@ void CDBrowser::recursiveAdd(QAction *act)
         m_insertactive = false;
         return;
     }
+    ContentDirectory::ServiceKind kind = cds->getKind();
+    if (kind == ContentDirectory::CDSKIND_MINIM) {
+        // Use search() rather than a tree walk for Minim, it is much
+        // more efficient.
+        UPnPDirContent dirbuf;
+        string ss("upnp:class = \"object.item.audioItem.musicTrack\"");
+        int err = cds->search(m_popupobjid, ss, dirbuf);
+        if (err != 0) {
+            LOGERR("CDBrowser::recursiveAdd: search failed, code " << err);
+            return;
+        }
 
-    if (m_reaper) {
-        delete m_reaper;
-        m_reaper = 0;
-    }
+        m_recwalkentries = dirbuf.m_items;
+
+        // If we are inside the folders view tree, and the option is
+        // set, sort by url (minim sorts by tracknum tag even inside
+        // folder view)
+        if (CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
+            m_popupobjid.compare(0, minimFoldersViewPrefix.size(),
+                                 minimFoldersViewPrefix) == 0) {
+            sort(m_recwalkentries.begin(), m_recwalkentries.end(), 
+                 dirObjCmpByURI);
+        }
+
+        rreaperDone(0);
+
+    } else {
+        if (m_reaper) {
+            delete m_reaper;
+            m_reaper = 0;
+        }
     
-    m_recwalkentries.clear();
-    m_recwalkdedup.clear();
-    m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
-    connect(m_reaper, 
-            SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
-            this, 
-            SLOT(onReaperSliceAvailable(const UPnPClient::UPnPDirContent *)));
-    connect(m_reaper, SIGNAL(done(int)), this, SLOT(rreaperDone(int)));
-    m_reaper->start();
+        m_recwalkentries.clear();
+        m_recwalkdedup.clear();
+        m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
+        connect(m_reaper, 
+                SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
+                this, 
+                SLOT(onReaperSliceAvailable(const UPnPClient::UPnPDirContent *)));
+        connect(m_reaper, SIGNAL(done(int)), this, SLOT(rreaperDone(int)));
+        m_reaper->start();
+    }
 }
 
 void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
@@ -505,17 +665,17 @@ void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
 
 void CDBrowser::rreaperDone(int status)
 {
-    if (!m_reaper)
-        return;
-    LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
-    m_reaper->wait();
-    delete m_reaper;
-    m_reaper = 0;
+    if (m_reaper) {
+        LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
+        m_reaper->wait();
+        delete m_reaper;
+        m_reaper = 0;
+    }
 
     MetaDataList mdl;
     mdl.resize(m_recwalkentries.size());
     for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
         udirentToMetadata(&m_recwalkentries[i], &mdl[i]);
     }
-    emit sig_tracks_to_playlist(PlaylistAddMode(m_popupmode), false, mdl);
+    emit sig_tracks_to_playlist(pupModeToPadMode(m_popupmode), false, mdl);
 }

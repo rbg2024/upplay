@@ -39,11 +39,6 @@ CSettingsStorage::~CSettingsStorage ()
     //is called
 }
 
-void CSettingsStorage::save_all()
-{
-    sync();
-}
-
 #define GENCODE_VARIABLE(NM, TP, CTP)      \
     static const QString NM##Key(#NM);     \
     void CSettingsStorage::set##NM(TP val) \
@@ -57,12 +52,6 @@ void CSettingsStorage::save_all()
 
 
 GENCODE_VARIABLE(Version, QString, String)
-
-bool CSettingsStorage::isRunFirstTime () 
-{
-    return value(VersionKey).isNull();
-}
-
 GENCODE_VARIABLE(Volume, int, Int)
 GENCODE_VARIABLE(PlayerSize, QSize, Size)
 GENCODE_VARIABLE(PlayerPos, QPoint, Point)
@@ -78,57 +67,15 @@ GENCODE_VARIABLE(ShowSmallPlaylist, bool, Bool)
 GENCODE_VARIABLE(PlaylistNumbers, bool, Bool)
 GENCODE_VARIABLE(NotifyNewVersion, bool,  Bool)
 GENCODE_VARIABLE(PlayerUID, QString, String)
+GENCODE_VARIABLE(FolderViewFNOrder, bool, Bool)
+GENCODE_VARIABLE(LoadPlaylist, bool, Bool)
 
-///////////////////////////////////////////////////
-// Maybe later section
-QStringList CSettingsStorage::getPlaylist()
+bool CSettingsStorage::isRunFirstTime () 
 {
-    return QStringList();
-}
-void CSettingsStorage::setPlaylist(QStringList)
-{
+    return value(VersionKey).isNull();
 }
 
-bool CSettingsStorage::getLoadLastTrack()
-{ 
-    return false;
-}
-void CSettingsStorage::setLoadLastTrack(bool)
-{
-}
-bool CSettingsStorage::getLoadPlaylist()
-{ 
-    return false;
-}
-void CSettingsStorage::setLoadPlaylist(bool)
-{	
-}
-LastTrack* CSettingsStorage::getLastTrack()
-{ 
-    return &m_lastTrack;
-}
-void CSettingsStorage::setLastTrack(LastTrack& t)
-{ 
-    m_lastTrack = t;     
-}
-void CSettingsStorage::updateLastTrack()
-{
-    QString str = m_lastTrack.toString();
-}
-bool CSettingsStorage::getRememberTime()
-{ 
-    return false; 
-}
-void CSettingsStorage::setRememberTime(bool)
-{
-}
-bool CSettingsStorage::getStartPlaying()
-{ 
-    return false;
-}
-void CSettingsStorage::setStartPlaying(bool)
-{ 
-}
+// Special cases, kept but not always implemented TBD
 void CSettingsStorage::setPlaylistMode(const Playlist_Mode&)
 {
 }
@@ -136,4 +83,4 @@ Playlist_Mode CSettingsStorage::getPlaylistMode()
 {
     return m_playlistmode;
 }
-//////////// End maybe later section
+// End special cases TBD

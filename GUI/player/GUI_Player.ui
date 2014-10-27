@@ -837,6 +837,7 @@
      <string>Preferences</string>
     </property>
     <addaction name="action_min2tray"/>
+    <addaction name="action_folderviewfnorder" />
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="font">
@@ -929,6 +930,20 @@
    </property>
    <property name="text">
     <string>Close to tray</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>DejaVu Sans</family>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_folderviewfnorder">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Use file name ordering inside folder hierarchy</string>
    </property>
    <property name="font">
     <font>

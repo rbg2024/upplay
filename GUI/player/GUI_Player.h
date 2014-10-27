@@ -130,6 +130,7 @@ private slots:
 
     void load_pl_on_startup_toggled(bool);
     void min2tray_toggled(bool);
+    void folderviewfnorder_toggled(bool);
     void only_one_instance_toggled(bool);
 
     void about(bool b=false);

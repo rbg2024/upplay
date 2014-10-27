@@ -77,6 +77,11 @@ class ContentDirectoryQO : public QThread {
 	m_status = UPNP_E_SUCCESS;
     }
 
+    const std::string& getObjid() {return m_objid;}
+    UPnPClient::ContentDirectory::ServiceKind getKind() {
+        return m_serv->getKind();
+    }
+
 signals:
     void sliceAvailable(const  UPnPClient::UPnPDirContent *);
     void done(int);

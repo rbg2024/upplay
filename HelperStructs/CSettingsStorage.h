@@ -34,6 +34,14 @@
 
 class CSettingsStorage;
 
+#define GENDEC_VARIABLE(NM, TP, CTP)       \
+    void set##NM(TP);                      \
+    TP get##NM ();                         \
+
+
+    QString getVersion();
+    void setVersion(QString str);
+
 using namespace std;
 
 class CSettingsStorage : public QSettings
@@ -60,83 +68,33 @@ private:
 
     LastTrack m_lastTrack;
     Playlist_Mode m_playlistmode;
-protected:
-    void save_all();
 
 public:
+    GENDEC_VARIABLE(Version, QString, String);
+    GENDEC_VARIABLE(Volume, int, Int);
+    GENDEC_VARIABLE(PlayerSize, QSize, Size);
+    GENDEC_VARIABLE(PlayerPos, QPoint, Point);
+    GENDEC_VARIABLE(PlayerFullscreen, bool, Bool);
+    GENDEC_VARIABLE(PlayerStyle, int, Int);
+    GENDEC_VARIABLE(ShowNotifications, bool, Bool);
+    GENDEC_VARIABLE(Notification, QString, String);
+    GENDEC_VARIABLE(NotificationTimeout, int, Int);
+    GENDEC_VARIABLE(NotificationScale, int, Int);
+    GENDEC_VARIABLE(NoShowLibrary, bool, Bool);
+    GENDEC_VARIABLE(MinimizeToTray, bool, Bool);
+    GENDEC_VARIABLE(ShowSmallPlaylist, bool, Bool);
+    GENDEC_VARIABLE(PlaylistNumbers, bool, Bool);
+    GENDEC_VARIABLE(NotifyNewVersion, bool,  Bool);
+    GENDEC_VARIABLE(PlayerUID, QString, String);
+    GENDEC_VARIABLE(FolderViewFNOrder, bool, Bool);
+    GENDEC_VARIABLE(LoadPlaylist, bool, Bool);
 
-    QString getVersion();
-    void setVersion(QString str);
-
-    void setPlayerUID(QString);
-    QString getPlayerUID();
-
-    int getVolume();
-    void setVolume(int vol);
-
-    QSize getPlayerSize();
-    void setPlayerSize(QSize size);
-
-    QPoint getPlayerPos();
-    void setPlayerPos(QPoint p);
-
-    bool getPlayerFullscreen();
-    void setPlayerFullscreen(bool);
-
-    QStringList getPlaylist();
-    void setPlaylist(QStringList playlist);
-
-    void setLoadPlaylist(bool b);
-    bool getLoadPlaylist();
-
-    bool getLoadLastTrack();
-    void setLoadLastTrack(bool b);
-
-    LastTrack* getLastTrack();
-    void setLastTrack(LastTrack& t);
-    void updateLastTrack();
-
-    bool getRememberTime();
-    void setRememberTime(bool);
-
-    bool getStartPlaying();
-    void setStartPlaying(bool);
-
-    void setPlaylistMode(const Playlist_Mode& plmode);
+    // Special cases
+    void setPlaylistMode(const Playlist_Mode&);
     Playlist_Mode getPlaylistMode();
 
-    void setPlayerStyle(int);
-    int getPlayerStyle();
-
-    void setShowNotifications(bool);
-    bool getShowNotifications();
-
-    void setNotificationTimeout(int);
-    int getNotificationTimeout();
-
-    void setNotification(QString);
-    QString getNotification();
-
-    void setNotificationScale(int);
-    int getNotificationScale();
-
-    void setLastFMSessionKey(QString);
-    QString getLastFMSessionKey();
-
-    void setNoShowLibrary(bool);
-    bool getNoShowLibrary();
-
-    void setMinimizeToTray(bool);
-    bool getMinimizeToTray();
-
-    bool getShowSmallPlaylist();
-    void setShowSmallPlaylist(bool);
-
-    bool getPlaylistNumbers();
-    void setPlaylistNumbers(bool b);
-
-    bool getNotifyNewVersion();
-    void setNotifyNewVersion(bool b);
 };
+
+#undef GENDEC_VARIABLE
 
 #endif // CSettingsStorage_H

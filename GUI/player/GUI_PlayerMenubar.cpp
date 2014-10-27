@@ -117,6 +117,12 @@ void GUI_Player::min2tray_toggled(bool b)
     m_min2tray = b;
 }
 
+// prvt slot
+void GUI_Player::folderviewfnorder_toggled(bool b)
+{
+    m_settings->setFolderViewFNOrder(b);
+}
+
 void GUI_Player::only_one_instance_toggled(bool)
 {
 }

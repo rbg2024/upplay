@@ -46,7 +46,7 @@ class CDBrowser : public QWebView
 
  public slots:
     virtual void serversPage();
-    void onDone(int);
+    void onBrowseDone(int);
     void onSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onInsertDone() { m_insertactive = false;}
@@ -67,6 +67,7 @@ class CDBrowser : public QWebView
     virtual void rreaperDone(int);
 
  private:
+    void initContainerHtml();
     void browseContainer(std::string, std::string);
 
     // The currently seen Media Server descriptions
@@ -92,7 +93,7 @@ class CDBrowser : public QWebView
     std::unordered_set<std::string> m_recwalkdedup;
     bool m_insertactive;
 
-    // Objid and index in entreis for the last popup menu click
+    // Objid and index in entries for the last popup menu click
     std::string m_popupobjid;
     int m_popupidx;
     int m_popupmode; // now, next, at end
