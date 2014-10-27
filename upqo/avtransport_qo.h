@@ -160,13 +160,11 @@ public slots:
         emit secsInSongChanged(info.reltime);
         m_cursecs = info.trackduration;
         if (m_cururi.compare(info.trackuri)) {
-            if (m_cururi.compare(info.trackuri)) {
-                qDebug() << "AVT: update: ext track change: cur [" << 
-                    m_cururi.c_str() << "] new [" <<                     
-                    info.trackuri.c_str() << "]";
-                setcururi(info.trackuri);
-                emit newTrackPlaying(u8s2qs(info.trackuri));
-            }
+            qDebug() << "AVT: update: ext track change: cur [" << 
+                m_cururi.c_str() << "] new [" <<                     
+                info.trackuri.c_str() << "]";
+            setcururi(info.trackuri);
+            emit newTrackPlaying(u8s2qs(info.trackuri));
         }
         if (m_cursecs > 0) {
             if (info.reltime > m_cursecs - 10) {
