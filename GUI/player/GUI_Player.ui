@@ -824,7 +824,6 @@
     <addaction name="action_viewLibrary"/>
     <addaction name="action_smallPlaylistItems"/>
     <addaction name="separator"/>
-    <addaction name="action_Dark"/>
     <addaction name="action_Fullscreen"/>
    </widget>
    <widget class="QMenu" name="menuPreferences">

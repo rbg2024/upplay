@@ -1,3 +1,11 @@
+/*
+Example colors for a dark version, but there is more to be done (esp: link color and entrylist table).
+html {
+    background-color: #3c3c3c;
+    color: #D8D8D8;
+    selection-background-color: #424e72;
+}
+*/
 
 /* Servers page. Each is a p */
 p.cdserver {
