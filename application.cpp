@@ -231,9 +231,7 @@ void Application::renderer_connections()
                 playlist, psl_new_ohpl(const MetaDataList&));
         CONNECT(ohplo, trackIdChanged(int), ploh, psl_trackIdChanged(int));
         CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
-                playlist, psl_mode_changed(Playlist_Mode));
-        CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
-                ui_playlist, setMode(Playlist_Mode));
+                ui_playlist, setPlayerMode(Playlist_Mode));
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
 
@@ -338,10 +336,8 @@ void Application::init_connections()
             playlist, psl_change_track(int));
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 
-    CONNECT(cdb, 
-            sig_tracks_to_playlist(PlaylistAddMode, bool, const MetaDataList&),
-            playlist, psl_add_tracks(PlaylistAddMode, bool,
-                                     const MetaDataList&));
+    CONNECT(cdb, sig_tracks_to_playlist(const MetaDataList&),
+            playlist, psl_add_tracks(const MetaDataList&));
 }
 
 

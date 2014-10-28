@@ -30,19 +30,13 @@
 #include <vector>
 
 #include <HelperStructs/PlaylistMode.h>
-#include <HelperStructs/MetaData.h>
 
-class CSettingsStorage;
+using namespace std;
 
 #define GENDEC_VARIABLE(NM, TP, CTP)       \
     void set##NM(TP);                      \
-    TP get##NM ();                         \
+    TP get##NM ();
 
-
-    QString getVersion();
-    void setVersion(QString str);
-
-using namespace std;
 
 class CSettingsStorage : public QSettings
 {
@@ -65,9 +59,6 @@ private:
 
     CSettingsStorage(const CSettingsStorage&);
     CSettingsStorage& operator=(const CSettingsStorage&);
-
-    LastTrack m_lastTrack;
-    Playlist_Mode m_playlistmode;
 
 public:
     GENDEC_VARIABLE(Version, QString, String);

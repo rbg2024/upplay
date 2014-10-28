@@ -75,12 +75,18 @@ bool CSettingsStorage::isRunFirstTime ()
     return value(VersionKey).isNull();
 }
 
-// Special cases, kept but not always implemented TBD
-void CSettingsStorage::setPlaylistMode(const Playlist_Mode&)
+// Special cases
+
+static const QString PlaylistModeKey("PlaylistMode");
+void CSettingsStorage::setPlaylistMode(const Playlist_Mode& mode)
 {
+    qDebug() << "setPlaylistMode: " << mode.toInt();
+    setValue(PlaylistModeKey, mode.toInt());
 }
 Playlist_Mode CSettingsStorage::getPlaylistMode()
 {
-    return m_playlistmode;
+    qDebug() << "getPlaylistMode: " << value(PlaylistModeKey).toInt();
+    return Playlist_Mode(value(PlaylistModeKey).toInt());
 }
-// End special cases TBD
+
+// End special cases 

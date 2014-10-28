@@ -133,7 +133,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
         MetaDataList mdl;
         mdl.resize(1);
         udirentToMetadata(&m_entries[i], &mdl[0]);
-        emit sig_tracks_to_playlist(PADM_PLAYLATER, false, mdl);
+        emit sig_tracks_to_playlist(mdl);
     }
     break;
 
@@ -426,15 +426,9 @@ void CDBrowser::serversPage()
 }
 
 enum PopupMode {
-    PUP_PLAYNOW,
-    PUP_PLAYNEXT,
-    PUP_PLAYLATER,
-    PUP_REPLACEANDPLAY,
-    PUP_REPLACE,
-    PUP_ALL_REPLACEANDPLAY,
-    PUP_ALL_PLAYLATER,
-    PUP_FROMHERE_REPLACEANDPLAY,
-    PUP_FROMHERE_PLAYLATER
+    PUP_ADD,
+    PUP_ADD_ALL,
+    PUP_ADD_FROMHERE,
 };
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
@@ -460,49 +454,19 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     QMenu *popup = new QMenu(this);
     QAction *act;
     QVariant v;
-    act = new QAction(tr("Play Now"), this);
-    v = QVariant(int(PUP_PLAYNOW));
-    act->setData(v);
-    popup->addAction(act);
-
-    act = new QAction(tr("Play Next"), this);
-    v = QVariant(int(PUP_PLAYNEXT));
-    act->setData(v);
-    popup->addAction(act);
-
-    act = new QAction(tr("Play Later"), this);
-    v = QVariant(int(PUP_PLAYLATER));
-    act->setData(v);
-    popup->addAction(act);
-
-    act = new QAction(tr("Replace and Play"), this);
-    v = QVariant(int(PUP_REPLACEANDPLAY));
-    act->setData(v);
-    popup->addAction(act);
-
-    act = new QAction(tr("Replace"), this);
-    v = QVariant(int(PUP_REPLACE));
+    act = new QAction(tr("Send to playlist"), this);
+    v = QVariant(int(PUP_ADD));
     act->setData(v);
     popup->addAction(act);
 
     if (!otype.compare("item")) {
-        act = new QAction(tr("Play all now"), this);
-        v = QVariant(int(PUP_ALL_REPLACEANDPLAY));
+        act = new QAction(tr("Send all to playlist"), this);
+        v = QVariant(int(PUP_ADD_ALL));
         act->setData(v);
         popup->addAction(act);
 
-        act = new QAction(tr("Play all later"), this);
-        v = QVariant(int(PUP_ALL_PLAYLATER));
-        act->setData(v);
-        popup->addAction(act);
-
-        act = new QAction(tr("Play from here now"), this);
-        v = QVariant(int(PUP_FROMHERE_REPLACEANDPLAY));
-        act->setData(v);
-        popup->addAction(act);
-
-        act = new QAction(tr("Play from here later"), this);
-        v = QVariant(int(PUP_FROMHERE_PLAYLATER));
+        act = new QAction(tr("Send all from here to playlist"), this);
+        v = QVariant(int(PUP_ADD_FROMHERE));
         act->setData(v);
         popup->addAction(act);
     }
@@ -522,25 +486,6 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     popup->popup(mapToGlobal(pos));
 }
 
-static PlaylistAddMode pupModeToPadMode(int pupm)
-{
-    PlaylistAddMode plmode;
-    switch (pupm) {
-    case PUP_PLAYNOW: plmode = PADM_PLAYNOW; break;
-    case PUP_PLAYNEXT: plmode = PADM_PLAYNEXT; break;
-    case PUP_PLAYLATER: plmode = PADM_PLAYLATER; break;
-    case PUP_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
-    case PUP_REPLACE: plmode = PADM_REPLACE; break;
-    case PUP_ALL_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
-    case PUP_ALL_PLAYLATER: plmode = PADM_PLAYLATER; break;
-    case PUP_FROMHERE_REPLACEANDPLAY: plmode = PADM_REPLACE_AND_PLAY; break;
-    case PUP_FROMHERE_PLAYLATER: plmode = PADM_PLAYLATER; break;
-    default: // ??
-        plmode = PADM_PLAYNOW;
-    }
-    return plmode;
-}
-    
 // Add a single track or a section of the current container. This
 // maybe triggered by a link click or a popup on an item entry
 void CDBrowser::simpleAdd(QAction *act)
@@ -555,12 +500,10 @@ void CDBrowser::simpleAdd(QAction *act)
     MetaDataList mdl;
     unsigned int starti = 0;
     switch (m_popupmode) {
-    case PUP_FROMHERE_REPLACEANDPLAY: 
-    case PUP_FROMHERE_PLAYLATER: 
+    case PUP_ADD_FROMHERE: 
         starti = m_popupidx;
         /* FALLTHROUGH */
-    case PUP_ALL_REPLACEANDPLAY:
-    case PUP_ALL_PLAYLATER:
+    case PUP_ADD_ALL:
         for (unsigned int i = 0; i < m_entries.size() - starti; i++) {
             unsigned int ei = starti + i;
             if (m_entries[ei].m_type == UPnPDirObject::item && 
@@ -576,7 +519,7 @@ void CDBrowser::simpleAdd(QAction *act)
         udirentToMetadata(&m_entries[m_popupidx], &mdl[0]);
     }
 
-    emit sig_tracks_to_playlist(pupModeToPadMode(m_popupmode), false, mdl);
+    emit sig_tracks_to_playlist(mdl);
 }
 
 // Recursive add. This is triggered popup on a container
@@ -677,5 +620,5 @@ void CDBrowser::rreaperDone(int status)
     for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
         udirentToMetadata(&m_recwalkentries[i], &mdl[i]);
     }
-    emit sig_tracks_to_playlist(pupModeToPadMode(m_popupmode), false, mdl);
+    emit sig_tracks_to_playlist(mdl);
 }

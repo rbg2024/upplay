@@ -42,7 +42,7 @@ public slots:
     // Insert after idx. Use -1 to insert at start
     void psl_insert_tracks(const MetaDataList&, int idx);
 
-    void psl_change_track(int);
+    void psl_change_track_impl(int);
     void psl_prepare_for_end_of_track();
     void psl_ext_track_change(const QString& uri);
     void psl_onCurrentMetadata(const MetaData&);

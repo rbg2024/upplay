@@ -105,7 +105,7 @@ void PlaylistAVT::send_next_playing_signal()
 {
     // Do not do this in shuffle mode: makes no sense + as we never go
     // through the stop state, shuffle does not work
-    if (_playlist_mode.shuffle) 
+    if (CSettingsStorage::getInstance()->getPlaylistMode().shuffle) 
         return;
     // Only if there is a track behind the current one
     if (m_play_idx >= 0 && m_play_idx < int(m_meta.size()) - 1)
@@ -129,7 +129,7 @@ void PlaylistAVT::psl_next_track()
         goto out;
     }
 
-    if (_playlist_mode.shuffle) {
+    if (CSettingsStorage::getInstance()->getPlaylistMode().shuffle) {
         // shuffle mode
         track_num = rand() % m_meta.size();
         if (track_num == m_play_idx) {
@@ -139,7 +139,7 @@ void PlaylistAVT::psl_next_track()
         if (m_play_idx >= int(m_meta.size()) -1) {
             // last track
             qDebug() << "PlaylistAVT::psl_next_track(): was last, stop or loop";
-            if(_playlist_mode.repAll) {
+            if (CSettingsStorage::getInstance()->getPlaylistMode().repAll) {
                 track_num = 0;
             }
         } else {
@@ -172,7 +172,7 @@ void PlaylistAVT::psl_clear_playlist_impl()
 
 void PlaylistAVT::psl_play()
 {
-    _pause = false;
+    m_pause = false;
 
     if (m_meta.empty()) {
         return;
@@ -191,7 +191,7 @@ void PlaylistAVT::psl_play()
 
 void PlaylistAVT::psl_pause()
 {
-    _pause = true;
+    m_pause = true;
     emit sig_pause();
 }
 
@@ -223,7 +223,7 @@ void PlaylistAVT::psl_backward()
 }
 
 // GUI -->
-void PlaylistAVT::psl_change_track(int new_row)
+void PlaylistAVT::psl_change_track_impl(int new_row)
 {
     if (!valid_row(new_row)) {
         return;

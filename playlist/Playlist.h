@@ -69,15 +69,18 @@ signals:
     void insertDone();
 
 public slots:
-    virtual void psl_insert_tracks(const MetaDataList&, int idx) = 0;
-    virtual void psl_add_tracks(PlaylistAddMode, bool, const MetaDataList&);
+    virtual void psl_insert_tracks(const MetaDataList&, int afteridx) = 0;
+    virtual void psl_add_tracks(const MetaDataList&);
 
-    virtual void psl_change_track(int) = 0;
+    virtual void psl_change_track(int num) {
+        m_insertion_point = -1;
+        psl_change_track_impl(num);
+    }
+    virtual void psl_change_track_impl(int) = 0;
+
     virtual void psl_new_transport_state(int, const char *);
     // Mode change requested by UI
     virtual void psl_change_mode(const Playlist_Mode&);
-    // Mode change reported by audio (OH)
-    virtual void psl_mode_changed(Playlist_Mode);
     virtual void psl_clear_playlist();
     virtual void psl_clear_playlist_impl() = 0;
     virtual void psl_play() = 0;
@@ -94,14 +97,11 @@ public slots:
 protected:
     MetaDataList m_meta;
 
-    int	 m_play_idx;
-    int  m_selection_min_row;
-    int  m_tpstate;
-    bool _pause;
-
-    Playlist_Mode _playlist_mode;
-
-    CSettingsStorage *_settings;
+    int	m_play_idx;
+    int m_selection_min_row;
+    int m_insertion_point;
+    int m_tpstate;
+    bool m_pause;
 
     virtual void remove_row(int row);
     virtual bool valid_row(int row) {

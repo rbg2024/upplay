@@ -18,60 +18,49 @@
 #ifndef PLAYLISTMODE_H_
 #define PLAYLISTMODE_H_
 
-#include <QDebug>
-#include <QString>
-#include <QStringList>
-
 struct Playlist_Mode {
 
-    bool rep1;
+    // Modes for playing the track sequence: both can be set
+
+    // Restart when done.
     bool repAll;
-    bool repNone;
-    bool append;
+    // Play in random order.
     bool shuffle;
-    bool dynamic;
 
-    Playlist_Mode() {
-        rep1 = false;
-        repAll = false;
-        repNone = true;
-        append = false;
-        shuffle = false;
+    // Modes for adding tracks
+
+    // Add at end of list, else after current track
+    bool append; 
+    // Replace current list. This implies append of course, so
+    // grey-out append when this is set
+    bool replace; 
+    // Begin playing the first track added.
+    bool playAdded; 
+
+    Playlist_Mode() { 
+        fromInt(0);
     }
-
-    void print() const {
-        qDebug() << "rep1 = " << rep1 << ", "
-             << "repAll = " << repAll << ", "
-             << "repNone = " << repNone << ", "
-             << "append = " << append <<", "
-             << "dynamic = " << dynamic << ","
-             << endl;
+    Playlist_Mode(int val) {
+        fromInt(val);
     }
+    int toInt() const {
+        int ret = 0;
 
-    QString toString() {
-        QString str;
-        str += (append ? "1" : "0")  + QString(",");
-        str += (repAll ? "1" : "0")  + QString(",");
-        str += (rep1 ? "1" : "0")  + QString(",");
-        str += (repNone ? "1" : "0")  + QString(",");
-        str += (shuffle ? "1" : "0")  + QString(",");
-        str += (dynamic ? "1" : "0");
+        if (repAll)     ret |= 1;
+        if (shuffle)    ret |= 2;
+        if (append)     ret |= 4;
+        if (replace)    ret |= 8;
+        if (playAdded)  ret |= 16;
 
-        return str;
+        return ret;
     }
-
-    void fromString(QString str) {
-        QStringList list = str.split(',');
-        if(list.size() != 6) return;
-
-        append = list[0].toInt() == 1;
-        repAll = list[1].toInt() == 1;
-        rep1 = list[2].toInt() == 1;
-        repNone = list[3].toInt() == 1;
-        shuffle = list[4].toInt() == 1;
-        dynamic = list[5].toInt() == 1;
+    void fromInt(int val) {
+        repAll =      (val & 1) != 0;
+        shuffle =     (val & 2) != 0;
+        append =      (val & 4) != 0;
+        replace =     (val & 8) != 0;
+        playAdded =   (val & 16) != 0;
     }
-
 };
 
 #endif

@@ -36,7 +36,7 @@ void PlaylistOH::psl_trackIdChanged(int id)
         if (it->id == id) {
             m_play_idx = it -m_meta.begin();
             qDebug() << " new track index " << m_play_idx;
-            emit sig_track_metadata(*it, -1, !_pause);
+            emit sig_track_metadata(*it, -1, !m_pause);
             emit sig_playing_track_changed(it - m_meta.begin());
             return;
         }
@@ -57,18 +57,18 @@ void PlaylistOH::psl_play()
     } else {
         emit sig_resume_play();
     }
-    _pause = false;
+    m_pause = false;
 }
 
 void PlaylistOH::psl_pause() 
 {
-    _pause = true;
+    m_pause = true;
     emit sig_pause();
 }
 
 void PlaylistOH::psl_stop() 
 {
-    _pause = true;
+    m_pause = true;
     emit sig_stop();
 }
 

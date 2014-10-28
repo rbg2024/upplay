@@ -24,6 +24,7 @@
 #include <QList>
 #include <QMap>
 #include <QStringList>
+#include <QDebug>
 
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/PlaylistMode.h"
@@ -53,7 +54,8 @@ public slots:
 
     // The following are connected to GUI signals, for responding to
     // user actions.
-    void psl_change_track(int idx) {
+    void psl_change_track_impl(int idx) {
+        qDebug() << "psl_change_track: " << idx;
         emit sig_row_activated(idx);
     }
     void psl_clear_playlist_impl();

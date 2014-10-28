@@ -27,15 +27,14 @@ using namespace std;
 #include "Playlist.h"
 
 Playlist::Playlist(QObject* parent) 
-    : QObject (parent)
+    : QObject (parent), m_play_idx(-1), m_selection_min_row(-1),
+      m_insertion_point(-1), m_tpstate(AUDIO_UNKNOWN), m_pause(false)
+
 {
-    _settings = CSettingsStorage::getInstance();
-    _playlist_mode = _settings->getPlaylistMode();
-    m_meta.clear();
     m_play_idx = -1;
-    m_selection_min_row = 0;
+    m_selection_min_row = -1;
     m_tpstate = AUDIO_UNKNOWN;
-    _pause = false;
+    m_pause = false;
 }
 
 // GUI -->
@@ -43,6 +42,8 @@ void Playlist::psl_clear_playlist()
 {
     m_meta.clear();
     m_play_idx = -1;
+    m_selection_min_row = -1;
+    m_insertion_point = -1;
     psl_clear_playlist_impl();
 }
 
@@ -82,55 +83,50 @@ void Playlist::psl_new_transport_state(int tps, const char *)
 // GUI -->
 void Playlist::psl_change_mode(const Playlist_Mode& mode)
 {
-    _settings->setPlaylistMode(mode);
-    _playlist_mode = mode;
-    mode.print();
+    CSettingsStorage::getInstance()->setPlaylistMode(mode);
     emit sig_mode_changed(mode);
 }
 
-// Audio -->
-void Playlist::psl_mode_changed(Playlist_Mode mode)
+void Playlist::psl_add_tracks(const MetaDataList& v_md)
 {
-    _playlist_mode = mode;
-}
-
-void Playlist::psl_add_tracks(PlaylistAddMode mode, bool, 
-                              const MetaDataList& v_md)
-{
-    qDebug() << "Playlist::psl_add_tracks() mode " << mode <<
+    qDebug() << "Playlist::psl_add_tracks: " <<
         " ninserttracks " <<  v_md.size() << 
         " m_meta.size() " << m_meta.size();
 
     emit sig_sync();
 
-    qDebug() << "Playlist::psl_add_tracks() after sync m_meta.size() " << 
-        m_meta.size();
+    Playlist_Mode playlist_mode = CSettingsStorage::getInstance()->getPlaylistMode();
+    if (playlist_mode.replace)
+        psl_clear_playlist();
 
-    switch (mode) {
-    case PADM_PLAYNOW: 
-    {
-        int playpoint = (m_play_idx < 0) ? 0 : m_play_idx;
-        psl_insert_tracks(v_md, playpoint - 1);
-        psl_change_track(playpoint);
+    int afteridx = -1;
+
+    if (playlist_mode.append) {
+        afteridx = m_meta.size() - 1;
+    } else {
+        if (m_insertion_point >= 0) {
+            afteridx = m_insertion_point;
+        } else if (m_play_idx >= 0) {
+            afteridx = m_play_idx;
+            // Using selection_min_row appears to be source of confusion
+            // } else if (m_selection_min_row >= 0) { 
+            // afteridx = m_selection_min_row;
+        } else {
+            // The more natural thing to do if neither playing nore
+            // selection is to append. Else clicking on several tracks
+            // inserts them in reverse order
+            afteridx = m_meta.size() - 1;
+        }
     }
-    break;
-    case PADM_PLAYNEXT:
-        psl_insert_tracks(v_md, m_play_idx);
-        break;
-    case PADM_REPLACE_AND_PLAY:
-        psl_clear_playlist();
-        psl_insert_tracks(v_md, -1);
+
+    psl_insert_tracks(v_md, afteridx);
+    m_insertion_point = afteridx + 1;
+
+    if (playlist_mode.playAdded) {
+        psl_change_track(afteridx+1);
         psl_play();
-        break;
-    case PADM_REPLACE:
-        psl_clear_playlist();
-        psl_insert_tracks(v_md, -1);
-        break;
-    case PADM_PLAYLATER:
-    default:
-        psl_insert_tracks(v_md, m_meta.size() - 1);
-        break;
     }
+
     emit insertDone();
 }
 
@@ -190,4 +186,3 @@ void Playlist::psl_remove_rows(const QList<int>& rows, bool select_next_row)
 
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
 }
-

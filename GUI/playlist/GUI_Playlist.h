@@ -59,7 +59,6 @@ signals:
     void selection_min_row(int);
 
     void clear_playlist();
-    void save_playlist(const QString&);
     void playlist_mode_changed(const Playlist_Mode&);
 
     void dropped_tracks(const MetaDataList&, int);
@@ -72,6 +71,7 @@ public slots:
     void fillPlaylist(MetaDataList&, int, int);
     void track_changed(int);
     void setMode(Playlist_Mode mode);
+    void setPlayerMode(Playlist_Mode mode);
     void psl_show_small_playlist_items(bool small_items);
 
 private slots:
@@ -80,14 +80,10 @@ private slots:
     void clear_playlist_slot();
     void playlist_mode_changed_slot();
 
-    void psl_info_tracks();
-    void psl_edit_tracks();
-
     void btn_numbers_changed(bool);
     void metadata_dropped(const MetaDataList&, int);
     void rows_removed(const QList<int>&, bool select_next_row);
     void no_focus();
-
 
 private:
     Ui::Playlist_Window*            ui;

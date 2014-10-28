@@ -52,11 +52,7 @@ class CDBrowser : public QWebView
     void onInsertDone() { m_insertactive = false;}
 
  signals:
-    void sig_tracks_to_playlist(PlaylistAddMode, bool replace, 
-                                const MetaDataList&);
-    void sig_open_multi_insert(PlaylistAddMode);
-    void sig_close_multi_insert();
- protected:
+    void sig_tracks_to_playlist(const MetaDataList&);
 
  protected slots:
     virtual void appendHtml(const QString&, const QString& html);
