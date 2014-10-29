@@ -1,0 +1,24 @@
+/* Dark version of the dir browser colors */
+
+html {
+    background-color: #3c3c3c;
+    color: #D8D8D8;
+    selection-background-color: #424e72;
+}
+
+a:link {
+    color: #D8D8D8;
+}
+
+/* Alternate colours for the directory list table */
+#entrylist tr:nth-child(even) {
+    background: #242424;
+}
+#entrylist td:empty {
+    background: #3c3c3c;
+    color: #D8D8D8;
+}
+#entrylist tr:nth-child(odd) {
+    background: #3c3c3c;
+    color: #D8D8D8;
+}

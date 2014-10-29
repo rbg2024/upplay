@@ -338,6 +338,7 @@ void Application::init_connections()
 
     CONNECT(cdb, sig_tracks_to_playlist(const MetaDataList&),
             playlist, psl_add_tracks(const MetaDataList&));
+    CONNECT(player, sig_skin_changed(bool), cdb, setStyleSheet(bool));
 }
 
 

@@ -1,0 +1,12 @@
+/* Colors for the standard dir browser table */
+
+/* Alternate colours for the directory list table */
+#entrylist tr:nth-child(even) {
+    background: #dddddd;
+}
+#entrylist td:empty {
+    background: white;
+}
+#entrylist tr:nth-child(odd) {
+    background: white;
+}

@@ -90,11 +90,12 @@ unix {
  # Installation stuff
   target.path = "$$PREFIX/bin"
 
-  bdata.files = dirbrowser/cdbrowser.css 
+  bdata.files = dirbrowser/cdbrowser.css dirbrowser/dark.css \
+              dirbrowser/standard.css
   bdata.path = $$PREFIX/share/upplay/cdbrowser   
   gdata.files = GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
   desktop.path = /usr/share/applications/
-  INSTALLS += target bdata desktop # gdata
+  INSTALLS += target bdata desktop gdata
 }

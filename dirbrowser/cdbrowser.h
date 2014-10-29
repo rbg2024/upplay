@@ -50,6 +50,7 @@ class CDBrowser : public QWebView
     void onSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onInsertDone() { m_insertactive = false;}
+    void setStyleSheet(bool);
 
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);

@@ -1,12 +1,3 @@
-/*
-Example colors for a dark version, but there is more to be done (esp: link color and entrylist table).
-html {
-    background-color: #3c3c3c;
-    color: #D8D8D8;
-    selection-background-color: #424e72;
-}
-*/
-
 /* Servers page. Each is a p */
 p.cdserver {
     margin: 7px 0px 0px 0px;
@@ -34,17 +25,6 @@ p.cdserver {
 
 #entrylist {
     clear: both;
-}
-
-/* Alternate colours for the directory list table */
-#entrylist tr:nth-child(even) {
-    background: #dddddd;
-}
-#entrylist td:empty {
-    background: white;
-}
-#entrylist tr:nth-child(odd) {
-    background: white;
 }
 
 /* Styles for the directory list cells */

@@ -15,6 +15,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include <fcntl.h>
+#include <sys/stat.h>
+
 #include <iostream>
 using namespace std;
 
@@ -40,6 +43,53 @@ using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
 
+static QByteArray readfile(const char *fn)
+{
+    int fd = -1;
+    char *cp = 0;
+    QByteArray ret;
+    struct stat st;
+
+    fd = open(fn, 0);
+    if (fd < 0 || fstat(fd, &st) < 0) {
+        goto out;
+    }
+    cp = (char *)malloc(st.st_size);
+    if (cp == 0) {
+        goto out;
+    }
+    if (read(fd, cp, st.st_size) != st.st_size) {
+        goto out;
+    }
+    ret.append(cp, st.st_size);
+out:
+    if (fd >= 0)
+        close(fd);
+    if (cp)
+        free(cp);
+    return ret;
+}
+
+void CDBrowser::setStyleSheet(bool dark)
+{
+    QString cssfn = Helper::getSharePath() + "cdbrowser/cdbrowser.css";
+    QByteArray css = readfile((const char *)cssfn.toLocal8Bit());
+
+    if (dark) {
+        cssfn = Helper::getSharePath() + "cdbrowser/dark.css";
+        css += readfile((const char *)cssfn.toLocal8Bit());
+    } else {
+        cssfn = Helper::getSharePath() + "cdbrowser/standard.css";
+    }
+    css += readfile((const char *)cssfn.toLocal8Bit());
+
+    css = QByteArray("data:text/css;charset=utf-8;base64,") +
+        css.toBase64();
+
+    QUrl cssurl(QString::fromUtf8((const char*)css));
+    settings()->setUserStyleSheetUrl(cssurl);
+}
+
 CDBrowser::CDBrowser(QWidget* parent)
     : QWebView(parent), m_reader(0), m_reaper(0), m_insertactive(false)
 {
@@ -50,17 +100,14 @@ CDBrowser::CDBrowser(QWidget* parent)
 
     settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
 
-    setHtml("<html><head><title>Upplay directory browser !</title></head>"
-            "<body><p>Looking for servers...</p>"
-            "</body></html>");
-
-    QString cssurl = QString("file://") + Helper::getSharePath() + 
-        "cdbrowser/cdbrowser.css";
-    settings()->setUserStyleSheetUrl(cssurl);
-
+    setStyleSheet(CSettingsStorage::getInstance()->getPlayerStyle());
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 	    this, SLOT(createPopupMenu(const QPoint&)));
+
+    setHtml("<html><head><title>Upplay directory browser !</title></head>"
+            "<body><p>Looking for servers...</p>"
+            "</body></html>");
 
     m_timer.setSingleShot(1);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(serversPage()));
