@@ -69,6 +69,7 @@ GENCODE_VARIABLE(NotifyNewVersion, bool,  Bool)
 GENCODE_VARIABLE(PlayerUID, QString, String)
 GENCODE_VARIABLE(FolderViewFNOrder, bool, Bool)
 GENCODE_VARIABLE(LoadPlaylist, bool, Bool)
+GENCODE_VARIABLE(SplitterState, QByteArray, ByteArray)
 
 bool CSettingsStorage::isRunFirstTime () 
 {

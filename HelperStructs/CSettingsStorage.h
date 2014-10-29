@@ -79,7 +79,7 @@ public:
     GENDEC_VARIABLE(PlayerUID, QString, String);
     GENDEC_VARIABLE(FolderViewFNOrder, bool, Bool);
     GENDEC_VARIABLE(LoadPlaylist, bool, Bool);
-
+    GENDEC_VARIABLE(SplitterState, QByteArray, ByteArray);
     // Special cases
     void setPlaylistMode(const Playlist_Mode&);
     Playlist_Mode getPlaylistMode();

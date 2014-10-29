@@ -123,7 +123,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
         rect.setHeight(size.height());
         this->setGeometry(rect);
     }
-
+    
     m_library_width = 600;
 
     /* TRAY ACTIONS */
@@ -413,6 +413,7 @@ void GUI_Player::setLibraryWidget(QWidget* w)
     delete ui->library_widget;
     ui->library_widget = w;
     ui->splitter->addWidget(w);
+    ui->splitter->restoreState(m_settings->getSplitterState());
 }
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
@@ -498,6 +499,8 @@ void GUI_Player::keyPressEvent(QKeyEvent* e)
 
 void GUI_Player::closeEvent(QCloseEvent* e)
 {
+    m_settings->setSplitterState(ui->splitter->saveState());
+
     if (m_min2tray) {
         e->ignore();
         this->hide();
