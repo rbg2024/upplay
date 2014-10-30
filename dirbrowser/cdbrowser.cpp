@@ -104,6 +104,8 @@ CDBrowser::CDBrowser(QWidget* parent)
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 	    this, SLOT(createPopupMenu(const QPoint&)));
+    connect(page()->mainFrame(), SIGNAL(contentsSizeChanged(const QSize&)),
+            this, SLOT(onContentsSizeChanged(const QSize&)));
 
     setHtml("<html><head><title>Upplay directory browser !</title></head>"
             "<body><p>Looking for servers...</p>"
@@ -118,6 +120,14 @@ CDBrowser::~CDBrowser()
 {
     delete m_reader;
 }
+
+void CDBrowser::onContentsSizeChanged(const QSize&)
+{
+    //qDebug() << "CDBrowser::onContentsSizeChanged: scrollpos " <<
+    // page()->mainFrame()->scrollPosition();
+    page()->mainFrame()->setScrollPosition(m_savedscrollpos);
+}
+
 
 void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 {
@@ -157,7 +167,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 	    return;
 	}
         m_curpath.clear();
-        m_curpath.push_back(pair<string,string>("0", "(servers)"));
+        m_curpath.push_back(CtPathElt("0", "(servers)"));
         m_ms = MSRH(new MediaServer(m_msdescs[cdsidx]));
         if (!m_ms) {
             qDebug() << "MediaServer connect failed";
@@ -187,6 +197,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     case 'C':
     {
         // Container clicked
+        m_curpath.back().scrollpos = page()->mainFrame()->scrollPosition();
 	unsigned int i = atoi(scurl.c_str()+1);
         if (i > m_entries.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad objid index: " << i 
@@ -201,29 +212,38 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     {
         // Click in curpath section.
 	unsigned int i = atoi(scurl.c_str()+1);
-        if (i > m_curpath.size()) {
-	    LOGERR("CDBrowser::onLinkClicked: bad curpath index: " << i 
-                   << " path count: " << m_curpath.size() << endl);
-	    return;
-	}
-        string objid = m_curpath[i].first;
-        string title = m_curpath[i].second;
-        m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
-        if (i == 0) {
-            m_msdescs.clear();
-            serversPage();
-        } else if (i == 1) {
-            // Server root
-            browseContainer("0", title);
-        } else {
-            browseContainer(objid, title);
-        }
+        curpathClicked(i);
+        return;
     }
     break;
 
     default:
         LOGERR("CDBrowser::onLinkClicked: bad link type: " << what << endl);
         return;
+    }
+}
+
+void CDBrowser::curpathClicked(unsigned int i)
+{
+    // qDebug() << "CDBrowser::curpathClicked: " << i << " pathsize " << 
+    // m_curpath.size();
+    if (i > m_curpath.size()) {
+        LOGERR("CDBrowser::curPathClicked: bad curpath index: " << i 
+               << " path count: " << m_curpath.size() << endl);
+        return;
+    }
+    string objid = m_curpath[i].objid;
+    string title = m_curpath[i].title;
+    QPoint scrollpos = m_curpath[i].scrollpos;
+    m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
+    if (i == 0) {
+        m_msdescs.clear();
+        serversPage();
+    } else if (i == 1) {
+        // Server root
+        browseContainer("0", title, scrollpos);
+    } else {
+        browseContainer(objid, title, scrollpos);
     }
 }
 
@@ -238,7 +258,7 @@ void CDBrowser::initContainerHtml()
 {
     QString htmlpath("<div id=\"browsepath\"><ul>");
     for (unsigned i = 0; i < m_curpath.size(); i++) {
-        QString title = QString::fromUtf8(m_curpath[i].second.c_str());
+        QString title = QString::fromUtf8(m_curpath[i].title.c_str());
         htmlpath += 
             QString("<li><a href=\"L%1\">%2</a> &gt;</li>").arg(i).arg(title);
     }
@@ -249,9 +269,10 @@ void CDBrowser::initContainerHtml()
     appendHtml(QString(), "<table id=\"entrylist\"></table>");
 }
 
-void CDBrowser::browseContainer(string ctid, string cttitle)
+void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 {
     qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
+    m_savedscrollpos = scrollpos;
     if (!m_ms) {
         LOGERR("CDBrowser::browseContainer: server not set" << endl);
         return;
@@ -263,7 +284,7 @@ void CDBrowser::browseContainer(string ctid, string cttitle)
     }
     m_entries.clear();
 
-    m_curpath.push_back(pair<string,string>(ctid, cttitle));
+    m_curpath.push_back(CtPathElt(ctid, cttitle));
 
     initContainerHtml();
 
@@ -410,7 +431,9 @@ void CDBrowser::onBrowseDone(int)
         }
 
         m_reader->wait();
+        page()->mainFrame()->setScrollPosition(m_savedscrollpos);
     }
+    
     //qDebug() << "CDBrowser::onBrowseDone done";
 }
 
@@ -476,21 +499,37 @@ enum PopupMode {
     PUP_ADD,
     PUP_ADD_ALL,
     PUP_ADD_FROMHERE,
+    PUP_BACK
 };
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
 {
     if (m_insertactive)
         return;
+    qDebug() << "void CDBrowser::createPopupMenu(const QPoint& pos)";
 
     QWebHitTestResult htr = page()->mainFrame()->hitTestContent(pos);
-    if (htr.isNull())
+    if (htr.isNull()) {
 	return;
+    }
     QWebElement el = htr.enclosingBlockElement();
     while (!el.isNull() && !el.hasAttribute("objid"))
 	el = el.parent();
-    if (el.isNull())
+    if (el.isNull()) {
+        if (m_curpath.size() == 0)
+            return;
+        QMenu *popup = new QMenu(this);
+        QAction *act;
+        QVariant v;
+        act = new QAction(tr("Back"), this);
+        v = QVariant(int(PUP_BACK));
+        act->setData(v);
+        popup->addAction(act);
+        popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
+                       SLOT(back(QAction *)));
+        popup->popup(mapToGlobal(pos));
 	return;
+    }
     m_popupobjid = qs2utf8s(el.attribute("objid"));
     m_popupidx = el.attribute("objidx").toInt();
 
@@ -531,6 +570,12 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         return;
     }
     popup->popup(mapToGlobal(pos));
+}
+
+void CDBrowser::back(QAction *)
+{
+    if (m_curpath.size() >= 2)
+        curpathClicked(m_curpath.size()-2);
 }
 
 // Add a single track or a section of the current container. This

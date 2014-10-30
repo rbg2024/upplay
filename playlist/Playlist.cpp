@@ -50,7 +50,7 @@ void Playlist::psl_clear_playlist()
 // Remove one row
 void Playlist::remove_row(int row)
 {
-    qDebug() << "Playlist::remove_row";
+    //qDebug() << "Playlist::remove_row";
     QList<int> remove_list;
     remove_list << row;
     psl_remove_rows(remove_list);
@@ -60,9 +60,9 @@ void Playlist::psl_new_transport_state(int tps, const char *)
 {
 //    qDebug() << "Playlist::psl_new_transport_state " << s <<
 //        " play_idx " << m_play_idx;
-    if (m_play_idx >= 0 && m_play_idx < int(m_meta.size())) 
-        qDebug() << "     meta[idx].pl_playing " << 
-            m_meta[m_play_idx].pl_playing;
+//    if (m_play_idx >= 0 && m_play_idx < int(m_meta.size())) 
+//        qDebug() << "     meta[idx].pl_playing " << 
+//            m_meta[m_play_idx].pl_playing;
 
     m_tpstate = tps;
     switch (tps) {

@@ -429,13 +429,11 @@ void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 
 void GUI_Player::stopped()
 {
-    qDebug() << "void GUI_Player::stopped()";
     m_metadata_available = false;
     stopClicked(false);
 }
 void GUI_Player::playing()
 {
-    qDebug() << "void GUI_Player::playing()";
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
     m_playing = true;
     m_trayIcon->setPlaying(m_playing);

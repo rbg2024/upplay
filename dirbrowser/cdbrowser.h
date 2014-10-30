@@ -25,6 +25,7 @@
 #include <QtWebKit/QWebView>
 #include <QVariant>
 #include <QTimer>
+#include <QPoint>
 
 #include "libupnpp/control/description.hxx"
 #include "libupnpp/control/mediaserver.hxx"
@@ -61,19 +62,30 @@ class CDBrowser : public QWebView
     virtual void createPopupMenu(const QPoint&);
     virtual void simpleAdd(QAction *);
     virtual void recursiveAdd(QAction *);
+    virtual void back(QAction *);
     virtual void rreaperDone(int);
-
+    virtual void onContentsSizeChanged(const QSize&);
  private:
     void initContainerHtml();
-    void browseContainer(std::string, std::string);
+    void browseContainer(std::string, std::string, QPoint scrollpos = QPoint());
+    void curpathClicked(unsigned int i);
 
     // The currently seen Media Server descriptions
     std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
     // Handle for the currently active media server
     UPnPClient::MSRH m_ms;
 
-    // Current path inside current server: vector of objid/title pairs
-    std::vector<std::pair<std::string, std::string> > m_curpath;
+    // Current path inside current server: remember objid,title and scroll pos
+    struct CtPathElt {
+        CtPathElt() : scrollpos(0,0) {}
+        CtPathElt(const std::string& id, const std::string& tt)
+            : objid(id), title(tt), scrollpos(0,0) 
+            {}
+        std::string objid;
+        std::string title;
+        QPoint scrollpos;
+    };
+    std::vector<CtPathElt> m_curpath;
 
     // We periodically check the server pool state.
     QTimer m_timer;
@@ -83,6 +95,8 @@ class CDBrowser : public QWebView
 
     // Content of the currently visited container
     std::vector<UPnPClient::UPnPDirObject> m_entries;
+    // Scroll position to be restored when we're done reading
+    QPoint m_savedscrollpos;
 
     // Content of recursive explore
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;

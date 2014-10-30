@@ -19,6 +19,11 @@
 
 #include "PlaylistOH.h"
 
+#include "libupnpp/log.hxx"
+
+using namespace UPnPP;
+
+
 void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOH::psl_new_ohpl: " << mdv.size() << " entries";
@@ -28,20 +33,20 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 
 void PlaylistOH::psl_trackIdChanged(int id)
 {
-    qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
+    //qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
     if (id <= 0)
         return;
 
     for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
         if (it->id == id) {
             m_play_idx = it -m_meta.begin();
-            qDebug() << " new track index " << m_play_idx;
+            // qDebug() << " new track index " << m_play_idx;
             emit sig_track_metadata(*it, -1, !m_pause);
             emit sig_playing_track_changed(it - m_meta.begin());
             return;
         }
     }
-    qDebug() << " Track id not found in array";
+    LOGINF("PlaylistOH::psl_trackIdChanged: track not found in array" << endl);
 }
 
 void PlaylistOH::psl_clear_playlist_impl()
