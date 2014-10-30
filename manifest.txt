@@ -4,6 +4,7 @@ COPYING
 GUI/
 GUI/ContextMenu.cpp
 GUI/ContextMenu.h
+GUI/dark.css
 GUI/icons/
 GUI/icons/append.png
 GUI/icons/append_small.png
@@ -70,6 +71,8 @@ GUI/icons/vol_3_dark.png
 GUI/icons/vol_mute.png
 GUI/icons/vol_mute_dark.png
 GUI/player/
+GUI/player/DirectSlider.cpp
+GUI/player/DirectSlider.h
 GUI/player/GUI_Player.cpp
 GUI/player/GUI_Player.h
 GUI/player/GUI_Player.ui
@@ -79,8 +82,6 @@ GUI/player/GUI_PlayerCover.cpp
 GUI/player/GUI_PlayerMenubar.cpp
 GUI/player/GUI_TrayIcon.cpp
 GUI/player/GUI_TrayIcon.h
-GUI/player/SearchSlider.cpp
-GUI/player/SearchSlider.h
 GUI/player/player
 GUI/player/testmain.cpp
 GUI/player/testplayer.pro
@@ -109,6 +110,7 @@ GUI/playlist/view/PlaylistView.h
 GUI/renderchoose/
 GUI/renderchoose/renderchoose.h
 GUI/renderchoose/renderchoose.ui
+GUI/standard.css
 GUI/upplay.qrc
 HelperStructs/
 HelperStructs/CSettingsStorage.cpp
@@ -128,7 +130,9 @@ dirbrowser/
 dirbrowser/cdbrowser.cpp
 dirbrowser/cdbrowser.css
 dirbrowser/cdbrowser.h
+dirbrowser/dark.css
 dirbrowser/rreaper.h
+dirbrowser/standard.css
 excludefile
 makesrcdist.sh
 playlist/
