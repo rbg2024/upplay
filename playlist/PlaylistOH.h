@@ -42,11 +42,10 @@ public:
     virtual ~PlaylistOH() {}
 
 signals:
-    // Connected to the OHPlaylist object
+    // All our signals are connected to the OHPlaylist object
     void sig_clear_playlist();
-    // Idem
     void sig_insert_tracks(const MetaDataList&, int);
-    // Idem: change the current id
+    void sig_tracks_removed(const QList<int>& rows);
     void sig_row_activated(int);
 
 public slots:
@@ -64,7 +63,9 @@ public slots:
     void psl_stop(); 
     void psl_forward();
     void psl_backward();
-    void psl_remove_rows(const QList<int> &, bool = true) {}
+    void psl_remove_rows(const QList<int>& rows, bool = true) {
+        emit sig_tracks_removed(rows);
+    }
     // Insert after idx. Use -1 to insert at start
     void psl_insert_tracks(const MetaDataList&, int);
 

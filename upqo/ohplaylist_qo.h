@@ -55,8 +55,11 @@ public:
     {
         //qDebug() << "OHPL: Changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "Id")) {
-            emit trackIdChanged(value);
+            // We could test for an unchanged Id, but let our clients
+            // do this because it's quite possible that we emit the
+            // first signal before we are connected
             m_curid = value;
+            emit trackIdChanged(value);
         } else if (!strcmp(nm, "TransportState")) {
             emit tpStateChanged(value);
         } else if (!strcmp(nm, "Shuffle")) {
@@ -231,7 +234,7 @@ private slots:
         //qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
         // "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit trackArrayChanged();
-
+        emit trackIdChanged(m_curid);
     out:
         return;
     }
