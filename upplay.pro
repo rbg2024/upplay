@@ -96,6 +96,6 @@ unix {
   gdata.files = GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
-  desktop.path = /usr/share/applications/
+  desktop.path = $$PREFIX/share/applications/
   INSTALLS += target bdata desktop gdata
 }
