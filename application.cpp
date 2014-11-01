@@ -225,26 +225,27 @@ void Application::renderer_connections()
             cerr << "OpenHome player but Playlist not openhome!";
             abort();
         }
-        CONNECT(ploh, sig_clear_playlist(), ohplo, clear());
 
+        // Connections from OpenHome renderer to local playlist
         CONNECT(ohplo, metadataArrayChanged(const MetaDataList&),
                 playlist, psl_new_ohpl(const MetaDataList&));
         CONNECT(ohplo, trackIdChanged(int), ploh, psl_trackIdChanged(int));
+        CONNECT(ohplo, audioStateChanged(int, const char *), 
+                playlist, psl_new_transport_state(int, const char *));
         CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
                 ui_playlist, setPlayerMode(Playlist_Mode));
+
+        // Connections from local playlist to openhome
+        CONNECT(ploh, sig_clear_playlist(), 
+                ohplo, clear());
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
                 ohplo, insertTracks(const MetaDataList&, int));
-
+        CONNECT(ploh, sig_tracks_removed(const QList<int>&), 
+                ohplo, removeTracks(const QList<int>&));
         CONNECT(ploh, sig_row_activated(int), ohplo, seekIndex(int));
-
-        CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
-                ohplo, removeTracks(const QList<int>&, bool));
-
         CONNECT(playlist, sig_mode_changed(Playlist_Mode),
                 ohplo, changeMode(Playlist_Mode));
         CONNECT(playlist, sig_sync(), ohplo, sync());
-        CONNECT(playlist, sig_async_playlist_updates(bool), 
-                ohplo, asyncArrayUpdates(bool));
         CONNECT(playlist, sig_pause(), ohplo, pause());
         CONNECT(playlist, sig_stop(),  ohplo, stop());
         CONNECT(playlist, sig_resume_play(), ohplo, play());
@@ -253,10 +254,9 @@ void Application::renderer_connections()
 
         CONNECT(player, search(int), ohplo, seekPC(int));
 
+        // Still using avtransport for time updates, tbd switch to ohtime
         CONNECT(avto, secsInSongChanged(quint32), 
                 player, setCurrentPosition(quint32));
-        CONNECT(ohplo, audioStateChanged(int, const char *), playlist, 
-                psl_new_transport_state(int, const char *));
 
     } else {
         PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);

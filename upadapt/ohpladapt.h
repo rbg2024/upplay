@@ -113,7 +113,7 @@ public slots:
         m_ininsert = false;
     }
 
-    void removeTracks(const QList<int>& lidx, bool) {
+    void removeTracks(const QList<int>& lidx) {
         //qDebug() << "OHPlayer::removeTracks";
         std::vector<int> ids;
         ids.reserve(lidx.size());

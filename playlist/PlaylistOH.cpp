@@ -39,10 +39,12 @@ void PlaylistOH::psl_trackIdChanged(int id)
 
     for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
         if (it->id == id) {
-            m_play_idx = it -m_meta.begin();
-            // qDebug() << " new track index " << m_play_idx;
-            emit sig_track_metadata(*it, -1, !m_pause);
-            emit sig_playing_track_changed(it - m_meta.begin());
+            if (m_play_idx != it - m_meta.begin()) {
+                m_play_idx = it -m_meta.begin();
+                // qDebug() << " new track index " << m_play_idx;
+                emit sig_track_metadata(*it, -1, !m_pause);
+                emit sig_playing_track_changed(it - m_meta.begin());
+            }
             return;
         }
     }
