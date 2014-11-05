@@ -4,7 +4,7 @@ LANGUAGE        = C++
 QT += webkit network
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 0.8.6
+VERSION = 0.8.7
 
 QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"$$VERSION\\\"
 
@@ -41,6 +41,7 @@ HEADERS += \
         upqo/avtransport_qo.h \
         upqo/cdirectory_qo.h \
         upqo/ohplaylist_qo.h \
+        upqo/ohtime_qo.h \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \

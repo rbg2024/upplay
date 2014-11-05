@@ -32,6 +32,7 @@
 
 #include "dirbrowser/cdbrowser.h"
 #include "upqo/renderingcontrol_qo.h"
+#include "upqo/ohtime_qo.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 
@@ -68,6 +69,7 @@ private:
     RenderingControlQO *rdco;
     AVTPlayer    *avto;
     OHPlayer     *ohplo;
+    OHTimeQO     *ohtmo;
     GUI_Playlist *ui_playlist;
 
     CSettingsStorage *settings;

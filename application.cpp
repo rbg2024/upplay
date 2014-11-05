@@ -89,6 +89,7 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(rdco);
     deleteZ(avto);
     deleteZ(ohplo);
+    deleteZ(ohtmo);
 
     MRDH rdr = getRenderer(uid, false);
     if (!rdr) {
@@ -118,6 +119,12 @@ bool Application::setupRenderer(const string& uid)
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
         ohplo = new OHPlayer(ohpl);
+        OHTMH ohtm = rdr->ohtm();
+        if (ohtm) {
+            ohtmo = new OHTimeQO(ohtm);
+            // no need for AVT then
+            deleteZ(avto);
+        }
         qDebug() << "setupRenderer: deleting old playlist, creating OH one";
         playlist = new PlaylistOH();
     } else {
@@ -166,7 +173,7 @@ void Application::chooseRenderer()
 Application::Application(QApplication* qapp, int, 
                          QTranslator* translator, QObject *parent)
     : QObject(parent), player(0), playlist(0), cdb(0), rdco(0),
-      avto(0), ohplo(0), ui_playlist(0), settings(0), app(qapp),
+      avto(0), ohplo(0), ohtmo(0), ui_playlist(0), settings(0), app(qapp),
       _initialized(false)
 {
     settings = CSettingsStorage::getInstance();
@@ -255,10 +262,19 @@ void Application::renderer_connections()
         CONNECT(player, search(int), ohplo, seekPC(int));
 
         // Still using avtransport for time updates, tbd switch to ohtime
-        CONNECT(avto, secsInSongChanged(quint32), 
-                player, setCurrentPosition(quint32));
+        if (ohtmo) {
+            CONNECT(ohtmo, secondsChanged(quint32), 
+                    player, setCurrentPosition(quint32));
+        } else {
+            CONNECT(avto, secsInSongChanged(quint32), 
+                    player, setCurrentPosition(quint32));
+        }
 
     } else {
+        if (avto == 0) {
+            cerr << "No OpenHome Playlist and no AVTRansport ??";
+            return;
+        }
         PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);
         if (plavt == 0) {
             cerr << "!OpenHome player but Playlist not AVT !";
@@ -302,7 +318,7 @@ void Application::init_connections()
 {
     // At startup, we don't necessarily have a renderer setup
     // The playlist is an AVT one by default and can be connected.
-    if (avto && rdco) {
+    if (rdco) {
         renderer_connections();
     }
 
