@@ -199,9 +199,13 @@ private slots:
                 continue;
             }
             UPnPClient::UPnPDirObject& ude = poolit->second;
-            if (ude.m_resources.empty())
-                continue;
-
+            if (ude.m_resources.empty()) {
+                LOGDEB("translateMetadata: no resources for:"  <<
+                       ude.dump() << endl);
+                //continue; does not seem to be an issue in fact. Only used
+                // for avt. Funny, this is the exact same problem which bubble
+                // had initially with ohpl tracks added through mpd (no uri)...
+            }
             MetaData md;
             udirentToMetadata(&ude, &md);
             md.id = *idit;

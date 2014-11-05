@@ -224,8 +224,15 @@ private slots:
             for (auto it = entries.begin(); it != entries.end(); it++) {
                 //qDebug() << "OHPL: data for " << it->id << " " << 
                 //    it->dirent.m_title.c_str();
+                // Kazoo for example does not set a resource (uri)
+                // inside the dirent.  Set it from the uri field in
+                // this case.
+                if (it->dirent.m_resources.empty()) {
+                    UPnPClient::UPnPResource res;
+                    res.m_uri = it->url;
+                    it->dirent.m_resources.push_back(res);
+                }
                 m_metapool[it->id] = it->dirent;
-                //qDebug() << "OHPL::onIdArrayChanged: got meta for " << it->id;
             }
             i += j;
         }
