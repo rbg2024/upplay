@@ -29,7 +29,10 @@ public:
         {
             m_srv->installReporter(this);
         }
-
+    ~RenderingControlQO() {
+            m_srv->installReporter(0);
+    }
+        
     void changed(const char *nm, int value)
         {
             //qDebug() << "RDR: Changed: " << nm << " : " << value << " (int)";

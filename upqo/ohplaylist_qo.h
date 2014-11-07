@@ -43,13 +43,16 @@ public:
           m_discardArrayEvents(false),
           m_srv(ohp)
     {
-        m_srv->installReporter(this);
         qRegisterMetaType<std::vector<int> >("std::vector<int>");
         connect(this, SIGNAL(__idArrayChanged(std::vector<int>)),
                 this, SLOT(onIdArrayChanged(std::vector<int>)),
                 Qt::QueuedConnection);
+        m_srv->installReporter(this);
     }
-    
+    virtual ~OHPlaylistQO() {
+        m_srv->installReporter(0);
+    }
+        
     // TransportState, Repeat, Shuffle, Id, TracksMax
     virtual void changed(const char *nm, int value)
     {
@@ -183,7 +186,7 @@ private slots:
         // for big ones, this will prevent what would otherwise be a
         // linear search the repeated search to make this
         // quadratic. We're sort of O(n * log(n)) instead.
-        {
+        if (!m_metapool.empty() && !nids.empty()){
             std::unordered_set<int> tmpset(nids.begin(), nids.end());
             for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
                 if (tmpset.find(it->first) == tmpset.end()) {

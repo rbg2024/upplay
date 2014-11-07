@@ -45,11 +45,14 @@ public:
           m_in_ending(false),
           m_tpstate(AVTransport::Unknown)
     {
-        m_srv->installReporter(this);
         m_timer = new QTimer(this);
         connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
         m_timer->start(1000);
         qRegisterMetaType<UPnPClient::UPnPDirObject>("UPnPClient::UPnPDirObject");
+        m_srv->installReporter(this);
+    }
+    virtual ~AVTransportQO() {
+        m_srv->installReporter(0);
     }
 
     virtual void changed(const char *nm, int value)

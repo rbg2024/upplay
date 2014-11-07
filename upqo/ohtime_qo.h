@@ -34,7 +34,10 @@ public:
     {
         m_srv->installReporter(this);
     }
-    
+    virtual ~OHTimeQO() {
+        m_srv->installReporter(0);
+    }
+
     // TrackCount, Duration and Seconds
     virtual void changed(const char *nm, int value)
     {
