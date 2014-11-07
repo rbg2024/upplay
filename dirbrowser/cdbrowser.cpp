@@ -259,8 +259,10 @@ void CDBrowser::initContainerHtml()
     QString htmlpath("<div id=\"browsepath\"><ul>");
     for (unsigned i = 0; i < m_curpath.size(); i++) {
         QString title = QString::fromUtf8(m_curpath[i].title.c_str());
+        QString objid = QString::fromUtf8(m_curpath[i].objid.c_str());
         htmlpath += 
-            QString("<li><a href=\"L%1\">%2</a> &gt;</li>").arg(i).arg(title);
+            QString("<li class=\"container\" objid=\"%3\"><a href=\"L%1\">%2</a> &gt;</li>").
+            arg(i).arg(title).arg(objid);
     }
     htmlpath += QString("</ul></div><br/>");
 
@@ -328,6 +330,9 @@ static string escapeHtml(const string &in)
     return out;
 }
 
+/** @arg idx index in entries array
+    @arg e array entry
+*/
 static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
@@ -515,7 +520,9 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     QWebElement el = htr.enclosingBlockElement();
     while (!el.isNull() && !el.hasAttribute("objid"))
 	el = el.parent();
+
     if (el.isNull()) {
+        // Click in blank space. We only have a Back action there for now
         if (m_curpath.size() == 0)
             return;
         QMenu *popup = new QMenu(this);
@@ -530,12 +537,24 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         popup->popup(mapToGlobal(pos));
 	return;
     }
+
+    // Clicked on some object. Dir entries inside the path have no objidx attr
+    // and that's ok
     m_popupobjid = qs2utf8s(el.attribute("objid"));
-    m_popupidx = el.attribute("objidx").toInt();
+    if (el.hasAttribute("objidx"))
+        m_popupidx = el.attribute("objidx").toInt();
+    else
+        m_popupidx = -1;
 
     QString otype = el.attribute("class");
     qDebug() << "Popup: " << " class " << otype << " objid " << 
         m_popupobjid.c_str();
+
+    if (m_popupidx == -1 && otype.compare("container")) {
+        // All path elements should be containers !
+        qDebug() << "Not container and no objidx??";
+        return;
+    }
 
     QMenu *popup = new QMenu(this);
     QAction *act;
