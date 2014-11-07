@@ -57,7 +57,7 @@ void PlaylistAVT::set_for_playing(int row)
     
     emit sig_playing_track_changed(row);
     emit sig_play_now(m_meta[row]);
-    emit sig_track_metadata(m_meta[row], 0, true);
+    emit sig_track_metadata(m_meta[row]);
 }
 
 // Player switched tracks under us. Hopefully the uri matches another
@@ -76,7 +76,7 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             m_play_idx = i;
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
-            emit sig_track_metadata(m_meta[i], -1, true);
+            emit sig_track_metadata(m_meta[i]);
             return;
         }
     }
@@ -86,7 +86,7 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             m_play_idx = i;
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
-            emit sig_track_metadata(m_meta[i], -1, true);
+            emit sig_track_metadata(m_meta[i]);
             return;
         }
     }
@@ -98,7 +98,7 @@ void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
         m_meta.push_back(md);
         playlist_updated();
     }
-    emit sig_track_metadata(md, -1, true);
+    emit sig_track_metadata(md);
 }
 
 void PlaylistAVT::send_next_playing_signal()

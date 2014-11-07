@@ -52,8 +52,8 @@ public:
 
 public slots:
 
-    void update_track (const MetaData & in, int pos=0, bool playing=true);
-    void setCurrentPosition (quint32 pos_sec);
+    void update_track(const MetaData& in);
+    void setCurrentPosition(quint32 pos_sec);
 
     void really_close(bool=false);
 

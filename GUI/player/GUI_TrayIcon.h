@@ -34,12 +34,9 @@ class NotificationPluginLoader;
 #include <QAction>
 #include <QTimer>
 
-
-
-
 /**
-  * Small class to be used as tray icon
-  */
+ * Small class to be used as tray icon
+ */
 class GUI_TrayIcon : public QSystemTrayIcon {
     Q_OBJECT
 public:
@@ -47,37 +44,34 @@ public:
     GUI_TrayIcon(QObject *parent = 0);
     virtual ~GUI_TrayIcon();
 
-    virtual bool event ( QEvent * e );
+    virtual bool event(QEvent * e);
     void set_timeout(int timeout_ms);
     void set_notification_active(bool active);
 
-   void set_enable_play(bool);
-   void set_enable_stop(bool);
-   void set_enable_mute(bool);
-   void set_enable_fwd(bool);
-   void set_enable_bwd(bool);
-   void set_enable_show(bool);
+    void set_enable_play(bool);
+    void set_enable_stop(bool);
+    void set_enable_mute(bool);
+    void set_enable_fwd(bool);
+    void set_enable_bwd(bool);
+    void set_enable_show(bool);
 
-
-
-
-   int get_vol_step();
+    int get_vol_step();
 
 public slots:
     void trackChanged(const MetaData& md);
-    void songChangedMessage (const MetaData& md);
+    void songChangedMessage(const MetaData& md);
     void setPlaying(bool);
     void setMute(bool mute);
     void change_skin(QString stylesheet);
     void stop();
 
 signals:
-
     /**
-      * this event is fired, if we have a mouse wheel event
-      * @param delta bigger then 0 when mouse wheel has moved forward smaller when moved backwards
-      */
-    void onVolumeChangedByWheel (int delta);
+     * this event is fired, if we have a mouse wheel event
+     * @param delta bigger then 0 when mouse wheel has moved forward
+     smaller when moved backwards
+    */
+    void sig_volume_changed_by_wheel(int delta);
     void sig_play_clicked();
     void sig_pause_clicked();
     void sig_fwd_clicked();
@@ -89,35 +83,29 @@ signals:
     void sig_stop_clicked();
 
 private slots:
-	void play_clicked();
-	void stop_clicked();
-	void fwd_clicked();
-	void bwd_clicked();
-	void show_clicked();
-	void close_clicked();
-	void mute_clicked();
-	void timer_timed_out();
-
-
+    void play_clicked();
+    void stop_clicked();
+    void fwd_clicked();
+    void bwd_clicked();
+    void show_clicked();
+    void close_clicked();
+    void mute_clicked();
+    void timer_timed_out();
 
 private:
-    /// some shared actions
-    QAction*					m_closeAction;
-    QAction*					m_playAction;
-    QAction*					m_stopAction;
-    QAction*					m_muteAction;
-    QAction*					m_fwdAction;
-    QAction*					m_bwdAction;
-    QAction*                    m_showAction;
-
+    QAction*    m_closeAction;
+    QAction*    m_playAction;
+    QAction*    m_stopAction;
+    QAction*    m_muteAction;
+    QAction*    m_fwdAction;
+    QAction*    m_bwdAction;
+    QAction*    m_showAction;
     QMenu*                      m_trayContextMenu;
-
 
     QIcon                   m_playIcon;
     QIcon                   m_pauseIcon;
     int                     m_timeout;
-    int						m_vol_step;
-
+    int                     m_vol_step;
 
     NotificationPluginLoader* m_plugin_loader;
 
@@ -126,15 +114,10 @@ private:
     bool                    m_mute;
     CSettingsStorage*       m_settings;
 
-    bool 		    _md_set;
-    MetaData		    _md;
-    QTimer*		    _timer;
+    bool            _md_set;
+    MetaData            _md;
+    QTimer*         _timer;
     bool            _mute;
-
-
-
-
 };
-
 
 #endif

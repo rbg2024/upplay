@@ -66,9 +66,9 @@ public:
         } else if (!strcmp(nm, "TransportState")) {
             emit tpStateChanged(value);
         } else if (!strcmp(nm, "Shuffle")) {
-            emit shuffleChanged(value!=0);
+            emit shuffleChanged(value != 0);
         } else if (!strcmp(nm, "Repeat")) {
-            emit repeatChanged(value!=0);
+            emit repeatChanged(value != 0);
         }
     }
 
@@ -116,9 +116,6 @@ public slots:
     virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
     virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
     virtual bool clear() {return m_srv->deleteAll() == 0;}
-    virtual bool idArray(std::vector<int> *ids, int *tokp) {
-        return m_srv->idArray(ids, tokp) == 0;
-    }
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
         //qDebug() << "OHPL:: insert after " << afterid;
@@ -241,8 +238,8 @@ private slots:
         }
 
         m_idsv = nids;
-        //qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
-        // "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
+        qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
+            "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit trackArrayChanged();
         emit trackIdChanged(m_curid);
     out:
@@ -265,6 +262,9 @@ protected:
 
 
 private:
+    virtual bool idArray(std::vector<int> *ids, int *tokp) {
+        return m_srv->idArray(ids, tokp) == 0;
+    }
     UPnPClient::OHPLH m_srv;
 };
 

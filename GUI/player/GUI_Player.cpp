@@ -139,7 +139,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
 GUI_Player::~GUI_Player()
 {
-    qDebug() << "closing player...";
     delete ui;
 }
 
@@ -170,7 +169,6 @@ QAction* GUI_Player::createAction(QKeySequence seq)
     return createAction(seq_list);
 }
 
-
 void GUI_Player::initGUI()
 {
     ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
@@ -186,10 +184,9 @@ void GUI_Player::initGUI()
 
 }
 
-
 // This is called from the playlist when new track info is known
 // (possibly up from the audio player)
-void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
+void GUI_Player::update_track(const MetaData& md)
 {
     if (!m_metadata.compare(md)) {
         return;
@@ -197,12 +194,6 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
     m_metadata = md;
 
     m_completeLength_ms = md.length_ms;
-    m_playing = playing;
-    m_trayIcon->setPlaying(playing);
-
-    if (pos_sec > 0) {
-        setCurrentPosition(pos_sec);
-    }
 
     ui->lab_sayonara->hide();
     ui->lab_title->show();
@@ -220,24 +211,17 @@ void GUI_Player::update_track(const MetaData& md, int pos_sec, bool playing)
     if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
         ui->lab_album->setText(Helper::get_album_w_disc(md));
     } else {
-        ui->lab_album->setText(
-            Helper::get_album_w_disc(md) + " (" + QString::number(md.year) + ")");
+        ui->lab_album->setText(Helper::get_album_w_disc(md) + " (" + 
+                               QString::number(md.year) + ")");
     }
 
     ui->lab_artist->setText(md.artist);
     ui->lab_title->setText(md.title);
 
-
     m_trayIcon->songChangedMessage(md);
 
     QString lengthString = Helper::cvtMsecs2TitleLengthString(md.length_ms, true);
     ui->maxTime->setText(lengthString);
-
-    if (m_playing) {
-        ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
-    } else {
-        ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
-    }
 
     QString tmp = QString("<font color=\"#FFAA00\" size=\"+10\">");
     if (md.bitrate < 96000) {
@@ -304,7 +288,6 @@ void GUI_Player::setStyle(int style)
 
 void GUI_Player::changeSkin(bool dark)
 {
-
     QString stylesheet = Style::get_style(dark);
 
     this->setStyleSheet(stylesheet);
@@ -338,11 +321,10 @@ void GUI_Player::setupTrayActions()
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
 
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-            this,       SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
+            this, SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
 
-    connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)),
-            this,       SLOT(volumeChangedByTick(int)));
-
+    connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)),
+            this, SLOT(volumeChangedByTick(int)));
 
     m_trayIcon->setPlaying(false);
 
@@ -429,18 +411,20 @@ void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 
 void GUI_Player::stopped()
 {
+    //qDebug() << "void GUI_Player::stopped()";
     m_metadata_available = false;
     stopClicked(false);
 }
 void GUI_Player::playing()
 {
+    //qDebug() << "void GUI_Player::playing()";
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
     m_playing = true;
     m_trayIcon->setPlaying(m_playing);
 }
 void GUI_Player::paused()
 {
-    qDebug() << "void GUI_Player::paused()";
+    //qDebug() << "void GUI_Player::paused()";
     ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     m_playing = false;
     m_trayIcon->setPlaying(m_playing);

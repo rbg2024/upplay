@@ -42,7 +42,7 @@ void PlaylistOH::psl_trackIdChanged(int id)
             if (m_play_idx != it - m_meta.begin()) {
                 m_play_idx = it -m_meta.begin();
                 // qDebug() << " new track index " << m_play_idx;
-                emit sig_track_metadata(*it, -1, !m_pause);
+                emit sig_track_metadata(*it);
                 emit sig_playing_track_changed(it - m_meta.begin());
             }
             return;

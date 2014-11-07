@@ -64,7 +64,7 @@ void GUI_Player::setupConnections()
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
 
     connect(ui->action_help, SIGNAL(triggered(bool)), this, SLOT(help(bool)));
-    connect(m_trayIcon, SIGNAL(onVolumeChangedByWheel(int)), 
+    connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)), 
             this, SLOT(volumeChangedByTick(int)));
 
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this,

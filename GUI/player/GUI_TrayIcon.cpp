@@ -35,8 +35,8 @@
 #include "GUI/player/GUI_TrayIcon.h"
 
 
-GUI_TrayIcon::GUI_TrayIcon(QObject *parent) 
-  : QSystemTrayIcon(parent)
+GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
+    : QSystemTrayIcon(parent)
 {
 
     m_settings = CSettingsStorage::getInstance();
@@ -46,9 +46,11 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     QString icon_path = Helper::getIconPath();
     QIcon play_icon = QIcon(icon_path + "/play.png");
     QIcon pause_icon = QIcon(icon_path + "/pause.png");
-
+    QIcon sayo_icon = QIcon(icon_path + "/logo.png");
     QPixmap play_pixmap = play_icon.pixmap(24, 24);
     QPixmap pause_pixmap = pause_icon.pixmap(24, 24);
+    QPixmap sayo_pixmap = sayo_icon.pixmap(24, 24);
+    setIcon(QIcon(sayo_pixmap));
 
     m_playIcon = QIcon(play_pixmap);
     m_pauseIcon = QIcon(pause_pixmap);
@@ -91,9 +93,7 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     QFont f = m_trayContextMenu->font();
     f.setFamily("DejaVu Sans");
     m_trayContextMenu->setFont(f);
-    this->setContextMenu(m_trayContextMenu);
-
-    this->setIcon(m_playIcon);
+    setContextMenu(m_trayContextMenu);
 
     connect(m_playAction, SIGNAL(triggered()), this, SLOT(play_clicked()));
     connect(m_fwdAction, SIGNAL(triggered()), this, SLOT(fwd_clicked()));
@@ -125,7 +125,7 @@ bool GUI_TrayIcon::event(QEvent * e)
 {
     if (e->type() == QEvent::Wheel) {
         QWheelEvent * wheelEvent = dynamic_cast <QWheelEvent *>(e);
-        emit onVolumeChangedByWheel(wheelEvent->delta());
+        emit sig_volume_changed_by_wheel(wheelEvent->delta());
     }
 
     return true;
@@ -155,7 +155,7 @@ void GUI_TrayIcon::songChangedMessage(const MetaData& md)
 
         else if (this -> isSystemTrayAvailable()) {
 
-            this -> showMessage("Upplay", md.title + tr(" by ") + md.artist, 
+            this -> showMessage("Upplay", md.title + tr(" by ") + md.artist,
                                 QSystemTrayIcon::Information, m_timeout);
         }
     }
@@ -265,27 +265,27 @@ void GUI_TrayIcon::setMute(bool mute)
     }
 
     if (!mute) {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_mute" + 
+        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_mute" +
                                     suffix + ".png"));
         m_muteAction->setText(tr("Mute"));
     }  else {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_3" + 
+        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_3" +
                                     suffix + ".png"));
         m_muteAction->setText(tr("Unmute"));
     }
 }
 
-void GUI_TrayIcon::setPlaying(bool play)
+void GUI_TrayIcon::setPlaying(bool playing)
 {
+    //qDebug() << "GUI_TrayIcon::setPlaying: " << playing;
+    m_playing = playing;
 
-    m_playing = play;
-
-    if (play) {
-        setIcon(m_playIcon);
+    if (playing) {
+        //setIcon(m_pauseIcon);
         m_playAction->setIcon(m_pauseIcon);
         m_playAction->setText(tr("Pause"));
     } else {
-        setIcon(m_pauseIcon);
+        //setIcon(m_playIcon);
         m_playAction->setIcon(m_playIcon);
         m_playAction->setText(tr("Play"));
     }

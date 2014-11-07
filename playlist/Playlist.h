@@ -47,7 +47,7 @@ signals:
     // Inform the ui_playlist about what row to highlight
     void sig_playing_track_changed(int row);
     // Current track info for displaying in the control area
-    void sig_track_metadata(const MetaData&, int pos_sec=-1, bool play=true);
+    void sig_track_metadata(const MetaData&);
     // Make sure we have the latest state of the world
     void sig_sync();
 
