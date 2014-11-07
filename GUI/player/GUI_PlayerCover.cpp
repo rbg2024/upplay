@@ -52,7 +52,10 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 
     QString smime = 
         reply->header(QNetworkRequest::ContentTypeHeader).toString();
-
+    int scolon;
+    if ((scolon = smime.indexOf(";")) > 0) {
+        smime = smime.left(scolon);
+    }
     QByteArray imtype;
     if (!smime.compare("image/png", Qt::CaseInsensitive)) {
         imtype = "PNG";
