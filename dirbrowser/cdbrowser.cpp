@@ -288,10 +288,8 @@ void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 
 void CDBrowser::search(const string& iss)
 {
-    qDebug() << "CDBrowser::search: " << iss.c_str();
     if (iss.empty())
         return;
-
     if (!m_ms) {
         LOGERR("CDBrowser::browseContainer: server not set" << endl);
         return;
@@ -302,20 +300,14 @@ void CDBrowser::search(const string& iss)
         return;
     }
     m_entries.clear();
-    initContainerHtml();
+    initContainerHtml(iss);
 
     if (m_reader) {
         delete m_reader;
         m_reader = 0;
     }
-    string ss("dc:title contains \"");
-    for (unsigned i = 0; i < iss.size(); i++) {
-        if (iss[i] != '"')
-            ss += iss[i];
-    }
-    ss += '"';
 
-    m_reader = new ContentDirectoryQO(cds, m_curpath.back().objid, ss, this);
+    m_reader = new ContentDirectoryQO(cds, m_curpath.back().objid, iss, this);
 
     connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));

@@ -79,11 +79,26 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
     connect(ui->tabs, SIGNAL(currentChanged(int)), 
             this, SLOT(onCurrentChanged(int)));
     connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
-
-    connect(ui->serverSearchPB, SIGNAL(clicked()), this, SLOT(serverSearch()));
+   
+    connect(ui->serverSearchCB, SIGNAL(stateChanged(int)), 
+            this, SLOT(onSearchKindChanged(int)));
+    onSearchKindChanged(int(ui->serverSearchCB->checkState()));
 
     setupTabConnections(0);
     setPlaylist(pl);
+}
+
+void DirBrowser::onSearchKindChanged(int state)
+{
+    if (state == Qt::Unchecked) {
+        ui->propsCMB->setEnabled(false);
+        ui->nextTB->setEnabled(true);
+        ui->prevTB->setEnabled(true);
+    } else {
+        ui->propsCMB->setEnabled(true);
+        ui->nextTB->setEnabled(false);
+        ui->prevTB->setEnabled(false);
+    }
 }
 
 void DirBrowser::setPlaylist(Playlist *pl)
@@ -117,24 +132,49 @@ void DirBrowser::onCurrentChanged(int )
     set<string> caps;
     if (cdb)
         cdb->getSearchCaps(caps);
+    while(ui->propsCMB->count())
+        ui->propsCMB->removeItem(0);
     if (caps.empty()) {
-        ui->serverSearchPB->setEnabled(false);
+        ui->serverSearchCB->setCheckState(Qt::Unchecked);
+        ui->serverSearchCB->setEnabled(false);
     } else {
-        ui->serverSearchPB->setEnabled(true);
+        ui->serverSearchCB->setEnabled(true);
         qDebug() << "Search Caps: ";
-        for (auto it = caps.begin(); it != caps.end(); it++) {
-            qDebug() << it->c_str();
+        vector<pair<string, string> > props;
+        props.push_back(pair<string,string>("upnp:artist", "Artist"));
+        props.push_back(pair<string,string>("upnp:album", "Album"));
+        props.push_back(pair<string,string>("dc:title", "Title"));
+        props.push_back(pair<string,string>("upnp:genre", "Genre"));
+        for (auto it = props.begin(); it != props.end(); it++) {
+            if (caps.find("*") != caps.end() || 
+                caps.find(it->first) != caps.end()) {
+                ui->propsCMB->addItem(u8s2qs(it->second),
+                                      QVariant(u8s2qs(it->first)));
+                qDebug() << it->second.c_str();
+            }
         }
+        onSearchKindChanged(ui->serverSearchCB->checkState());
     }
 }
 
 void DirBrowser::serverSearch()
 {
     QString text = ui->searchCMB->lineEdit()->text();
+    int i = ui->propsCMB->currentIndex();
+    string prop = qs2utf8s(ui->propsCMB->itemData(i).toString());
     if (text != "") {
+        string iss = qs2utf8s(text);
+        string ss(prop);
+        ss += " contains \"";
+        for (unsigned i = 0; i < iss.size(); i++) {
+            if (iss[i] == '"' || iss[i] == '\\')
+                ss += string("\\");
+            ss += iss[i];
+        }
+        ss += '"';
         CDBrowser *cdb = currentBrowser();
         if (cdb)
-            cdb->search(qs2utf8s(text));
+            cdb->search(ss);
     }
 }
 
@@ -148,10 +188,14 @@ void DirBrowser::openSearch()
 
 void DirBrowser::returnPressedInSearch()
 {
-    QString text = ui->searchCMB->lineEdit()->text();
-    if (ui->searchCMB->findText(text))
-        ui->searchCMB->insertItem(0, text);
-    searchNext();
+    if (ui->propsCMB->isEnabled()) {
+        serverSearch();
+    } else {
+        QString text = ui->searchCMB->lineEdit()->text();
+        if (ui->searchCMB->findText(text))
+            ui->searchCMB->insertItem(0, text);
+        searchNext();
+    }
 }
 
 void DirBrowser::closeSearch()
@@ -194,9 +238,11 @@ void DirBrowser::searchPrev()
 
 void DirBrowser::onTextChanged(const QString& text)
 {
-    qDebug() << "Search line text changed: " << text;
-    if (!text.isEmpty()) {
-	doSearch(text, false);
+    if (!ui->propsCMB->isEnabled()) {
+        qDebug() << "Search line text changed: " << text;
+        if (!text.isEmpty()) {
+            doSearch(text, false);
+        }
     }
 }
 

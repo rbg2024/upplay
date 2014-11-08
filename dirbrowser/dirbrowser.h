@@ -45,6 +45,7 @@ public slots:
     void returnPressedInSearch();
     void on_searchcaps_changed();
     void serverSearch();
+    void onSearchKindChanged(int);
 
 private:
     void setupTabConnections(int i);
