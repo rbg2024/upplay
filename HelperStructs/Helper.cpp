@@ -20,12 +20,14 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctime>
+#include <errno.h>
+#include <fcntl.h>
+#include <unistd.h>
 
+#include <ctime>
 #include <string>
 #include <iostream>
 #include <sstream>
-using namespace std;
 
 #include <QDir>
 #include <QUrl>
@@ -43,6 +45,38 @@ using namespace std;
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
+
+using namespace std;
+
+QByteArray Helper::readFileToByteArray(const char *fn)
+{
+    int fd = -1;
+    char *cp = 0;
+    QByteArray ret;
+    struct stat st;
+
+    fd = open(fn, 0);
+    if (fd < 0 || fstat(fd, &st) < 0) {
+        qDebug() << "readfile: open/fstat [" << fn << "] errno " << errno;
+        goto out;
+    }
+    cp = (char *)malloc(st.st_size);
+    if (cp == 0) {
+        qDebug() << "readfile: no mem: can't allocate " << st.st_size;
+        goto out;
+    }
+    if (read(fd, cp, st.st_size) != st.st_size) {
+        qDebug() << "readfile: read [" << fn <<  "] errno " << errno;
+        goto out;
+    }
+    ret.append(cp, st.st_size);
+out:
+    if (fd >= 0)
+        close(fd);
+    if (cp)
+        free(cp);
+    return ret;
+}
 
 QString Helper::cvtQString2FirstUpper(QString str)
 {

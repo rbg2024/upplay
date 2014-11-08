@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include <QThread>
+#include <QDebug>
 
 #include <upnp/upnp.h>
 
@@ -33,19 +34,18 @@ class ContentDirectoryQO : public QThread {
 
  public: 
     ContentDirectoryQO(UPnPClient::CDSH server, std::string objid, 
-                       QObject *parent = 0)
-        : QThread(parent), m_serv(server), m_objid(objid)
-    {
+                       std::string ss = std::string(), QObject *parent = 0)
+        : QThread(parent), m_serv(server), m_objid(objid), m_searchstr(ss) {
     }
 
-    ~ContentDirectoryQO()
-    {
+    ~ContentDirectoryQO() {
         for (auto entry = m_slices.begin(); entry != m_slices.end(); entry++)
             delete *entry;
     }
 
-    virtual void run() 
-    {
+    virtual void run() {
+        qDebug() << "ContentDirectoryQO::run. Search string: " << 
+            m_searchstr.c_str();
 	int offset = 0;
         int toread = 20; // read small count the first time
 	int total = 1000;// Updated on first read.
@@ -59,10 +59,15 @@ class ContentDirectoryQO : public QThread {
                 emit done(m_status);
                 return;
             }
-            std::cerr << "dirreader: reading " << toread << " total " <<
-                total << std::endl;
-            m_status = m_serv->readDirSlice(m_objid, offset, toread,
-                                            *slice,  &count, &total);
+            qDebug() << "dirreader: reading " << toread << " total " << total;
+            if (m_searchstr.empty()) {
+                m_status = m_serv->readDirSlice(m_objid, offset, toread,
+                                                *slice,  &count, &total);
+            } else {
+                m_status = m_serv->searchSlice(m_objid, m_searchstr,
+                                               offset, toread,
+                                               *slice,  &count, &total);
+            }
             if (m_status != UPNP_E_SUCCESS) {
                 emit done(m_status);
                 return;
@@ -89,6 +94,7 @@ signals:
 private:
     UPnPClient::CDSH m_serv;
     std::string m_objid;
+    std::string m_searchstr;
     // We use a list (vs vector) so that existing element addresses
     // are unchanged when we append
     std::list< UPnPClient::UPnPDirContent*> m_slices;

@@ -21,6 +21,7 @@
 #include <vector>
 #include <iostream>
 #include <unordered_set>
+#include <set>
 
 #include <QtWebKit/QWebView>
 #include <QVariant>
@@ -36,6 +37,7 @@
 
 class ContentDirectoryQO;
 class RecursiveReaper;
+class DirBrowser;
 
 class CDBrowser : public QWebView
 {
@@ -44,17 +46,21 @@ class CDBrowser : public QWebView
  public:
     CDBrowser(QWidget* parent = 0);
     virtual ~CDBrowser();
+    void setDirBrowser(DirBrowser *db) {m_browsers = db;}
+    void getSearchCaps(std::set<std::string>& caps) {caps = m_searchcaps;}
+    void search(const std::string& iss);
 
  public slots:
     virtual void serversPage();
     void onBrowseDone(int);
     void onSliceAvailable(const UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
-    void onInsertDone() { m_insertactive = false;}
     void setStyleSheet(bool);
 
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
+    void sig_now_in(QWidget *, const QString&);
+    void sig_searchcaps_changed();
 
  protected slots:
     virtual void appendHtml(const QString&, const QString& html);
@@ -65,8 +71,9 @@ class CDBrowser : public QWebView
     virtual void back(QAction *);
     virtual void rreaperDone(int);
     virtual void onContentsSizeChanged(const QSize&);
+
  private:
-    void initContainerHtml();
+    void initContainerHtml(const std::string& ss=string());
     void browseContainer(std::string, std::string, QPoint scrollpos = QPoint());
     void curpathClicked(unsigned int i);
 
@@ -74,6 +81,9 @@ class CDBrowser : public QWebView
     std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
     // Handle for the currently active media server
     UPnPClient::MSRH m_ms;
+
+    // Search caps of current server
+    std::set<std::string> m_searchcaps;
 
     // Current path inside current server: remember objid,title and scroll pos
     struct CtPathElt {
@@ -102,7 +112,7 @@ class CDBrowser : public QWebView
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
     // Store of seen urls hashes for deduplication while walking the tree
     std::unordered_set<std::string> m_recwalkdedup;
-    bool m_insertactive;
+    DirBrowser *m_browsers;
 
     // Objid and index in entries for the last popup menu click
     std::string m_popupobjid;

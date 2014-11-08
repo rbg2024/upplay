@@ -31,6 +31,7 @@ HEADERS += \
         HelperStructs/PlaylistMode.h \
         HelperStructs/Style.h \
         application.h \
+        dirbrowser/dirbrowser.h \
         dirbrowser/cdbrowser.h \
         dirbrowser/rreaper.h \
         playlist/Playlist.h \
@@ -63,6 +64,7 @@ SOURCES += \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
         application.cpp \
+        dirbrowser/dirbrowser.cpp \
         dirbrowser/cdbrowser.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
@@ -71,6 +73,7 @@ SOURCES += \
         upplay.cpp 
 
 FORMS   = \
+        dirbrowser/dirbrowser.ui \
         GUI/player/GUI_Player.ui \
         GUI/playlist/GUI_Playlist.ui \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \

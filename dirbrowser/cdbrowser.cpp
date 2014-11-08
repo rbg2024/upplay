@@ -15,9 +15,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#include <fcntl.h>
-#include <sys/stat.h>
-
 #include <iostream>
 using namespace std;
 
@@ -37,61 +34,15 @@ using namespace std;
 #include "upadapt/upputils.h"
 #include "upadapt/md5.hxx"
 #include "cdbrowser.h"
+#include "dirbrowser.h"
 #include "rreaper.h"
 
 using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
 
-static QByteArray readfile(const char *fn)
-{
-    int fd = -1;
-    char *cp = 0;
-    QByteArray ret;
-    struct stat st;
-
-    fd = open(fn, 0);
-    if (fd < 0 || fstat(fd, &st) < 0) {
-        goto out;
-    }
-    cp = (char *)malloc(st.st_size);
-    if (cp == 0) {
-        goto out;
-    }
-    if (read(fd, cp, st.st_size) != st.st_size) {
-        goto out;
-    }
-    ret.append(cp, st.st_size);
-out:
-    if (fd >= 0)
-        close(fd);
-    if (cp)
-        free(cp);
-    return ret;
-}
-
-void CDBrowser::setStyleSheet(bool dark)
-{
-    QString cssfn = Helper::getSharePath() + "cdbrowser/cdbrowser.css";
-    QByteArray css = readfile((const char *)cssfn.toLocal8Bit());
-
-    if (dark) {
-        cssfn = Helper::getSharePath() + "cdbrowser/dark.css";
-        css += readfile((const char *)cssfn.toLocal8Bit());
-    } else {
-        cssfn = Helper::getSharePath() + "cdbrowser/standard.css";
-    }
-    css += readfile((const char *)cssfn.toLocal8Bit());
-
-    css = QByteArray("data:text/css;charset=utf-8;base64,") +
-        css.toBase64();
-
-    QUrl cssurl(QString::fromUtf8((const char*)css));
-    settings()->setUserStyleSheetUrl(cssurl);
-}
-
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_reader(0), m_reaper(0), m_insertactive(false)
+    : QWebView(parent), m_reader(0), m_reaper(0), m_browsers(0)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
@@ -121,6 +72,28 @@ CDBrowser::~CDBrowser()
     delete m_reader;
 }
 
+void CDBrowser::setStyleSheet(bool dark)
+{
+    QString cssfn = Helper::getSharePath() + "cdbrowser/cdbrowser.css";
+    QByteArray css = 
+        Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+
+    if (dark) {
+        cssfn = Helper::getSharePath() + "cdbrowser/dark.css";
+        css +=  Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+    } else {
+        cssfn = Helper::getSharePath() + "cdbrowser/standard.css";
+    }
+    css +=  Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+
+    css = QByteArray("data:text/css;charset=utf-8;base64,") +
+        css.toBase64();
+
+    QUrl cssurl(QString::fromUtf8((const char*)css));
+    settings()->setUserStyleSheetUrl(cssurl);
+}
+
+
 void CDBrowser::onContentsSizeChanged(const QSize&)
 {
     //qDebug() << "CDBrowser::onContentsSizeChanged: scrollpos " <<
@@ -142,7 +115,8 @@ void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
     if (elt_id.isEmpty()) {
         js = QString("document.body.innerHTML += morehtml.text");
     } else {
-        js = QString("document.getElementById(\"%1\").innerHTML += morehtml.text").arg(elt_id);
+        js = QString("document.getElementById(\"%1\").innerHTML += "
+                     "morehtml.text").arg(elt_id);
     }
     mainframe->evaluateJavaScript(js);
 }
@@ -172,6 +146,11 @@ void CDBrowser::onLinkClicked(const QUrl &url)
         if (!m_ms) {
             qDebug() << "MediaServer connect failed";
             return;
+        }
+        CDSH cds = m_ms->cds();
+        if (cds) {
+            cds->getSearchCapabilities(m_searchcaps);
+            emit sig_searchcaps_changed();
         }
 	browseContainer("0", m_msdescs[cdsidx].friendlyName);
     }
@@ -254,18 +233,21 @@ static const QString init_container_page(
     "</body></html>"
     );
 
-void CDBrowser::initContainerHtml()
+void CDBrowser::initContainerHtml(const string& ss)
 {
     QString htmlpath("<div id=\"browsepath\"><ul>");
     for (unsigned i = 0; i < m_curpath.size(); i++) {
         QString title = QString::fromUtf8(m_curpath[i].title.c_str());
         QString objid = QString::fromUtf8(m_curpath[i].objid.c_str());
-        htmlpath += 
-            QString("<li class=\"container\" objid=\"%3\"><a href=\"L%1\">%2</a> &gt;</li>").
+        htmlpath += QString("<li class=\"container\" objid=\"%3\">"
+                            "<a href=\"L%1\">%2</a> &gt;</li>").
             arg(i).arg(title).arg(objid);
     }
     htmlpath += QString("</ul></div><br/>");
-
+    if (!ss.empty()) {
+        htmlpath += QString("Search results for: ") + 
+            QString::fromUtf8(ss.c_str()) + "<br/>";
+    }
     setHtml(init_container_page);
     appendHtml(QString(), htmlpath);
     appendHtml(QString(), "<table id=\"entrylist\"></table>");
@@ -274,6 +256,8 @@ void CDBrowser::initContainerHtml()
 void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 {
     qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
+    emit sig_now_in(this, QString::fromUtf8(cttitle.c_str()));
+
     m_savedscrollpos = scrollpos;
     if (!m_ms) {
         LOGERR("CDBrowser::browseContainer: server not set" << endl);
@@ -294,7 +278,44 @@ void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
         delete m_reader;
         m_reader = 0;
     }
-    m_reader = new ContentDirectoryQO(cds, ctid, this);
+    m_reader = new ContentDirectoryQO(cds, ctid, string(), this);
+
+    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
+            this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
+    connect(m_reader, SIGNAL(done(int)), this, SLOT(onBrowseDone(int)));
+    m_reader->start();
+}
+
+void CDBrowser::search(const string& iss)
+{
+    qDebug() << "CDBrowser::search: " << iss.c_str();
+    if (iss.empty())
+        return;
+
+    if (!m_ms) {
+        LOGERR("CDBrowser::browseContainer: server not set" << endl);
+        return;
+    }
+    CDSH cds = m_ms->cds();
+    if (!cds) {
+        LOGERR("Cant reach content directory service" << endl);
+        return;
+    }
+    m_entries.clear();
+    initContainerHtml();
+
+    if (m_reader) {
+        delete m_reader;
+        m_reader = 0;
+    }
+    string ss("dc:title contains \"");
+    for (unsigned i = 0; i < iss.size(); i++) {
+        if (iss[i] != '"')
+            ss += iss[i];
+    }
+    ss += '"';
+
+    m_reader = new ContentDirectoryQO(cds, m_curpath.back().objid, ss, this);
 
     connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
@@ -470,6 +491,8 @@ void CDBrowser::serversPage()
         m_timer.start(secs * 1000);
         return;
     }
+    m_searchcaps.clear();
+    emit sig_searchcaps_changed();
     if (!MediaServer::getDeviceDescs(msdescs)) {
         LOGERR("CDBrowser::serversPage: getDeviceDescs failed" << endl);
         return;
@@ -509,7 +532,7 @@ enum PopupMode {
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
 {
-    if (m_insertactive)
+    if (!m_browsers || m_browsers->insertActive())
         return;
     qDebug() << "void CDBrowser::createPopupMenu(const QPoint& pos)";
 
@@ -637,18 +660,21 @@ void CDBrowser::simpleAdd(QAction *act)
 void CDBrowser::recursiveAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::recursiveAdd";
-    m_insertactive = true;
+    if (m_browsers)
+        m_browsers->setInsertActive(true);
     m_popupmode = act->data().toInt();
 
     if (!m_ms) {
         qDebug() << "CDBrowser::browseContainer: server not set" ;
-        m_insertactive = false;
+        if (m_browsers)
+            m_browsers->setInsertActive(false);
         return;
     }
     CDSH cds = m_ms->cds();
     if (!cds) {
         qDebug() << "Cant reach content directory service";
-        m_insertactive = false;
+        if (m_browsers)
+            m_browsers->setInsertActive(false);
         return;
     }
     ContentDirectory::ServiceKind kind = cds->getKind();

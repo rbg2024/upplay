@@ -21,11 +21,13 @@
 #include <QString>
 #include <QList>
 #include <QWidget>
+#include <QByteArray>
 
 #include "HelperStructs/MetaData.h"
 
 
 namespace Helper {
+    QByteArray readFileToByteArray(const char *fn);
 
     QString cvtMsecs2TitleLengthString(long int msec, bool colon=true, 
                                        bool show_days=true);

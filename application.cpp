@@ -51,6 +51,8 @@ using namespace UPnPClient;
 #ifndef deleteZ
 #define deleteZ(X) {delete X; X = 0;}
 #endif
+#define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d), \
+                                      Qt::UniqueConnection)
 
 UPnPDeviceDirectory *superdir;
 
@@ -131,6 +133,7 @@ bool Application::setupRenderer(const string& uid)
         ohplo = 0;
         playlist = new PlaylistAVT();
     }
+    cdb->setPlaylist(playlist);
 
     QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
     if (player) {
@@ -187,7 +190,7 @@ Application::Application(QApplication* qapp, int,
     ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
     player->setPlaylistWidget(ui_playlist);
 
-    cdb = new CDBrowser(player->getParentOfLibrary());
+    cdb = new DirBrowser(player->getParentOfLibrary(), playlist);
     player->setLibraryWidget(cdb);
 
     rdco = 0;
@@ -307,7 +310,6 @@ void Application::renderer_connections()
     CONNECT(player, sig_mute(bool), rdco, setMute(bool));
     CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
     CONNECT(rdco, muteChanged(bool), player, setMuteUi(bool));
-    CONNECT(playlist, insertDone(), cdb, onInsertDone());
     // Set up the initial volume from the renderer value
     player->setVolumeUi(rdco->volume());
 }
@@ -352,8 +354,6 @@ void Application::init_connections()
             playlist, psl_change_track(int));
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 
-    CONNECT(cdb, sig_tracks_to_playlist(const MetaDataList&),
-            playlist, psl_add_tracks(const MetaDataList&));
     CONNECT(player, sig_skin_changed(bool), cdb, setStyleSheet(bool));
 }
 

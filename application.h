@@ -30,7 +30,7 @@
 #include <QMainWindow>
 #include <QTranslator>
 
-#include "dirbrowser/cdbrowser.h"
+#include "dirbrowser/dirbrowser.h"
 #include "upqo/renderingcontrol_qo.h"
 #include "upqo/ohtime_qo.h"
 #include "upadapt/avtadapt.h"
@@ -44,9 +44,6 @@
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
-
-#define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d), \
-                                      Qt::UniqueConnection)
 
 class Application : public QObject
 {
@@ -65,7 +62,7 @@ public slots:
 private:
     GUI_Player 	 *player;
     Playlist     *playlist;
-    CDBrowser    *cdb;
+    DirBrowser    *cdb;
     RenderingControlQO *rdco;
     AVTPlayer    *avto;
     OHPlayer     *ohplo;
