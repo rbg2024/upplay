@@ -82,7 +82,6 @@ signals:
     void sig_volume_changed (int);
     void search(int pos_percent);
 
-
     /* File */
     void sig_choose_renderer();
 
@@ -90,6 +89,7 @@ signals:
     void show_playlists();
     void show_small_playlist_items(bool);
     void sig_skin_changed(bool);
+    void showSearchPanel(bool);
 
     /* Covers */
     void sig_want_cover(const MetaData &);

@@ -355,6 +355,7 @@ void Application::init_connections()
     CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
 
     CONNECT(player, sig_skin_changed(bool), cdb, setStyleSheet(bool));
+    CONNECT(player, showSearchPanel(bool), cdb, showSearchPanel(bool));
 }
 
 

@@ -45,6 +45,8 @@ void GUI_Player::setupConnections()
     // view
     connect(ui->action_viewLibrary, SIGNAL(toggled(bool)), this,
             SLOT(showLibrary(bool)));
+    connect(ui->action_viewSearchPanel, SIGNAL(toggled(bool)), this,
+            SIGNAL(showSearchPanel(bool)));
     connect(ui->action_Dark, SIGNAL(toggled(bool)), this,
             SLOT(changeSkin(bool)));
 

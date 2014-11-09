@@ -781,7 +781,7 @@
      <x>0</x>
      <y>0</y>
      <width>550</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="font">
@@ -822,6 +822,7 @@
      <string>View</string>
     </property>
     <addaction name="action_viewLibrary"/>
+    <addaction name="action_viewSearchPanel"/>
     <addaction name="action_smallPlaylistItems"/>
     <addaction name="separator"/>
     <addaction name="action_Dark"/>
@@ -837,7 +838,7 @@
      <string>Preferences</string>
     </property>
     <addaction name="action_min2tray"/>
-    <addaction name="action_folderviewfnorder" />
+    <addaction name="action_folderviewfnorder"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="font">
@@ -983,6 +984,14 @@
   <action name="actionChange_Media_Renderer">
    <property name="text">
     <string>Change Media Renderer</string>
+   </property>
+  </action>
+  <action name="action_viewSearchPanel">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Search panel</string>
    </property>
   </action>
  </widget>

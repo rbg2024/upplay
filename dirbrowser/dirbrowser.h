@@ -20,6 +20,9 @@
 
 #include "playlist/Playlist.h"
 
+// The DirBrowser object has multiple tabs, each displaying the server
+// list of a directory listing or search result, and a hideable search
+// panel at the bottom
 class DirBrowser : public QWidget {
     Q_OBJECT
 public:
@@ -29,23 +32,27 @@ public:
     void doSearch(const QString&, bool);
 
 public slots:
+    void setPlaylist(Playlist *pl);
     void setStyleSheet(bool);
     void addTab();
     void closeCurrentTab();
-    void onTabTitleNeedChange(QWidget *, const QString&);
-    void setPlaylist(Playlist *pl);
-    void onCurrentChanged(int);
-    void onInsertDone() {m_insertactive = false;}
-    void setInsertActive(bool onoff);
-    void onTextChanged(const QString&);
+    void onCurrentTabChanged(int);
+    void changeTabTitle(QWidget *, const QString&);
+    void onSearchcapsChanged();
+
+    void openSearchPanel();
+    void closeSearchPanel();
+    void showSearchPanel(bool);
+    void toggleSearchKind();
+    void onSearchKindChanged(int);
+    void onSearchTextChanged(const QString&);
     void searchNext();
     void searchPrev();
-    void openSearch();
-    void closeSearch();
     void returnPressedInSearch();
-    void on_searchcaps_changed();
     void serverSearch();
-    void onSearchKindChanged(int);
+
+    void onInsertDone() {m_insertactive = false;}
+    void setInsertActive(bool onoff);
 
 private:
     void setupTabConnections(int i);
