@@ -1,0 +1,34 @@
+= Searching in upplay
+
+Upplay supports two search modes:
+ 
+- Inside the current directory page: this is handy to quickly skip inside
+  a long list.
+- Classic UPnP search on the server.
+
+The search panel is located at the bottom of the library window (the one on
+the right), and normally hidden. You can open it by the following actions:
+ 
+- Using the View menu
+- Typing '/' inside the library window.
+- Typing 'Ctrl+f' inside the library window.
+
+You can close the panel by the following actions:
+
+- Using the View menu.
+- Typing 'Esc' (the Escape key).
+
+By default, the panel is in local search mode. Typing in the search entry
+will try to find matches in the page. You can use the two arrow buttons or
+type F3 or Shift+F3 to find the next or previous match.
+
+If the currently displayed page comes from an UPnP Media Server which
+supports searching (not all do), you can switch the panel to server search
+by checking the _Server Search_ checkbutton. You can also toggle between
+local and server modes by typing Ctl+s.
+
+In server mode, the search panel will let you enter a search string and the
+kind of field inside which you want to search (the combobox on the right,
+Artist/Album/Title). Type Enter or click the search button to start the
+search. The results are displayed just like a directory listing.
+
