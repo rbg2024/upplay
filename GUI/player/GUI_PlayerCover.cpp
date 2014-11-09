@@ -36,10 +36,6 @@ void GUI_Player::coverClicked()
 
     QString targetpath = 
         Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-
-    //m_alternate_covers->start(searchstring, targetpath);
-
-    this->setFocus();
 }
 
 void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)

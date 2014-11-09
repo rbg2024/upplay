@@ -1,5 +1,5 @@
 upplay
-Makefile
+./Makefile
 .ui
 .moc
 .obj
