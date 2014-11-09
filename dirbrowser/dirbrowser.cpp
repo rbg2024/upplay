@@ -87,8 +87,6 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
             this, SLOT(onSearchKindChanged(int)));
     connect(ui->execSearchPB, SIGNAL(clicked()), this, SLOT(serverSearch()));
 
-    connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
-   
     onSearchKindChanged(int(ui->serverSearchCB->checkState()));
     ui->execSearchPB->hide();
     setupTabConnections(0);
@@ -102,6 +100,7 @@ void DirBrowser::setPlaylist(Playlist *pl)
     for (int i = 0; i < ui->tabs->count(); i++) {
         setupTabConnections(i);
     }
+    connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
 }
 
 void DirBrowser::setStyleSheet(bool dark)
