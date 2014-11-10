@@ -142,7 +142,7 @@ void DirBrowser::closeCurrentTab()
 
 // Adjust the search panel according the the server caps for the
 // active tab
-void DirBrowser::onCurrentTabChanged(int )
+void DirBrowser::onCurrentTabChanged(int)
 {
     CDBrowser *cdb = currentBrowser();
     set<string> caps;
@@ -155,7 +155,7 @@ void DirBrowser::onCurrentTabChanged(int )
         ui->serverSearchCB->setEnabled(false);
     } else {
         ui->serverSearchCB->setEnabled(true);
-        qDebug() << "Search Caps: ";
+        QString scs;
         vector<pair<string, string> > props;
         props.push_back(pair<string,string>("upnp:artist", "Artist"));
         props.push_back(pair<string,string>("upnp:album", "Album"));
@@ -166,9 +166,10 @@ void DirBrowser::onCurrentTabChanged(int )
                 caps.find(it->first) != caps.end()) {
                 ui->propsCMB->addItem(u8s2qs(it->second),
                                       QVariant(u8s2qs(it->first)));
-                qDebug() << it->second.c_str();
             }
+            scs += u8s2qs(it->first.c_str()) + " ";
         }
+        qDebug() << "Search caps: " << scs;
         onSearchKindChanged(ui->serverSearchCB->checkState());
     }
 }
@@ -179,7 +180,7 @@ void DirBrowser::changeTabTitle(QWidget *w, const QString& tt)
     if (i >= 0) {
         ui->tabs->setTabText(i, tt);
     } else {
-        qDebug() << "Widget not found in tabs: " << w;
+        qDebug() << "changeTabTitle: Widget not found in tabs: " << w;
     }
 }
 
@@ -228,7 +229,7 @@ void DirBrowser::toggleSearchKind()
 void DirBrowser::onSearchKindChanged(int state)
 {
     if (state == Qt::Unchecked) {
-        ui->propsCMB->hide();
+//        ui->propsCMB->hide();
         ui->propsCMB->setEnabled(false);
         ui->execSearchPB->hide();
         ui->execSearchPB->setEnabled(false);
@@ -237,7 +238,7 @@ void DirBrowser::onSearchKindChanged(int state)
         ui->prevTB->show();
         ui->prevTB->setEnabled(true);
     } else {
-        ui->propsCMB->show();
+//        ui->propsCMB->show();
         ui->propsCMB->setEnabled(true);
         ui->execSearchPB->show();
         ui->execSearchPB->setEnabled(true);
@@ -251,7 +252,6 @@ void DirBrowser::onSearchKindChanged(int state)
 void DirBrowser::onSearchTextChanged(const QString& text)
 {
     if (!ui->propsCMB->isEnabled()) {
-        qDebug() << "Search line text changed: " << text;
         if (!text.isEmpty()) {
             doSearch(text, false);
         }
