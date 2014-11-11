@@ -23,7 +23,6 @@ using namespace std;
 #include <QUrl>
 #include <QWebElement>
 #include <QMenu>
-#include <QApplication>
 
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
@@ -70,7 +69,7 @@ CDBrowser::CDBrowser(QWidget* parent)
 
 CDBrowser::~CDBrowser()
 {
-    deleteReaders();
+    delete m_reader;
 }
 
 void CDBrowser::setStyleSheet(bool dark)
@@ -214,19 +213,16 @@ void CDBrowser::curpathClicked(unsigned int i)
     }
     string objid = m_curpath[i].objid;
     string title = m_curpath[i].title;
-    string ss = m_curpath[i].searchStr;
     QPoint scrollpos = m_curpath[i].scrollpos;
     m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
     if (i == 0) {
         m_msdescs.clear();
-        m_ms = MSRH(0);
         serversPage();
+    } else if (i == 1) {
+        // Server root
+        browseContainer("0", title, scrollpos);
     } else {
-        if (ss.empty()) {
-            browseContainer(objid, title, scrollpos);
-        } else {
-            search(objid, ss, scrollpos);
-        }
+        browseContainer(objid, title, scrollpos);
     }
 }
 
@@ -247,7 +243,7 @@ void CDBrowser::initContainerHtml(const string& ss)
                             "<a href=\"L%1\">%2</a> &gt;</li>").
             arg(i).arg(title).arg(objid);
     }
-    htmlpath += QString("</ul></div><br clear=\"all\"/>");
+    htmlpath += QString("</ul></div><br/>");
     if (!ss.empty()) {
         htmlpath += QString("Search results for: ") + 
             QString::fromUtf8(ss.c_str()) + "<br/>";
@@ -260,8 +256,6 @@ void CDBrowser::initContainerHtml(const string& ss)
 void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 {
     qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
-    deleteReaders();
-
     emit sig_now_in(this, QString::fromUtf8(cttitle.c_str()));
 
     m_savedscrollpos = scrollpos;
@@ -279,23 +273,21 @@ void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
     m_curpath.push_back(CtPathElt(ctid, cttitle));
 
     initContainerHtml();
-    
+
+    if (m_reader) {
+        delete m_reader;
+        m_reader = 0;
+    }
     m_reader = new ContentDirectoryQO(cds, ctid, string(), this);
 
-    connect(m_reader, SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent*)),
-            this, SLOT(onSliceAvailable(UPnPClient::UPnPDirContent *)));
+    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
+            this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
     connect(m_reader, SIGNAL(done(int)), this, SLOT(onBrowseDone(int)));
     m_reader->start();
 }
 
 void CDBrowser::search(const string& iss)
 {
-    search(m_curpath.back().objid, iss);
-}
-
-void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
-{
-    deleteReaders();
     if (iss.empty())
         return;
     if (!m_ms) {
@@ -307,15 +299,18 @@ void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
         LOGERR("Cant reach content directory service" << endl);
         return;
     }
-    m_savedscrollpos = scrollpos;
     m_entries.clear();
-    m_curpath.push_back(CtPathElt(objid, "(search)", iss));
     initContainerHtml(iss);
+
+    if (m_reader) {
+        delete m_reader;
+        m_reader = 0;
+    }
 
     m_reader = new ContentDirectoryQO(cds, m_curpath.back().objid, iss, this);
 
-    connect(m_reader, SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent*)),
-            this, SLOT(onSliceAvailable(UPnPClient::UPnPDirContent *)));
+    connect(m_reader, SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent*)),
+            this, SLOT(onSliceAvailable(const UPnPClient::UPnPDirContent *)));
     connect(m_reader, SIGNAL(done(int)), this, SLOT(onBrowseDone(int)));
     m_reader->start();
 }
@@ -397,34 +392,11 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
     return out;
 }
 
-void CDBrowser::deleteReaders() 
+void CDBrowser::onSliceAvailable(const UPnPDirContent *dc)
 {
-    qDebug() << "deleteReaders()";
-    if (m_reader) {
-        m_reader->setCancel();
-        m_reader->wait();
-        delete m_reader;
-        m_reader = 0;
-    }
-    if (m_reaper) {
-        m_reaper->setCancel();
-        m_reaper->wait();
-        delete m_reaper;
-        m_reaper = 0;
-    }
-}
-
-void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
-{
-    qDebug() << "CDBrowser::onSliceAvailable";
-    if (!m_reader) {
-        qDebug() << "CDBrowser::onSliceAvailable: no reader";
-        // Cancelled.
-        delete dc;
-        return;
-    }
     QString html;
 
+    // qDebug() << "CDBrowser::onSliceAvailable";
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
     for (auto& entry: dc->m_containers) {
@@ -438,7 +410,6 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
         html += ItemToHtml(m_entries.size()-1, entry);
     }
     appendHtml("entrylist", html);
-    delete dc;
 }
 
 static bool dirObjCmpByURI(const UPnPDirObject& o1, const UPnPDirObject& o2)
@@ -457,35 +428,30 @@ static bool dirObjCmpByURI(const UPnPDirObject& o1, const UPnPDirObject& o2)
 void CDBrowser::onBrowseDone(int)
 {
     //qDebug() <<"CDBrowser::onBrowseDone";
-    if (!m_reader) {
-        qDebug() << "CDBrowser::onBrowseDone(int) no reader: cancelled";
-        return;
-    }
-
-    ContentDirectory::ServiceKind kind = m_reader->getKind();
-    if (kind == ContentDirectory::CDSKIND_MINIM && 
-        CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
-        m_curpath.back().searchStr.empty() &&
-        m_reader->getObjid().compare(0, minimFoldersViewPrefix.size(),
-                                     minimFoldersViewPrefix) == 0) {
+    if (m_reader) {
+        ContentDirectory::ServiceKind kind = m_reader->getKind();
+        if (kind == ContentDirectory::CDSKIND_MINIM && 
+            CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
+            m_reader->getObjid().compare(0, minimFoldersViewPrefix.size(),
+                                         minimFoldersViewPrefix) == 0) {
                 
-        sort(m_entries.begin(), m_entries.end(), dirObjCmpByURI);
-        initContainerHtml();
-        QString html;
-        for (unsigned i = 0; i < m_entries.size(); i++) {
-            if (m_entries[i].m_type == UPnPDirObject::container) {
-                html += CTToHtml(i, m_entries[i]);
-            } else {
-                html += ItemToHtml(i, m_entries[i]);
+            sort(m_entries.begin(), m_entries.end(), dirObjCmpByURI);
+            initContainerHtml();
+            QString html;
+            for (unsigned i = 0; i < m_entries.size(); i++) {
+                if (m_entries[i].m_type == UPnPDirObject::container) {
+                    html += CTToHtml(i, m_entries[i]);
+                } else {
+                    html += ItemToHtml(i, m_entries[i]);
+                }
             }
+            appendHtml("entrylist", html);
         }
-        appendHtml("entrylist", html);
+
+        m_reader->wait();
+        page()->mainFrame()->setScrollPosition(m_savedscrollpos);
     }
-
-    m_reader->wait();
-    page()->mainFrame()->setScrollPosition(m_savedscrollpos);
-    deleteReaders();
-
+    
     //qDebug() << "CDBrowser::onBrowseDone done";
 }
 
@@ -510,8 +476,6 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
 
 void CDBrowser::serversPage()
 {
-    deleteReaders();
-
     vector<UPnPDeviceDesc> msdescs;
     int secs = UPnPDeviceDirectory::getTheDir()->getRemainingDelay();
     if (secs > 1) {
@@ -645,7 +609,7 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
 void CDBrowser::back(QAction *)
 {
     if (m_curpath.size() >= 2)
-        curpathClicked(m_curpath.size() - 2);
+        curpathClicked(m_curpath.size()-2);
 }
 
 // Add a single track or a section of the current container. This
@@ -688,13 +652,12 @@ void CDBrowser::simpleAdd(QAction *act)
 void CDBrowser::recursiveAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::recursiveAdd";
-    deleteReaders();
     if (m_browsers)
         m_browsers->setInsertActive(true);
     m_popupmode = act->data().toInt();
 
     if (!m_ms) {
-        qDebug() << "CDBrowser::recursiveAdd: server not set" ;
+        qDebug() << "CDBrowser::browseContainer: server not set" ;
         if (m_browsers)
             m_browsers->setInsertActive(false);
         return;
@@ -733,27 +696,27 @@ void CDBrowser::recursiveAdd(QAction *act)
         rreaperDone(0);
 
     } else {
+        if (m_reaper) {
+            delete m_reaper;
+            m_reaper = 0;
+        }
+    
         m_recwalkentries.clear();
         m_recwalkdedup.clear();
         m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
         connect(m_reaper, 
-                SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent *)),
+                SIGNAL(sliceAvailable(const UPnPClient::UPnPDirContent *)),
                 this, 
-                SLOT(onReaperSliceAvailable(UPnPClient::UPnPDirContent *)));
+                SLOT(onReaperSliceAvailable(const UPnPClient::UPnPDirContent *)));
         connect(m_reaper, SIGNAL(done(int)), this, SLOT(rreaperDone(int)));
         m_reaper->start();
     }
 }
 
-void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
+void CDBrowser::onReaperSliceAvailable(const UPnPClient::UPnPDirContent *dc)
 {
-    qDebug() << "CDBrowser::onReaperSliceAvailable: got " << 
-        dc->m_items.size() << " items";
-    if (!m_reaper) {
-        qDebug() << "CDBrowser::onReaperSliceAvailable: cancelled";
-        delete dc;
-        return;
-    }
+    LOGDEB1("CDBrowser::onReaperSliceAvailable: got " << 
+            dc->m_items.size() << " items" << endl);
     for (unsigned int i = 0; i < dc->m_items.size(); i++) {
         if (dc->m_items[i].m_resources.empty()) {
             LOGDEB("CDBrowser::onReaperSlice: entry has no resources??"<< endl);
@@ -770,13 +733,17 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
             LOGDEB("CDBrowser::onReaperSlice: dup found" << endl);
         }
     }
-    delete dc;
 }
 
 void CDBrowser::rreaperDone(int status)
 {
-    LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
-    deleteReaders();
+    if (m_reaper) {
+        LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
+        m_reaper->wait();
+        delete m_reaper;
+        m_reaper = 0;
+    }
+
     MetaDataList mdl;
     mdl.resize(m_recwalkentries.size());
     for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {

@@ -35,12 +35,11 @@ class ContentDirectoryQO : public QThread {
  public: 
     ContentDirectoryQO(UPnPClient::CDSH server, std::string objid, 
                        std::string ss = std::string(), QObject *parent = 0)
-        : QThread(parent), m_serv(server), m_objid(objid), m_searchstr(ss) {
+        : QThread(parent), m_serv(server), m_objid(objid), m_searchstr(ss),
+          m_cancel(false) {
     }
 
     ~ContentDirectoryQO() {
-        for (auto entry = m_slices.begin(); entry != m_slices.end(); entry++)
-            delete *entry;
     }
 
     virtual void run() {
@@ -52,6 +51,8 @@ class ContentDirectoryQO : public QThread {
         int count;
 
 	while (offset < total) {
+            if (m_cancel)
+                break;
             UPnPClient::UPnPDirContent *slice = 
                 new UPnPClient::UPnPDirContent();
             if (slice == 0) {
@@ -73,7 +74,6 @@ class ContentDirectoryQO : public QThread {
                 return;
             }
             offset += count;
-            m_slices.push_back(slice);
             emit sliceAvailable(slice);
 
             toread = m_serv->goodSliceSize();
@@ -81,6 +81,7 @@ class ContentDirectoryQO : public QThread {
         emit done(m_status);
 	m_status = UPNP_E_SUCCESS;
     }
+    void setCancel() {m_cancel = true;}
 
     const std::string& getObjid() {return m_objid;}
     UPnPClient::ContentDirectory::ServiceKind getKind() {
@@ -88,7 +89,7 @@ class ContentDirectoryQO : public QThread {
     }
 
 signals:
-    void sliceAvailable(const  UPnPClient::UPnPDirContent *);
+    void sliceAvailable(UPnPClient::UPnPDirContent *);
     void done(int);
 
 private:
@@ -97,8 +98,8 @@ private:
     std::string m_searchstr;
     // We use a list (vs vector) so that existing element addresses
     // are unchanged when we append
-    std::list< UPnPClient::UPnPDirContent*> m_slices;
     int m_status;
+    bool m_cancel;
 };
 
 #endif /* _DIRREADER_H_INCLUDED_ */

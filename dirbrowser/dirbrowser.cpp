@@ -133,7 +133,7 @@ void DirBrowser::addTab()
 
 void DirBrowser::closeCurrentTab()
 {
-    if (m_insertactive)
+    if (m_insertactive || ui->tabs->count() <= 1)
         return;
     QWidget *w = ui->tabs->currentWidget();
     ui->tabs->removeTab(ui->tabs->currentIndex());

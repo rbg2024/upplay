@@ -53,8 +53,8 @@ class CDBrowser : public QWebView
  public slots:
     virtual void serversPage();
     void onBrowseDone(int);
-    void onSliceAvailable(const UPnPClient::UPnPDirContent *);
-    void onReaperSliceAvailable(const UPnPClient::UPnPDirContent *);
+    void onSliceAvailable(UPnPClient::UPnPDirContent *);
+    void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
     void setStyleSheet(bool);
 
  signals:
@@ -75,43 +75,57 @@ class CDBrowser : public QWebView
  private:
     void initContainerHtml(const std::string& ss=string());
     void browseContainer(std::string, std::string, QPoint scrollpos = QPoint());
+    void search(const string& objid, const string& iss, QPoint scrollpos = 
+                QPoint());
     void curpathClicked(unsigned int i);
 
-    // The currently seen Media Server descriptions
+    // When displaying the serves list, we periodically check the
+    // server pool state. The last seen Media Server descriptions are
+    // stored in m_msdescs for diffing with the new ones and deciding
+    // if we need to redraw. Timer and servers list are only used
+    // while we are displaying the servers page, the timer is stopped
+    // as soon as a link is clicked.
+    QTimer m_timer;
     std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
+
     // Handle for the currently active media server
     UPnPClient::MSRH m_ms;
 
     // Search caps of current server
     std::set<std::string> m_searchcaps;
 
-    // Current path inside current server: remember objid,title and scroll pos
+    // Current path inside current server: remember objid,title and
+    // scroll pos for going back
     struct CtPathElt {
         CtPathElt() : scrollpos(0,0) {}
-        CtPathElt(const std::string& id, const std::string& tt)
-            : objid(id), title(tt), scrollpos(0,0) 
+        CtPathElt(const std::string& id, const std::string& tt, 
+                  const std::string ss = std::string())
+            : objid(id), title(tt), searchStr(ss), scrollpos(0,0) 
             {}
         std::string objid;
         std::string title;
+        std::string searchStr;
         QPoint scrollpos;
     };
     std::vector<CtPathElt> m_curpath;
 
-    // We periodically check the server pool state.
-    QTimer m_timer;
-
+    // Threaded objects to perform directory reads and recursive walks
     ContentDirectoryQO *m_reader;
     RecursiveReaper    *m_reaper;
+    void deleteReaders();
 
-    // Content of the currently visited container
+    // Content of the currently visited container or search
     std::vector<UPnPClient::UPnPDirObject> m_entries;
-    // Scroll position to be restored when we're done reading
+    // Scroll position to be restored when we're done reading. This is
+    // so that the user can scroll while we insert?
     QPoint m_savedscrollpos;
 
-    // Content of recursive explore
+    // Content of recursive explore, for possible sorting before use
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
     // Store of seen urls hashes for deduplication while walking the tree
     std::unordered_set<std::string> m_recwalkdedup;
+
+    // Pointer to tabbed object for access to shared state (insertActive)
     DirBrowser *m_browsers;
 
     // Objid and index in entries for the last popup menu click

@@ -37,7 +37,7 @@ class RecursiveReaper : public QThread {
  public: 
     RecursiveReaper(UPnPClient::CDSH server, std::string objid, 
                        QObject *parent = 0)
-        : QThread(parent), m_serv(server)
+        : QThread(parent), m_serv(server), m_cancel(false)
     {
         m_ctobjids.push(objid);
         m_allctobjids.insert(objid);
@@ -49,24 +49,27 @@ class RecursiveReaper : public QThread {
 
     virtual void run() {
         qDebug() << "RecursiveReaper::run";
-        m_slices.push_back(new UPnPClient::UPnPDirContent());
 	m_status = UPNP_E_SUCCESS;
         while (!m_ctobjids.empty()) {
+            if (m_cancel) {
+                qDebug() << "RecursiveReaper:: cancelled";
+                break;
+            }
             // We don't stop on a container scan error, minimserver for one 
             // sometimes has dialog hiccups with libupnp, this is not fatal.
             scanContainer(m_ctobjids.front());
             m_ctobjids.pop();
         }
-        if (!m_slices.empty() && !m_slices.back()->m_items.empty()) {
-            emit sliceAvailable(&*m_slices.back());
-        }
-
         emit done(m_status);
         qDebug() << "RecursiveReaper::done";
     }
 
+    void setCancel() {
+        m_cancel = true;
+    }
+
 signals:
-    void sliceAvailable(const UPnPClient::UPnPDirContent*);
+    void sliceAvailable(UPnPClient::UPnPDirContent*);
     void done(int);
 
 private:
@@ -80,7 +83,12 @@ private:
         int count;
 
         while (offset < total) {
-            UPnPClient::UPnPDirContent& slice = *m_slices.back();
+            if (m_cancel) {
+                qDebug() << "RecursiveReaper:: cancelled";
+                break;
+            }
+            UPnPClient::UPnPDirContent& slice = 
+                *(new UPnPClient::UPnPDirContent());
 
             unsigned int lastctidx = slice.m_containers.size();
 
@@ -119,7 +127,6 @@ private:
                 qDebug() << "RecursiveReaper::scanCT got " << 
                     slice.m_items.size() << " items";
                 emit sliceAvailable(&slice);
-                m_slices.push_back(new UPnPClient::UPnPDirContent());
             }
             toread = m_serv->goodSliceSize();
         }
@@ -131,11 +138,7 @@ private:
     std::queue<std::string> m_ctobjids;
     std::unordered_set<std::string> m_allctobjids;
     int m_status;
-
-public:
-    // We use a list (vs vector) so that existing element addresses
-    // are unchanged when we append
-    std::list<UPnPClient::UPnPDirContent*> m_slices;
+    bool m_cancel;
 };
 
 #endif /* _RREAPER_H_INCLUDED_ */
