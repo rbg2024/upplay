@@ -35,6 +35,7 @@ public slots:
     void setPlaylist(Playlist *pl);
     void setStyleSheet(bool);
     void addTab();
+    void closeTab(int);
     void closeCurrentTab();
     void onCurrentTabChanged(int);
     void changeTabTitle(QWidget *, const QString&);

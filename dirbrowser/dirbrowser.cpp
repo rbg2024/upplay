@@ -34,6 +34,7 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
 
     ui->setupUi(this);
     ui->searchFrame->hide();
+    ui->tabs->setTabsClosable(true);
 
     QToolButton *plusbut = new QToolButton(this);
     QString icon_path = Helper::getIconPath();
@@ -53,7 +54,9 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
 
     connect(ui->tabs, SIGNAL(currentChanged(int)), 
             this, SLOT(onCurrentTabChanged(int)));
-
+    connect(ui->tabs, SIGNAL(tabCloseRequested(int)), 
+            this, SLOT(closeTab(int)));
+            
     icon = QIcon(icon_path + "/cross.png");
     ui->closeSearchTB->setIcon(icon);
     connect(ui->closeSearchTB, SIGNAL(clicked()), 
@@ -129,14 +132,20 @@ void DirBrowser::addTab()
     ui->tabs->addTab(tab, tr("Servers"));
 
     setupTabConnections(cdb);
+    ui->tabs->setCurrentIndex(ui->tabs->count() -1);
 }
 
 void DirBrowser::closeCurrentTab()
 {
+    closeTab(ui->tabs->currentIndex());
+}
+
+void DirBrowser::closeTab(int i)
+{
     if (m_insertactive || ui->tabs->count() <= 1)
         return;
-    QWidget *w = ui->tabs->currentWidget();
-    ui->tabs->removeTab(ui->tabs->currentIndex());
+    QWidget *w = ui->tabs->widget(i);
+    ui->tabs->removeTab(i);
     delete w;
 }
 

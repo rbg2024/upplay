@@ -399,7 +399,7 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
 
 void CDBrowser::deleteReaders() 
 {
-    qDebug() << "deleteReaders()";
+    //qDebug() << "deleteReaders()";
     if (m_reader) {
         m_reader->setCancel();
         m_reader->wait();
