@@ -15,7 +15,6 @@ QPushButton[flat=true] {
     padding-right: 1px;
 }
 
-
 QPushButton[flat=true]:checked {
     background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, 
                                       radius:0.6, fx:0.502, fy:0.500876, 
