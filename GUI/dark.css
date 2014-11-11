@@ -287,6 +287,7 @@ QComboBox:on {
 
 QComboBox::drop-down {
     width: 18px;
+    margin-left: 10px;
     border-left-width: 1px;
     border-left-color: #242424;
     border-left-style: solid;
