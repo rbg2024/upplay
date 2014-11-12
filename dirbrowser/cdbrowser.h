@@ -27,6 +27,7 @@
 #include <QVariant>
 #include <QTimer>
 #include <QPoint>
+#include <QMouseEvent>
 
 #include "libupnpp/control/description.hxx"
 #include "libupnpp/control/mediaserver.hxx"
@@ -50,6 +51,20 @@ class CDBrowser : public QWebView
     void getSearchCaps(std::set<std::string>& caps) {caps = m_searchcaps;}
     void search(const std::string& iss);
 
+    // Entry for path inside current server: for going back later
+    struct CtPathElt {
+        CtPathElt() : scrollpos(0,0) {}
+        CtPathElt(const std::string& id, const std::string& tt, 
+                  const std::string ss = std::string())
+            : objid(id), title(tt), searchStr(ss), scrollpos(0,0) {}
+        std::string objid;
+        std::string title;
+        std::string searchStr;
+        QPoint scrollpos;
+    };
+
+    void browseIn(QString UDN, vector<CtPathElt> path);
+
  public slots:
     virtual void serversPage();
     void onBrowseDone(int);
@@ -61,6 +76,8 @@ class CDBrowser : public QWebView
     void sig_tracks_to_playlist(const MetaDataList&);
     void sig_now_in(QWidget *, const QString&);
     void sig_searchcaps_changed();
+    void sig_browse_in_new_tab(QString UDN,
+                               std::vector<CDBrowser::CtPathElt>);
 
  protected slots:
     virtual void appendHtml(const QString&, const QString& html);
@@ -71,6 +88,8 @@ class CDBrowser : public QWebView
     virtual void back(QAction *);
     virtual void rreaperDone(int);
     virtual void onContentsSizeChanged(const QSize&);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+
 
  private:
     void initContainerHtml(const std::string& ss=string());
@@ -79,7 +98,7 @@ class CDBrowser : public QWebView
                 QPoint());
     void curpathClicked(unsigned int i);
 
-    // When displaying the serves list, we periodically check the
+    // When displaying the servers list, we periodically check the
     // server pool state. The last seen Media Server descriptions are
     // stored in m_msdescs for diffing with the new ones and deciding
     // if we need to redraw. Timer and servers list are only used
@@ -94,19 +113,6 @@ class CDBrowser : public QWebView
     // Search caps of current server
     std::set<std::string> m_searchcaps;
 
-    // Current path inside current server: remember objid,title and
-    // scroll pos for going back
-    struct CtPathElt {
-        CtPathElt() : scrollpos(0,0) {}
-        CtPathElt(const std::string& id, const std::string& tt, 
-                  const std::string ss = std::string())
-            : objid(id), title(tt), searchStr(ss), scrollpos(0,0) 
-            {}
-        std::string objid;
-        std::string title;
-        std::string searchStr;
-        QPoint scrollpos;
-    };
     std::vector<CtPathElt> m_curpath;
 
     // Threaded objects to perform directory reads and recursive walks
@@ -120,18 +126,24 @@ class CDBrowser : public QWebView
     // so that the user can scroll while we insert?
     QPoint m_savedscrollpos;
 
-    // Content of recursive explore, for possible sorting before use
+    // Recursive explore contents, for possible sorting before sending to pl
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
-    // Store of seen urls hashes for deduplication while walking the tree
+    // URL hashes for deduplication while walking the tree
     std::unordered_set<std::string> m_recwalkdedup;
 
-    // Pointer to tabbed object for access to shared state (insertActive)
+    // Pointer to parent tabbed object for access to shared state (insertActive)
     DirBrowser *m_browsers;
 
     // Objid and index in entries for the last popup menu click
     std::string m_popupobjid;
     int m_popupidx;
     int m_popupmode; // now, next, at end
+
+    // Remember last click kind for detecting midclick
+    Qt::MouseButton m_lastbutton;
+
+    // State for init browsing in subdir instead of servers page (middle-click)
+    QString m_initUDN;
 };
 
 // A QObject to hold a QString. Maybe there would be a simpler way to

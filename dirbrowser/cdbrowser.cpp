@@ -43,7 +43,8 @@ using namespace UPnPClient;
 static const string minimFoldersViewPrefix("0$folders");
 
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_reader(0), m_reaper(0), m_browsers(0)
+    : QWebView(parent), m_reader(0), m_reaper(0), m_browsers(0), 
+      m_lastbutton(Qt::LeftButton)
 {
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
@@ -73,6 +74,13 @@ CDBrowser::~CDBrowser()
     deleteReaders();
 }
 
+void CDBrowser::mouseReleaseEvent(QMouseEvent *event)
+{
+    //qDebug() << "CDBrowser::mouseReleaseEvent";
+    m_lastbutton = event->button();
+    QWebView::mouseReleaseEvent(event);
+}
+
 void CDBrowser::setStyleSheet(bool dark)
 {
     QString cssfn = Helper::getSharePath() + "cdbrowser/cdbrowser.css";
@@ -94,7 +102,6 @@ void CDBrowser::setStyleSheet(bool dark)
     settings()->setUserStyleSheetUrl(cssurl);
 }
 
-
 void CDBrowser::onContentsSizeChanged(const QSize&)
 {
     //qDebug() << "CDBrowser::onContentsSizeChanged: scrollpos " <<
@@ -102,10 +109,9 @@ void CDBrowser::onContentsSizeChanged(const QSize&)
     page()->mainFrame()->setScrollPosition(m_savedscrollpos);
 }
 
-
 void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 {
-    //LOGDEB("CDBrowser::appendHtml: " << qs2utf8s(html) << endl);
+    //qDebug() "CDBrowser::appendHtml: " << qs2utf8s(html);
     
     QWebFrame *mainframe = page()->mainFrame();
     StringObj morehtml(html);
@@ -126,15 +132,16 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 {
     m_timer.stop();
     string scurl = qs2utf8s(url.toString());
-    //LOGDEB("CDBrowser::onLinkClicked: " << scurl << endl);
+    //qDebug() << "CDBrowser::onLinkClicked: " << scurl << " button " << 
+    //m_lastbutton << " mid " << Qt::MidButton;
 
     int what = scurl[0];
 
     switch (what) {
 
-    // Browse server root
     case 'S':
     {
+        // Servers page server link click: browse clicked server root
 	unsigned int cdsidx = atoi(scurl.c_str()+1);
         if (cdsidx > m_msdescs.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad link index: " << cdsidx 
@@ -159,8 +166,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 
     case 'I':
     {
-        // Item clicked add to playlist
-
+        // Directory listing item link clicked: add to playlist
 	unsigned int i = atoi(scurl.c_str()+1);
         if (i > m_entries.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad objid index: " << i 
@@ -176,7 +182,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 
     case 'C':
     {
-        // Container clicked
+        // Directory listing container link clicked: browse subdir.
         m_curpath.back().scrollpos = page()->mainFrame()->scrollPosition();
 	unsigned int i = atoi(scurl.c_str()+1);
         if (i > m_entries.size()) {
@@ -184,7 +190,15 @@ void CDBrowser::onLinkClicked(const QUrl &url)
                    << " id count: " << m_entries.size() << endl);
 	    return;
 	}
-	browseContainer(m_entries[i].m_id, m_entries[i].m_title);
+        if (m_lastbutton == Qt::MidButton) {
+            // Open in new tab
+            vector<CtPathElt> npath(m_curpath);
+            npath.push_back(CtPathElt(m_entries[i].m_id, m_entries[i].m_title));
+            emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
+        } else {
+            browseContainer(m_entries[i].m_id, m_entries[i].m_title);
+        }
+        return;
     }
     break;
 
@@ -205,29 +219,66 @@ void CDBrowser::onLinkClicked(const QUrl &url)
 
 void CDBrowser::curpathClicked(unsigned int i)
 {
-    // qDebug() << "CDBrowser::curpathClicked: " << i << " pathsize " << 
+    //qDebug() << "CDBrowser::curpathClicked: " << i << " pathsize " << 
     // m_curpath.size();
-    if (i > m_curpath.size()) {
+    if (i >= m_curpath.size()) {
         LOGERR("CDBrowser::curPathClicked: bad curpath index: " << i 
                << " path count: " << m_curpath.size() << endl);
         return;
     }
-    string objid = m_curpath[i].objid;
-    string title = m_curpath[i].title;
-    string ss = m_curpath[i].searchStr;
-    QPoint scrollpos = m_curpath[i].scrollpos;
-    m_curpath.erase(m_curpath.begin()+i, m_curpath.end());
+
     if (i == 0) {
+        m_curpath.clear();
         m_msdescs.clear();
         m_ms = MSRH(0);
         serversPage();
     } else {
-        if (ss.empty()) {
-            browseContainer(objid, title, scrollpos);
+        string objid = m_curpath[i].objid;
+        string title = m_curpath[i].title;
+        string ss = m_curpath[i].searchStr;
+        QPoint scrollpos = m_curpath[i].scrollpos;
+        if (m_lastbutton == Qt::MidButton) {
+            vector<CtPathElt> npath(m_curpath);
+            npath.push_back(CtPathElt(objid, title, ss));
+            emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
         } else {
-            search(objid, ss, scrollpos);
+            m_curpath.erase(m_curpath.begin() + i, m_curpath.end());
+            if (ss.empty()) {
+                browseContainer(objid, title, scrollpos);
+            } else {
+                search(objid, ss, scrollpos);
+            }
         }
     }
+}
+
+void CDBrowser::browseIn(QString UDN, vector<CtPathElt> path)
+{
+    qDebug() << "CDBrowser::browsein: " << UDN;
+
+    m_curpath = path;
+    if (m_msdescs.size() == 0) {
+        qDebug() << "CDBrowser::browsein: no servers";
+        m_initUDN = UDN;
+        return;
+    } 
+
+    m_lastbutton = Qt::LeftButton;
+
+    // find uid in msdescs and create m_ms
+    unsigned int i;
+    string sudn = qs2utf8s(UDN);
+    for (i = 0; i < m_msdescs.size(); i++) {
+        if (m_msdescs[i].UDN == sudn) {
+            break;
+        }
+    }
+    if (i == m_msdescs.size()) {
+        qDebug() << "CDBrowser::browsein: " << UDN << " not found";
+        return;
+    }
+    m_ms = MSRH(new MediaServer(m_msdescs[i]));
+    curpathClicked(path.size() - 1);
 }
 
 static const QString init_container_page(
@@ -299,7 +350,7 @@ void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
     if (iss.empty())
         return;
     if (!m_ms) {
-        LOGERR("CDBrowser::browseContainer: server not set" << endl);
+        LOGERR("CDBrowser::search: server not set" << endl);
         return;
     }
     CDSH cds = m_ms->cds();
@@ -416,7 +467,7 @@ void CDBrowser::deleteReaders()
 
 void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
 {
-    qDebug() << "CDBrowser::onSliceAvailable";
+    //qDebug() << "CDBrowser::onSliceAvailable";
     if (!m_reader) {
         qDebug() << "CDBrowser::onSliceAvailable: no reader";
         // Cancelled.
@@ -428,12 +479,12 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
     for (auto& entry: dc->m_containers) {
-        // qDebug() << "Container: " << entry.dump().c_str();;
+        //qDebug() << "Container: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += CTToHtml(m_entries.size()-1, entry);
     }
     for (auto& entry: dc->m_items) {
-        // qDebug() << "Item: " << entry.dump().c_str();;
+        //qDebug() << "Item: " << entry.dump().c_str();;
         m_entries.push_back(entry);
         html += ItemToHtml(m_entries.size()-1, entry);
     }
@@ -511,6 +562,7 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
 void CDBrowser::serversPage()
 {
     deleteReaders();
+    emit sig_now_in(this, tr("Servers"));
 
     vector<UPnPDeviceDesc> msdescs;
     int secs = UPnPDeviceDirectory::getTheDir()->getRemainingDelay();
@@ -543,7 +595,16 @@ void CDBrowser::serversPage()
     } else {
         //qDebug() << "CDBrowser::serversPage: updating";
     }
+
     m_msdescs = msdescs;
+
+    if (!m_initUDN.isEmpty()) {
+        QString s = m_initUDN;
+        m_initUDN = "";
+        browseIn(s, m_curpath);
+        return;
+    }
+
     setHtml(QString::fromUtf8(init_server_page.c_str()));
     for (unsigned i = 0; i < msdescs.size(); i++) {
         appendHtml("", DSToHtml(i, msdescs[i]));

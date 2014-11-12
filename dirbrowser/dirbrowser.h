@@ -19,6 +19,7 @@
 #include "ui_dirbrowser.h"
 
 #include "playlist/Playlist.h"
+#include "cdbrowser.h"
 
 // The DirBrowser object has multiple tabs, each displaying the server
 // list of a directory listing or search result, and a hideable search
@@ -54,6 +55,7 @@ public slots:
 
     void onInsertDone() {m_insertactive = false;}
     void setInsertActive(bool onoff);
+    void onBrowseInNewTab(QString UDN, std::vector<CDBrowser::CtPathElt>);
 
 private:
     void setupTabConnections(int i);

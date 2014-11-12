@@ -92,7 +92,6 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
 
     onSearchKindChanged(int(ui->serverSearchCB->checkState()));
     ui->execSearchPB->hide();
-    setupTabConnections(0);
     setPlaylist(pl);
 }
 
@@ -127,11 +126,10 @@ void DirBrowser::addTab()
 
     CDBrowser *cdb = new CDBrowser(tab);
     cdb->setObjectName(QString::fromUtf8("cdBrowser"));
-    vl->addWidget(cdb);
-
-    ui->tabs->addTab(tab, tr("Servers"));
-
     setupTabConnections(cdb);
+
+    vl->addWidget(cdb);
+    ui->tabs->addTab(tab, QString());
     ui->tabs->setCurrentIndex(ui->tabs->count() -1);
 }
 
@@ -370,8 +368,29 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
     connect(cdb, SIGNAL(sig_now_in(QWidget *, const QString&)), 
             this, SLOT(changeTabTitle(QWidget *, const QString&)));
 
+    disconnect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)), 0, 0);
     connect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
             m_pl, SLOT(psl_add_tracks(const MetaDataList&)));
+    disconnect(cdb, SIGNAL(sig_searchcaps_changed()), 0, 0);
     connect(cdb, SIGNAL(sig_searchcaps_changed()), 
             this, SLOT(onSearchcapsChanged()));
+    disconnect(cdb,
+               SIGNAL(sig_browse_in_new_tab(QString,
+                                            std::vector<CDBrowser::CtPathElt>)),
+               0, 0);
+    connect(cdb,
+            SIGNAL(sig_browse_in_new_tab(QString,
+                                         std::vector<CDBrowser::CtPathElt>)),
+            this, SLOT(onBrowseInNewTab(QString, 
+                                        std::vector<CDBrowser::CtPathElt>)));
+}
+
+void DirBrowser::onBrowseInNewTab(QString UDN,
+                                  vector<CDBrowser::CtPathElt> path)
+{
+    //qDebug() << "onBrowseInNewTab(): " << UDN;
+    addTab();
+    CDBrowser *cdb = currentBrowser();
+    if (cdb) 
+        cdb->browseIn(UDN, path);
 }
