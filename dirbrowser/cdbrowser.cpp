@@ -65,7 +65,7 @@ CDBrowser::CDBrowser(QWidget* parent)
             "</body></html>");
 
     m_timer.setSingleShot(1);
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(serversPage()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(initialPage()));
     m_timer.start(0);
 }
 
@@ -231,18 +231,18 @@ void CDBrowser::curpathClicked(unsigned int i)
         m_curpath.clear();
         m_msdescs.clear();
         m_ms = MSRH(0);
-        serversPage();
+        initialPage();
     } else {
         string objid = m_curpath[i].objid;
         string title = m_curpath[i].title;
         string ss = m_curpath[i].searchStr;
         QPoint scrollpos = m_curpath[i].scrollpos;
+        m_curpath.erase(m_curpath.begin() + i, m_curpath.end());
         if (m_lastbutton == Qt::MidButton) {
             vector<CtPathElt> npath(m_curpath);
             npath.push_back(CtPathElt(objid, title, ss));
             emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
         } else {
-            m_curpath.erase(m_curpath.begin() + i, m_curpath.end());
             if (ss.empty()) {
                 browseContainer(objid, title, scrollpos);
             } else {
@@ -254,31 +254,31 @@ void CDBrowser::curpathClicked(unsigned int i)
 
 void CDBrowser::browseIn(QString UDN, vector<CtPathElt> path)
 {
-    qDebug() << "CDBrowser::browsein: " << UDN;
+    //qDebug() << "CDBrowser::browsein: " << UDN;
 
     m_curpath = path;
+
     if (m_msdescs.size() == 0) {
-        qDebug() << "CDBrowser::browsein: no servers";
+        // If the servers list is not ready yet, just set m_initUDN to tell
+        // initialPage() to do the right thing later when it gets the servers
+        // qDebug() << "CDBrowser::browsein: no servers";
         m_initUDN = UDN;
         return;
     } 
 
     m_lastbutton = Qt::LeftButton;
 
-    // find uid in msdescs and create m_ms
-    unsigned int i;
+    // Find UDN in msdescs, create a MediaServer object, and read the
+    // specified container (last in input curpath)
     string sudn = qs2utf8s(UDN);
-    for (i = 0; i < m_msdescs.size(); i++) {
+    for (unsigned int i = 0; i < m_msdescs.size(); i++) {
         if (m_msdescs[i].UDN == sudn) {
-            break;
+            m_ms = MSRH(new MediaServer(m_msdescs[i]));
+            curpathClicked(path.size() - 1);
+            return;
         }
     }
-    if (i == m_msdescs.size()) {
-        qDebug() << "CDBrowser::browsein: " << UDN << " not found";
-        return;
-    }
-    m_ms = MSRH(new MediaServer(m_msdescs[i]));
-    curpathClicked(path.size() - 1);
+    qDebug() << "CDBrowser::browsein: " << UDN << " not found";
 }
 
 static const QString init_container_page(
@@ -559,7 +559,7 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
     return out;
 }
 
-void CDBrowser::serversPage()
+void CDBrowser::initialPage()
 {
     deleteReaders();
     emit sig_now_in(this, tr("Servers"));
@@ -567,17 +567,17 @@ void CDBrowser::serversPage()
     vector<UPnPDeviceDesc> msdescs;
     int secs = UPnPDeviceDirectory::getTheDir()->getRemainingDelay();
     if (secs > 1) {
-        qDebug() << "CDBrowser::serversPage: waiting " << secs;
+        qDebug() << "CDBrowser::initialPage: waiting " << secs;
         m_timer.start(secs * 1000);
         return;
     }
     m_searchcaps.clear();
     emit sig_searchcaps_changed();
     if (!MediaServer::getDeviceDescs(msdescs)) {
-        LOGERR("CDBrowser::serversPage: getDeviceDescs failed" << endl);
+        LOGERR("CDBrowser::initialPage: getDeviceDescs failed" << endl);
         return;
     }
-    //qDebug() << "CDBrowser::serversPage: " << msdescs.size() << " servers";
+    //qDebug() << "CDBrowser::initialPage: " << msdescs.size() << " servers";
     
     bool same = msdescs.size() == m_msdescs.size();
     if (same) {
@@ -589,27 +589,28 @@ void CDBrowser::serversPage()
         }
     }
     if (same) {
-        //LOGDEB("CDBrowser::serversPage: no change" << endl);
+        //LOGDEB("CDBrowser::initialPage: no change" << endl);
         m_timer.start(5000);
         return;
     } else {
-        //qDebug() << "CDBrowser::serversPage: updating";
+        //qDebug() << "CDBrowser::initialPage: updating";
     }
 
     m_msdescs = msdescs;
 
     if (!m_initUDN.isEmpty()) {
+        // "Browse in new tab": show appropriate container
         QString s = m_initUDN;
         m_initUDN = "";
         browseIn(s, m_curpath);
-        return;
+    } else {
+        // Show servers list
+        setHtml(QString::fromUtf8(init_server_page.c_str()));
+        for (unsigned i = 0; i < msdescs.size(); i++) {
+            appendHtml("", DSToHtml(i, msdescs[i]));
+        }
+        m_timer.start(5000);
     }
-
-    setHtml(QString::fromUtf8(init_server_page.c_str()));
-    for (unsigned i = 0; i < msdescs.size(); i++) {
-        appendHtml("", DSToHtml(i, msdescs[i]));
-    }
-    m_timer.start(5000);
 }
 
 enum PopupMode {

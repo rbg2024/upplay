@@ -66,7 +66,7 @@ class CDBrowser : public QWebView
     void browseIn(QString UDN, vector<CtPathElt> path);
 
  public slots:
-    virtual void serversPage();
+    virtual void initialPage();
     void onBrowseDone(int);
     void onSliceAvailable(UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
