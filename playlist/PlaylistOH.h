@@ -63,9 +63,7 @@ public slots:
     void psl_stop(); 
     void psl_forward();
     void psl_backward();
-    void psl_remove_rows(const QList<int>& rows, bool = true) {
-        emit sig_tracks_removed(rows);
-    }
+    void psl_remove_rows(const QList<int>& rows, bool = true);
     // Insert after idx. Use -1 to insert at start
     void psl_insert_tracks(const MetaDataList&, int);
 

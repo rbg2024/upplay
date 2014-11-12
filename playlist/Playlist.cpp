@@ -132,6 +132,6 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
 
 void Playlist::psl_selection_min_row(int row)
 {
-    qDebug() << "Playlist::psl_selection_min_row: " << row;
+    qDebug() << "Playlist::psl_selection_min_row: now: " << row;
     m_selection_min_row = row;
 }

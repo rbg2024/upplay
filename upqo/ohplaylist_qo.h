@@ -140,6 +140,8 @@ public slots:
     }
 
     virtual bool deleteId(int id) {
+        if (id == m_curid)
+            m_srv->stop();
         int ret = m_srv->deleteId(id);
         if (ret == 0) {
             // Update local state at once in case we get an insert

@@ -99,3 +99,11 @@ void PlaylistOH::psl_insert_tracks(const MetaDataList& meta, int afteridx)
         " afteridx" << afteridx;
     emit sig_insert_tracks(meta, afteridx);
 }
+
+void PlaylistOH::psl_remove_rows(const QList<int>& rows, bool)
+{
+    if (rows.contains(m_play_idx)) {
+        m_play_idx = -1;
+    }
+    emit sig_tracks_removed(rows);
+}
