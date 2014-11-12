@@ -88,10 +88,22 @@ public slots:
     virtual void psl_stop() = 0;
     virtual void psl_forward() = 0;
     virtual void psl_backward() = 0;
-    // Note: this needs to be implemented locally even in the OH case
-    // because an insert may immediatly follow (d&d), before we get
-    // the updated list from the player.
-    virtual void psl_remove_rows(const QList<int> &, bool select_next=true);
+
+    // Note: in openhome mode, drag-dropping a selection containing
+    // the currently playing track results in a track change because
+    // this is seen as 2 separate remove/insert operations. After the
+    // remove, the playing track has changed, and there is no way to
+    // restore it when the insert occurs. We would need additional
+    // input from the playlist ui which is the only code with the info
+    // to link the remove/insert ops. Even then, it would be
+    // complicated to restore the right playing track because we'd
+    // have to wait for the playlist update from the remote player to
+    // do it. Even them this would cause the sound to flicker. It
+    // seems that the only option is to acknowledge the issue. We now stop
+    // playing in this situation (when removing the currently playing track)
+    virtual void psl_remove_rows(const QList<int> &, bool select_next=true) 
+        = 0;
+
     virtual void psl_selection_min_row(int);
 
 protected:

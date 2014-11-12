@@ -283,3 +283,49 @@ void PlaylistAVT::playlist_updated()
     rename((const char *)tmp.toLocal8Bit(), 
            (const char *)m_savefile.toLocal8Bit());
 }
+
+void PlaylistAVT::psl_remove_rows(const QList<int>& rows, bool select_next_row)
+{
+    qDebug() << "PlaylistAVT::psl_remove_rows";
+    if (rows.empty()) {
+        return;
+    }
+
+    if (rows.contains(m_play_idx)) {
+        m_play_idx = -1;
+        emit sig_stop();
+    }
+
+    MetaDataList v_tmp_md;
+    int n_tracks_before_cur_idx = 0;
+    int first_row = rows[0];
+    for (unsigned int i = 0; i < m_meta.size(); i++) {
+        if (rows.contains(i)) {
+            if (int(i) < m_play_idx) {
+                n_tracks_before_cur_idx++;
+            }
+        } else {
+            MetaData md = m_meta[i];
+            md.pl_dragged = false;
+            md.pl_selected = false;
+            md.pl_playing = false;
+            v_tmp_md.push_back(md);
+        }
+    }
+
+    m_play_idx -= n_tracks_before_cur_idx;
+    m_meta = v_tmp_md;
+
+    if (m_play_idx < 0 || m_play_idx >= (int) m_meta.size()) {
+        m_play_idx = -1;
+    } else {
+        m_meta[m_play_idx].pl_playing = true;
+    }
+
+    if (select_next_row) {
+        m_meta[first_row].pl_selected = true;
+    }
+
+    playlist_updated();
+    emit sig_playlist_updated(m_meta, m_play_idx, 0);
+}
