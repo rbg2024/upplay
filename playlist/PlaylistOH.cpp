@@ -40,11 +40,15 @@ void PlaylistOH::psl_trackIdChanged(int id)
     for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
         if (it->id == id) {
             if (m_play_idx != it - m_meta.begin()) {
-                m_play_idx = it -m_meta.begin();
-                // qDebug() << " new track index " << m_play_idx;
-                emit sig_track_metadata(*it);
                 emit sig_playing_track_changed(it - m_meta.begin());
+                m_play_idx = it - m_meta.begin();
+                //qDebug() << " new track index " << m_play_idx;
             }
+            // If the track id change was caused by the currently
+            // playing track having been removed, the play index did
+            // not change but the metadata did, so emit metadata in
+            // all cases.
+            emit sig_track_metadata(*it);
             return;
         }
     }
