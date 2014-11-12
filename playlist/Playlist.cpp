@@ -17,14 +17,22 @@
  *
  */
 
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <ctime>
-using namespace std;
 
 #include <QList>
 #include <QDebug>
+#include <QFileDialog>
 
-
+#include "upadapt/upputils.h"
 #include "Playlist.h"
+#include "HelperStructs/Helper.h"
+
+
+using namespace std;
 
 Playlist::Playlist(QObject* parent) 
     : QObject (parent), m_play_idx(-1), m_selection_min_row(-1),
@@ -133,6 +141,49 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
     }
 
     emit insertDone();
+}
+
+static string maybemakesavedir()
+{
+    string sd = qs2utf8s(Helper::getHomeDataPath()) + "pl";
+    if (access(sd.c_str(), 0) != 0) {
+        if (mkdir(sd.c_str(), 0700) != 0) {
+            qDebug() << "Playlist::psl_load_playlist: can't create: " <<
+                sd.c_str();
+            return string();
+        }
+    }
+    return sd;
+}
+void Playlist::psl_load_playlist()
+{
+    string savedir = maybemakesavedir();
+    if (savedir.empty())
+        return;
+    QString fn =  QFileDialog::getOpenFileName(
+        0, tr("Open Playlist"), u8s2qs(savedir), tr("Saved playlists (*.pl)"));
+    if (!fn.isNull()) {
+        MetaDataList meta;
+        meta.unSerialize(fn);
+        psl_clear_playlist();
+        psl_add_tracks(meta);
+    }
+}
+
+void Playlist::psl_save_playlist()
+{
+    string savedir = maybemakesavedir();
+    if (savedir.empty())
+        return;
+    QString fn =  QFileDialog::getSaveFileName(
+        0, tr("Save Current Playlist"), u8s2qs(savedir), 
+        tr("Saved playlists (*.pl)"));
+    if (!fn.isNull()) {
+        if (fn.indexOf(".pl") != fn.size() - 3)
+            fn += ".pl";
+        qDebug() << "Saving to " << fn;
+        m_meta.serialize(fn);
+    }
 }
 
 void Playlist::psl_selection_min_row(int row)

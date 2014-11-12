@@ -72,6 +72,8 @@ signals:
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int afteridx) = 0;
     virtual void psl_add_tracks(const MetaDataList&);
+    virtual void psl_load_playlist();
+    virtual void psl_save_playlist();
 
     virtual void psl_change_track(int num) {
         m_insertion_point = -1;

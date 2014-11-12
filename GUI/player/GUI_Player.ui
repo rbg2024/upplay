@@ -813,8 +813,10 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="separator"/>
     <addaction name="actionChange_Media_Renderer"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Playlist"/>
+    <addaction name="actionLoad_Playlist"/>
     <addaction name="separator"/>
     <addaction name="action_Close"/>
    </widget>
@@ -1001,6 +1003,16 @@
    </property>
    <property name="text">
     <string>Search panel</string>
+   </property>
+  </action>
+  <action name="actionSave_Playlist">
+   <property name="text">
+    <string>Save Playlist</string>
+   </property>
+  </action>
+  <action name="actionLoad_Playlist">
+   <property name="text">
+    <string>Load Playlist</string>
    </property>
   </action>
  </widget>

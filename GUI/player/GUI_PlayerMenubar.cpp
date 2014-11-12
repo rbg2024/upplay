@@ -31,10 +31,6 @@
 
 
 /** FILE **/
-void GUI_Player::onChangeMediaRenderer()
-{
-    emit sig_choose_renderer();
-}
 
 /** FILE END **/
 

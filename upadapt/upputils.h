@@ -34,6 +34,9 @@ inline QString u8s2qs(const std::string us)
     return QString::fromUtf8(us.c_str());
 }
 
+namespace UPnPClient {
+    class UPnPDirObject;
+}
 
 struct MetaData;
 

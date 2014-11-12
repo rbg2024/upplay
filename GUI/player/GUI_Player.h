@@ -71,7 +71,6 @@ public slots:
     void setRendererName(const QString& nm);
 
 signals:
-
     /* Player*/
     void play();
     void pause();
@@ -84,21 +83,14 @@ signals:
 
     /* File */
     void sig_choose_renderer();
+    void sig_save_playlist();
+    void sig_load_playlist();
 
     /* Preferences / View */
     void show_playlists();
     void show_small_playlist_items(bool);
     void sig_skin_changed(bool);
     void showSearchPanel(bool);
-
-    /* Covers */
-    void sig_want_cover(const MetaData &);
-    void sig_fetch_alternate_covers(int);
-    void sig_want_more_covers();
-    void sig_fetch_all_covers();
-
-    void sig_stream_selected(const QString&, const QString&);
-
 
 private slots:
     void playClicked(bool b = true);
@@ -117,7 +109,6 @@ private slots:
     void volumeLower();
 
     /* File */
-    void onChangeMediaRenderer();
 
     /* View */
     void showLibrary(bool, bool resize=true);

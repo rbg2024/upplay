@@ -342,6 +342,8 @@ void Application::init_connections()
     CONNECT(player, stop(), playlist, psl_stop());
     CONNECT(player, forward(), playlist, psl_forward());
     CONNECT(player, backward(), playlist, psl_backward());
+    CONNECT(player, sig_load_playlist(), playlist, psl_load_playlist());
+    CONNECT(player, sig_save_playlist(), playlist, psl_save_playlist());
 
     CONNECT(playlist, sig_track_metadata(const MetaData&),
             player, update_track(const MetaData&));

@@ -36,11 +36,13 @@ void GUI_Player::setupConnections()
 
     // file
     connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),
-            this, SLOT(onChangeMediaRenderer()));
-
+            this, SIGNAL(sig_choose_renderer()));
+    connect(ui->actionSave_Playlist, SIGNAL(triggered(bool)),
+            this, SIGNAL(sig_save_playlist()));
+    connect(ui->actionLoad_Playlist, SIGNAL(triggered(bool)),
+            this, SIGNAL(sig_load_playlist()));
     connect(ui->action_Close, SIGNAL(triggered(bool)), this,
             SLOT(really_close(bool)));
-
 
     // view
     connect(ui->action_viewLibrary, SIGNAL(toggled(bool)), this,
