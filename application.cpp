@@ -162,6 +162,9 @@ void Application::chooseRenderer()
         cerr << "Internal error: bad row after renderer choose dlg" << endl;
         return;
     }
+    MetaDataList curmeta;
+    if (playlist)
+        playlist->get_metadata(curmeta);
 
     QString friendlyname = QString::fromUtf8(devices[row].friendlyName.c_str());
     if (!setupRenderer(devices[row].UDN)) {
@@ -171,6 +174,13 @@ void Application::chooseRenderer()
     }
     settings->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
     init_connections();
+
+    if (playlist && !dlg.keepRB->isChecked()) {
+        if (dlg.replRB->isChecked()) {
+            playlist->psl_clear_playlist();
+        }
+        playlist->psl_add_tracks(curmeta);
+    }
 }
 
 Application::Application(QApplication* qapp, int, 

@@ -40,6 +40,7 @@ public:
     virtual uint get_num_tracks() {
         return m_meta.size();
     }
+    virtual void get_metadata(MetaDataList&);
 
 signals:
     // New playlist (for displaying in ui_playlist)

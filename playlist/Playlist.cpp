@@ -87,6 +87,11 @@ void Playlist::psl_change_mode(const Playlist_Mode& mode)
     emit sig_mode_changed(mode);
 }
 
+void Playlist::get_metadata(MetaDataList& out)
+{
+    out = m_meta;
+}
+
 void Playlist::psl_add_tracks(const MetaDataList& v_md)
 {
     qDebug() << "Playlist::psl_add_tracks: " <<
