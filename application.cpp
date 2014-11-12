@@ -131,7 +131,7 @@ bool Application::setupRenderer(const string& uid)
         playlist = new PlaylistOH();
     } else {
         ohplo = 0;
-        playlist = new PlaylistAVT();
+        playlist = new PlaylistAVT(rdr->m_desc.UDN);
     }
     cdb->setPlaylist(playlist);
 

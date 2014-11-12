@@ -19,8 +19,6 @@
 
 #include <ctime>
 
-using namespace std;
-
 #include <QFile>
 #include <QList>
 #include <QObject>
@@ -34,12 +32,38 @@ using namespace std;
 
 #include "PlaylistAVT.h"
 #include "HelperStructs/Helper.h"
+#include "upadapt/upputils.h"
+
+using namespace std;
 
 PlaylistAVT::PlaylistAVT(QObject *parent)
   : Playlist(parent)
 {
-    m_savefile = Helper::getHomeDataPath() + "savedQueue";
-    m_meta.unSerialize(m_savefile);
+    QTimer::singleShot(0, this, SLOT(playlist_updated()));
+}
+
+PlaylistAVT::PlaylistAVT(const string& _udn, QObject *parent)
+  : Playlist(parent)
+{
+    string udn(_udn);
+    if (udn.find("uuid:") == 0) {
+        udn = udn.substr(5);
+    }
+
+    m_savefile = qs2utf8s(Helper::getHomeDataPath()) + string("sq-") +
+        (udn.empty() ? "savedQueue" : udn);
+
+    // We used to call these "savedQueue". Rename on first use. This
+    // can go away in a few releases.
+    string oldsaved = qs2utf8s(Helper::getHomeDataPath()) + "savedQueue";
+    if (!udn.empty()) {
+        if (access(oldsaved.c_str(), R_OK) == 0 && 
+            access(m_savefile.c_str(), 0) != 0) {
+            rename(oldsaved.c_str(), m_savefile.c_str());
+        }
+    }
+
+    m_meta.unSerialize(u8s2qs(m_savefile));
     QTimer::singleShot(0, this, SLOT(playlist_updated()));
 }
 
@@ -278,10 +302,9 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
 void PlaylistAVT::playlist_updated()
 {
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
-    QString tmp(m_savefile + "-");
-    m_meta.serialize(tmp);
-    rename((const char *)tmp.toLocal8Bit(), 
-           (const char *)m_savefile.toLocal8Bit());
+    string tmp(m_savefile + "-");
+    m_meta.serialize(u8s2qs(tmp));
+    rename(tmp.c_str(),  m_savefile.c_str());
 }
 
 void PlaylistAVT::psl_remove_rows(const QList<int>& rows, bool select_next_row)

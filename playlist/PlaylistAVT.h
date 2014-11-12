@@ -35,7 +35,8 @@ class PlaylistAVT : public Playlist {
     Q_OBJECT
 
 public:
-    PlaylistAVT(QObject * parent = 0);
+    PlaylistAVT(QObject *parent = 0);
+    PlaylistAVT(const std::string& UDN, QObject *parent = 0);
     virtual ~PlaylistAVT() {}
 
 public slots:
@@ -72,7 +73,7 @@ protected:
 private slots:
     void playlist_updated();
 private:
-    QString m_savefile;
+    std::string m_savefile;
 };
 
 #endif /* PLAYLISTAVT_H_ */
