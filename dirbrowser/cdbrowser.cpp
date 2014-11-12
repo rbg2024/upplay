@@ -617,7 +617,8 @@ enum PopupMode {
     PUP_ADD,
     PUP_ADD_ALL,
     PUP_ADD_FROMHERE,
-    PUP_BACK
+    PUP_BACK,
+    PUP_OPEN_IN_NEW_TAB
 };
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
@@ -654,6 +655,7 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     // Clicked on some object. Dir entries inside the path have no objidx attr
     // and that's ok
     m_popupobjid = qs2utf8s(el.attribute("objid"));
+    m_popupobjtitle = qs2utf8s(el.toPlainText());
     if (el.hasAttribute("objidx"))
         m_popupidx = el.attribute("objidx").toInt();
     else
@@ -690,6 +692,10 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     }
 
     if (!otype.compare("container")) {
+        act = new QAction(tr("Open in new tab"), this);
+        v = QVariant(int(PUP_OPEN_IN_NEW_TAB));
+        act->setData(v);
+        popup->addAction(act);
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
                        SLOT(recursiveAdd(QAction *)));
     } else if (!otype.compare("item")) {
@@ -750,24 +756,29 @@ void CDBrowser::simpleAdd(QAction *act)
 void CDBrowser::recursiveAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::recursiveAdd";
-    deleteReaders();
-    if (m_browsers)
-        m_browsers->setInsertActive(true);
     m_popupmode = act->data().toInt();
+
+    deleteReaders();
+
+    if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
+        vector<CtPathElt> npath(m_curpath);
+        npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
+        emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
+        return;
+    }
 
     if (!m_ms) {
         qDebug() << "CDBrowser::recursiveAdd: server not set" ;
-        if (m_browsers)
-            m_browsers->setInsertActive(false);
         return;
     }
     CDSH cds = m_ms->cds();
     if (!cds) {
         qDebug() << "Cant reach content directory service";
-        if (m_browsers)
-            m_browsers->setInsertActive(false);
         return;
     }
+
+    if (m_browsers)
+        m_browsers->setInsertActive(true);
     ContentDirectory::ServiceKind kind = cds->getKind();
     if (kind == ContentDirectory::CDSKIND_MINIM) {
         // Use search() rather than a tree walk for Minim, it is much

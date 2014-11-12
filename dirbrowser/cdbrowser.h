@@ -136,6 +136,7 @@ class CDBrowser : public QWebView
 
     // Objid and index in entries for the last popup menu click
     std::string m_popupobjid;
+    std::string m_popupobjtitle;
     int m_popupidx;
     int m_popupmode; // now, next, at end
 
