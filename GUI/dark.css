@@ -34,6 +34,11 @@ QListView:focus, QTableView:focus{
     border: 1px solid #424e72;
 }
 
+QSplitter::handle {
+    background-color: #242424;
+    width: 2px;
+}
+
 QScrollBar::vertical {
     margin: 15px 0px 15px 0px;
     padding-left: 3px;
@@ -249,45 +254,16 @@ QMenu::indicator:non-exclusive:checked {
     image: url(:/icons/cb_checked.png);
 }
 
-
 QComboBox {
     border: 1px solid #2B2B2B;
     border-radius: 3px;
-    padding: 1px 3px 1px 3px;
+    padding: 1px 1px 1px 10px;
     background-color: #505050;
-}
-
-QComboBox:editable {
-    background: #525252;
-}
-
-QComboBox:!editable, QComboBox::drop-down:editable {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #555555, stop: 0.4 #383838);
-    padding-top: 3px;
-    padding-bottom: 2px;
-}
-
-QComboBox:!editable:on, QComboBox::drop-down:editable:on {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1b42a, stop: 0.4 #e8841a, stop: 0.5 #e8841a, stop: 1.0 #e8841a);
-}
-
-QComboBox:!editable:off, QComboBox::drop-down:editable:off {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #f1b42a, stop: 0.4 #e8841a, stop: 0.5 #e8841a, stop: 1.0 #e8841a);
-}
-
-QComboBox QAbstractItemView {
-    border-radius: 0px;
-}
-
-QComboBox:on {
-    /* shift the text when the popup opens */
-    padding-top: 3px;
-    padding-left: 4px;
+    min-width: 6em;
 }
 
 QComboBox::drop-down {
-    width: 18px;
-    margin-left: 10px;
+    margin-left: 0px;
     border-left-width: 1px;
     border-left-color: #242424;
     border-left-style: solid;
@@ -307,7 +283,6 @@ QComboBox:focus {
     border: 1px solid #e8841a;
 }
 
-
 QLineEdit {
     border: 1px solid #2B2B2B;
     border-radius: 4px;
@@ -324,7 +299,6 @@ QLineEdit:read-only {
     border: 1px solid #2B2B2B;
 }
 
-
 QLineEdit:disabled {
     border-radius: 4px;
     border: 1px solid #2B2B2B;
@@ -339,7 +313,8 @@ QTabWidget::pane {
 
 QTabWidget::tab-bar {
     left: 5px;
-/* move to the right by 5px */}
+/* move to the right by 5px */
+}
 
 QTabBar::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #525252, stop: 0.4 #383838, stop: 0.5 #383838, stop: 1.0 #424242);
@@ -549,11 +524,9 @@ QCheckBox::indicator:checked:disabled {
     image: url(:/icons/cb_checked_disabled.png);
 }
 
-
 QCheckBox::indicator:checked:enabled {
     image: url(:/icons/cb_checked.png);
 }
-
 
 
 QRadioButton {
@@ -603,7 +576,6 @@ QPushButton[flat=true]{
     padding-right: 1px;
 }
 
-
 QPushButton[flat=true]:hover{
     background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.54, fx:0.502, fy:0.500876, stop:0.45 rgba(243, 132, 26, 255), stop:1 rgba(255, 255, 255, 0));
 }
@@ -624,24 +596,26 @@ QPushButton[flat=false] {
     border: 1px solid #282828;
     border-radius: 6px;
     background: #505050;
-    padding: 4px;
+    margin: 2px;
+    margin-left: 4px;
+    padding-top: 2px;
+    padding-right: 8px;
+    padding-bottom: 1px;
+    padding-left: 6px;
 }
 
 QPushButton[flat=false]:hover {
     border: 1px solid #e8841a;
     border-radius: 6px;
-    padding: 4px;
 /*   background: #3b3b3b;*/
 }
 
 QPushButton[flat=false]:pressed {
     border: 1px solid #e8841a;
     border-radius: 6px;
-    padding: 4px;
+    padding: 6px;
     background: #323232;
 }
-
-
 
 QPushButton[flat=false]:disabled {
     border: 1px solid #303030;
@@ -659,7 +633,6 @@ QProgressBar {
     color: #f8f8f8;
     
 }
-
 
 QProgressBar::chunk {
     background-color: #424e72;
