@@ -1,0 +1,110 @@
+= The Upplay Qt-X11-Unix UPnP audio control point
+
+image::legend-upplay-main.png[]
+
+== Player section
+
+Play, Pause, Stop, Next, Previous, Seek, and Adjust volume. I would guess that
+these don't need explanations.
+
+== Playlist section
+
+Playlist entries:
+
+- Double-click entry to play
+- Click entry, then click the play button to play
+- Select and drag-drop to reorder
+- Right click and select 'Remove' to delete current selection
+
+Playlist buttons:
+
+- Playlist modes select how the tracks are sequenced: normal, repeat,
+  shuffle.
+- Playlist add modes determine how "Send to playlist" from the directory
+  browser will affect the playlist. By default, this inserts after the
+  current track. You can also choose to Append or Replace, and opt to
+  immediately start play for the first of the new tracks.
+- The sequential number toggle will show numbers in front of the
+  entries. Not too sure what this is good for...
+
+== Directory browser section
+
+The list at the top is a hybrid path/search history section:
+
+ - When you browse a directory tree by clicking on containers, it shows
+   your location in the tree.
+ - If you perform searches, your search history will be stacked at the end
+   of the path. Searches are not nested, and always relative to the closest
+   directory earlier in the path. If you click a directory inside the
+   search results, it will get stacked, and any further searches will be
+   relative to this directory, not the earlier one.
+
+Left-Clicking a track title will send it to the playlist, according to the
+current playlist add mode.
+
+Left-Clicking a directory title will get you there.
+
+Right-clicking a track title will propose three actions:
+
+ - Send to playlist: same as left-clicking.
+ - Send all to playlist: send all tracks from this directory.
+ - Send all from here to playlist: this track and the following ones go to
+   the playlist.
+
+Right-clicking a directory (in the list or in the path) will propose two
+actions:
+
+- Send to playlist: this is a recursive walk, it will send all tracks from
+  the subtree to the playlist. Don't do this at the root of a big tree...
+- Open in new tab.
+
+Right-clicking empty space will propose to go back (or up).
+
+Mid-Clicking a directory from the entries list, or a search or directory in
+the path at the top will open the element in a new tab. This can be
+particularly useful if you want to go back to a previous search without
+losing the current display.
+
+`^f` or `/` will open the search panel, `Esc` will close it (or the x-cross
+button at the right).
+
+When the search panel opens for the first time, it is in local search
+mode. Typing stuff in the entry area will try to locate the same stuff in
+the listing. The next/prev buttons will walk the matches, and so will
+`F3`/`Shift-F3`.
+
+If your media server supports search, you can toggle local/server search by
+typing `^s` or clicking the `Server Search` checkbox. When server search is
+active, you can choose the property you will be searching with the combobox
+at the right (Artist/Album/Title/Genre).
+
+Not all servers support search (e.g, MediaTomb does not, Minidlna does,
+etc.).
+
+== Tab bar section
+
+Clicking the big plus sign will open a new tab. Clicking a tab's cross
+sign will close it...
+
+
+== Menus
+
+File:
+
+- Change Media Renderer will let you do just this. You will see a dialog
+  with the list of renderers currently seen on the network. After choosing
+  one, you may decide that the current *upplay* playlist will replace the
+  one or the new renderer, or be appended to it by checking the appropriate
+  places. Double-clicking a renderer will get you there too.
+- Save / Load playlist will let you save the current playlist to a local
+  file, or load one which you previously saved.
+
+View:  you can elect to hide the right panel (directory listing), change
+the color scheme for a dark one and other interesting experiences.
+
+Preferences should be reasonably self-explaining.
+
+And help, there is no help...
+
+
+  

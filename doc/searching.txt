@@ -9,14 +9,15 @@ Upplay supports two search modes:
 The search panel is located at the bottom of the library window (the one on
 the right), and normally hidden. You can open it by the following actions:
  
-- Using the View menu
 - Typing '/' inside the library window.
 - Typing 'Ctrl+f' inside the library window.
+- Using the View menu
 
 You can close the panel by the following actions:
 
-- Using the View menu.
 - Typing 'Esc' (the Escape key).
+- Clicking the x cross on the right of the panel
+- Using the View menu.
 
 By default, the panel is in local search mode. Typing in the search entry
 will try to find matches in the page. You can use the two arrow buttons or
