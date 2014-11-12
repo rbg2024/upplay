@@ -291,12 +291,24 @@ static const QString init_container_page(
 void CDBrowser::initContainerHtml(const string& ss)
 {
     QString htmlpath("<div id=\"browsepath\"><ul>");
+    bool current_is_search = false;
     for (unsigned i = 0; i < m_curpath.size(); i++) {
         QString title = QString::fromUtf8(m_curpath[i].title.c_str());
         QString objid = QString::fromUtf8(m_curpath[i].objid.c_str());
+        QString sep("&gt;");
+        if (!m_curpath[i].searchStr.empty()) {
+            if (current_is_search) {
+                // Indicate that searches are not nested by changing
+                // the separator
+                sep = "&lt;&gt;";
+            }
+            current_is_search = true;
+        }
+        if (i == 0)
+            sep = "";
         htmlpath += QString("<li class=\"container\" objid=\"%3\">"
-                            "<a href=\"L%1\">%2</a> &gt;</li>").
-            arg(i).arg(title).arg(objid);
+                            " %4 <a href=\"L%1\">%2</a></li>").
+            arg(i).arg(title).arg(objid).arg(sep);
     }
     htmlpath += QString("</ul></div><br clear=\"all\"/>");
     if (!ss.empty()) {
