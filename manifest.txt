@@ -6,6 +6,7 @@ GUI/ContextMenu.cpp
 GUI/ContextMenu.h
 GUI/dark.css
 GUI/icons/
+GUI/icons/addtab.png
 GUI/icons/append.png
 GUI/icons/append_small.png
 GUI/icons/arrow_down.png
@@ -22,6 +23,7 @@ GUI/icons/bwd_orange.png
 GUI/icons/cb_checked.png
 GUI/icons/cb_checked_disabled.png
 GUI/icons/close.png
+GUI/icons/cross.png
 GUI/icons/delete.png
 GUI/icons/dynamic.png
 GUI/icons/edit.png
@@ -131,8 +133,19 @@ dirbrowser/cdbrowser.cpp
 dirbrowser/cdbrowser.css
 dirbrowser/cdbrowser.h
 dirbrowser/dark.css
+dirbrowser/dirbrowser.cpp
+dirbrowser/dirbrowser.h
+dirbrowser/dirbrowser.ui
 dirbrowser/rreaper.h
 dirbrowser/standard.css
+doc/
+doc/Makefile
+doc/legend-upplay-main.png
+doc/legend-upplay-main.xcf
+doc/searching.html
+doc/searching.txt
+doc/upplay.html
+doc/upplay.txt
 excludefile
 makesrcdist.sh
 playlist/
@@ -156,4 +169,5 @@ upqo/
 upqo/avtransport_qo.h
 upqo/cdirectory_qo.h
 upqo/ohplaylist_qo.h
+upqo/ohtime_qo.h
 upqo/renderingcontrol_qo.h
