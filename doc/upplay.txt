@@ -27,6 +27,9 @@ Playlist buttons:
 - The sequential number toggle will show numbers in front of the
   entries. Not too sure what this is good for...
 
+You can clear the current playlist by clicking the broom icon above it on
+the left.
+
 == Directory browser section
 
 The list at the top is a hybrid path/search history section:
@@ -68,18 +71,7 @@ losing the current display.
 `^f` or `/` will open the search panel, `Esc` will close it (or the x-cross
 button at the right).
 
-When the search panel opens for the first time, it is in local search
-mode. Typing stuff in the entry area will try to locate the same stuff in
-the listing. The next/prev buttons will walk the matches, and so will
-`F3`/`Shift-F3`.
-
-If your media server supports search, you can toggle local/server search by
-typing `^s` or clicking the `Server Search` checkbox. When server search is
-active, you can choose the property you will be searching with the combobox
-at the right (Artist/Album/Title/Genre).
-
-Not all servers support search (e.g, MediaTomb does not, Minidlna does,
-etc.).
+link:searching.html[more detail on search].
 
 == Tab bar section
 

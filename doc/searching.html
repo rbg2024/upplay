@@ -752,7 +752,7 @@ Inside the current directory page: this is handy to quickly skip inside
 </li>
 <li>
 <p>
-Classic UPnP search on the server.
+Server search.
 </p>
 </li>
 </ul></div>
@@ -761,12 +761,12 @@ the right), and normally hidden. You can open it by the following actions:</p></
 <div class="ulist"><ul>
 <li>
 <p>
-Typing <em>/</em> inside the library window.
+Typing <tt>/</tt> inside the library window.
 </p>
 </li>
 <li>
 <p>
-Typing <em>Ctrl+f</em> inside the library window.
+Typing <tt>Ctrl+f</tt> inside the library window.
 </p>
 </li>
 <li>
@@ -775,42 +775,51 @@ Using the View menu
 </p>
 </li>
 </ul></div>
+<div class="paragraph"><p>Not all servers support search (e.g, MediaTomb does not, Minidlna does,
+etc.).</p></div>
 <div class="paragraph"><p>You can close the panel by the following actions:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Typing <em>Esc</em> (the Escape key).
+Typing <tt>Esc</tt> (the Escape key).
 </p>
 </li>
 <li>
 <p>
-Clicking the x cross on the right of the panel
+Clicking the x-cross icon on the right of the panel
 </p>
 </li>
 <li>
 <p>
-Using the View menu.
+Using the <tt>View</tt> menu.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>By default, the panel is in local search mode. Typing in the search entry
-will try to find matches in the page. You can use the two arrow buttons or
-type F3 or Shift+F3 to find the next or previous match.</p></div>
-<div class="paragraph"><p>If the currently displayed page comes from an UPnP Media Server which
-supports searching (not all do), you can switch the panel to server search
-by checking the <em>Server Search</em> checkbutton. You can also toggle between
-local and server modes by typing Ctl+s.</p></div>
+<div class="paragraph"><p>When the search panel opens for the first time, the panel is in local
+search mode. Typing inside the search entry area will try to find matches
+in the page. You can use the two arrow buttons or type <tt>F3</tt> or <tt>Shift+F3</tt>
+to find the next or previous match.</p></div>
 <div class="paragraph"><p>In server mode, the search panel will let you enter a search string and the
 kind of field inside which you want to search (the combobox on the right,
-Artist/Album/Title). Type Enter or click the search button to start the
-search. The results are displayed just like a directory listing.</p></div>
+Artist/Album/Title). Type <tt>Enter</tt> or click the search button to start the
+search.</p></div>
+<div class="paragraph"><p>The results are displayed just like a directory listing and can be
+used in the same way (including opening tabs for directory listings, etc.).</p></div>
+<div class="paragraph"><p>Server searches are always relative to the first directory earlier in the
+path, never to another search.
+If your search yields nothing, one of the things to check is that you are
+high enough in the tree (not searching a single directory).</p></div>
+<div class="paragraph"><p>Also <strong><em>space characters are significant in the search entry</em></strong>. This has a
+capacity for trouble but it can also be a great help when trying to match
+words (there are no standard UPnP ways to specify word matches, or anchor a
+search at the beginning or end of a field).</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-11-12 19:02:19 CET
+Last updated 2014-11-13 09:31:26 CET
 </div>
 </div>
 </body>
