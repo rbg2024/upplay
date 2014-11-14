@@ -348,11 +348,12 @@ CDBrowser *DirBrowser::currentBrowser()
 void DirBrowser::setupTabConnections(int i)
 {
     QWidget *tw = ui->tabs->widget(i);
-    CDBrowser *cdb;
+    CDBrowser *cdb = 0;
     if (tw) {
         cdb = tw->findChild<CDBrowser*>();
     } else {
         qDebug() << "Tab " << i << " not found";
+        return;
     }
     if (!cdb) {
         qDebug() << "Tab " << i << " has no browser child";
