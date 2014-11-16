@@ -746,13 +746,12 @@ void CDBrowser::simpleAdd(QAction *act)
         starti = m_popupidx;
         /* FALLTHROUGH */
     case PUP_ADD_ALL:
-        for (unsigned int i = 0; i < m_entries.size() - starti; i++) {
-            unsigned int ei = starti + i;
-            if (m_entries[ei].m_type == UPnPDirObject::item && 
-                m_entries[ei].m_iclass == 
+        for (unsigned int i = starti; i < m_entries.size(); i++) {
+            if (m_entries[i].m_type == UPnPDirObject::item && 
+                m_entries[i].m_iclass == 
                 UPnPDirObject::ITC_audioItem_musicTrack) {
                 mdl.resize(mdl.size()+1);
-                udirentToMetadata(&m_entries[ei], &mdl[i]);
+                udirentToMetadata(&m_entries[i], &mdl[mdl.size()-1]);
             }
         }
         break;
