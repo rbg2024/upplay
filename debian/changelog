@@ -1,8 +1,8 @@
 upplay (0.9.1-1) unstable; urgency=low
 
-  * ?
+  * Fixed core dump when using "add all" on directory with subdirs.
 
- -- Jean-Francois Dockes <jf@dockes.org>  Fri, 14 Nov 2014 18:19:00 +0100
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 16 Nov 2014 18:17:00 +0100
 
 upplay (0.9.0-1) unstable; urgency=low
 
