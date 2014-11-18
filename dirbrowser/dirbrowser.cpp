@@ -181,11 +181,17 @@ void DirBrowser::onCurrentTabChanged(int)
     }
 }
 
+static QString escapeAmpersand(const QString& in)
+{
+    QString out(in);
+    return out.replace(QChar::fromAscii('&'), QString::fromAscii("&&"));
+}
+
 void DirBrowser::changeTabTitle(QWidget *w, const QString& tt)
 {
     int i = ui->tabs->indexOf((QWidget*)w->parent());
     if (i >= 0) {
-        ui->tabs->setTabText(i, tt);
+        ui->tabs->setTabText(i, escapeAmpersand(tt));
     } else {
         qDebug() << "changeTabTitle: Widget not found in tabs: " << w;
     }
