@@ -167,7 +167,6 @@ void GUI_Player::about(bool b)
         );
     infobox.setStandardButtons(QMessageBox::Ok);
     infobox.button(QMessageBox::Ok)->setFocusPolicy(Qt::NoFocus);
-    Helper::set_deja_vu_font(&infobox);
     infobox.exec();
 }
 

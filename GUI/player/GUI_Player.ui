@@ -16,11 +16,6 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="font">
-   <font>
-    <family>DejaVu Sans</family>
-   </font>
-  </property>
   <property name="focusPolicy">
    <enum>Qt::StrongFocus</enum>
   </property>
@@ -114,7 +109,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>40</height>
+                <height>50</height>
                </size>
               </property>
               <property name="font">
@@ -144,7 +139,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>40</height>
+                <height>50</height>
                </size>
               </property>
               <property name="font">
@@ -152,7 +147,6 @@
                 <pointsize>10</pointsize>
                 <weight>75</weight>
                 <bold>true</bold>
-                <stylestrategy>PreferAntialias</stylestrategy>
                </font>
               </property>
               <property name="styleSheet">
@@ -562,6 +556,18 @@
            <layout class="QHBoxLayout" name="horizontalLayout_6">
             <item>
              <widget class="QLabel" name="lab_writtenby">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>6</pointsize>
@@ -578,6 +584,18 @@
             </item>
             <item>
              <widget class="QLabel" name="lab_artist">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>30</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>6</pointsize>
@@ -619,13 +637,13 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>20</height>
+                <height>30</height>
                </size>
               </property>
               <property name="font">
@@ -647,13 +665,13 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>30</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>20</height>
+                <height>30</height>
                </size>
               </property>
               <property name="font">
@@ -682,6 +700,12 @@
            <layout class="QHBoxLayout" name="horizontalLayout_8">
             <item>
              <widget class="QLabel" name="lab_version">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>20</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -793,11 +817,6 @@
      <height>25</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-    </font>
-   </property>
    <property name="defaultUp">
     <bool>false</bool>
    </property>
@@ -805,11 +824,6 @@
     <bool>false</bool>
    </property>
    <widget class="QMenu" name="menuFle">
-    <property name="font">
-     <font>
-      <family>DejaVu Sans</family>
-     </font>
-    </property>
     <property name="title">
      <string>File</string>
     </property>
@@ -821,11 +835,6 @@
     <addaction name="action_Close"/>
    </widget>
    <widget class="QMenu" name="menuView">
-    <property name="font">
-     <font>
-      <family>DejaVu Sans</family>
-     </font>
-    </property>
     <property name="styleSheet">
      <string notr="true"/>
     </property>
@@ -840,11 +849,6 @@
     <addaction name="action_Fullscreen"/>
    </widget>
    <widget class="QMenu" name="menuPreferences">
-    <property name="font">
-     <font>
-      <family>DejaVu Sans</family>
-     </font>
-    </property>
     <property name="title">
      <string>Preferences</string>
     </property>
@@ -852,11 +856,6 @@
     <addaction name="action_folderviewfnorder"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
-    <property name="font">
-     <font>
-      <family>DejaVu Sans</family>
-     </font>
-    </property>
     <property name="title">
      <string>Help</string>
     </property>
@@ -872,12 +871,6 @@
    <property name="text">
     <string>Close</string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
@@ -889,31 +882,15 @@
    <property name="text">
     <string>Dark</string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
   </action>
   <action name="action_help">
    <property name="text">
     <string>Help</string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-    </font>
-   </property>
   </action>
   <action name="action_about">
    <property name="text">
     <string>About</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-    </font>
    </property>
   </action>
   <action name="action_viewLibrary">
@@ -926,12 +903,6 @@
    <property name="text">
     <string>&amp;Library</string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
    <property name="shortcutContext">
     <enum>Qt::ApplicationShortcut</enum>
    </property>
@@ -943,12 +914,6 @@
    <property name="text">
     <string>Close to tray</string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
   </action>
   <action name="action_folderviewfnorder">
    <property name="checkable">
@@ -956,12 +921,6 @@
    </property>
    <property name="text">
     <string>Use file name ordering inside folder hierarchy</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
    </property>
   </action>
   <action name="action_Fullscreen">
@@ -971,12 +930,6 @@
    <property name="text">
     <string>Fullscreen </string>
    </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
   </action>
   <action name="action_smallPlaylistItems">
    <property name="checkable">
@@ -984,12 +937,6 @@
    </property>
    <property name="text">
     <string>Small Playlist Items</string>
-   </property>
-   <property name="font">
-    <font>
-     <family>DejaVu Sans</family>
-     <pointsize>9</pointsize>
-    </font>
    </property>
   </action>
   <action name="actionChange_Media_Renderer">

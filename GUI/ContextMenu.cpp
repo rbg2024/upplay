@@ -38,7 +38,6 @@ ContextMenu::ContextMenu(QWidget* parent) :
     _play_next_action = new QAction(QIcon(Helper::getIconPath() + "fwd_orange.png"), tr("Play next"), this);
     _append_action = new QAction(QIcon(Helper::getIconPath() + "append.png"), tr("Append"), this);
 
-    Helper::set_deja_vu_font(this);
 }
 
 

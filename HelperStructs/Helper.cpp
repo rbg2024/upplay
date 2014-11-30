@@ -71,10 +71,12 @@ QByteArray Helper::readFileToByteArray(const char *fn)
     }
     ret.append(cp, st.st_size);
 out:
-    if (fd >= 0)
+    if (fd >= 0) {
         close(fd);
-    if (cp)
+    }
+    if (cp) {
         free(cp);
+    }
     return ret;
 }
 
@@ -84,9 +86,9 @@ QString Helper::cvtQString2FirstUpper(QString str)
     QString ret_str = "";
     QStringList lst = str.split(" ");
 
-    foreach(QString word, lst){
+    foreach(QString word, lst) {
         QString first = word.left(1);
-        word.remove(0,1);
+        word.remove(0, 1);
         word = first.toUpper() + word + " ";
 
         ret_str += word;
@@ -98,15 +100,15 @@ QString Helper::cvtQString2FirstUpper(QString str)
 QString cvtNum2String(int num, int digits)
 {
     QString str = QString::number(num);
-    while(str.size() < digits){
+    while (str.size() < digits) {
         str.prepend("0");
     }
 
     return str;
 }
 
-QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon, 
-                                           bool show_days)
+QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
+        bool show_days)
 {
     bool show_hrs = false;
 
@@ -119,25 +121,26 @@ QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
 
     QString final_str;
 
-    if(days > 0 && show_days){
+    if (days > 0 && show_days) {
         final_str += QString::number(days) + "d ";
         hrs = hrs % 24;
         show_hrs = true;
     }
 
-    if(!show_days){
+    if (!show_days) {
         hrs += (days * 24);
     }
 
-    if(hrs > 0 || show_hrs){
+    if (hrs > 0 || show_hrs) {
         final_str += QString::number(hrs) + "h ";
         min = min % 60;
     }
 
-    if(colon)
+    if (colon) {
         final_str +=  cvtNum2String(min, 2) + ":" + cvtNum2String(secs, 2);
-    else
+    } else {
         final_str +=  cvtNum2String(min, 2) + "m " + cvtNum2String(secs, 2);
+    }
 
     return final_str;
 
@@ -147,16 +150,18 @@ QString Helper::getSharePath()
 {
     QString path;
 #ifndef Q_OS_WIN
-    if(QFile::exists(PREFIX "/share/upplay")) 
+    if (QFile::exists(PREFIX "/share/upplay")) {
         path = PREFIX "/share/upplay/";
-    else 
+    } else {
         path = "";
+    }
 #else
     path = QDir::homePath() + QString("\\.upplay\\images\\");
-    if(QFile::exists(path)){
+    if (QFile::exists(path)) {
         return path;
-    } else 
+    } else {
         path = "";
+    }
 #endif
 
     return path;
@@ -170,7 +175,7 @@ QString Helper::getIconPath()
 QString Helper::getHomeDataPath()
 {
     QString mydatadir = QDir::homePath() + "/.local/share/upplay";
-    if(!QFile::exists(mydatadir)) {
+    if (!QFile::exists(mydatadir)) {
         QDir().mkdir(mydatadir);
     }
     return mydatadir + "/";
@@ -180,36 +185,39 @@ QString Helper::get_cover_path(QString artist, QString album, QString extension)
 {
     QString cover_dir = getHomeDataPath() + QDir::separator() + "covers";
 
-    if(!QFile::exists(cover_dir)) {
+    if (!QFile::exists(cover_dir)) {
         QDir().mkdir(cover_dir);
     }
 
     QString cover_token = calc_cover_token(artist, album);
-    QString cover_path =  cover_dir + QDir::separator() + cover_token + 
-        "." + extension;
+    QString cover_path =  cover_dir + QDir::separator() + cover_token +
+                          "." + extension;
     return cover_path;
 }
 
-QString Helper::createLink(QString name, QString target, bool underline){
-	
+QString Helper::createLink(QString name, QString target, bool underline)
+{
+
     int dark = CSettingsStorage::getInstance()->getPlayerStyle();
-    if(target.size() == 0) 
+    if (target.size() == 0) {
         target = name;
+    }
 
     QString content;
     QString style = "";
-	
-    if(!underline) 
-        style = " style: \"text-decoration=none;\" ";
 
-    if(dark) {
-        content = LIGHT_BLUE(name);
+    if (!underline) {
+        style = " style: \"text-decoration=none;\" ";
     }
-    else 
+
+    if (dark) {
+        content = LIGHT_BLUE(name);
+    } else {
         content = DARK_BLUE(name);
-	
-    return QString("<a href=\"") + target + "\"" + style + ">" + 
-        content + "</a>";
+    }
+
+    return QString("<a href=\"") + target + "\"" + style + ">" +
+           content + "</a>";
 }
 
 QString Helper::calc_filesize_str(qint64 filesize)
@@ -219,14 +227,14 @@ QString Helper::calc_filesize_str(qint64 filesize)
     qint64 gb = mb * 1024;
 
     QString size;
-    if(filesize > gb){
-        size = QString::number(filesize / gb) + "." + 
-            QString::number((filesize / mb) % gb).left(2)  + " GB";
-    } else if (filesize > mb){
-        size = QString::number(filesize / mb) + "." + 
-            QString::number((filesize / kb) % mb).left(2)  + " MB";
+    if (filesize > gb) {
+        size = QString::number(filesize / gb) + "." +
+               QString::number((filesize / mb) % gb).left(2)  + " GB";
+    } else if (filesize > mb) {
+        size = QString::number(filesize / mb) + "." +
+               QString::number((filesize / kb) % mb).left(2)  + " MB";
     }  else {
-        size = QString::number( filesize / kb) + " KB";
+        size = QString::number(filesize / kb) + " KB";
     }
 
     return size;
@@ -234,9 +242,9 @@ QString Helper::calc_filesize_str(qint64 filesize)
 
 QString Helper::calc_cover_token(QString artist, QString album)
 {
-    QString ret = 
+    QString ret =
         QCryptographicHash::hash(artist.trimmed().toLower().toUtf8() +
-                                 album.trimmed().toLower().toUtf8(), 
+                                 album.trimmed().toLower().toUtf8(),
                                  QCryptographicHash::Md5).toHex();
     return ret;
 }
@@ -266,112 +274,11 @@ QStringList Helper::get_soundfile_extensions()
     return filters;
 }
 
-bool Helper::is_soundfile(QString filename)
-{
-    QStringList extensions = get_soundfile_extensions();
-    foreach (QString extension, extensions) {
-        if (filename.toLower().endsWith(extension.right(4).toLower())) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-QStringList Helper::get_playlistfile_extensions()
-{
-    QStringList filters;
-
-    filters << "*.pls"
-            << "*.m3u"
-            << "*.ram"
-            << "*.asx";
-
-    foreach (QString filter, filters) {
-        filters.push_back(filter.toUpper());
-    }
-
-    return filters;
-}
-
-bool Helper::is_playlistfile(QString filename)
-{
-    QStringList extensions = get_playlistfile_extensions();
-    foreach(QString extension, extensions){
-        if(filename.toLower().endsWith(extension.right(4).toLower())){
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-QString Helper::calc_file_extension(QString filename)
-{
-    int last_point = filename.lastIndexOf(".") + 1;
-    return filename.right(filename.size() - last_point);
-}
-
-void Helper::remove_files_in_directory(QString dir_name, QStringList filters)
-{
-    if(filters.size() == 0) 
-        filters << "*";
-
-    QDir dir(dir_name);
-    dir.setFilter(QDir::Files);
-    dir.setNameFilters(filters);
-    QStringList file_list = dir.entryList();
-
-    foreach(QString filename, file_list) {
-        QFile file(dir.absoluteFilePath(filename));
-        file.remove();
-    }
-}
-
-QString Helper::get_parent_folder(QString filename)
-{
-    QString ret= filename.left(filename.lastIndexOf(QDir::separator()) + 1);
-    int last_idx = ret.lastIndexOf(QDir::separator());
-    while(last_idx == ret.size() - 1){
-	ret = ret.left(ret.size() - 1);
-    	last_idx = ret.lastIndexOf(QDir::separator());
-    }
-    return ret;
-}
-
-QString Helper::get_filename_of_path(QString path)
-{
-    while (path.endsWith(QDir::separator())) 
-        path.remove(path.size() - 1, 1);
-    path.remove(Helper::get_parent_folder(path));
-    path.remove(QDir::separator());
-    return path;
-}
-
-void Helper::split_filename(QString src, QString& path, QString& filename)
-{
-    path = Helper::get_parent_folder(src);
-    filename = Helper::get_filename_of_path(src);	
-}
-
-QStringList Helper::extract_folders_of_files(QStringList files)
-{
-    QStringList folders;
-    foreach(QString file, files) {
-        QString folder = get_parent_folder(file);
-        if(!folders.contains(folder))
-            folders << folder;
-    }
-
-    return folders;
-}
-
 bool Helper::read_file_into_str(QString filename, QString* content)
 {
     QFile file(filename);
     content->clear();
-    if(!file.open(QIODevice::ReadOnly)){
+    if (!file.open(QIODevice::ReadOnly)) {
         return false;
     }
 
@@ -384,80 +291,9 @@ bool Helper::read_file_into_str(QString filename, QString* content)
 
     file.close();
 
-    if(content->size() > 0 ){
+    if (content->size() > 0) {
         return true;
     }
 
     return false;
-}
-
-QString Helper::split_string_to_widget(QString str, QWidget* w, QChar sep)
-{
-
-    QFontMetrics fm(w->font());
-
-    int width = w->width();
-
-
-    QString subtext = str;
-    QStringList lst;
-
-    while(fm.width(subtext) > width){
-        int textsize = fm.width(subtext);
-        double scale = (width * 1.0) / textsize;
-        int idx = subtext.size() * scale - 2;
-        if(idx < 0) idx = 0;
-
-        while(subtext.at(idx) != sep && idx >= 0){
-            idx --;
-        }
-
-        if(idx >= 0){
-
-            lst << subtext.left(idx+1);
-            subtext = subtext.right(subtext.size() - idx);
-        }
-
-        else
-            break;
-
-    }
-
-    lst << subtext;
-    return lst.join("<br />");
-}
-
-bool Helper::is_url(QString str){
-    if(is_www(str)) return true;
-    if(str.startsWith("file"), Qt::CaseInsensitive) return true;
-    return false;
-}
-
-bool Helper::is_www(QString str){
-
-
-    if(str.startsWith("http")) return true;
-    else if(str.startsWith("ftp")) return true;
-    return false;
-}
-
-bool Helper::is_dir(QString filename){
-    if(!QFile::exists(filename)) return false;
-    QFileInfo fileinfo(filename);
-    return fileinfo.isDir();
-}
-
-bool Helper::is_file(QString filename){
-    if(!QFile::exists(filename)) return false;
-    QFileInfo fileinfo(filename);
-    return fileinfo.isFile();
-}
-
-
-void Helper::set_deja_vu_font(QWidget* w){
-    QFont f = w->font();
-    f.setFamily("DejaVu Sans");
-    f.setStyleStrategy(QFont::PreferAntialias);
-    f.setHintingPreference(QFont::PreferNoHinting);
-    w->setFont(f);
 }

@@ -69,7 +69,6 @@
      </property>
      <property name="font">
       <font>
-       <family>DejaVu Sans</family>
        <pointsize>8</pointsize>
        <weight>75</weight>
        <bold>true</bold>
@@ -105,7 +104,6 @@
      </property>
      <property name="font">
       <font>
-       <family>DejaVu Sans</family>
        <pointsize>7</pointsize>
       </font>
      </property>
@@ -142,7 +140,6 @@
      </property>
      <property name="font">
       <font>
-       <family>DejaVu Sans</family>
        <pointsize>7</pointsize>
       </font>
      </property>

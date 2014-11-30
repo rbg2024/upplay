@@ -52,7 +52,12 @@ CDBrowser::CDBrowser(QWidget* parent)
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
     settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
-
+    if (parent) {
+        settings()->setFontSize(QWebSettings::DefaultFontSize, 
+                              parent->font().pointSize()+4);
+	settings()->setFontFamily(QWebSettings::StandardFont, 
+			       parent->font().family());
+    }
     setStyleSheet(CSettingsStorage::getInstance()->getPlayerStyle());
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),

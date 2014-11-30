@@ -27,9 +27,7 @@
 #include <QIcon>
 #include <QPixmap>
 #include <QTimer>
-#include <QFont>
 
-//#include "Notification/NotificationPluginLoader.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "GUI/player/GUI_TrayIcon.h"
@@ -90,9 +88,6 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     m_trayContextMenu->addSeparator();
     m_trayContextMenu->addAction(m_showAction);
     m_trayContextMenu->addAction(m_closeAction);
-    QFont f = m_trayContextMenu->font();
-    f.setFamily("DejaVu Sans");
-    m_trayContextMenu->setFont(f);
     setContextMenu(m_trayContextMenu);
 
     connect(m_playAction, SIGNAL(triggered()), this, SLOT(play_clicked()));
