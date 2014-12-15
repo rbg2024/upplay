@@ -174,10 +174,19 @@ private slots:
 
     void onIdArrayChanged(std::vector<int> nids) {
         //qDebug() << "OHPL::onIdArrayChanged: " << vtos(nids).c_str();
+
+        // We used to do nothing if the id array was unchanged, but
+        // this gained very little, and going through lets us
+        // re-read the current title metadata further on. This could
+        // have changed without an id change, for example if the renderer
+        // is upmpdcli and mpd is playing an internet radio (no qvers
+        // update when the title changes).
+#if 0
         if (!m_forceUpdate && nids == m_idsv) {
             //qDebug() << "OHPL::onIdArrayChanged: unchanged";
             return;
         }
+#endif
         m_forceUpdate = false;
 
         // Clean up metapool entries not in ids. We build a set with
@@ -196,10 +205,10 @@ private slots:
             }
         }
 
-        // Find ids for which we have no metadata
+        // Find ids for which we have no metadata. Always re-read current title
         std::vector<int> unids; // unknown
         for (auto it = nids.begin(); it != nids.end(); it++) {
-            if (m_metapool.find(*it) == m_metapool.end())
+            if (m_metapool.find(*it) == m_metapool.end() || m_curid == *it)
                 unids.push_back(*it);
         }
         if (!unids.empty()) {
