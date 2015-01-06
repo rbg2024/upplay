@@ -114,10 +114,10 @@ bool Application::setupRenderer(const string& uid)
     }
 
     rdco = new RenderingControlQO(rdc);
-    avto = new AVTPlayer(avt);
 
     deleteZ(playlist);
 
+	bool needavt = true;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
         ohplo = new OHPlayer(ohpl);
@@ -125,7 +125,7 @@ bool Application::setupRenderer(const string& uid)
         if (ohtm) {
             ohtmo = new OHTimeQO(ohtm);
             // no need for AVT then
-            deleteZ(avto);
+			needavt = false;
         }
         qDebug() << "setupRenderer: deleting old playlist, creating OH one";
         playlist = new PlaylistOH();
@@ -133,6 +133,11 @@ bool Application::setupRenderer(const string& uid)
         ohplo = 0;
         playlist = new PlaylistAVT(rdr->m_desc.UDN);
     }
+
+	if (needavt)
+		avto = new AVTPlayer(avt);
+
+
     cdb->setPlaylist(playlist);
 
     QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
@@ -274,11 +279,11 @@ void Application::renderer_connections()
 
         CONNECT(player, search(int), ohplo, seekPC(int));
 
-        // Still using avtransport for time updates, tbd switch to ohtime
+		// Use either ohtime or avt for time updates
         if (ohtmo) {
             CONNECT(ohtmo, secondsChanged(quint32), 
                     player, setCurrentPosition(quint32));
-        } else {
+        } else if (avto) {
             CONNECT(avto, secsInSongChanged(quint32), 
                     player, setCurrentPosition(quint32));
         }
