@@ -71,17 +71,14 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
 
-    ui->lab_artist->hide();
-    ui->lab_title->hide();
     ui->lab_rating->hide();
-    ui->lab_album->hide();
+    ui->lab_album->setText(tr("Copyright 2011-2013"));
 
-    ui->lab_sayonara->setText(tr("Upplay Player"));
+    ui->lab_title->setText(tr("Upplay ") + m_settings->getVersion());
     ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ?
                              m_settings->getVersion() :
                              m_renderer_friendly_name);
-    ui->lab_writtenby->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
-    ui->lab_copyright->setText(tr("Copyright") + " 2011-2013");
+    ui->lab_artist->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
 
     m_metadata_available = false;
     m_playing = false;
@@ -194,17 +191,9 @@ void GUI_Player::update_track(const MetaData& md)
     m_metadata = md;
 
     m_completeLength_ms = md.length_ms;
-
-    ui->lab_sayonara->hide();
-    ui->lab_title->show();
+    total_time_changed(md.length_ms);
 
     ui->lab_version->hide();
-    ui->lab_artist->show();
-
-    ui->lab_writtenby->hide();
-    ui->lab_album->show();
-
-    ui->lab_copyright->hide();
     ui->lab_rating->show();
 
     // sometimes ignore the date
@@ -219,9 +208,6 @@ void GUI_Player::update_track(const MetaData& md)
     ui->lab_title->setText(md.title);
 
     m_trayIcon->songChangedMessage(md);
-
-    QString lengthString = Helper::cvtMsecs2TitleLengthString(md.length_ms, true);
-    ui->maxTime->setText(lengthString);
 
     QString tmp = QString("<font color=\"#FFAA00\" size=\"+10\">");
     if (md.bitrate < 96000) {
@@ -413,6 +399,7 @@ void GUI_Player::stopped()
 {
     //qDebug() << "void GUI_Player::stopped()";
     m_metadata_available = false;
+    m_metadata = MetaData();
     stopClicked(false);
 }
 void GUI_Player::playing()

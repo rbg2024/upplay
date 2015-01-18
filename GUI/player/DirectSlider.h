@@ -43,6 +43,14 @@ public:
 
     virtual ~DirectSlider() {}
 
+public slots:
+
+    void setValueNoSigs(int val) {
+        blockSignals(true);
+        setValue(val);
+        blockSignals(false);
+    }
+
 protected:
     virtual void mousePressEvent ( QMouseEvent * event );
 };

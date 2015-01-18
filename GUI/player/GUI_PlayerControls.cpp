@@ -51,20 +51,14 @@ void GUI_Player::stopClicked(bool b)
     m_trayIcon->stop();
     m_playing = false;
 
-    ui->lab_title->hide();
-    ui->lab_sayonara->show();
-
-    ui->lab_artist->hide();
-    ui->lab_writtenby->show();
-
-    ui->lab_album->hide();
+    ui->lab_title->setText(tr("Upplay ") + m_settings->getVersion());
+    ui->lab_artist->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
+    ui->lab_album->setText(tr("Copyright 2011-2013"));
     ui->lab_version->show();
-
     ui->lab_rating->hide();
-    ui->lab_copyright->show();
 
     this->setWindowTitle("Upplay");
-    ui->songProgress->setValue(0);
+    ui->songProgress->setValueNoSigs(0);
     ui->curTime->setText("0:00");
     ui->maxTime->setText("0:00");
 
@@ -141,9 +135,7 @@ void GUI_Player::setCurrentPosition(quint32 pos_sec)
     // "song len " << m_completeLength_ms << " mS";
     if (m_completeLength_ms != 0) {
         int newSliderVal = (pos_sec * 100000) / (m_completeLength_ms);
-        ui->songProgress->blockSignals(true);
-        ui->songProgress->setValue(newSliderVal);
-        ui->songProgress->blockSignals(false);
+        ui->songProgress->setValueNoSigs(newSliderVal);
     }
     QString curPosString = Helper::cvtMsecs2TitleLengthString(pos_sec * 1000);
     ui->curTime->setText(curPosString);
@@ -198,9 +190,7 @@ void GUI_Player::setVolume(int volume_percent, bool dostore, bool doemit)
 {
     //qDebug() << "GUI_PLayer::setVolume " << volume_percent;
     setupVolButton(volume_percent);
-    ui->songProgress->blockSignals(true);
-    ui->volumeSlider->setValue(volume_percent);
-    ui->songProgress->blockSignals(false);
+    ui->volumeSlider->setValueNoSigs(volume_percent);
     if (doemit) {
         emit sig_volume_changed(volume_percent);
     }
