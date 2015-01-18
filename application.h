@@ -33,6 +33,7 @@
 #include "dirbrowser/dirbrowser.h"
 #include "upqo/renderingcontrol_qo.h"
 #include "upqo/ohtime_qo.h"
+#include "upqo/ohvolume_qo.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 
@@ -60,19 +61,23 @@ public slots:
     void chooseRenderer();
 
 private:
-    GUI_Player 	 *player;
-    Playlist     *playlist;
-    DirBrowser    *cdb;
-    RenderingControlQO *rdco;
-    AVTPlayer    *avto;
-    OHPlayer     *ohplo;
-    OHTimeQO     *ohtmo;
-    GUI_Playlist *ui_playlist;
+    GUI_Player   *m_player;
+    Playlist     *m_playlist;
+    DirBrowser    *m_cdb;
 
-    CSettingsStorage *settings;
-    QApplication *app;
+    RenderingControlQO *m_rdco;
+    AVTPlayer    *m_avto;
 
-    bool		 _initialized;
+    OHPlayer     *m_ohplo;
+    OHTimeQO     *m_ohtmo;
+    OHVolumeQO   *m_ohvlo;
+
+    GUI_Playlist *m_ui_playlist;
+
+    CSettingsStorage *m_settings;
+    QApplication *m_app;
+
+    bool                 m_initialized;
 
     void init_connections();
     void renderer_connections();

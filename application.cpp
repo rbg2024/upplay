@@ -1,5 +1,3 @@
-/* application.cpp */
-
 /* Copyright (C) 2013  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -51,7 +49,7 @@ using namespace UPnPClient;
 #ifndef deleteZ
 #define deleteZ(X) {delete X; X = 0;}
 #endif
-#define CONNECT(a,b,c,d) app->connect(a, SIGNAL(b), c, SLOT(d), \
+#define CONNECT(a,b,c,d) m_app->connect(a, SIGNAL(b), c, SLOT(d), \
                                       Qt::UniqueConnection)
 
 UPnPDeviceDirectory *superdir;
@@ -83,67 +81,71 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 
 bool Application::is_initialized()
 {
-    return _initialized;
+    return m_initialized;
 }
 
 bool Application::setupRenderer(const string& uid)
 {
-    deleteZ(rdco);
-    deleteZ(avto);
-    deleteZ(ohplo);
-    deleteZ(ohtmo);
+    deleteZ(m_playlist);
+    deleteZ(m_rdco);
+    deleteZ(m_avto);
+    deleteZ(m_ohplo);
+    deleteZ(m_ohtmo);
+    deleteZ(m_ohvlo);
 
+    // Create media renderer object. We don't use it directly but it
+    // gives handles to the services. Note that the lib will return
+    // anything implementing either renderingcontrol or ohproduct
     MRDH rdr = getRenderer(uid, false);
     if (!rdr) {
         cerr << "Renderer " << uid << " not found" << endl;
         return false;
     }
 
-    AVTH avt = rdr->avt();
-    if (!avt) {
-        cerr << "Device " << uid << 
-            " has no AVTransport service" << endl;
-        return false;
+    if (rdr->rdc()) {
+        m_rdco = new RenderingControlQO(rdr->rdc());
+    } else {
+        if (!rdr->ohvl()) {
+            cerr << "Device implements neither RenderingControl nor OHVolume" <<
+                endl;
+            return false;
+        }
+        m_ohvlo =  new OHVolumeQO(rdr->ohvl());
     }
 
-    RDCH rdc = rdr->rdc();
-    if (!rdc) {
-        cerr << "Device " << uid << 
-            " has no RenderingControl service" << endl;
-        return false;
-    }
-
-    rdco = new RenderingControlQO(rdc);
-
-    deleteZ(playlist);
-
-	bool needavt = true;
+    bool needavt = true;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
-        ohplo = new OHPlayer(ohpl);
+        m_ohplo = new OHPlayer(ohpl);
         OHTMH ohtm = rdr->ohtm();
         if (ohtm) {
-            ohtmo = new OHTimeQO(ohtm);
+            m_ohtmo = new OHTimeQO(ohtm);
             // no need for AVT then
-			needavt = false;
+            needavt = false;
         }
-        qDebug() << "setupRenderer: deleting old playlist, creating OH one";
-        playlist = new PlaylistOH();
+        m_playlist = new PlaylistOH();
     } else {
-        ohplo = 0;
-        playlist = new PlaylistAVT(rdr->m_desc.UDN);
+        m_ohplo = 0;
+        m_playlist = new PlaylistAVT(rdr->m_desc.UDN);
     }
 
-	if (needavt)
-		avto = new AVTPlayer(avt);
+    if (needavt) {
+        if (!rdr->avt()) {
+            cerr << "Renderer: AVTransport missing but we need it" << endl;
+            return false;
+        }
+        m_avto = new AVTPlayer(rdr->avt());
+    }
 
-
-    cdb->setPlaylist(playlist);
+    m_cdb->setPlaylist(m_playlist);
 
     QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
-    if (player) {
-        player->setRendererName(fn);
+    if (m_player) {
+        m_player->setRendererName(fn);
     }
+
+    renderer_connections();
+
     return true;
 }
 
@@ -151,16 +153,17 @@ void Application::chooseRenderer()
 {
     vector<UPnPDeviceDesc> devices;
     if (!MediaRenderer::getDeviceDescs(devices) || devices.empty()) {
-        QMessageBox::warning(0, "Upplay", 
+        QMessageBox::warning(0, "Upplay",
                              tr("No Media Renderers found."));
         return;
     }
-    RenderChooseDLG dlg(player);
+    RenderChooseDLG dlg(m_player);
     for (auto it = devices.begin(); it != devices.end(); it++) {
         dlg.rndsLW->addItem(QString::fromUtf8(it->friendlyName.c_str()));
     }
-    if (!dlg.exec())
+    if (!dlg.exec()) {
         return;
+    }
 
     int row = dlg.rndsLW->currentRow();
     if (row < 0 || row >= int(devices.size())) {
@@ -168,50 +171,47 @@ void Application::chooseRenderer()
         return;
     }
     MetaDataList curmeta;
-    if (playlist)
-        playlist->get_metadata(curmeta);
+    if (m_playlist) {
+        m_playlist->get_metadata(curmeta);
+    }
 
     QString friendlyname = QString::fromUtf8(devices[row].friendlyName.c_str());
     if (!setupRenderer(devices[row].UDN)) {
-        QMessageBox::warning(0, "Upplay", tr("Can't connect to ") + 
+        QMessageBox::warning(0, "Upplay", tr("Can't connect to ") +
                              friendlyname);
         return;
     }
-    settings->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
-    init_connections();
+    m_settings->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
 
-    if (playlist && !dlg.keepRB->isChecked()) {
+    if (m_playlist && !dlg.keepRB->isChecked()) {
         if (dlg.replRB->isChecked()) {
-            playlist->psl_clear_playlist();
+            m_playlist->psl_clear_playlist();
         }
-        playlist->psl_add_tracks(curmeta);
+        m_playlist->psl_add_tracks(curmeta);
     }
 }
 
-Application::Application(QApplication* qapp, int, 
+Application::Application(QApplication* qapp, int,
                          QTranslator* translator, QObject *parent)
-    : QObject(parent), player(0), playlist(0), cdb(0), rdco(0),
-      avto(0), ohplo(0), ohtmo(0), ui_playlist(0), settings(0), app(qapp),
-      _initialized(false)
+    : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
+      m_avto(0), m_ohplo(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
+      m_settings(0), m_app(qapp), m_initialized(false)
 {
-    settings = CSettingsStorage::getInstance();
+    m_settings = CSettingsStorage::getInstance();
 
     QString version = getVersion();
-    settings->setVersion(version);
+    m_settings->setVersion(version);
 
-    player = new GUI_Player(translator);
-    playlist = new PlaylistAVT();
+    m_player = new GUI_Player(translator);
 
-    ui_playlist = new GUI_Playlist(player->getParentOfPlaylist(), 0);
-    player->setPlaylistWidget(ui_playlist);
+    m_ui_playlist = new GUI_Playlist(m_player->getParentOfPlaylist(), 0);
+    m_player->setPlaylistWidget(m_ui_playlist);
 
-    cdb = new DirBrowser(player->getParentOfLibrary(), playlist);
-    player->setLibraryWidget(cdb);
+    m_cdb = new DirBrowser(m_player->getParentOfLibrary(), 0);
+    m_player->setLibraryWidget(m_cdb);
 
-    rdco = 0;
-    avto = 0;
-
-    string uid = qs2utf8s(settings->getPlayerUID());
+    init_connections();
+    string uid = qs2utf8s(m_settings->getPlayerUID());
     if (uid.empty()) {
         QTimer::singleShot(0, this, SLOT(chooseRenderer()));
     } else {
@@ -221,158 +221,156 @@ Application::Application(QApplication* qapp, int,
         }
     }
 
-    init_connections();
+    m_player->setWindowTitle("Upplay " + version);
+    m_player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
+    m_player->setPlaylist(m_ui_playlist);
+    m_player->setStyle(m_settings->getPlayerStyle());
+    m_player->show();
 
-    player->setWindowTitle("Upplay " + version);
-    player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
-    player->setPlaylist(ui_playlist);
-    player->setStyle(settings->getPlayerStyle() );
-    player->show();
+    m_ui_playlist->resize(m_player->getParentOfPlaylist()->size());
 
-    ui_playlist->resize(player->getParentOfPlaylist()->size());
+    m_player->ui_loaded();
 
-    player->ui_loaded();
-
-    _initialized = true;
+    m_initialized = true;
 }
 
 Application::~Application()
 {
 }
 
-
 void Application::renderer_connections()
 {
-    if (ohplo) {
+    if (m_ohplo) {
         qDebug() << "Connecting ohplo::metadataArrayChanged(MetaDataList& mdv)";
-        PlaylistOH *ploh = dynamic_cast<PlaylistOH*>(playlist);
+        PlaylistOH *ploh = dynamic_cast<PlaylistOH*>(m_playlist);
         if (ploh == 0) {
             cerr << "OpenHome player but Playlist not openhome!";
             abort();
         }
 
         // Connections from OpenHome renderer to local playlist
-        CONNECT(ohplo, metadataArrayChanged(const MetaDataList&),
-                playlist, psl_new_ohpl(const MetaDataList&));
-        CONNECT(ohplo, trackIdChanged(int), ploh, psl_trackIdChanged(int));
-        CONNECT(ohplo, audioStateChanged(int, const char *), 
-                playlist, psl_new_transport_state(int, const char *));
-        CONNECT(ohplo, playlistModeChanged(Playlist_Mode),
-                ui_playlist, setPlayerMode(Playlist_Mode));
+        CONNECT(m_ohplo, metadataArrayChanged(const MetaDataList&),
+                m_playlist, psl_new_ohpl(const MetaDataList&));
+        CONNECT(m_ohplo, trackIdChanged(int), ploh, psl_trackIdChanged(int));
+        CONNECT(m_ohplo, audioStateChanged(int, const char *),
+                m_playlist, psl_new_transport_state(int, const char *));
+        CONNECT(m_ohplo, playlistModeChanged(Playlist_Mode),
+                m_ui_playlist, setPlayerMode(Playlist_Mode));
 
         // Connections from local playlist to openhome
-        CONNECT(ploh, sig_clear_playlist(), 
-                ohplo, clear());
+        CONNECT(ploh, sig_clear_playlist(),
+                m_ohplo, clear());
         CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
-                ohplo, insertTracks(const MetaDataList&, int));
-        CONNECT(ploh, sig_tracks_removed(const QList<int>&), 
-                ohplo, removeTracks(const QList<int>&));
-        CONNECT(ploh, sig_row_activated(int), ohplo, seekIndex(int));
-        CONNECT(playlist, sig_mode_changed(Playlist_Mode),
-                ohplo, changeMode(Playlist_Mode));
-        CONNECT(playlist, sig_sync(), ohplo, sync());
-        CONNECT(playlist, sig_pause(), ohplo, pause());
-        CONNECT(playlist, sig_stop(),  ohplo, stop());
-        CONNECT(playlist, sig_resume_play(), ohplo, play());
-        CONNECT(playlist, sig_forward(), ohplo, next());
-        CONNECT(playlist, sig_backward(), ohplo, previous());
+                m_ohplo, insertTracks(const MetaDataList&, int));
+        CONNECT(ploh, sig_tracks_removed(const QList<int>&),
+                m_ohplo, removeTracks(const QList<int>&));
+        CONNECT(ploh, sig_row_activated(int), m_ohplo, seekIndex(int));
+        CONNECT(m_playlist, sig_mode_changed(Playlist_Mode),
+                m_ohplo, changeMode(Playlist_Mode));
+        CONNECT(m_playlist, sig_sync(), m_ohplo, sync());
+        CONNECT(m_playlist, sig_pause(), m_ohplo, pause());
+        CONNECT(m_playlist, sig_stop(),  m_ohplo, stop());
+        CONNECT(m_playlist, sig_resume_play(), m_ohplo, play());
+        CONNECT(m_playlist, sig_forward(), m_ohplo, next());
+        CONNECT(m_playlist, sig_backward(), m_ohplo, previous());
 
-        CONNECT(player, search(int), ohplo, seekPC(int));
-
-		// Use either ohtime or avt for time updates
-        if (ohtmo) {
-            CONNECT(ohtmo, secondsChanged(quint32), 
-                    player, setCurrentPosition(quint32));
-        } else if (avto) {
-            CONNECT(avto, secsInSongChanged(quint32), 
-                    player, setCurrentPosition(quint32));
-        }
+        CONNECT(m_player, search(int), m_ohplo, seekPC(int));
 
     } else {
-        if (avto == 0) {
+        if (m_avto == 0) {
             cerr << "No OpenHome Playlist and no AVTRansport ??";
             return;
         }
-        PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(playlist);
+        PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(m_playlist);
         if (plavt == 0) {
             cerr << "!OpenHome player but Playlist not AVT !";
             abort();
         }
         CONNECT(plavt, sig_play_now(const MetaData&, int, bool),
-                avto, changeTrack(const MetaData&, int, bool));
+                m_avto, changeTrack(const MetaData&, int, bool));
         CONNECT(plavt, sig_next_track_to_play(const MetaData&),
-                avto, infoNextTrack(const MetaData&));
-        CONNECT(avto, endOfTrackIsNear(), 
+                m_avto, infoNextTrack(const MetaData&));
+        CONNECT(m_avto, endOfTrackIsNear(),
                 plavt, psl_prepare_for_end_of_track());
-        CONNECT(avto, newTrackPlaying(const QString&), 
+        CONNECT(m_avto, newTrackPlaying(const QString&),
                 plavt, psl_ext_track_change(const QString&));
-        CONNECT(avto, sig_currentMetadata(const MetaData&),
+        CONNECT(m_avto, sig_currentMetadata(const MetaData&),
                 plavt, psl_onCurrentMetadata(const MetaData&));
         // the search (actually seek) param is in percent
-        CONNECT(player, search(int), avto, seekPC(int));
+        CONNECT(m_player, search(int), m_avto, seekPC(int));
 
-        CONNECT(avto, secsInSongChanged(quint32), 
-                player, setCurrentPosition(quint32));
-        CONNECT(avto, audioStateChanged(int, const char*), playlist, 
+        CONNECT(m_avto, audioStateChanged(int, const char*), m_playlist,
                 psl_new_transport_state(int, const char *));
-        CONNECT(avto, stoppedAtEOT(), playlist, psl_forward());
+        CONNECT(m_avto, stoppedAtEOT(), m_playlist, psl_forward());
 
-        CONNECT(playlist, sig_stop(),  avto, stop());
-        CONNECT(playlist, sig_resume_play(), avto, play());
-        CONNECT(playlist, sig_pause(), avto, pause());
+        CONNECT(m_playlist, sig_stop(),  m_avto, stop());
+        CONNECT(m_playlist, sig_resume_play(), m_avto, play());
+        CONNECT(m_playlist, sig_pause(), m_avto, pause());
     }
-    CONNECT(player, sig_volume_changed(int), rdco, setVolume(int));
-    CONNECT(player, sig_mute(bool), rdco, setMute(bool));
-    CONNECT(rdco, volumeChanged(int), player, setVolumeUi(int));
-    CONNECT(rdco, muteChanged(bool), player, setMuteUi(bool));
-    // Set up the initial volume from the renderer value
-    player->setVolumeUi(rdco->volume());
+
+    // Use either ohtime or avt for time updates
+    if (m_ohtmo) {
+        CONNECT(m_ohtmo, secondsChanged(quint32),
+                m_player, setCurrentPosition(quint32));
+    } else if (m_avto) {
+        CONNECT(m_avto, secsInSongChanged(quint32),
+                m_player, setCurrentPosition(quint32));
+    }
+    if (m_ohvlo) {
+        CONNECT(m_player, sig_volume_changed(int), m_ohvlo, setVolume(int));
+        CONNECT(m_player, sig_mute(bool), m_ohvlo, setMute(bool));
+        CONNECT(m_ohvlo, volumeChanged(int), m_player, setVolumeUi(int));
+        CONNECT(m_ohvlo, muteChanged(bool), m_player, setMuteUi(bool));
+        // Set up the initial volume from the renderer value
+        m_player->setVolumeUi(m_ohvlo->volume());
+    } else if (m_rdco) {
+        CONNECT(m_player, sig_volume_changed(int), m_rdco, setVolume(int));
+        CONNECT(m_player, sig_mute(bool), m_rdco, setMute(bool));
+        CONNECT(m_rdco, volumeChanged(int), m_player, setVolumeUi(int));
+        CONNECT(m_rdco, muteChanged(bool), m_player, setMuteUi(bool));
+        // Set up the initial volume from the renderer value
+        m_player->setVolumeUi(m_rdco->volume());
+    }
+
+    CONNECT(m_player, play(), m_playlist, psl_play());
+    CONNECT(m_player, pause(), m_playlist, psl_pause());
+    CONNECT(m_player, stop(), m_playlist, psl_stop());
+    CONNECT(m_player, forward(), m_playlist, psl_forward());
+    CONNECT(m_player, backward(), m_playlist, psl_backward());
+    CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
+    CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
+
+    CONNECT(m_playlist, sig_track_metadata(const MetaData&),
+            m_player, update_track(const MetaData&));
+    CONNECT(m_playlist, sig_stopped(),  m_player, stopped());
+    CONNECT(m_playlist, sig_paused(),  m_player, paused());
+    CONNECT(m_playlist, sig_playing(),  m_player, playing());
+    CONNECT(m_playlist, sig_playing_track_changed(int),
+            m_ui_playlist, track_changed(int));
+    CONNECT(m_playlist, sig_playlist_updated(MetaDataList&, int, int),
+            m_ui_playlist, fillPlaylist(MetaDataList&, int, int));
+    CONNECT(m_ui_playlist, selection_min_row(int),
+            m_playlist, psl_selection_min_row(int));
+    CONNECT(m_ui_playlist, playlist_mode_changed(const Playlist_Mode&),
+            m_playlist, psl_change_mode(const Playlist_Mode&));
+    CONNECT(m_ui_playlist, dropped_tracks(const MetaDataList&, int),
+            m_playlist, psl_insert_tracks(const MetaDataList&, int));
+    CONNECT(m_ui_playlist, sig_rows_removed(const QList<int>&, bool),
+            m_playlist, psl_remove_rows(const QList<int>&, bool));
+    CONNECT(m_ui_playlist, row_activated(int),
+            m_playlist, psl_change_track(int));
+    CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
+
 }
 
-// Establish the connections we can do without a renderer, and call
-// renderer_connection() if we can
+// Connections which make sense without a renderer.
 void Application::init_connections()
 {
-    // At startup, we don't necessarily have a renderer setup
-    // The playlist is an AVT one by default and can be connected.
-    if (rdco) {
-        renderer_connections();
-    }
-
-    CONNECT(player, show_small_playlist_items(bool), 
-            ui_playlist, psl_show_small_playlist_items(bool));
-    CONNECT(player, sig_choose_renderer(), this, chooseRenderer());
-    CONNECT(player, play(), playlist, psl_play());
-    CONNECT(player, pause(), playlist, psl_pause());
-    CONNECT(player, stop(), playlist, psl_stop());
-    CONNECT(player, forward(), playlist, psl_forward());
-    CONNECT(player, backward(), playlist, psl_backward());
-    CONNECT(player, sig_load_playlist(), playlist, psl_load_playlist());
-    CONNECT(player, sig_save_playlist(), playlist, psl_save_playlist());
-
-    CONNECT(playlist, sig_track_metadata(const MetaData&),
-            player, update_track(const MetaData&));
-    CONNECT(playlist, sig_stopped(),  player, stopped());
-    CONNECT(playlist, sig_paused(),  player, paused());
-    CONNECT(playlist, sig_playing(),  player, playing());
-    CONNECT(playlist, sig_playing_track_changed(int), 
-            ui_playlist, track_changed(int));
-    CONNECT(playlist, sig_playlist_updated(MetaDataList&, int, int), 
-            ui_playlist, fillPlaylist(MetaDataList&, int, int));
-    CONNECT(ui_playlist, selection_min_row(int),
-            playlist, psl_selection_min_row(int));
-    CONNECT(ui_playlist, playlist_mode_changed(const Playlist_Mode&), 
-            playlist, psl_change_mode(const Playlist_Mode&));
-    CONNECT(ui_playlist, dropped_tracks(const MetaDataList&, int), 
-            playlist, psl_insert_tracks(const MetaDataList&, int));
-    CONNECT(ui_playlist, sig_rows_removed(const QList<int>&, bool), 
-            playlist, psl_remove_rows(const QList<int>&, bool));
-    CONNECT(ui_playlist, row_activated(int),  
-            playlist, psl_change_track(int));
-    CONNECT(ui_playlist, clear_playlist(), playlist, psl_clear_playlist());
-
-    CONNECT(player, sig_skin_changed(bool), cdb, setStyleSheet(bool));
-    CONNECT(player, showSearchPanel(bool), cdb, showSearchPanel(bool));
+    CONNECT(m_player, show_small_playlist_items(bool),
+            m_ui_playlist, psl_show_small_playlist_items(bool));
+    CONNECT(m_player, sig_choose_renderer(), this, chooseRenderer());
+    CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
+    CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));
 }
 
 
@@ -383,5 +381,5 @@ QString Application::getVersion()
 
 QMainWindow* Application::getMainWindow()
 {
-    return this->player;
+    return this->m_player;
 }

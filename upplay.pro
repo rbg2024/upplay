@@ -43,6 +43,7 @@ HEADERS += \
         upqo/cdirectory_qo.h \
         upqo/ohplaylist_qo.h \
         upqo/ohtime_qo.h \
+        upqo/ohvolume_qo.h \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \
