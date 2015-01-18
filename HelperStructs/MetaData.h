@@ -93,7 +93,7 @@ struct MetaData {
         didl = "";
     }
 
-    void print() {
+    void print() const {
 
         qDebug() << title
                  << " by " << artist
