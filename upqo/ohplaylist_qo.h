@@ -102,17 +102,30 @@ public slots:
         m_discardArrayEvents = !onoff;
     }
 
-    virtual bool play() {return m_srv->play() == 0;}
-    virtual bool stop() {return m_srv->stop() == 0;}
-    virtual bool pause() {return m_srv->pause() == 0;}
+    virtual bool play() {
+        //qDebug() << "OHPL::play()";
+        return m_srv->play() == 0;
+    }
+    virtual bool stop() {
+        //qDebug() << "OHPL::stop()";
+        return m_srv->stop() == 0;
+    }
+    virtual bool pause() {
+        //qDebug() << "OHPL::pause()";
+        return m_srv->pause() == 0;
+    }
     virtual bool next() {return m_srv->next() == 0;}
     virtual bool previous() {return m_srv->previous() == 0;}
     virtual bool setRepeat(bool b) {return m_srv->setRepeat(b) == 0;}
     virtual bool setShuffle(bool b) {return m_srv->setShuffle(b) == 0;}
     virtual bool seekSecondAbsolute(int s) {
-        return m_srv->seekSecondAbsolute(s) == 0;}
+        //qDebug() << "OHPL::seekSecondAbsolute(" << s << ")";
+        return m_srv->seekSecondAbsolute(s) == 0;
+    }
     virtual bool seekSecondRelative(int s) {
-        return m_srv->seekSecondRelative(s) == 0;}
+        //qDebug() << "OHPL::sekkSecondRelative()";
+        return m_srv->seekSecondRelative(s) == 0;
+    }
     virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
     virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
     virtual bool clear() {return m_srv->deleteAll() == 0;}
