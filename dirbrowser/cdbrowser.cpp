@@ -38,6 +38,7 @@ using namespace std;
 #include "dirbrowser.h"
 #include "rreaper.h"
 
+using namespace UPnPP;
 using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
@@ -199,7 +200,7 @@ void CDBrowser::onLinkClicked(const QUrl &url)
             // Open in new tab
             vector<CtPathElt> npath(m_curpath);
             npath.push_back(CtPathElt(m_entries[i].m_id, m_entries[i].m_title));
-            emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
+            emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
         } else {
             browseContainer(m_entries[i].m_id, m_entries[i].m_title);
         }
@@ -246,7 +247,7 @@ void CDBrowser::curpathClicked(unsigned int i)
         if (m_lastbutton == Qt::MidButton) {
             vector<CtPathElt> npath(m_curpath);
             npath.push_back(CtPathElt(objid, title, ss));
-            emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
+            emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
         } else {
             if (ss.empty()) {
                 browseContainer(objid, title, scrollpos);
@@ -779,7 +780,7 @@ void CDBrowser::recursiveAdd(QAction *act)
     if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
         vector<CtPathElt> npath(m_curpath);
         npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
-        emit sig_browse_in_new_tab(u8s2qs(m_ms->m_desc.UDN), npath);
+        emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
         return;
     }
 

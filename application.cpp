@@ -126,7 +126,7 @@ bool Application::setupRenderer(const string& uid)
         m_playlist = new PlaylistOH();
     } else {
         m_ohplo = 0;
-        m_playlist = new PlaylistAVT(rdr->m_desc.UDN);
+        m_playlist = new PlaylistAVT(rdr->desc()->UDN);
     }
 
     if (needavt) {
@@ -139,7 +139,7 @@ bool Application::setupRenderer(const string& uid)
 
     m_cdb->setPlaylist(m_playlist);
 
-    QString fn = QString::fromUtf8(rdr->m_desc.friendlyName.c_str());
+    QString fn = QString::fromUtf8(rdr->desc()->friendlyName.c_str());
     if (m_player) {
         m_player->setRendererName(fn);
     }

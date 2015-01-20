@@ -30,6 +30,8 @@ using namespace std;
 #include "upqo/ohplaylist_qo.h"
 #include "upadapt/upputils.h"
 
+using namespace UPnPP;
+
 class OHPlayer : public OHPlaylistQO {
 Q_OBJECT
 
