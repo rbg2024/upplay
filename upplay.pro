@@ -4,7 +4,7 @@ LANGUAGE        = C++
 QT += webkit network
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 0.9.2
+VERSION = 0.10.0
 
 QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"$$VERSION\\\"
 
