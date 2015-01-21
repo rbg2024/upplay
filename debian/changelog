@@ -1,3 +1,9 @@
+upplay (0.10.0-1) unstable; urgency=low
+
+  * Support pure OpenHome renderers like BubbleUPnP Server.
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 20 Jan 2014 17:51:00 +0100
+
 upplay (0.9.1-1) unstable; urgency=low
 
   * Fixed core dump when using "add all" on directory with subdirs.
