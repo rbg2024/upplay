@@ -104,8 +104,8 @@ public:
 
     virtual void changed(const char *nm, UPnPClient::UPnPDirObject meta) {
         if (!strcmp(nm, "AVTransportURIMetaData")) {
-            //qDebug() << "AVT: Changed: " << nm << " (dirc): " << 
-            //    meta.dump().c_str();
+            qDebug() << "AVT: Changed: " << nm << " (dirc): " << 
+                meta.dump().c_str();
             // Don't use this if no resources are set. XBMC does this
             // for some reason.
             if (!meta.m_resources.empty()) {
