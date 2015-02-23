@@ -91,7 +91,8 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
         pos.setY(pos.y());
         pos.setX(pos.x() + 10);
 
-        _rc_menu->exec(pos);
+		if (_rc_menu)
+			_rc_menu->exec(pos);
 
         break;
 
