@@ -1,7 +1,9 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-QT += webkit network
+QT += script webkit network
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 # VERSION is ^egrepped and must stay in the first column
 VERSION = 0.10.0

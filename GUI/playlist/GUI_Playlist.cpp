@@ -20,7 +20,6 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QScrollBar>
-#include <QMacStyle>
 #include <QAbstractListModel>
 #include <QStyleFactory>
 #include <QMessageBox>

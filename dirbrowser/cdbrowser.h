@@ -23,7 +23,7 @@
 #include <unordered_set>
 #include <set>
 
-#include <QtWebKit/QWebView>
+#include <QWebView>
 #include <QVariant>
 #include <QTimer>
 #include <QPoint>

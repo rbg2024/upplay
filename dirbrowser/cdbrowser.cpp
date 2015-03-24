@@ -24,6 +24,7 @@ using namespace std;
 #include <QWebElement>
 #include <QMenu>
 #include <QApplication>
+#include <QScriptEngine>
 
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
@@ -123,7 +124,13 @@ void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
     StringObj morehtml(html);
 
     mainframe->addToJavaScriptWindowObject("morehtml", &morehtml, 
-                                           QScriptEngine::ScriptOwnership);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+                      QWebFrame::ScriptOwnership
+#else
+                      QScriptEngine::ScriptOwnership
+#endif
+);
+
     QString js;
     if (elt_id.isEmpty()) {
         js = QString("document.body.innerHTML += morehtml.text");

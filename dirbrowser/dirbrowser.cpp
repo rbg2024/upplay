@@ -184,7 +184,7 @@ void DirBrowser::onCurrentTabChanged(int)
 static QString escapeAmpersand(const QString& in)
 {
     QString out(in);
-    return out.replace(QChar::fromAscii('&'), QString::fromAscii("&&"));
+    return out.replace(QChar('&'), QString::fromUtf8("&&"));
 }
 
 void DirBrowser::changeTabTitle(QWidget *w, const QString& tt)
