@@ -37,7 +37,8 @@ desktop-file-install --delete-original \
 %{_bindir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/upplay.desktop
-
+%{_datadir}/pixmaps/upplay.png
+%{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
 * Sun Feb 22 2015 Jean-Francois Dockes <jf@dockes.org> - 0.10.0

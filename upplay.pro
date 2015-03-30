@@ -104,5 +104,9 @@ unix {
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
   desktop.path = $$PREFIX/share/applications/
-  INSTALLS += target bdata desktop gdata
+  icona.files += GUI/icons/upplay.png
+  icona.path = $$PREFIX/share/icons/hicolor/48x48/apps/
+  iconb.files += GUI/icons/upplay.png
+  iconb.path = $$PREFIX/share/pixmaps/
+  INSTALLS += target bdata desktop gdata icona iconb
 }
