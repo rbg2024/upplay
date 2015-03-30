@@ -91,8 +91,8 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
         pos.setY(pos.y());
         pos.setX(pos.x() + 10);
 
-		if (_rc_menu)
-			_rc_menu->exec(pos);
+        if (_rc_menu)
+            _rc_menu->exec(pos);
 
         break;
 
@@ -509,7 +509,7 @@ QList<int> PlaylistView::calc_selections()
 
     if (selections.empty())
         emit sig_selection_min_row(-1);
-    else 
+    else
         emit sig_selection_min_row(get_min_selected());
     return selections;
 }
@@ -618,7 +618,9 @@ void PlaylistView::dropEvent(QDropEvent* event)
 
 void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
 {
-
+    if (_cur_selected_rows.empty()) {
+        return;
+    }
 
     QList<int> affected_rows;
 
@@ -696,8 +698,8 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
     for (uint i = 0; i < v_metadata.size(); i++) {
         affected_rows << i + row + 1;
     }
-
-    emit sig_metadata_dropped(v_metadata, row);
+    if (!affected_rows.empty())
+        emit sig_metadata_dropped(v_metadata, row);
 }
 
 
