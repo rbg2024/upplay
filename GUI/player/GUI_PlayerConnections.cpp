@@ -61,8 +61,8 @@ void GUI_Player::setupConnections()
     // preferencesF
     connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
             SLOT(min2tray_toggled(bool)));
-    connect(ui->action_folderviewfnorder, SIGNAL(toggled(bool)), this,
-            SLOT(folderviewfnorder_toggled(bool)));
+    connect(ui->action_sortprefs, SIGNAL(triggered(bool)), this,
+            SIGNAL(sig_sortprefs()));
 
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));

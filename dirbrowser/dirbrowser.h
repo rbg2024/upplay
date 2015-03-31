@@ -41,6 +41,7 @@ public slots:
     void onCurrentTabChanged(int);
     void changeTabTitle(QWidget *, const QString&);
     void onSearchcapsChanged();
+    void onSortprefs();
 
     void openSearchPanel();
     void closeSearchPanel();

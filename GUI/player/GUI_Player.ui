@@ -755,7 +755,7 @@
      <string>Preferences</string>
     </property>
     <addaction name="action_min2tray"/>
-    <addaction name="action_folderviewfnorder"/>
+    <addaction name="action_sortprefs"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -817,12 +817,12 @@
     <string>Close to tray</string>
    </property>
   </action>
-  <action name="action_folderviewfnorder">
+  <action name="action_sortprefs">
    <property name="checkable">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
-    <string>Use file name ordering inside folder hierarchy</string>
+    <string>Sort preferences</string>
    </property>
   </action>
   <action name="action_Fullscreen">

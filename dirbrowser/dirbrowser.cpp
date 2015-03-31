@@ -25,6 +25,8 @@
 #include "dirbrowser.h"
 #include "HelperStructs/Helper.h"
 #include "upadapt/upputils.h"
+#include "GUI/prefs/sortprefs.h"
+#include "HelperStructs/CSettingsStorage.h"
 
 DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
     : QWidget(parent), ui(new Ui::DirBrowser), m_pl(pl), m_insertactive(false)
@@ -311,6 +313,80 @@ void DirBrowser::serverSearch()
         if (cdb)
             cdb->search(ss);
     }
+}
+
+void DirBrowser::onSortprefs()
+{
+    static map<string, string>  allSortCrits;
+    static map<string, string>  allSortCritsRev;
+    if (allSortCrits.empty()) {
+        allSortCrits["Track Number"] = "upnp:originalTrackNumber";
+        allSortCrits["Track Title"] = "dc:title";
+        allSortCrits["Date"] = "dc:date";
+        allSortCrits["Artist"] = "upnp:artist";
+        allSortCrits["Album Title"] = "upnp:album";
+
+        for (auto it = allSortCrits.begin(); it != allSortCrits.end(); it++) {
+            allSortCritsRev[it->second] = it->first;
+        }
+    }
+
+    QStringList qcrits = CSettingsStorage::getInstance()->getSortCrits();
+    vector<string> crits;
+    if (qcrits.size() == 0) {
+        qcrits.push_back("upnp:artist");
+        qcrits.push_back("upnp:album");
+        qcrits.push_back("upnp:originalTrackNumber");
+        qcrits.push_back("dc:title");
+        qcrits.push_back("dc:date");
+    }
+
+    for (int i = 0; i < qcrits.size(); i++) {
+        string nm = allSortCritsRev[qs2utf8s(qcrits[i])];
+        if (nm == "") {
+            // Bummer. Limp along and hope for the best
+            nm = qs2utf8s(qcrits[i]);
+        }
+        crits.push_back(nm);
+    }
+
+    int sortkind = CSettingsStorage::getInstance()->getSortKind();
+    SortprefsDLG dlg(crits);
+    switch (sortkind) {
+    case 0:
+    default:
+        dlg.noSortRB->setChecked(true);
+        break;
+    case 1:
+        dlg.minimfnRB->setChecked(true);
+        break;
+    case 2:
+        dlg.sortRB->setChecked(true);
+        break;
+    }
+        
+    if (dlg.exec()) {
+        sortkind = 0;
+        if (dlg.minimfnRB->isChecked()) {
+            sortkind = 1;
+        } else if (dlg.sortRB->isChecked()) {
+            sortkind = 2;
+        }
+        CSettingsStorage::getInstance()->setSortKind(sortkind);
+        qcrits.clear();
+        for (int i = 0; i < dlg.critsLW->count(); i++) {
+            QString val = 
+                dlg.critsLW->item(i)->data(Qt::DisplayRole).toString();
+            //qDebug() << "Sort nm: " << val;
+            val = u8s2qs(allSortCrits[qs2utf8s(val)]);
+            if (val != "") {
+                qcrits += val;
+                //qDebug() << "Sort crit: " << val;
+            }
+        }
+        CSettingsStorage::getInstance()->setSortCrits(qcrits);
+        currentBrowser()->refresh();
+    }        
 }
 
 // Perform text search in current tab. 

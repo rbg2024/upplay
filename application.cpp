@@ -32,6 +32,7 @@ using namespace std;
 #include "GUI/player/GUI_Player.h"
 #include "GUI/playlist/GUI_Playlist.h"
 #include "GUI/renderchoose/renderchoose.h"
+
 #include "playlist/PlaylistAVT.h"
 #include "playlist/PlaylistOH.h"
 #include "HelperStructs/Helper.h"
@@ -338,6 +339,7 @@ void Application::renderer_connections()
     CONNECT(m_player, forward(), m_playlist, psl_forward());
     CONNECT(m_player, backward(), m_playlist, psl_backward());
     CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
+    CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
     CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
 
     CONNECT(m_playlist, sig_track_metadata(const MetaData&),

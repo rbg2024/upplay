@@ -96,7 +96,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     m_min2tray = m_settings->getMinimizeToTray();
     ui->action_min2tray->setChecked(m_min2tray);
-    ui->action_folderviewfnorder->setChecked(m_settings->getFolderViewFNOrder());
 
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
     ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);

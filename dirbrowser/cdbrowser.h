@@ -71,7 +71,7 @@ class CDBrowser : public QWebView
     void onSliceAvailable(UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
     void setStyleSheet(bool);
-
+    void refresh();
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
     void sig_now_in(QWidget *, const QString&);

@@ -333,6 +333,14 @@ void CDBrowser::initContainerHtml(const string& ss)
     appendHtml(QString(), "<table id=\"entrylist\"></table>");
 }
 
+// Re-browse (because sort criteria changed probably)
+void CDBrowser::refresh()
+{
+    if (m_curpath.size() >= 1) {
+        curpathClicked(m_curpath.size() - 1);
+    }
+}
+
 void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 {
     qDebug() << "CDBrowser::browseContainer: " << " ctid " << ctid.c_str();
@@ -517,18 +525,48 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
     delete dc;
 }
 
-static bool dirObjCmpByURI(const UPnPDirObject& o1, const UPnPDirObject& o2)
-{
-    if (o1.m_resources.size() == 0 && o2.m_resources.size() == 0) {
-        return o1.m_title < o2.m_title;
-    } else if (o1.m_resources.size() == 0 && o2.m_resources.size() != 0) {
-        return true;
-    } else if (o1.m_resources.size() != 0 && o2.m_resources.size() == 0) {
+class DirObjCmp {
+public:
+    DirObjCmp(const vector<string>& crits)
+        : m_crits(crits) {}
+    bool operator()(const UPnPDirObject& o1, const UPnPDirObject& o2) {
+        int rel;
+        string s1, s2;
+        for (unsigned int i = 0; i < m_crits.size(); i++) {
+            const string& crit = m_crits[i];
+            rel = dirobgetprop(o1, crit, s1).compare(
+                dirobgetprop(o2, crit, s2));
+            if (rel < 0)
+                return true;
+            else if (rel > 0)
+                return false;
+        }
         return false;
-    } else {
-        return o1.m_resources[0].m_uri < o2.m_resources[0].m_uri;
     }
-}
+    const string& dirobgetprop(const UPnPDirObject& o, const string& nm,
+        string& storage) {
+        if (!nm.compare("dc:title")) {
+            return o.m_title;
+        } else if (!nm.compare("uri")) {
+            if (o.m_resources.size() == 0)
+                return nullstr;
+            return o.m_resources[0].m_uri;
+        } 
+        const string& prop = o.getprop(nm);
+        if (!nm.compare("upnp:originalTrackNumber")) {
+            char num[30];
+            int i = atoi(prop.c_str());
+            sprintf(num, "%010d", i);
+            storage = num;
+            return storage;
+        } else {
+            return prop;
+        }
+    }
+    vector<string> m_crits;
+    static string nullstr;
+};
+string DirObjCmp::nullstr;
 
 void CDBrowser::onBrowseDone(int)
 {
@@ -538,14 +576,25 @@ void CDBrowser::onBrowseDone(int)
         return;
     }
 
-    ContentDirectory::ServiceKind kind = m_reader->getKind();
-    if (kind == ContentDirectory::CDSKIND_MINIM && 
-        CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
+    vector<string> sortcrits;
+    int sortkind = CSettingsStorage::getInstance()->getSortKind();
+    if (sortkind == 1 && 
+        m_reader->getKind() == ContentDirectory::CDSKIND_MINIM && 
         m_curpath.back().searchStr.empty() &&
         m_reader->getObjid().compare(0, minimFoldersViewPrefix.size(),
                                      minimFoldersViewPrefix) == 0) {
-                
-        sort(m_entries.begin(), m_entries.end(), dirObjCmpByURI);
+        sortcrits.push_back("uri");
+    } else if (sortkind == 2) {
+        QStringList qcrits = CSettingsStorage::getInstance()->getSortCrits();
+        for (int i = 0; i < qcrits.size(); i++) {
+            sortcrits.push_back(qs2utf8s(qcrits[i]));
+        }
+    }
+
+    if (!sortcrits.empty()) {
+        DirObjCmp cmpo(sortcrits);
+
+        sort(m_entries.begin(), m_entries.end(), cmpo);
         initContainerHtml();
         QString html;
         for (unsigned i = 0; i < m_entries.size(); i++) {
@@ -820,11 +869,13 @@ void CDBrowser::recursiveAdd(QAction *act)
         // If we are inside the folders view tree, and the option is
         // set, sort by url (minim sorts by tracknum tag even inside
         // folder view)
-        if (CSettingsStorage::getInstance()->getFolderViewFNOrder() && 
+        if (CSettingsStorage::getInstance()->getSortKind() == 1 && 
             m_popupobjid.compare(0, minimFoldersViewPrefix.size(),
                                  minimFoldersViewPrefix) == 0) {
-            sort(m_recwalkentries.begin(), m_recwalkentries.end(), 
-                 dirObjCmpByURI);
+            vector<string> crits;
+            crits.push_back("uri");
+            DirObjCmp cmpo(crits);
+            sort(m_recwalkentries.begin(), m_recwalkentries.end(), cmpo);
         }
 
         rreaperDone(0);
