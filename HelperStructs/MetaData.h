@@ -58,11 +58,15 @@ struct MetaData {
     bool pl_playing;
     bool pl_dragged;
 
-    bool is_lib_selected;
+    bool unused1;
     bool is_disabled;
 
     QString didl;
     QString albumArtURI;
+
+    ///// The following are not saved on disk as part of a saved playlist.///
+    // While playing in avt + shuffle mode: remember what we already played
+    bool shuffle_played;
 
     inline MetaData () {
         id = -1;
@@ -87,10 +91,12 @@ struct MetaData {
         pl_playing = false;
         pl_dragged = false;
 
-        is_lib_selected = false;
+        unused1 = false;
         is_disabled = false;
 
         didl = "";
+        
+        shuffle_played = false;
     }
 
     void print() const {
@@ -134,7 +140,7 @@ struct MetaData {
         list.push_back( (pl_playing) ? "1" : "0" );
         list.push_back( (pl_selected) ? "1" : "0" );
         list.push_back( (pl_dragged) ? "1" : "0" );
-        list.push_back( (is_lib_selected) ? "1" : "0" );
+        list.push_back( (unused1) ? "1" : "0" );
         list.push_back( (is_disabled) ? "1" : "0");
         list.push_back(didl);
         list.push_back(albumArtURI);
@@ -169,7 +175,7 @@ struct MetaData {
         md.pl_playing = (list[idx++] == "1");
         md.pl_selected = (list[idx++] == "1");
         md.pl_dragged = (list[idx++] == "1");
-        md.is_lib_selected = (list[idx++] == "1");
+        md.unused1 = (list[idx++] == "1");
         md.is_disabled = (list[idx++] == "1");
         md.didl = list[idx++];
         md.albumArtURI = list[idx++];
@@ -198,7 +204,7 @@ struct MetaData {
             pl_playing == other.pl_playing &&
             pl_selected == other.pl_selected &&
             pl_dragged == other.pl_dragged &&
-            is_lib_selected == other.is_lib_selected &&
+            unused1 == other.unused1 &&
             is_disabled == other.is_disabled &&
             didl == other.didl &&
             albumArtURI == other.albumArtURI;
@@ -228,7 +234,7 @@ struct MetaData {
             pl_playing << 
             pl_selected << 
             pl_dragged << 
-            is_lib_selected << 
+            unused1 << 
             is_disabled << 
             didl << 
             albumArtURI;
@@ -257,7 +263,7 @@ struct MetaData {
             pl_playing >> 
             pl_selected >> 
             pl_dragged >> 
-            is_lib_selected >> 
+            unused1 >> 
             is_disabled >> 
             didl >>
             albumArtURI;

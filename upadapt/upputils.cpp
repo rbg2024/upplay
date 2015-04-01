@@ -82,7 +82,7 @@ bool udirentToMetadata(const UPnPDirObject *dop, MetaData *mdp)
     mdp->pl_selected = false;
     mdp->pl_dragged = false;
     mdp->pl_playing = false;
-    mdp->is_lib_selected = false;
+    mdp->unused1 = false;
     mdp->is_disabled = false;
     mdp->didl = u8s2qs(dop->getdidl());
     mdp->albumArtURI = uf2qs(dop, "upnp:albumArtURI", false);

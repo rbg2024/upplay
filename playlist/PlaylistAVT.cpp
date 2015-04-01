@@ -78,7 +78,8 @@ void PlaylistAVT::set_for_playing(int row)
 
     m_play_idx = row;
     m_meta.setCurPlayTrack(row);
-    
+    m_meta[row].shuffle_played = true;
+
     emit sig_playing_track_changed(row);
     emit sig_play_now(m_meta[row]);
     emit sig_track_metadata(m_meta[row]);
@@ -127,8 +128,7 @@ void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
 
 void PlaylistAVT::send_next_playing_signal()
 {
-    // Do not do this in shuffle mode: makes no sense + as we never go
-    // through the stop state, shuffle does not work
+    // Do not do this in shuffle mode: makes no sense
     if (CSettingsStorage::getInstance()->getPlaylistMode().shuffle) 
         return;
     // Only if there is a track behind the current one
@@ -154,11 +154,16 @@ void PlaylistAVT::psl_next_track()
     }
 
     if (CSettingsStorage::getInstance()->getPlaylistMode().shuffle) {
-        // shuffle mode
-        track_num = rand() % m_meta.size();
-        if (track_num == m_play_idx) {
-            track_num = (m_play_idx + 1) % m_meta.size();
+        // Build an array on unplayed tracks
+        vector<unsigned int> unplayed;
+        for (unsigned int i = 0; i < m_meta.size(); i++) {
+            if (!m_meta[i].shuffle_played)
+                unplayed.push_back(i);
         }
+        if (unplayed.empty())
+            goto out;
+
+        track_num = unplayed[rand() % unplayed.size()];
     } else {
         if (m_play_idx >= int(m_meta.size()) -1) {
             // last track
@@ -291,6 +296,8 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
         } else {
             it->pl_playing = false;
         }
+        // Not sure this is necessary, but looks reasonable
+        it->shuffle_played = false;
     }
 
     // Prepare following track
