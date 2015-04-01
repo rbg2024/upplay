@@ -50,9 +50,25 @@ public:
         m_timer->start(1000);
         qRegisterMetaType<UPnPClient::UPnPDirObject>("UPnPClient::UPnPDirObject");
         m_srv->installReporter(this);
+        // We are handling the playlist: set the renderer in "normal" mode.
+        m_srv->setPlayMode(UPnPClient::AVTransport::PM_Normal);
     }
     virtual ~AVTransportQO() {
         m_srv->installReporter(0);
+    }
+
+    const char *tpstatetostr(int tps) {
+        switch(tps) {
+        default:
+        case UPnPClient::AVTransport::Unknown: return "Unknown";
+        case UPnPClient::AVTransport::Stopped: return "Stopped";
+        case UPnPClient::AVTransport::Playing: return "Playing";
+        case UPnPClient::AVTransport::Transitioning: return "Transitionning";
+        case UPnPClient::AVTransport::PausedPlayback: return "PausedPlay";
+        case UPnPClient::AVTransport::PausedRecording: return "PausedRecord";
+        case UPnPClient::AVTransport::Recording: return "Recording";
+        case UPnPClient::AVTransport::NoMediaPresent: return "No Media";
+        }
     }
 
     virtual void changed(const char *nm, int value)
@@ -64,7 +80,7 @@ public:
             //qDebug() << "AVT: Changed: " << nm << " (int): " << value;
             m_cursecs = value;
         } else if (!strcmp(nm, "TransportState")) {
-            //qDebug() << "AVT: Changed: " << nm << " (int): " << value;
+            //qDebug() << "AVT: Changed: " << nm << " " << tpstatetostr(value);
             emit tpStateChanged(value);
             if (value == UPnPClient::AVTransport::Stopped && m_in_ending) {
                 m_in_ending = false;
@@ -121,6 +137,7 @@ public slots:
     }
     virtual void stop() {
         setcururi("");
+        m_in_ending = false;
         m_srv->stop();
     }
     virtual void pause() {
@@ -226,7 +243,13 @@ private:
         qDebug() << "setcururi: " << uri.c_str();
         m_cururi = uri;
         m_sent_end_of_track_sig = false;
-        m_in_ending = false;
+        if (uri != "") {
+            // Don't reset m_in_ending if uri is null: we often get an
+            // uri change to "" before we get the transport state
+            // change event. Resetting m_in_ending would prevent the
+            // emission of the stoppedAtEOT signal
+            m_in_ending = false;
+        }
     }
     QString u8s2qs(const std::string us) {
         return QString::fromUtf8(us.c_str());
