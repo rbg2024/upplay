@@ -25,6 +25,7 @@ p.cdserver {
 
 #entrylist {
     clear: both;
+    width: 100%;
 }
 
 /* Styles for the directory list cells */
