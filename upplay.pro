@@ -8,8 +8,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 # VERSION is ^egrepped and must stay in the first column
 VERSION = 0.10.1
 
-QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"$$VERSION\\\"
-#QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+QMAKE_CXXFLAGS += -std=c++0x
 
 
 CONFIG  += qt warn_on thread release debug
