@@ -22,7 +22,7 @@
 #include <list>
 #include <queue>
 #include <iostream>
-#include <unordered_set>
+#include "libupnpp/config.h"
 
 #include <QDebug>
 #include <QThread>
@@ -101,7 +101,8 @@ private:
             offset += count;
 
             // Put containers aside for later exploration
-            for (auto it = slice.m_containers.begin() + lastctidx;
+            for (std::vector<UPnPClient::UPnPDirObject>::iterator it = 
+                     slice.m_containers.begin() + lastctidx;
                  it != slice.m_containers.end(); it++) {
                 if (it->m_title.empty())
                     continue;
@@ -136,7 +137,7 @@ private:
 
     UPnPClient::CDSH m_serv;
     std::queue<std::string> m_ctobjids;
-    std::unordered_set<std::string> m_allctobjids;
+    STD_UNORDERED_SET<std::string> m_allctobjids;
     int m_status;
     bool m_cancel;
 };

@@ -170,7 +170,8 @@ void DirBrowser::onCurrentTabChanged(int)
         props.push_back(pair<string,string>("upnp:album", "Album"));
         props.push_back(pair<string,string>("dc:title", "Title"));
         props.push_back(pair<string,string>("upnp:genre", "Genre"));
-        for (auto it = props.begin(); it != props.end(); it++) {
+        for (vector<pair<string, string> >::iterator it = props.begin(); 
+             it != props.end(); it++) {
             if (caps.find("*") != caps.end() || 
                 caps.find(it->first) != caps.end()) {
                 ui->propsCMB->addItem(u8s2qs(it->second),
@@ -326,7 +327,8 @@ void DirBrowser::onSortprefs()
         allSortCrits["Artist"] = "upnp:artist";
         allSortCrits["Album Title"] = "upnp:album";
 
-        for (auto it = allSortCrits.begin(); it != allSortCrits.end(); it++) {
+        for (map<string, string>::iterator it = allSortCrits.begin(); 
+             it != allSortCrits.end(); it++) {
             allSortCritsRev[it->second] = it->first;
         }
     }

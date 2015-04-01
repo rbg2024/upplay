@@ -56,7 +56,8 @@ public slots:
     // Seek to time in percent
     void seekPC(int pc) {
         if (m_songsecs == -1) {
-            auto poolit = m_metapool.find(m_id);
+            STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator
+                poolit = m_metapool.find(m_id);
             if (poolit != m_metapool.end()) {
                 UPnPClient::UPnPDirObject& ude = poolit->second;
                 std::string sval;
@@ -193,8 +194,10 @@ private slots:
     void translateMetaData() {
         //qDebug() << "OHPlayer::translateMetaData()";
         MetaDataList mdv;
-        for (auto idit = m_idsv.begin(); idit != m_idsv.end(); idit++) {
-            auto poolit = m_metapool.find(*idit);
+        for (std::vector<int>::iterator idit = m_idsv.begin(); 
+             idit != m_idsv.end(); idit++) {
+            STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator poolit 
+                = m_metapool.find(*idit);
             if (poolit == m_metapool.end()) {
                 qDebug() << "OHPlayer::translateMetaData: "
                     "no data found for " << *idit << "!!!";

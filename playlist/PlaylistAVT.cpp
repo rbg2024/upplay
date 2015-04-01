@@ -290,7 +290,8 @@ void PlaylistAVT::psl_insert_tracks(const MetaDataList& nmeta, int row)
     // Find the playing track (could be part of nmeta if this is a d&d
     // cut/paste) and adjust m_play_idx
     m_play_idx = -1;
-    for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
+    for (vector<MetaData>::iterator it = m_meta.begin(); 
+         it != m_meta.end(); it++) {
         if (it->pl_playing && m_play_idx == -1) {
             m_play_idx = it - m_meta.begin();
         } else {

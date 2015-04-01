@@ -20,7 +20,7 @@
 
 #include <vector>
 #include <iostream>
-#include <unordered_set>
+#include "libupnpp/config.h"
 #include <set>
 
 #include <QWebView>
@@ -129,7 +129,7 @@ class CDBrowser : public QWebView
     // Recursive explore contents, for possible sorting before sending to pl
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
     // URL hashes for deduplication while walking the tree
-    std::unordered_set<std::string> m_recwalkdedup;
+    STD_UNORDERED_SET<std::string> m_recwalkdedup;
 
     // Pointer to parent tabbed object for access to shared state (insertActive)
     DirBrowser *m_browsers;

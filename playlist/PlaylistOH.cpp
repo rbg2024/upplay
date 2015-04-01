@@ -37,7 +37,8 @@ void PlaylistOH::psl_trackIdChanged(int id)
     if (id <= 0)
         return;
 
-    for (auto it = m_meta.begin(); it != m_meta.end(); it++) {
+    for (vector<MetaData>::iterator it = m_meta.begin(); 
+         it != m_meta.end(); it++) {
         if (it->id == id) {
             if (m_play_idx != it - m_meta.begin()) {
                 emit sig_playing_track_changed(it - m_meta.begin());

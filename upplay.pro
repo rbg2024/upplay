@@ -9,6 +9,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 VERSION = 0.10.1
 
 QMAKE_CXXFLAGS += -std=c++0x  -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+#QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+
 
 CONFIG  += qt warn_on thread release debug
 

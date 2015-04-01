@@ -16,6 +16,8 @@
  */
 
 #include <iostream>
+#include "libupnpp/config.h"
+
 using namespace std;
 
 #include <QWebFrame>
@@ -243,7 +245,7 @@ void CDBrowser::curpathClicked(unsigned int i)
     if (i == 0) {
         m_curpath.clear();
         m_msdescs.clear();
-        m_ms = MSRH(0);
+        m_ms = MSRH();
         initialPage();
     } else {
         string objid = m_curpath[i].objid;
@@ -511,15 +513,17 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
 
     m_entries.reserve(m_entries.size() + dc->m_containers.size() + 
                       dc->m_items.size());
-    for (auto& entry: dc->m_containers) {
+    for (std::vector<UPnPDirObject>::iterator it = dc->m_containers.begin();
+         it != dc->m_containers.end(); it++) {
         //qDebug() << "Container: " << entry.dump().c_str();;
-        m_entries.push_back(entry);
-        html += CTToHtml(m_entries.size()-1, entry);
+        m_entries.push_back(*it);
+        html += CTToHtml(m_entries.size()-1, *it);
     }
-    for (auto& entry: dc->m_items) {
+    for (std::vector<UPnPDirObject>::iterator it = dc->m_items.begin();
+         it != dc->m_items.end(); it++) {
         //qDebug() << "Item: " << entry.dump().c_str();;
-        m_entries.push_back(entry);
-        html += ItemToHtml(m_entries.size()-1, entry);
+        m_entries.push_back(*it);
+        html += ItemToHtml(m_entries.size()-1, *it);
     }
     appendHtml("entrylist", html);
     delete dc;
@@ -911,7 +915,8 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
         //       dc->m_items[i].m_resources[0].m_uri << endl);
         string md5;
         MD5String(dc->m_items[i].m_resources[0].m_uri, md5);
-        auto res = m_recwalkdedup.insert(md5);
+        pair<STD_UNORDERED_SET<std::string>::iterator, bool> res = 
+            m_recwalkdedup.insert(md5);
         if (res.second) {
             m_recwalkentries.push_back(dc->m_items[i]);
         } else {

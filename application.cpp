@@ -19,7 +19,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <functional>
 
 using namespace std;
 
@@ -159,7 +158,8 @@ void Application::chooseRenderer()
         return;
     }
     RenderChooseDLG dlg(m_player);
-    for (auto it = devices.begin(); it != devices.end(); it++) {
+    for (vector<UPnPDeviceDesc>::iterator it = devices.begin(); 
+         it != devices.end(); it++) {
         dlg.rndsLW->addItem(QString::fromUtf8(it->friendlyName.c_str()));
     }
     if (!dlg.exec()) {

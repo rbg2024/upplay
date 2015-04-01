@@ -18,8 +18,7 @@
 #define _OHPLAYLIST_QO_INCLUDED
 
 #include <string>
-#include <unordered_map>
-#include <unordered_set>
+#include "libupnpp/config.h"
 
 #include <QObject>
 #include <QThread>
@@ -208,8 +207,9 @@ private slots:
         // linear search the repeated search to make this
         // quadratic. We're sort of O(n * log(n)) instead.
         if (!m_metapool.empty() && !nids.empty()){
-            std::unordered_set<int> tmpset(nids.begin(), nids.end());
-            for (auto it = m_metapool.begin(); it != m_metapool.end(); ) {
+            STD_UNORDERED_SET<int> tmpset(nids.begin(), nids.end());
+            for (STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator it
+                     = m_metapool.begin(); it != m_metapool.end(); ) {
                 if (tmpset.find(it->first) == tmpset.end()) {
                     it = m_metapool.erase(it);
                 } else {
@@ -220,7 +220,8 @@ private slots:
 
         // Find ids for which we have no metadata. Always re-read current title
         std::vector<int> unids; // unknown
-        for (auto it = nids.begin(); it != nids.end(); it++) {
+        for (std::vector<int>::iterator it = nids.begin(); 
+             it != nids.end(); it++) {
             if (m_metapool.find(*it) == m_metapool.end() || m_curid == *it)
                 unids.push_back(*it);
         }
@@ -245,7 +246,8 @@ private slots:
                 qDebug() << "OHPL: readList failed: " << ret;
                 goto out;
             }
-            for (auto it = entries.begin(); it != entries.end(); it++) {
+            for (std::vector<UPnPClient::OHPlaylist::TrackListEntry>::iterator
+                     it = entries.begin(); it != entries.end(); it++) {
                 //qDebug() << "OHPL: data for " << it->id << " " << 
                 //    it->dirent.m_title.c_str();
                 // Kazoo for example does not set a resource (uri)
@@ -272,14 +274,15 @@ private slots:
 
 protected:
     std::vector<int> m_idsv;
-    std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
+    STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject> m_metapool;
     int m_curid;
     bool m_forceUpdate;
     bool m_discardArrayEvents;
 
     std::string vtos(std::vector<int> nids) {
         std::string sids;
-        for (auto it = nids.begin(); it != nids.end(); it++)
+        for (std::vector<int>::iterator it = nids.begin(); 
+             it != nids.end(); it++)
             sids += UPnPP::SoapHelp::i2s(*it) + " ";
         return sids;
     }
