@@ -22,6 +22,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QTimer>
 #include <QDebug>
 
 #include "libupnpp/control/ohplaylist.hxx"
@@ -40,8 +41,11 @@ public:
     OHPlaylistQO(UPnPClient::OHPLH ohp, QObject *parent = 0)
         : QObject(parent), m_curid(-1), m_forceUpdate(false), 
           m_discardArrayEvents(false),
-          m_srv(ohp)
+          m_srv(ohp), m_timer(0), m_errcnt(0)
     {
+        m_timer = new QTimer(this);
+        connect(m_timer, SIGNAL(timeout()), this, SLOT(testconn()));
+        m_timer->start(2000);
         qRegisterMetaType<std::vector<int> >("std::vector<int>");
         connect(this, SIGNAL(__idArrayChanged(std::vector<int>)),
                 this, SLOT(onIdArrayChanged(std::vector<int>)),
@@ -95,6 +99,18 @@ public slots:
         if (idArray(&ids, &tp)) {
             onIdArrayChanged(ids);
         }
+    }
+
+    // Ping renderer to check it's still there.
+    virtual void testconn() {
+        int val;
+        if (m_srv->id(&val) != 0) {
+            if (m_errcnt++ > 2) {
+                emit connectionLost();
+            }
+            return;
+        }
+        m_errcnt = 0;
     }
 
     virtual void asyncArrayUpdates(bool onoff) {
@@ -178,6 +194,7 @@ signals:
     void tpStateChanged(int);
     void shuffleChanged(bool);
     void repeatChanged(bool);
+    void connectionLost();
 
     // This is an internal signal. Use trackArrayChanged()
     void __idArrayChanged(std::vector<int>);
@@ -293,6 +310,8 @@ private:
         return m_srv->idArray(ids, tokp) == 0;
     }
     UPnPClient::OHPLH m_srv;
+    QTimer *m_timer;
+    int m_errcnt;
 };
 
 #endif // _OHPLAYLIST_QO_INCLUDED

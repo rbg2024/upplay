@@ -239,6 +239,20 @@ Application::~Application()
 {
 }
 
+void Application::reconnectOrChoose()
+{
+    string uid = qs2utf8s(m_settings->getPlayerUID());
+    if (uid.empty() || !setupRenderer(uid)) {
+        if (QMessageBox::warning(0, "Upplay",
+                             tr("Connection to current rendererer lost. "
+                                "Choose again ?"),
+                             QMessageBox::Cancel | QMessageBox::Ok, 
+                                 QMessageBox::Ok) == QMessageBox::Ok) {
+            chooseRenderer();
+        }
+    }
+}
+
 void Application::renderer_connections()
 {
     if (m_ohplo) {
@@ -257,6 +271,7 @@ void Application::renderer_connections()
                 m_playlist, psl_new_transport_state(int, const char *));
         CONNECT(m_ohplo, playlistModeChanged(Playlist_Mode),
                 m_ui_playlist, setPlayerMode(Playlist_Mode));
+        CONNECT(m_ohplo, connectionLost(), this, reconnectOrChoose());
 
         // Connections from local playlist to openhome
         CONNECT(ploh, sig_clear_playlist(),
@@ -303,7 +318,7 @@ void Application::renderer_connections()
         CONNECT(m_avto, audioStateChanged(int, const char*), m_playlist,
                 psl_new_transport_state(int, const char *));
         CONNECT(m_avto, stoppedAtEOT(), m_playlist, psl_forward());
-
+        CONNECT(m_avto, connectionLost(), this, reconnectOrChoose());
         CONNECT(m_playlist, sig_stop(),  m_avto, stop());
         CONNECT(m_playlist, sig_resume_play(), m_avto, play());
         CONNECT(m_playlist, sig_pause(), m_avto, pause());

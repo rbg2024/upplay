@@ -39,7 +39,7 @@ Q_OBJECT
 
 public:
     AVTransportQO(UPnPClient::AVTH avt, QObject *parent = 0)
-        : QObject(parent), m_srv(avt), m_timer(0), 
+        : QObject(parent), m_srv(avt), m_timer(0), m_errcnt(0),
           m_cursecs(-1),
           m_sent_end_of_track_sig(false),
           m_in_ending(false),
@@ -172,8 +172,12 @@ public slots:
         int error;
         if ((error = m_srv->getPositionInfo(info)) != 0) {
             qDebug() << "getPositionInfo failed with error " << error;
+            if (m_errcnt++ > 4) {
+                emit connectionLost();
+            }
             return;
         }
+        m_errcnt = 0;
         //qDebug() << "AVT: update: posinfo: reltime " << info.reltime << 
         //    " tdur " << info.trackduration << " meta " << 
         //    info.trackmeta.dump().c_str();
@@ -229,10 +233,12 @@ signals:
     void tpActionsChanged(int);
     void stoppedAtEOT();
     void currentMetadata(UPnPClient::UPnPDirObject);
+    void connectionLost();
 
 private:
     UPnPClient::AVTH m_srv;
     QTimer *m_timer;
+    int m_errcnt;
     int m_cursecs;
     bool m_sent_end_of_track_sig;
     bool m_in_ending;

@@ -59,6 +59,7 @@ signals:
     
 public slots:
     void chooseRenderer();
+    void reconnectOrChoose();
 
 private:
     GUI_Player   *m_player;
