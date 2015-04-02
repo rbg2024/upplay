@@ -326,6 +326,7 @@ void DirBrowser::onSortprefs()
         allSortCrits["Date"] = "dc:date";
         allSortCrits["Artist"] = "upnp:artist";
         allSortCrits["Album Title"] = "upnp:album";
+        allSortCrits["URI"] = "uri";
 
         for (map<string, string>::iterator it = allSortCrits.begin(); 
              it != allSortCrits.end(); it++) {
@@ -341,6 +342,7 @@ void DirBrowser::onSortprefs()
         qcrits.push_back("upnp:originalTrackNumber");
         qcrits.push_back("dc:title");
         qcrits.push_back("dc:date");
+        qcrits.push_back("uri");
     }
 
     for (int i = 0; i < qcrits.size(); i++) {
