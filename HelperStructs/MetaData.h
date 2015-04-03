@@ -290,22 +290,28 @@ public:
         }
     }
 
-    bool contains(const MetaData& md, bool cs=false) {
+    bool contains(const MetaData& md, bool cs=false, MetaData **found = 0) {
         if(cs) {
             QString filepath = md.filepath.trimmed();
 
             for(uint i = 0; i < size(); i++){
                 QString filepath2 = at(i).filepath.trimmed();
-                if(!filepath.compare(filepath2)) 
+                if(!filepath.compare(filepath2)) {
+                    if (found) 
+                        *found = &(at(i));
                     return true;
+                }
             }
         } else {
             QString filepath = md.filepath.toLower().trimmed();
 
             for (uint i = 0; i < size(); i++){
                 QString filepath2 = at(i).filepath.toLower().trimmed();
-                if(!filepath.compare(filepath2)) 
+                if(!filepath.compare(filepath2)) {
+                    if (found) 
+                        *found = &(at(i));
                     return true;
+                }
             }
         }
         return false;

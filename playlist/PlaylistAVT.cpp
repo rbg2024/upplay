@@ -119,11 +119,17 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
 
 void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
 {
-    if (!m_meta.contains(md, true)) {
+    MetaData *localmeta = 0;
+    if (!m_meta.contains(md, true, &localmeta)) {
         m_meta.push_back(md);
         playlist_updated();
     }
-    emit sig_track_metadata(md);
+    bool preferlocal = true;
+    if (localmeta && preferlocal) {
+        emit sig_track_metadata(*localmeta);
+    } else {
+        emit sig_track_metadata(md);
+    }
 }
 
 void PlaylistAVT::send_next_playing_signal()
