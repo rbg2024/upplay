@@ -280,6 +280,8 @@ void PlaylistView::init_rc_menu()
     connect(_rc_menu, SIGNAL(sig_info_clicked()), this, SLOT(info_clicked()));
     connect(_rc_menu, SIGNAL(sig_edit_clicked()), this, SLOT(edit_clicked()));
     connect(_rc_menu, SIGNAL(sig_remove_clicked()), this, SLOT(remove_clicked()));
+    connect(_rc_menu, SIGNAL(sig_sort_tno_clicked()), 
+            this, SIGNAL(sig_sort_tno()));
 }
 
 void PlaylistView::set_context_menu_actions(int actions)

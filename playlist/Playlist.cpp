@@ -100,6 +100,69 @@ void Playlist::get_metadata(MetaDataList& out)
     out = m_meta;
 }
 
+class MetaDataCmp {
+public:
+    enum SortCrit {SC_TIT, SC_ART, SC_ALB, SC_Y, SC_FN, SC_TNO};
+
+    MetaDataCmp(const vector<SortCrit>& crits)
+        : m_crits(crits) {}
+    bool operator()(const MetaData& o1, const MetaData& o2) {
+        int rel;
+        QString s1, s2;
+        for (unsigned int i = 0; i < m_crits.size(); i++) {
+            SortCrit crit = m_crits[i];
+            rel = obgetprop(o1, crit, s1).compare(obgetprop(o2, crit, s2));
+            if (rel < 0)
+                return true;
+            else if (rel > 0)
+                return false;
+        }
+        return false;
+    }
+    const QString& obgetprop(const MetaData& o, SortCrit crit, QString& stor) {
+
+        qint32 val;
+        switch(crit) {
+        case SC_TIT: return o.title;
+        case SC_ART: return o.artist;
+        case SC_ALB: return o.album;
+        case SC_FN: return o.filepath;
+        case SC_Y: val = o.year; goto valtostr;
+        case SC_TNO: val = o.track_num;
+        valtostr: {
+                char num[30];
+                sprintf(num, "%010d", int(val));
+                stor = num;
+                return stor;
+            } 
+        default:
+            return nullstr;
+        }
+    }
+
+    vector<SortCrit> m_crits;
+    static QString nullstr;
+};
+QString MetaDataCmp::nullstr;
+
+static void mdsort(const MetaDataList& inlist, MetaDataList& outlist,
+                   const vector<MetaDataCmp::SortCrit> crits)
+{
+    MetaDataCmp cmpo(crits);
+    outlist = inlist;
+    std::sort(outlist.begin(), outlist.end(), cmpo);
+}
+
+void Playlist::psl_sort_by_tno()
+{
+    vector<MetaDataCmp::SortCrit> crits;
+    crits.push_back(MetaDataCmp::SC_TNO);
+    MetaDataList md;
+    mdsort(m_meta, md, crits);
+    psl_clear_playlist();
+    psl_insert_tracks(md, -1);
+}
+
 void Playlist::psl_add_tracks(const MetaDataList& v_md)
 {
     qDebug() << "Playlist::psl_add_tracks: " <<
@@ -121,7 +184,7 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
             afteridx = m_insertion_point;
         } else if (m_play_idx >= 0) {
             afteridx = m_play_idx;
-            // Using selection_min_row appears to be source of confusion
+
             // } else if (m_selection_min_row >= 0) { 
             // afteridx = m_selection_min_row;
         } else {

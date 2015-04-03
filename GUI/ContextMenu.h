@@ -33,16 +33,14 @@
 #define ENTRY_DELETE (1 << 3)
 #define ENTRY_PLAY_NEXT (1 << 4)
 #define ENTRY_APPEND (1 << 5)
-
+#define ENTRY_SORT_TNO (1 << 6)
 
 class ContextMenu : public QMenu {
     Q_OBJECT
 
 public:
     explicit ContextMenu(QWidget *parent = 0);
-    virtual ~ContextMenu();
     void setup_entries(int entries);
-
 
 signals:
     void sig_info_clicked();
@@ -51,16 +49,7 @@ signals:
     void sig_delete_clicked();
     void sig_play_next_clicked();
     void sig_append_clicked();
-
-private slots:
-    void info_clicked();
-    void edit_clicked();
-    void remove_clicked();
-    void delete_clicked();
-    void play_next_clicked();
-    void append_clicked();
-
-public slots:
+    void sig_sort_tno_clicked();
 
 private:
     QAction*            _info_action;
@@ -69,9 +58,9 @@ private:
     QAction*            _delete_action;
     QAction*            _play_next_action;
     QAction*            _append_action;
+    QAction*            _sort_tno_action;
 
     void clear_actions();
-
 };
 
 #endif // CONTEXTMENU_H

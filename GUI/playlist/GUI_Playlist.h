@@ -66,6 +66,7 @@ signals:
 
     void search_similar_artists(const QString&);
     void sig_no_focus();
+    void sig_sort_tno();
 
 public slots:
     void fillPlaylist(MetaDataList&, int, int);

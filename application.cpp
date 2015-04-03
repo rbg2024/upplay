@@ -374,6 +374,7 @@ void Application::renderer_connections()
             m_playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(m_ui_playlist, sig_rows_removed(const QList<int>&, bool),
             m_playlist, psl_remove_rows(const QList<int>&, bool));
+    CONNECT(m_ui_playlist, sig_sort_tno(), m_playlist, psl_sort_by_tno());
     CONNECT(m_ui_playlist, row_activated(int),
             m_playlist, psl_change_track(int));
     CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());

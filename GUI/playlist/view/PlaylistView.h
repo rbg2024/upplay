@@ -41,6 +41,7 @@ signals:
     void context_menu_emitted(const QPoint&);
     void sig_metadata_dropped(const MetaDataList&, int);
     void sig_rows_removed(const QList<int>&, bool);
+    void sig_sort_tno();
     void sig_info_clicked();
     void sig_remove_clicked();
     void sig_edit_clicked();

@@ -81,6 +81,8 @@ GUI_Playlist::GUI_Playlist(QWidget *parent, GUI_InfoDialog* dialog) :
             this, SLOT(metadata_dropped(const MetaDataList&, int)));
     connect(ui->listView, SIGNAL(sig_rows_removed(const QList<int>&, bool)), 
             this, SLOT(rows_removed(const QList<int>&, bool)));
+    connect(ui->listView, SIGNAL(sig_sort_tno()), 
+            this, SIGNAL(sig_sort_tno()));
 
     connect(ui->listView, SIGNAL(sig_selection_changed(MetaDataList&)), 
             this, SLOT(selection_changed(MetaDataList&)));
@@ -178,7 +180,7 @@ void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int)
     ui->listView->fill(v_metadata, cur_play_idx);
     _total_msecs = 0;
 
-    int actions = ENTRY_REMOVE;
+    int actions = ENTRY_REMOVE | ENTRY_SORT_TNO;
 
     ui->listView->set_context_menu_actions(actions);
     ui->listView->set_drag_enabled(true);
