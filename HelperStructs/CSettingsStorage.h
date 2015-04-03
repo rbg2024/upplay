@@ -79,7 +79,7 @@ public:
     GENDEC_VARIABLE(PlayerUID, QString, String);
     GENDEC_VARIABLE(LoadPlaylist, bool, Bool);
     GENDEC_VARIABLE(SplitterState, QByteArray, ByteArray);
-    // 0 no sort, 1 minim sortbyfn, 2 use criteria
+    enum SortKinds {SK_NOSORT=0, SK_MINIMFNORDER=1, SK_CUSTOM=2};
     GENDEC_VARIABLE(SortKind, int, Int);
     GENDEC_VARIABLE(SortCrits, QStringList, StringList);
     // Special cases

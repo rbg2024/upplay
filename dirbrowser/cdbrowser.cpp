@@ -582,13 +582,13 @@ void CDBrowser::onBrowseDone(int)
 
     vector<string> sortcrits;
     int sortkind = CSettingsStorage::getInstance()->getSortKind();
-    if (sortkind == 1 && 
+    if (sortkind == CSettingsStorage::SK_MINIMFNORDER && 
         m_reader->getKind() == ContentDirectory::CDSKIND_MINIM && 
         m_curpath.back().searchStr.empty() &&
         m_reader->getObjid().compare(0, minimFoldersViewPrefix.size(),
                                      minimFoldersViewPrefix) == 0) {
         sortcrits.push_back("uri");
-    } else if (sortkind == 2) {
+    } else if (sortkind == CSettingsStorage::SK_CUSTOM) {
         QStringList qcrits = CSettingsStorage::getInstance()->getSortCrits();
         for (int i = 0; i < qcrits.size(); i++) {
             sortcrits.push_back(qs2utf8s(qcrits[i]));
@@ -873,7 +873,8 @@ void CDBrowser::recursiveAdd(QAction *act)
         // If we are inside the folders view tree, and the option is
         // set, sort by url (minim sorts by tracknum tag even inside
         // folder view)
-        if (CSettingsStorage::getInstance()->getSortKind() == 1 && 
+        if (CSettingsStorage::getInstance()->getSortKind() == 
+            CSettingsStorage::SK_MINIMFNORDER && 
             m_popupobjid.compare(0, minimFoldersViewPrefix.size(),
                                  minimFoldersViewPrefix) == 0) {
             vector<string> crits;

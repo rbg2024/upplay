@@ -357,24 +357,24 @@ void DirBrowser::onSortprefs()
     int sortkind = CSettingsStorage::getInstance()->getSortKind();
     SortprefsDLG dlg(crits);
     switch (sortkind) {
-    case 0:
+    case CSettingsStorage::SK_NOSORT:
     default:
         dlg.noSortRB->setChecked(true);
         break;
-    case 1:
+    case CSettingsStorage::SK_MINIMFNORDER:
         dlg.minimfnRB->setChecked(true);
         break;
-    case 2:
+    case CSettingsStorage::SK_CUSTOM:
         dlg.sortRB->setChecked(true);
         break;
     }
         
     if (dlg.exec()) {
-        sortkind = 0;
+        sortkind = CSettingsStorage::SK_NOSORT;
         if (dlg.minimfnRB->isChecked()) {
-            sortkind = 1;
+            sortkind = CSettingsStorage::SK_MINIMFNORDER;
         } else if (dlg.sortRB->isChecked()) {
-            sortkind = 2;
+            sortkind = CSettingsStorage::SK_CUSTOM;
         }
         CSettingsStorage::getInstance()->setSortKind(sortkind);
         qcrits.clear();
