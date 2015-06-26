@@ -37,9 +37,9 @@ static QString get_fg_color(int val_bg){
 		return QString(" color: #D8D8D8 ");
 }
 
-PlaylistItemDelegate::PlaylistItemDelegate(QListView* parent, bool small){
+PlaylistItemDelegate::PlaylistItemDelegate(QListView* parent, bool compact){
 
-	if(small){ 	
+	if(compact){ 	
 		_row_height = 20;
 		_pl_entry = new GUI_PlaylistEntrySmall();
 	}

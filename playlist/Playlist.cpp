@@ -17,7 +17,6 @@
  *
  */
 
-#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -25,6 +24,7 @@
 
 #include <QList>
 #include <QDebug>
+#include <QDir>
 #include <QFileDialog>
 
 #include "upadapt/upputils.h"
@@ -208,16 +208,16 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
 
 static string maybemakesavedir()
 {
-    string sd = qs2utf8s(Helper::getHomeDataPath()) + "pl";
-    if (access(sd.c_str(), 0) != 0) {
-        if (mkdir(sd.c_str(), 0700) != 0) {
-            qDebug() << "Playlist::psl_load_playlist: can't create: " <<
-                sd.c_str();
-            return string();
+    string ret;
+    QDir topdata(Helper::getHomeDataPath());
+    if (!topdata.exists("pl")) {
+        if (topdata.mkdir("pl")) {
+            ret = qs2utf8s(topdata.absolutePath()) + "pl";
         }
     }
-    return sd;
+    return ret;
 }
+
 void Playlist::psl_load_playlist()
 {
     string savedir = maybemakesavedir();

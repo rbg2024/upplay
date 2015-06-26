@@ -76,7 +76,7 @@ public:
     }
 
     // ProtocolInfo
-    virtual void changed(const char */*nm*/, const char */*value*/)
+    virtual void changed(const char * /*nm*/, const char * /*value*/)
     {
         //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
     }
@@ -250,16 +250,16 @@ private slots:
         const unsigned int batchsize(10);
         for (unsigned int i = 0; i < unids.size();) {
             unsigned int j = 0;
-            std::vector<int> small;
+            std::vector<int> metaslice;
             for (; j < batchsize && (i+j) < unids.size(); j++) {
-                small.push_back(unids[i+j]);
+                metaslice.push_back(unids[i+j]);
             }
 
             //qDebug() << "OHPL::onIdArrayChanged: Requesting metadata for " 
-            //<< vtos(small).c_str();
+            //<< vtos(metaslice).c_str();
             std::vector<UPnPClient::OHPlaylist::TrackListEntry> entries;
             int ret;
-            if ((ret = m_srv->readList(small, &entries))) {
+            if ((ret = m_srv->readList(metaslice, &entries))) {
                 qDebug() << "OHPL: readList failed: " << ret;
                 goto out;
             }

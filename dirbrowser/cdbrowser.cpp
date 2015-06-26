@@ -93,16 +93,15 @@ void CDBrowser::mouseReleaseEvent(QMouseEvent *event)
 void CDBrowser::setStyleSheet(bool dark)
 {
     QString cssfn = Helper::getSharePath() + "cdbrowser/cdbrowser.css";
-    QByteArray css = 
-        Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+    QByteArray css = Helper::readFileToByteArray(cssfn);
 
     if (dark) {
         cssfn = Helper::getSharePath() + "cdbrowser/dark.css";
-        css +=  Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+        css +=  Helper::readFileToByteArray(cssfn);
     } else {
         cssfn = Helper::getSharePath() + "cdbrowser/standard.css";
     }
-    css +=  Helper::readFileToByteArray((const char *)cssfn.toLocal8Bit());
+    css +=  Helper::readFileToByteArray(cssfn);
 
     css = QByteArray("data:text/css;charset=utf-8;base64,") +
         css.toBase64();

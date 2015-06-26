@@ -57,9 +57,9 @@ PlaylistAVT::PlaylistAVT(const string& _udn, QObject *parent)
     // can go away in a few releases.
     string oldsaved = qs2utf8s(Helper::getHomeDataPath()) + "savedQueue";
     if (!udn.empty()) {
-        if (access(oldsaved.c_str(), R_OK) == 0 && 
-            access(m_savefile.c_str(), 0) != 0) {
-            rename(oldsaved.c_str(), m_savefile.c_str());
+        QFile os(QString::fromLocal8Bit(oldsaved.c_str()));
+        if (os.exists() && !QFile::exists(QString::fromLocal8Bit(m_savefile.c_str()))) {
+            os.rename(QString::fromLocal8Bit(m_savefile.c_str()));
         }
     }
 

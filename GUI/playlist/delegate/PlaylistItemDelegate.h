@@ -33,7 +33,7 @@
 class PlaylistItemDelegate : public QItemDelegate {
 
 public:
-    PlaylistItemDelegate(QListView *parent, bool small);
+    PlaylistItemDelegate(QListView *parent, bool compact);
 	virtual ~PlaylistItemDelegate();
 
     virtual void paint( QPainter *painter, const QStyleOptionViewItem &option,

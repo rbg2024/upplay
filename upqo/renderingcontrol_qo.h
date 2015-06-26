@@ -42,7 +42,7 @@ public:
                 emit muteChanged(value);
             }
         }
-    void changed(const char */*nm*/, const char */*value*/)
+    void changed(const char * /*nm*/, const char * /*value*/)
         {
             //qDebug()<< "RDR: Changed: " << nm << " : " << value << " (char*)";
         }
