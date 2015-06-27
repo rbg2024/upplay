@@ -208,14 +208,11 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
 
 static string maybemakesavedir()
 {
-    string ret;
     QDir topdata(Helper::getHomeDataPath());
-    if (!topdata.exists("pl")) {
-        if (topdata.mkdir("pl")) {
-            ret = qs2utf8s(topdata.absolutePath()) + "pl";
-        }
+    if (!topdata.exists("pl") && !topdata.mkdir("pl")) {
+        qDebug() << "Could not create: " << topdata.absoluteFilePath("pl");
     }
-    return ret;
+    return qs2utf8s(topdata.absoluteFilePath("pl"));
 }
 
 void Playlist::psl_load_playlist()
