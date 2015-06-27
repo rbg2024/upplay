@@ -127,9 +127,12 @@ bool PlaylistItemModel::insertRows(int position, int rows, const QModelIndex &in
 	 return true;
 }
 
-bool PlaylistItemModel::removeRows(int position, int rows, const QModelIndex &index){
-
-	Q_UNUSED(index);
+bool PlaylistItemModel::removeRows(int position, int rows, const QModelIndex &index)
+{
+    Q_UNUSED(index);
+    if (rows < 1) {
+        return true;
+    }
 
 	 beginRemoveRows(QModelIndex(), position, position+rows-1);
 

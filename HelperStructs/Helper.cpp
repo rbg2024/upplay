@@ -123,6 +123,26 @@ QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
 
 }
 
+#ifdef Q_OS_WIN
+#include <Shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
+
+QString GetExecPath()
+{
+    TCHAR dest[MAX_PATH];
+    DWORD length = GetModuleFileName(NULL, dest, MAX_PATH);
+#ifdef NTDDI_WIN8_future
+    PathCchRemoveFileSpec(dest, MAX_PATH);
+#else
+    PathRemoveFileSpec(dest);
+#endif
+    if (sizeof(TCHAR) == 2)
+        return QString::fromUtf16((const ushort*)dest);
+    else
+        return QString::fromUtf8((const char*)dest);
+}
+#endif
+
 QString Helper::getSharePath()
 {
     QString path;
@@ -133,14 +153,11 @@ QString Helper::getSharePath()
         path = "";
     }
 #else
-    path = QDir::homePath() + QString("\\.upplay\\images\\");
-    if (QFile::exists(path)) {
-        return path;
-    } else {
-        path = "";
-    }
+    QDir execdir(GetExecPath());
+    QString rpath("Share");
+    execdir.mkpath(rpath);
+    path = execdir.absoluteFilePath(rpath);
 #endif
-
     return path;
 }
 
@@ -151,11 +168,16 @@ QString Helper::getIconPath()
 
 QString Helper::getHomeDataPath()
 {
-    QString mydatadir = QDir::homePath() + "/.local/share/upplay";
-    if (!QFile::exists(mydatadir)) {
-        QDir().mkdir(mydatadir);
-    }
-    return mydatadir + "/";
+    QDir homedir(QDir::home());
+
+#ifndef Q_OS_WIN
+    QString rpath = QString::fromUtf8(".local/share/upplay");
+#else
+    QString rpath = QString::fromUtf8("AppData/Local/upplay/");
+#endif
+
+    homedir.mkpath(rpath);
+    return homedir.absoluteFilePath(rpath);
 }
 
 QString Helper::get_cover_path(QString artist, QString album, QString extension)
