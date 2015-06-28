@@ -1,0 +1,603 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;moc;h;def;odl;idl;res;</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{c0fb7798-90d1-4c4d-8982-429a44eb212d}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{914ed86a-8c61-450d-bd9a-9a945c35c459}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="HelperStructs\CSettingsStorage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\ContextMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\DirectSlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_PlayerConnections.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_PlayerControls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_PlayerCover.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_PlayerMenubar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\GUI_Playlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\entry\GUI_PlaylistEntryBig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\entry\GUI_PlaylistEntrySmall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\player\GUI_TrayIcon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperStructs\Helper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="playlist\Playlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="playlist\PlaylistAVT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\delegate\PlaylistItemDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\model\PlaylistItemModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="playlist\PlaylistOH.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\playlist\view\PlaylistView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelperStructs\Style.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dirbrowser\cdbrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dirbrowser\dirbrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="upplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="upadapt\upputils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_CSettingsStorage.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_CSettingsStorage.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ContextMenu.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ContextMenu.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_DirectSlider.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_DirectSlider.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_Player.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_Player.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_Playlist.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_Playlist.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_PlaylistEntry.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_PlaylistEntry.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_PlaylistEntryBig.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_PlaylistEntryBig.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_PlaylistEntrySmall.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_PlaylistEntrySmall.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_GUI_TrayIcon.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_GUI_TrayIcon.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_Playlist.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_Playlist.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_PlaylistAVT.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_PlaylistAVT.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_PlaylistItemModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_PlaylistItemModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_PlaylistOH.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_PlaylistOH.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_PlaylistView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_PlaylistView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_application.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_application.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_avtadapt.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_avtadapt.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_avtransport_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_avtransport_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_cdbrowser.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_cdbrowser.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_cdirectory_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_cdirectory_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_dirbrowser.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_dirbrowser.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ohpladapt.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ohpladapt.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ohplaylist_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ohplaylist_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ohtime_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ohtime_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ohvolume_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ohvolume_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_renderchoose.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_renderchoose.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_renderingcontrol_qo.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_renderingcontrol_qo.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_rreaper.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_rreaper.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_sortprefs.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_sortprefs.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_upplay.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="HelperStructs\CSettingsStorage.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\ContextMenu.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\player\DirectSlider.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\player\GUI_Player.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\GUI_Playlist.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\entry\GUI_PlaylistEntry.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\entry\GUI_PlaylistEntryBig.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\entry\GUI_PlaylistEntrySmall.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\player\GUI_TrayIcon.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="HelperStructs\Helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="playlist\Playlist.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="playlist\PlaylistAVT.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="GUI\playlist\delegate\PlaylistItemDelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\playlist\delegate\PlaylistItemDelegateInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="GUI\playlist\model\PlaylistItemModel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="HelperStructs\PlaylistMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="playlist\PlaylistOH.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\view\PlaylistView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <ClInclude Include="HelperStructs\Style.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="application.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upadapt\avtadapt.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\avtransport_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dirbrowser\cdbrowser.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\cdirectory_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dirbrowser\dirbrowser.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upadapt\ohpladapt.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\ohplaylist_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\ohtime_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\ohvolume_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\renderchoose\renderchoose.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="upqo\renderingcontrol_qo.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dirbrowser\rreaper.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\prefs\sortprefs.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="GUI\player\GUI_Player.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\GUI_Playlist.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\entry\GUI_PlaylistEntryBig.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\playlist\entry\GUI_PlaylistEntrySmall.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="dirbrowser\dirbrowser.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\renderchoose\renderchoose.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GUI\prefs\sortprefs.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GUI\icons\addtab.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\append.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_down.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_down_orange.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_left.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_left_orange.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_right.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_right_orange.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_up.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\arrow_up_orange.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\broom.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\bwd.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\cb_checked.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\cb_checked_disabled.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\close.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\cross.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\delete.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\dynamic.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\edit.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\fwd.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\fwd_orange.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\id3.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\import.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\info_small.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\logo.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\numbers.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\pause.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\play.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\rb_checked.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\rb_checked_disabled.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\rec.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\rep1.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\repAll.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\scroll_hor_bg.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\scroll_ver_bg.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\shuffle.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\slider_hor_bg.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\slider_ver_bg.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\stop.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <CustomBuild Include="GUI\upplay.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <None Include="GUI\icons\vol_1.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_1_dark.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_2.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_2_dark.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_3.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_3_dark.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_mute.png">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GUI\icons\vol_mute_dark.png">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\Users\Bill\Documents\UPnP\upplay\upplay_resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_GUI_Player.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_GUI_Playlist.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_GUI_PlaylistEntryBig.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_GUI_PlaylistEntrySmall.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_dirbrowser.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_renderchoose.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_sortprefs.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
