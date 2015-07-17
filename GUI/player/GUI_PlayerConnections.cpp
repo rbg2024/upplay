@@ -71,7 +71,7 @@ void GUI_Player::setupConnections()
     connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)), 
             this, SLOT(volumeChangedByTick(int)));
 
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this,
+    connect(ui->volumeSlider, SIGNAL(sliderMoved(int)), this,
             SLOT(volumeChanged(int)));
     connect(ui->songProgress, SIGNAL(valueChanged(int)), this,
             SLOT(setProgressJump(int)));
