@@ -156,6 +156,8 @@ static void mdsort(const MetaDataList& inlist, MetaDataList& outlist,
 void Playlist::psl_sort_by_tno()
 {
     vector<MetaDataCmp::SortCrit> crits;
+    // Makes no sense to sort by tno independantly of album
+    crits.push_back(MetaDataCmp::SC_ALB);
     crits.push_back(MetaDataCmp::SC_TNO);
     MetaDataList md;
     mdsort(m_meta, md, crits);
