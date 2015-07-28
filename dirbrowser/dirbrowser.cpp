@@ -104,7 +104,8 @@ void DirBrowser::setPlaylist(Playlist *pl)
     for (int i = 0; i < ui->tabs->count(); i++) {
         setupTabConnections(i);
     }
-    connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
+    if (m_pl)
+        connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
 }
 
 void DirBrowser::setStyleSheet(bool dark)
@@ -456,8 +457,9 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
             this, SLOT(changeTabTitle(QWidget *, const QString&)));
 
     disconnect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)), 0, 0);
-    connect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
-            m_pl, SLOT(psl_add_tracks(const MetaDataList&)));
+    if (m_pl)
+        connect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
+                m_pl, SLOT(psl_add_tracks(const MetaDataList&)));
     disconnect(cdb, SIGNAL(sig_searchcaps_changed()), 0, 0);
     connect(cdb, SIGNAL(sig_searchcaps_changed()), 
             this, SLOT(onSearchcapsChanged()));

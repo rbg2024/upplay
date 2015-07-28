@@ -103,6 +103,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     if (rdr->rdc()) {
+        qDebug() << "Application::setupRenderer: using Rendering Control";
         m_rdco = new RenderingControlQO(rdr->rdc());
     } else {
         if (!rdr->ohvl()) {
@@ -110,15 +111,18 @@ bool Application::setupRenderer(const string& uid)
                 endl;
             return false;
         }
+        qDebug() << "Application::setupRenderer: using OHVolume";
         m_ohvlo =  new OHVolumeQO(rdr->ohvl());
     }
 
     bool needavt = true;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
+        qDebug() << "Application::setupRenderer: using OHPlaylist";
         m_ohplo = new OHPlayer(ohpl);
         OHTMH ohtm = rdr->ohtm();
         if (ohtm) {
+            qDebug() << "Application::setupRenderer: OHTm ok, no need for avt";
             m_ohtmo = new OHTimeQO(ohtm);
             // no need for AVT then
             needavt = false;
@@ -126,6 +130,7 @@ bool Application::setupRenderer(const string& uid)
         m_playlist = new PlaylistOH();
     } else {
         m_ohplo = 0;
+        qDebug() << "Application::setupRenderer: using AVT playlist";
         m_playlist = new PlaylistAVT(rdr->desc()->UDN);
     }
 
