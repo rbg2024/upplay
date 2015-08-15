@@ -50,7 +50,7 @@ bool udirentToMetadata(const UPnPDirObject *dop, MetaData *mdp)
     mdp->album_id = -1;
 
     mdp->title = u8s2qs(dop->m_title);
-    qDebug() << "udirentToMetadata: title: " << mdp->title;
+    // qDebug() << "udirentToMetadata: title: " << mdp->title;
     mdp->artist = uf2qs(dop, "upnp:artist", false);
     mdp->album = uf2qs(dop, "upnp:album", false);
     mdp->rating = 0;

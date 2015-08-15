@@ -27,6 +27,7 @@ using namespace std;
 #include <QMenu>
 #include <QApplication>
 #include <QScriptEngine>
+#include <QByteArray>
 
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
@@ -41,15 +42,29 @@ using namespace std;
 #include "dirbrowser.h"
 #include "rreaper.h"
 
+// Maybe one day
+#undef USING_WEBENGINE
+
 using namespace UPnPP;
 using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
 
+void CDWebPage::javaScriptConsoleMessage(const QString& 
+					 //msg
+					 , int 
+					 //lineNum
+					 , const QString&)
+{
+    //qDebug()<< "JAVASCRIPT: "<< msg << "at line " << lineNum;
+}
+
+
 CDBrowser::CDBrowser(QWidget* parent)
     : QWebView(parent), m_reader(0), m_reaper(0), m_browsers(0), 
       m_lastbutton(Qt::LeftButton)
 {
+    setPage(new CDWebPage(this));
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
 	    this, SLOT(onLinkClicked(const QUrl &)));
 
@@ -117,11 +132,22 @@ void CDBrowser::onContentsSizeChanged(const QSize&)
     page()->mainFrame()->setScrollPosition(m_savedscrollpos);
 }
 
+#ifdef USING_WEBENGINE
+static QString base64_encode(QString string)
+{
+    QByteArray ba;
+    ba.append(string);
+    return ba.toBase64();
+}
+#endif
+
 void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 {
-    //qDebug() "CDBrowser::appendHtml: " << qs2utf8s(html);
+    //qDebug() << "CDBrowser::appendHtml: elt_id " << elt_id << " html " << html;
     
     QWebFrame *mainframe = page()->mainFrame();
+
+#ifndef USING_WEBENGINE
     StringObj morehtml(html);
 
     mainframe->addToJavaScriptWindowObject("morehtml", &morehtml, 
@@ -139,6 +165,19 @@ void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
         js = QString("document.getElementById(\"%1\").innerHTML += "
                      "morehtml.text").arg(elt_id);
     }
+#else 
+    // WEBENGINE version. Can't access qt object from the page, so do everything in js
+    QString js;
+    js = "var morehtml = \"" + base64_encode(html) + "\";\n";
+    if (elt_id.isEmpty()) {
+        js += QString("document.body.innerHTML += atob(morehtml);\n");
+    } else {
+        js += QString("document.getElementById(\"%1\").innerHTML += "
+                     "atob(morehtml);\n").arg(elt_id);
+    }
+    // qDebug() << "Executing JS: [" << js << "]";
+#endif
+
     mainframe->evaluateJavaScript(js);
 }
 
@@ -295,10 +334,18 @@ void CDBrowser::browseIn(QString UDN, vector<CtPathElt> path)
     qDebug() << "CDBrowser::browsein: " << UDN << " not found";
 }
 
-static const QString init_container_page(
+static const QString init_container_pagetop(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
-    "</head><body>"
+    "<script type=\"text/javascript\">\n");
+
+static const QString init_container_pagebot(
+    "</script>\n"
+#ifdef USING_WEBENGINE
+    "</head><body onload=\"addEventListener('click', saveLoc)\">\n"
+#else
+    "</head><body>\n"
+#endif
     "</body></html>"
     );
 
@@ -329,7 +376,13 @@ void CDBrowser::initContainerHtml(const string& ss)
         htmlpath += QString("Search results for: ") + 
             QString::fromUtf8(ss.c_str()) + "<br/>";
     }
-    setHtml(init_container_page);
+
+    QString js;
+#ifdef USING_WEBENGINE
+    QString jsfn = Helper::getSharePath() + "/cdbrowser/containerscript.js";
+    js = QString::fromUtf8(Helper::readFileToByteArray(jsfn));
+#endif
+    setHtml(init_container_pagetop + js + init_container_pagebot);
     appendHtml(QString(), htmlpath);
     appendHtml(QString(), "<table id=\"entrylist\"></table>");
 }

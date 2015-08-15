@@ -18,6 +18,8 @@
 #ifndef _CDBROWSER_H_INCLUDED_
 #define _CDBROWSER_H_INCLUDED_
 
+/** CDBrowser displays Content Directory data inside a DirBrowser Tab */
+
 #include <vector>
 #include <iostream>
 #include "libupnpp/config.h"
@@ -39,6 +41,17 @@
 class ContentDirectoryQO;
 class RecursiveReaper;
 class DirBrowser;
+
+// We only subclass QWebPage in order to display the JS error messages
+class CDWebPage: public QWebPage {
+    Q_OBJECT;
+
+ public:
+    CDWebPage(QWidget* parent = 0) : QWebPage(parent) {
+    }
+    virtual void javaScriptConsoleMessage(const QString& msg, int lineNum, 
+					  const QString & sourceID);
+};
 
 class CDBrowser : public QWebView
 {
@@ -72,6 +85,7 @@ class CDBrowser : public QWebView
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
     void setStyleSheet(bool);
     void refresh();
+
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
     void sig_now_in(QWidget *, const QString&);

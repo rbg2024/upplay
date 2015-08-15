@@ -102,7 +102,7 @@ unix {
   target.path = "$$PREFIX/bin"
 
   bdata.files = dirbrowser/cdbrowser.css dirbrowser/dark.css \
-              dirbrowser/standard.css
+              dirbrowser/standard.css dirbrowser/containerscript.js
   bdata.path = $$PREFIX/share/upplay/cdbrowser   
   gdata.files = GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/
