@@ -1,3 +1,9 @@
+upplay (1.0.0-1) unstable; urgency=low
+
+  * New logo, sort options, smoother volume control, renderer reconnections.
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 16 Aug 2015 10:25:00 +0100
+
 upplay (0.10.0-1) unstable; urgency=low
 
   * Support pure OpenHome renderers like BubbleUPnP Server.

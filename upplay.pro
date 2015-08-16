@@ -6,7 +6,7 @@ QT += script webkit network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 0.10.1
+VERSION = 1.0.0
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
 QMAKE_CXXFLAGS += -std=c++0x
