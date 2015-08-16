@@ -62,8 +62,8 @@ GUI/icons/shuffle.png
 GUI/icons/slider_hor_bg.png
 GUI/icons/slider_ver_bg.png
 GUI/icons/stop.png
+GUI/icons/upplay.ico
 GUI/icons/upplay.png
-GUI/icons/upplay.xpm
 GUI/icons/vol_1.png
 GUI/icons/vol_1_dark.png
 GUI/icons/vol_2.png
@@ -109,6 +109,9 @@ GUI/playlist/model/PlaylistItemModel.h
 GUI/playlist/view/
 GUI/playlist/view/PlaylistView.cpp
 GUI/playlist/view/PlaylistView.h
+GUI/prefs/
+GUI/prefs/sortprefs.h
+GUI/prefs/sortprefs.ui
 GUI/renderchoose/
 GUI/renderchoose/renderchoose.h
 GUI/renderchoose/renderchoose.ui
@@ -132,6 +135,7 @@ dirbrowser/
 dirbrowser/cdbrowser.cpp
 dirbrowser/cdbrowser.css
 dirbrowser/cdbrowser.h
+dirbrowser/containerscript.js
 dirbrowser/dark.css
 dirbrowser/dirbrowser.cpp
 dirbrowser/dirbrowser.h
@@ -144,9 +148,12 @@ doc/legend-upplay-main.png
 doc/legend-upplay-main.xcf
 doc/searching.html
 doc/searching.txt
+doc/upplay-releases.txt
 doc/upplay.html
 doc/upplay.txt
 excludefile
+innosetup/
+innosetup/upplay-setup.iss
 makesrcdist.sh
 playlist/
 playlist/Playlist.cpp
@@ -155,6 +162,8 @@ playlist/PlaylistAVT.cpp
 playlist/PlaylistAVT.h
 playlist/PlaylistOH.cpp
 playlist/PlaylistOH.h
+rpm/
+rpm/upplay.spec
 upadapt/
 upadapt/avtadapt.h
 upadapt/md5.cxx
@@ -165,6 +174,12 @@ upadapt/upputils.h
 upplay.cpp
 upplay.desktop
 upplay.pro
+upplay.pro.user
+upplay.sln
+upplay.vcxproj
+upplay.vcxproj.filters
+upplay.vcxproj.user
+upplay_resource.rc
 upqo/
 upqo/avtransport_qo.h
 upqo/cdirectory_qo.h

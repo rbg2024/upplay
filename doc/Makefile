@@ -3,7 +3,7 @@
 .txt.html:
 	asciidoc $<
 
-all: upplay.html searching.html
+all: upplay.html searching.html upplay-releases.html
 
 clean:
 	rm -f *.html

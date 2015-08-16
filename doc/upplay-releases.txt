@@ -6,7 +6,7 @@ Upplay now seems stable, and leaves the 0.x behind. Mostly to make it clear
 that upplay and libupnpp versions don't need to stay in lockstep. Upplay
 1.0 needs libupnpp 0.11.0 or newer (libupnpp2).
 
-2015-08-16 0.11.0::
+2015-08-16 1.0.0::
 - The Playlist context menu now has a "Sort by track number" option.
 - New directory sort options
 - New logo replacing the Sayonara one.
