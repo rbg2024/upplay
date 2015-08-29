@@ -23,7 +23,7 @@ DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 LicenseFile=C:\Users\Bill\Documents\COPYING.txt
 OutputDir=C:\Users\Bill\Documents\UPnP\upplay\innosetup
-OutputBaseFilename=upplaysetup
+OutputBaseFilename=upplaysetup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 
