@@ -50,6 +50,22 @@ using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
 
+// Escape things that would look like HTML markup
+static string escapeHtml(const string &in)
+{
+    string out;
+    for (string::size_type pos = 0; pos < in.length(); pos++) {
+	switch(in.at(pos)) {
+	case '<': out += "&lt;"; break;
+	case '>': out += "&gt;"; break;
+	case '&': out += "&amp;"; break;
+	case '"': out += "&quot;"; break;
+	default: out += in.at(pos); break;
+	}
+    }
+    return out;
+}
+
 void CDWebPage::javaScriptConsoleMessage(const QString& 
 					 //msg
 					 , int 
@@ -462,27 +478,22 @@ void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
 static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 {
     QString out;
-    out += QString("<tr class=\"container\" objid=\"%1\" objidx=\"%2\"><td></td><td>").
-        arg(e.m_id.c_str());
+    out += QString("<tr class=\"container\" objid=\"%1\" objidx=\"%2\">"
+                   "<td></td><td>").arg(e.m_id.c_str());
     out += QString("<a class=\"ct_title\" href=\"C%1\">").arg(idx);
-    out += QString::fromUtf8(e.m_title.c_str());
-    out += QString("</a></td></tr>");
-    return out;
-}
-
-// Escape things that would look like HTML markup
-static string escapeHtml(const string &in)
-{
-    string out;
-    for (string::size_type pos = 0; pos < in.length(); pos++) {
-	switch(in.at(pos)) {
-	case '<': out += "&lt;"; break;
-	case '>': out += "&gt;"; break;
-	case '&': out += "&amp;"; break;
-	case '"': out += "&quot;"; break;
-	default: out += in.at(pos); break;
-	}
+    out += QString::fromUtf8(escapeHtml(e.m_title).c_str());
+    out += "</a></td>";
+    string val;
+    e.getprop("upnp:artist", val);
+    if (!val.empty()) {
+        if (val.size() > 15) {
+            val = val.substr(0,12) + "...";
+        }
+        out += "<td class=\"ct_artist\">";
+        out += QString::fromUtf8(escapeHtml(val).c_str());
+        out += "</td>";
     }
+    out += "</tr>";
     return out;
 }
 
@@ -498,7 +509,8 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
         arg(e.m_id.c_str()).arg(idx);
 
     e.getprop("upnp:originalTrackNumber", val);
-    out += QString("<td class=\"tk_tracknum\">") + escapeHtml(val).c_str() + "</td>";
+    out += QString("<td class=\"tk_tracknum\">") + 
+        escapeHtml(val).c_str() + "</td>";
 
     out += "<td class=\"tk_title\">";
     out += QString("<a href=\"I%1\">").arg(idx);
@@ -567,13 +579,13 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
                       dc->m_items.size());
     for (std::vector<UPnPDirObject>::iterator it = dc->m_containers.begin();
          it != dc->m_containers.end(); it++) {
-        //qDebug() << "Container: " << entry.dump().c_str();;
+        //qDebug() << "Container: " << it->dump().c_str();;
         m_entries.push_back(*it);
         html += CTToHtml(m_entries.size()-1, *it);
     }
     for (std::vector<UPnPDirObject>::iterator it = dc->m_items.begin();
          it != dc->m_items.end(); it++) {
-        //qDebug() << "Item: " << entry.dump().c_str();;
+        //qDebug() << "Item: " << it->dump().c_str();;
         m_entries.push_back(*it);
         html += ItemToHtml(m_entries.size()-1, *it);
     }
