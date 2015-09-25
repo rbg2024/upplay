@@ -596,6 +596,11 @@ void CDBrowser::deleteReaders()
         delete m_reaper;
         m_reaper = 0;
     }
+    // Give a chance to queued signals (a thread could have queued
+    // something before/while we're cancelling it). Else, typically
+    // onSliceAvailable could be called at a later time and mess the
+    // display.
+    qApp->processEvents();
 }
 
 void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
