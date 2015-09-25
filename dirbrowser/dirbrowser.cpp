@@ -407,11 +407,15 @@ void DirBrowser::doSearch(const QString& text, bool reverse)
     if (cdb == 0) {
 	return;
     }
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
     QWebPage::FindFlags options = QWebPage::FindWrapsAroundDocument;
     if (reverse)
         options |= QWebPage::FindBackward;
 
     cdb->findText(text, options);
+#endif
 }
 
 void DirBrowser::setInsertActive(bool onoff)

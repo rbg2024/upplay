@@ -2,15 +2,16 @@ TEMPLATE        = app
 LANGUAGE        = C++
 
 QT += script webkit network
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
+
+#QT += script widgets network webenginewidgets
 
 # VERSION is ^egrepped and must stay in the first column
 VERSION = 1.0.0
 
-QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
-
+#QMAKE_CXXFLAGS += -DUSING_WEBENGINE
 
 CONFIG  += qt warn_on thread release debug
 

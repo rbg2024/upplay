@@ -18,15 +18,25 @@
 #include <iostream>
 #include "libupnpp/config.h"
 
-using namespace std;
+#include <QUrl>
+#ifdef USING_WEBENGINE
+#warning acceptNavigationRequest is only called for http://. Change all links
+// Notes for WebEngine
+// - All links must be changed to http://
+// - It seems that the links passed to acceptNav.. have the host part 
+//   lowercased -> change S0 to http://s0, not http://S0
 
+#include <QWebEnginePage>
+#include <QWebEngineSettings>
+#else
 #include <QWebFrame>
 #include <QWebSettings>
-#include <QUrl>
 #include <QWebElement>
+#include <QScriptEngine>
+#endif
+
 #include <QMenu>
 #include <QApplication>
-#include <QScriptEngine>
 #include <QByteArray>
 
 #include "HelperStructs/Helper.h"
@@ -42,9 +52,8 @@ using namespace std;
 #include "dirbrowser.h"
 #include "rreaper.h"
 
-// Maybe one day
-#undef USING_WEBENGINE
 
+using namespace std;
 using namespace UPnPP;
 using namespace UPnPClient;
 
@@ -66,13 +75,15 @@ static string escapeHtml(const string &in)
     return out;
 }
 
-void CDWebPage::javaScriptConsoleMessage(const QString& 
-					 //msg
-					 , int 
-					 //lineNum
-					 , const QString&)
+void CDWebPage::javaScriptConsoleMessage(
+#ifdef USING_WEBENGINE
+    JavaScriptConsoleMessageLevel,
+#endif
+    const QString& msg, int lineNum, const QString&)
 {
-    //qDebug()<< "JAVASCRIPT: "<< msg << "at line " << lineNum;
+    Q_UNUSED(msg);
+    Q_UNUSED(lineNum);
+    //qDebug() << "JAVASCRIPT: "<< msg << "at line " << lineNum;
 }
 
 
@@ -81,10 +92,12 @@ CDBrowser::CDBrowser(QWidget* parent)
       m_lastbutton(Qt::LeftButton)
 {
     setPage(new CDWebPage(this));
+#ifndef USING_WEBENGINE
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
-	    this, SLOT(onLinkClicked(const QUrl &)));
+            this, SLOT(onLinkClicked(const QUrl &)));
 
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+#endif
 
     settings()->setAttribute(QWebSettings::JavascriptEnabled, true);
     if (parent) {
@@ -97,8 +110,12 @@ CDBrowser::CDBrowser(QWidget* parent)
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 	    this, SLOT(createPopupMenu(const QPoint&)));
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
     connect(page()->mainFrame(), SIGNAL(contentsSizeChanged(const QSize&)),
             this, SLOT(onContentsSizeChanged(const QSize&)));
+#endif
 
     setHtml("<html><head><title>Upplay directory browser !</title></head>"
             "<body><p>Looking for servers...</p>"
@@ -138,14 +155,22 @@ void CDBrowser::setStyleSheet(bool dark)
         css.toBase64();
 
     QUrl cssurl(QString::fromUtf8((const char*)css));
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
     settings()->setUserStyleSheetUrl(cssurl);
+#endif
 }
 
 void CDBrowser::onContentsSizeChanged(const QSize&)
 {
     //qDebug() << "CDBrowser::onContentsSizeChanged: scrollpos " <<
     // page()->mainFrame()->scrollPosition();
+#ifdef USING_WEBENGINE
+    // No way to do this with webengine ?
+#else
     page()->mainFrame()->setScrollPosition(m_savedscrollpos);
+#endif
 }
 
 #ifdef USING_WEBENGINE
@@ -155,25 +180,41 @@ static QString base64_encode(QString string)
     ba.append(string);
     return ba.toBase64();
 }
+static void dumpHtml(QString html)
+{
+    qDebug() << "showHtml: " << html;
+}
+
+static void jsResult(QVariant res)
+{
+    qDebug() << "jsResult: " << res.toString();
+}
 #endif
 
 void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 {
-    //qDebug() << "CDBrowser::appendHtml: elt_id " << elt_id << " html " << html;
-    
-    QWebFrame *mainframe = page()->mainFrame();
+    //qDebug()<<"CDBrowser::appendHtml: elt_id ["<<elt_id<< "] html "<< html;
 
-#ifndef USING_WEBENGINE
+#ifdef USING_WEBENGINE
+    // With webengine, we can't access qt object from the page, so we
+    // do everything in js. The data is encoded as base64 to avoid
+    // quoting issues
+    QString js;
+    js = "var morehtml = \"" + base64_encode(html) + "\";\n";
+    if (elt_id.isEmpty()) {
+        js += QString("document.body.innerHTML += window.atob(morehtml);\n");
+    } else {
+        js += QString("document.getElementById(\"%1\").innerHTML += "
+                     "window.atob(morehtml);\n").arg(elt_id);
+    }
+    qDebug() << "Executing JS: [" << js << "]";
+    page()->runJavaScript(js, jsResult);
+#else
+    QWebFrame *mainframe = page()->mainFrame();
     StringObj morehtml(html);
 
     mainframe->addToJavaScriptWindowObject("morehtml", &morehtml, 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-                      QWebFrame::ScriptOwnership
-#else
-                      QScriptEngine::ScriptOwnership
-#endif
-);
-
+                                           SCRIPTOWNERSHIP);
     QString js;
     if (elt_id.isEmpty()) {
         js = QString("document.body.innerHTML += morehtml.text");
@@ -181,28 +222,16 @@ void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
         js = QString("document.getElementById(\"%1\").innerHTML += "
                      "morehtml.text").arg(elt_id);
     }
-#else 
-    // WEBENGINE version. Can't access qt object from the page, so do everything in js
-    QString js;
-    js = "var morehtml = \"" + base64_encode(html) + "\";\n";
-    if (elt_id.isEmpty()) {
-        js += QString("document.body.innerHTML += atob(morehtml);\n");
-    } else {
-        js += QString("document.getElementById(\"%1\").innerHTML += "
-                     "atob(morehtml);\n").arg(elt_id);
-    }
-    // qDebug() << "Executing JS: [" << js << "]";
-#endif
-
     mainframe->evaluateJavaScript(js);
+#endif
 }
 
 void CDBrowser::onLinkClicked(const QUrl &url)
 {
     m_timer.stop();
     string scurl = qs2utf8s(url.toString());
-    //qDebug() << "CDBrowser::onLinkClicked: " << scurl << " button " << 
-    //m_lastbutton << " mid " << Qt::MidButton;
+    //qDebug() << "CDBrowser::onLinkClicked: " << url.toString() << 
+    //" button " <<  m_lastbutton << " mid " << Qt::MidButton;
 
     int what = scurl[0];
 
@@ -252,7 +281,11 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     case 'C':
     {
         // Directory listing container link clicked: browse subdir.
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
         m_curpath.back().scrollpos = page()->mainFrame()->scrollPosition();
+#endif
 	unsigned int i = atoi(scurl.c_str()+1);
         if (i > m_entries.size()) {
 	    LOGERR("CDBrowser::onLinkClicked: bad objid index: " << i 
@@ -399,6 +432,7 @@ void CDBrowser::initContainerHtml(const string& ss)
     js = QString::fromUtf8(Helper::readFileToByteArray(jsfn));
 #endif
     setHtml(init_container_pagetop + js + init_container_pagebot);
+    waitForPage();
     appendHtml(QString(), htmlpath);
     appendHtml(QString(), "<table id=\"entrylist\"></table>");
 }
@@ -676,7 +710,11 @@ void CDBrowser::onBrowseDone(int)
     }
 
     m_reader->wait();
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
     page()->mainFrame()->setScrollPosition(m_savedscrollpos);
+#endif
     deleteReaders();
 
     //qDebug() << "CDBrowser::onBrowseDone done";
@@ -699,6 +737,19 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
     out += QString::fromUtf8(dev.friendlyName.c_str());
     out += QString("</a></p>");
     return out;
+}
+
+void CDBrowser::waitForPage()
+{
+#ifdef USING_WEBENGINE
+    QEventLoop loop;
+    QTimer tT;
+    tT.setSingleShot(true);
+    connect(&tT, SIGNAL(timeout()), &loop, SLOT(quit()));
+    connect(this, SIGNAL(loadFinished(bool)), &loop, SLOT(quit()));
+    tT.start(2000); 
+    loop.exec();
+#endif
 }
 
 void CDBrowser::initialPage()
@@ -748,6 +799,7 @@ void CDBrowser::initialPage()
     } else {
         // Show servers list
         setHtml(QString::fromUtf8(init_server_page.c_str()));
+        waitForPage();
         for (unsigned i = 0; i < msdescs.size(); i++) {
             appendHtml("", DSToHtml(i, msdescs[i]));
         }
@@ -769,6 +821,9 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         return;
     qDebug() << "void CDBrowser::createPopupMenu(const QPoint& pos)";
 
+#ifdef USING_WEBENGINE
+#warning tobedone
+#else
     QWebHitTestResult htr = page()->mainFrame()->hitTestContent(pos);
     if (htr.isNull()) {
 	return;
@@ -850,6 +905,7 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         return;
     }
     popup->popup(mapToGlobal(pos));
+#endif
 }
 
 void CDBrowser::back(QAction *)
