@@ -56,13 +56,9 @@ void GUI_Player::setupConnections()
             SLOT(small_playlist_items_toggled(bool)));
     connect(ui->action_Fullscreen, SIGNAL(toggled(bool)), this,
             SLOT(show_fullscreen_toggled(bool)));
+    connect(ui->action_Preferences, SIGNAL(triggered(bool)), this,
+            SIGNAL(sig_preferences()));
 
-
-    // preferencesF
-    connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
-            SLOT(min2tray_toggled(bool)));
-    connect(ui->action_sortprefs, SIGNAL(triggered(bool)), this,
-            SIGNAL(sig_sortprefs()));
 
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));

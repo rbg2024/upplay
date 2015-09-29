@@ -92,6 +92,7 @@ signals:
     void sig_skin_changed(bool);
     void showSearchPanel(bool);
     void sig_sortprefs();
+    void sig_preferences();
 
 private slots:
     void playClicked(bool b = true);
@@ -121,7 +122,6 @@ private slots:
     /* Preferences */
 
     void load_pl_on_startup_toggled(bool);
-    void min2tray_toggled(bool);
     void only_one_instance_toggled(bool);
 
     void about(bool b=false);
@@ -172,7 +172,7 @@ private:
     MetaData			m_metadata;
     MetaData			m_metadata_corrected;
     bool                m_metadata_available;
-    bool                m_min2tray;
+    bool                m_overridemin2tray;
 
     int                 m_library_width;
     int                 m_library_stretch_factor;

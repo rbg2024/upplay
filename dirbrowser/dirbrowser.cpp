@@ -319,79 +319,8 @@ void DirBrowser::serverSearch()
 
 void DirBrowser::onSortprefs()
 {
-    static map<string, string>  allSortCrits;
-    static map<string, string>  allSortCritsRev;
-    if (allSortCrits.empty()) {
-        allSortCrits["Track Number"] = "upnp:originalTrackNumber";
-        allSortCrits["Track Title"] = "dc:title";
-        allSortCrits["Date"] = "dc:date";
-        allSortCrits["Artist"] = "upnp:artist";
-        allSortCrits["Album Title"] = "upnp:album";
-        allSortCrits["URI"] = "uri";
-
-        for (map<string, string>::iterator it = allSortCrits.begin(); 
-             it != allSortCrits.end(); it++) {
-            allSortCritsRev[it->second] = it->first;
-        }
-    }
-
-    QStringList qcrits = CSettingsStorage::getInstance()->getSortCrits();
-    vector<string> crits;
-    if (qcrits.size() == 0) {
-        qcrits.push_back("upnp:artist");
-        qcrits.push_back("upnp:album");
-        qcrits.push_back("upnp:originalTrackNumber");
-        qcrits.push_back("dc:title");
-        qcrits.push_back("dc:date");
-        qcrits.push_back("uri");
-    }
-
-    for (int i = 0; i < qcrits.size(); i++) {
-        string nm = allSortCritsRev[qs2utf8s(qcrits[i])];
-        if (nm == "") {
-            // Bummer. Limp along and hope for the best
-            nm = qs2utf8s(qcrits[i]);
-        }
-        crits.push_back(nm);
-    }
-
-    int sortkind = CSettingsStorage::getInstance()->getSortKind();
-    SortprefsDLG dlg(crits);
-    switch (sortkind) {
-    case CSettingsStorage::SK_NOSORT:
-    default:
-        dlg.noSortRB->setChecked(true);
-        break;
-    case CSettingsStorage::SK_MINIMFNORDER:
-        dlg.minimfnRB->setChecked(true);
-        break;
-    case CSettingsStorage::SK_CUSTOM:
-        dlg.sortRB->setChecked(true);
-        break;
-    }
-        
-    if (dlg.exec()) {
-        sortkind = CSettingsStorage::SK_NOSORT;
-        if (dlg.minimfnRB->isChecked()) {
-            sortkind = CSettingsStorage::SK_MINIMFNORDER;
-        } else if (dlg.sortRB->isChecked()) {
-            sortkind = CSettingsStorage::SK_CUSTOM;
-        }
-        CSettingsStorage::getInstance()->setSortKind(sortkind);
-        qcrits.clear();
-        for (int i = 0; i < dlg.critsLW->count(); i++) {
-            QString val = 
-                dlg.critsLW->item(i)->data(Qt::DisplayRole).toString();
-            //qDebug() << "Sort nm: " << val;
-            val = u8s2qs(allSortCrits[qs2utf8s(val)]);
-            if (val != "") {
-                qcrits += val;
-                //qDebug() << "Sort crit: " << val;
-            }
-        }
-        CSettingsStorage::getInstance()->setSortCrits(qcrits);
-        currentBrowser()->refresh();
-    }        
+    qDebug() << "DirBrowser::onSortprefs()";
+    currentBrowser()->refresh();
 }
 
 // Perform text search in current tab. 

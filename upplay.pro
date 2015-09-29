@@ -31,6 +31,8 @@ HEADERS += \
         GUI/playlist/model/PlaylistItemModel.h \
         GUI/playlist/view/PlaylistView.h \
         GUI/prefs/sortprefs.h \
+        GUI/prefs/prefs.h \
+        GUI/prefs/confgui.h \
         GUI/renderchoose/renderchoose.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
@@ -67,6 +69,9 @@ SOURCES += \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.cpp \
         GUI/playlist/model/PlaylistItemModel.cpp \
         GUI/playlist/view/PlaylistView.cpp \
+        GUI/prefs/prefs.cpp \
+        GUI/prefs/confgui.cpp \
+        GUI/prefs/sortprefs.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \

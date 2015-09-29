@@ -519,9 +519,12 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
     out += "</a></td>";
     string val;
     e.getprop("upnp:artist", val);
-    if (!val.empty()) {
-        if (val.size() > 15) {
-            val = val.substr(0,12) + "...";
+    QSettings settings;
+    if (!val.empty() && settings.value("showartwithalb").toBool()) {
+        int maxlen = settings.value("artwithalblen").toInt();
+        if (maxlen && int(val.size()) > maxlen) {
+            int len = maxlen-3 >= 0 ? maxlen-3 : 0;
+            val = val.substr(0,len) + "...";
         }
         out += "<td class=\"ct_artist\">";
         out += QString::fromUtf8(escapeHtml(val).c_str());

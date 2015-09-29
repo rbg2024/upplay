@@ -34,6 +34,8 @@ using namespace std;
 
 #include "playlist/PlaylistAVT.h"
 #include "playlist/PlaylistOH.h"
+#include "GUI/prefs/prefs.h"
+
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
@@ -49,8 +51,9 @@ using namespace UPnPClient;
 #ifndef deleteZ
 #define deleteZ(X) {delete X; X = 0;}
 #endif
+
 #define CONNECT(a,b,c,d) m_app->connect(a, SIGNAL(b), c, SLOT(d), \
-                                      Qt::UniqueConnection)
+                                        Qt::UniqueConnection)
 
 UPnPDeviceDirectory *superdir;
 
@@ -394,6 +397,9 @@ void Application::init_connections()
     CONNECT(m_player, sig_choose_renderer(), this, chooseRenderer());
     CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
     CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));
+    static UPPrefs g_prefs(m_player);
+    CONNECT(m_player, sig_preferences(), &g_prefs, onShowPrefs());
+    CONNECT(&g_prefs, sig_prefsChanged(), m_cdb, onSortprefs());
 }
 
 

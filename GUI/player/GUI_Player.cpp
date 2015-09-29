@@ -83,6 +83,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     m_metadata_available = false;
     m_playing = false;
     m_mute = false;
+    m_overridemin2tray = false;
 
     ui_playlist = 0;
 
@@ -93,9 +94,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     m_cov_lookup = 0;//new CoverLookup();
     m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
-
-    m_min2tray = m_settings->getMinimizeToTray();
-    ui->action_min2tray->setChecked(m_min2tray);
 
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
     ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
@@ -318,6 +316,8 @@ void GUI_Player::setupTrayActions()
 
 void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
 {
+    QSettings settings;
+
     switch (reason) {
 
     case QSystemTrayIcon::Trigger:
@@ -326,7 +326,7 @@ void GUI_Player::trayItemActivated(QSystemTrayIcon::ActivationReason reason)
             this->setHidden(false);
             this->showNormal();
             this->activateWindow();
-        } else if (m_min2tray) {
+        } else if (settings.value("min2tray").toBool()) {
             this->setHidden(true);
         } else {
             this->showMinimized();
@@ -468,8 +468,8 @@ void GUI_Player::keyPressEvent(QKeyEvent* e)
 void GUI_Player::closeEvent(QCloseEvent* e)
 {
     m_settings->setSplitterState(ui->splitter->saveState());
-
-    if (m_min2tray) {
+    QSettings settings;
+    if (!m_overridemin2tray && settings.value("min2tray").toBool()) {
         e->ignore();
         this->hide();
     }
@@ -477,6 +477,6 @@ void GUI_Player::closeEvent(QCloseEvent* e)
 
 void GUI_Player::really_close(bool)
 {
-    m_min2tray = false;
+    m_overridemin2tray = true;
     this->close();
 }
