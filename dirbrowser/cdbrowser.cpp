@@ -849,12 +849,12 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         v = QVariant(int(PUP_BACK));
         act->setData(v);
         popup->addAction(act);
-        popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
-                       SLOT(back(QAction *)));
     }
 
     // Click in blank area: the only entry is Back
     if (el.isNull()) {
+        popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
+                       SLOT(back(QAction *)));
         popup->popup(mapToGlobal(pos));
         return;
     }
@@ -894,7 +894,8 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         act->setData(v);
         popup->addAction(act);
     }
-
+   
+    // Connect to either recursive add or simpleAdd depending on entry type.
     if (!otype.compare("container")) {
         act = new QAction(tr("Open in new tab"), this);
         v = QVariant(int(PUP_OPEN_IN_NEW_TAB));
@@ -927,6 +928,11 @@ void CDBrowser::simpleAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::simpleAdd";
     m_popupmode = act->data().toInt();
+    if (m_popupmode == PUP_BACK) {
+        back(0);
+        return;
+    }
+
     if (m_popupidx < 0 || m_popupidx > int(m_entries.size())) {
         LOGERR("CDBrowser::simpleAdd: bad obj index: " << m_popupidx
                << " id count: " << m_entries.size() << endl);
@@ -964,6 +970,10 @@ void CDBrowser::recursiveAdd(QAction *act)
 
     deleteReaders();
 
+    if (m_popupmode == PUP_BACK) {
+        back(0);
+        return;
+    }
     if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
         vector<CtPathElt> npath(m_curpath);
         npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
