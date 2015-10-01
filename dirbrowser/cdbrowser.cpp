@@ -840,21 +840,23 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
     while (!el.isNull() && !el.hasAttribute("objid"))
 	el = el.parent();
 
-    if (el.isNull()) {
-        // Click in blank space. We only have a Back action there for now
-        if (m_curpath.size() == 0)
-            return;
-        QMenu *popup = new QMenu(this);
-        QAction *act;
-        QVariant v;
+    QMenu *popup = new QMenu(this);
+    QAction *act;
+    QVariant v;
+    if (m_curpath.size() != 0) {
+        // Back action
         act = new QAction(tr("Back"), this);
         v = QVariant(int(PUP_BACK));
         act->setData(v);
         popup->addAction(act);
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
                        SLOT(back(QAction *)));
+    }
+
+    // Click in blank area: the only entry is Back
+    if (el.isNull()) {
         popup->popup(mapToGlobal(pos));
-	return;
+        return;
     }
 
     // Clicked on some object. Dir entries inside the path have no objidx attr
@@ -876,9 +878,6 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         return;
     }
 
-    QMenu *popup = new QMenu(this);
-    QAction *act;
-    QVariant v;
     act = new QAction(tr("Send to playlist"), this);
     v = QVariant(int(PUP_ADD));
     act->setData(v);
