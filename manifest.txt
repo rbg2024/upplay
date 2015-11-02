@@ -110,6 +110,11 @@ GUI/playlist/view/
 GUI/playlist/view/PlaylistView.cpp
 GUI/playlist/view/PlaylistView.h
 GUI/prefs/
+GUI/prefs/confgui.cpp
+GUI/prefs/confgui.h
+GUI/prefs/prefs.cpp
+GUI/prefs/prefs.h
+GUI/prefs/sortprefs.cpp
 GUI/prefs/sortprefs.h
 GUI/prefs/sortprefs.ui
 GUI/renderchoose/
@@ -152,8 +157,6 @@ doc/upplay-releases.txt
 doc/upplay.html
 doc/upplay.txt
 excludefile
-innosetup/
-innosetup/upplay-setup.iss
 makesrcdist.sh
 playlist/
 playlist/Playlist.cpp
@@ -175,11 +178,6 @@ upplay.cpp
 upplay.desktop
 upplay.pro
 upplay.pro.user
-upplay.sln
-upplay.vcxproj
-upplay.vcxproj.filters
-upplay.vcxproj.user
-upplay_resource.rc
 upqo/
 upqo/avtransport_qo.h
 upqo/cdirectory_qo.h
@@ -187,3 +185,11 @@ upqo/ohplaylist_qo.h
 upqo/ohtime_qo.h
 upqo/ohvolume_qo.h
 upqo/renderingcontrol_qo.h
+windows/
+windows/innosetup/
+windows/innosetup/upplay-setup.iss
+windows/upplay.sln
+windows/upplay.vcxproj
+windows/upplay.vcxproj.filters
+windows/upplay.vcxproj.user
+windows/upplay_resource.rc
