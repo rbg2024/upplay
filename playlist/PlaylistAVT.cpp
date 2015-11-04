@@ -196,6 +196,7 @@ out:
     } else {
         set_for_playing(-1);
         emit sig_stop();
+        emit sig_playlist_done();
         return;
     }
 }

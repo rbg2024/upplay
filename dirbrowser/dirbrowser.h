@@ -18,6 +18,7 @@
 #define _DIRBROWSER_H_INCLUDED_
 #include "ui_dirbrowser.h"
 
+#include "HelperStructs/MetaData.h"
 #include "playlist/Playlist.h"
 #include "cdbrowser.h"
 
@@ -25,12 +26,14 @@
 // list of a directory listing or search result, and a hideable search
 // panel at the bottom
 class DirBrowser : public QWidget {
-    Q_OBJECT
+    Q_OBJECT;
+
 public:
     DirBrowser(QWidget *parent, Playlist *pl);
     bool insertActive();
     CDBrowser *currentBrowser();
     void doSearch(const QString&, bool);
+    bool randPlayActive() {return m_randplayer != 0;}
 
 public slots:
     void setPlaylist(Playlist *pl);
@@ -57,7 +60,11 @@ public slots:
     void onInsertDone() {m_insertactive = false;}
     void setInsertActive(bool onoff);
     void onBrowseInNewTab(QString UDN, std::vector<CDBrowser::CtPathElt>);
-
+    void onRandTracksToPlaylist(const MetaDataList& mdl);
+    void onEnterRandPlay(RandPlayer::PlayMode mode, const
+                         std::vector<UPnPClient::UPnPDirObject>&);
+    void onRandStop();
+    
 private:
     void setupTabConnections(int i);
     void setupTabConnections(CDBrowser* w);
@@ -65,6 +72,7 @@ private:
     Ui::DirBrowser *ui;
     Playlist *m_pl;
     bool m_insertactive;
+    RandPlayer *m_randplayer;
 };
 
 

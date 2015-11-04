@@ -42,6 +42,7 @@ HEADERS += \
         dirbrowser/dirbrowser.h \
         dirbrowser/cdbrowser.h \
         dirbrowser/rreaper.h \
+        dirbrowser/randplayer.h \
         playlist/Playlist.h \
         playlist/PlaylistAVT.h \
         playlist/PlaylistOH.h \
@@ -79,6 +80,7 @@ SOURCES += \
         dirbrowser/dirbrowser.cpp \
         dirbrowser/cdbrowser.cpp \
         dirbrowser/rreaper.cpp \
+        dirbrowser/randplayer.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
         playlist/PlaylistOH.cpp \

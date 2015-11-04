@@ -46,10 +46,11 @@
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/globals.h"
 
+#include "randplayer.h"
+
 class ContentDirectoryQO;
 class RecursiveReaper;
 class DirBrowser;
-
 
 class CDBrowser : public QWebView
 {
@@ -86,11 +87,14 @@ class CDBrowser : public QWebView
 
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
+    void sig_tracks_to_randplay(RandPlayer::PlayMode,
+                                const std::vector<UPnPClient::UPnPDirObject>&);
     void sig_now_in(QWidget *, const QString&);
     void sig_searchcaps_changed();
     void sig_browse_in_new_tab(QString UDN,
                                std::vector<CDBrowser::CtPathElt>);
-
+    void sig_rand_stop();
+                        
  public slots:
     virtual void appendHtml(const QString&, const QString& html);
     virtual void onLinkClicked(const QUrl &);

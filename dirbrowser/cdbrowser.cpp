@@ -836,7 +836,10 @@ enum PopupMode {
     PUP_ADD_ALL,
     PUP_ADD_FROMHERE,
     PUP_BACK,
-    PUP_OPEN_IN_NEW_TAB
+    PUP_OPEN_IN_NEW_TAB,
+    PUP_RAND_PLAY_TRACKS,
+    PUP_RAND_PLAY_ALBS,
+    PUP_RAND_STOP,
 };
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
@@ -917,6 +920,17 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         v = QVariant(int(PUP_OPEN_IN_NEW_TAB));
         act->setData(v);
         popup->addAction(act);
+
+        act = new QAction(tr("Random play by tracks"), this);
+        v = QVariant(int(PUP_RAND_PLAY_TRACKS));
+        act->setData(v);
+        popup->addAction(act);
+
+        act = new QAction(tr("Random play by albums"), this);
+        v = QVariant(int(PUP_RAND_PLAY_ALBS));
+        act->setData(v);
+        popup->addAction(act);
+
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
                        SLOT(recursiveAdd(QAction *)));
     } else if (!otype.compare("item")) {
@@ -928,6 +942,15 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
             otype;
         return;
     }
+
+    // Like BACK, RAND_STOP must be processed by both simple and
+    // recursiveAdd()
+    act = new QAction(tr("Stop random play"), this);
+    v = QVariant(int(PUP_RAND_STOP));
+    act->setData(v);
+    popup->addAction(act);
+    act->setEnabled(m_browsers->randPlayActive());
+    
     popup->popup(mapToGlobal(pos));
 #endif
 }
@@ -946,6 +969,10 @@ void CDBrowser::simpleAdd(QAction *act)
     m_popupmode = act->data().toInt();
     if (m_popupmode == PUP_BACK) {
         back(0);
+        return;
+    }
+    if (m_popupmode == PUP_RAND_STOP) {
+        emit sig_rand_stop();
         return;
     }
 
@@ -990,6 +1017,11 @@ void CDBrowser::recursiveAdd(QAction *act)
         back(0);
         return;
     }
+    if (m_popupmode == PUP_RAND_STOP) {
+        emit sig_rand_stop();
+        return;
+    }
+
     if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
         vector<CtPathElt> npath(m_curpath);
         npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
@@ -1082,12 +1114,30 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
 
 void CDBrowser::rreaperDone(int status)
 {
-    LOGDEB("CDBrowser::rreaperDone: status: " << status << endl);
+    LOGDEB("CDBrowser::rreaperDone: status: " << status << ". Entries: " <<
+           m_recwalkentries.size() << endl);
     deleteReaders();
-    MetaDataList mdl;
-    mdl.resize(m_recwalkentries.size());
-    for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
-        udirentToMetadata(&m_recwalkentries[i], &mdl[i]);
+    if (m_popupmode == PUP_RAND_PLAY_TRACKS ||
+        m_popupmode == PUP_RAND_PLAY_ALBS) {
+        // Sort list
+        if (m_popupmode == PUP_RAND_PLAY_ALBS) {
+            vector<string> sortcrits;
+            sortcrits.push_back("upnp:album");
+            sortcrits.push_back("upnp:originalTrackNumber");
+            DirObjCmp cmpo(sortcrits);
+            sort(m_recwalkentries.begin(), m_recwalkentries.end(), cmpo);
+        }
+        RandPlayer::PlayMode mode = m_popupmode == PUP_RAND_PLAY_TRACKS ?
+            RandPlayer::PM_TRACKS : RandPlayer::PM_ALBS;
+        LOGDEB("CDBrowser::rreaperDone: emitting sig_tracks_to_randplay, mode "
+               << mode << endl);
+        emit sig_tracks_to_randplay(mode, m_recwalkentries);
+    } else {
+        MetaDataList mdl;
+        mdl.resize(m_recwalkentries.size());
+        for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
+            udirentToMetadata(&m_recwalkentries[i], &mdl[i]);
+        }
+        emit sig_tracks_to_playlist(mdl);
     }
-    emit sig_tracks_to_playlist(mdl);
 }

@@ -41,6 +41,7 @@ public:
         return m_meta.size();
     }
     virtual void get_metadata(MetaDataList&);
+    virtual Playlist_Mode mode();
 
 signals:
     // New playlist (for displaying in ui_playlist)
@@ -51,7 +52,9 @@ signals:
     void sig_track_metadata(const MetaData&);
     // Make sure we have the latest state of the world
     void sig_sync();
-
+    // Stopped at end of Playlist
+    void sig_playlist_done();
+    
     // These request action from the audio part
     void sig_stop();
     void sig_pause();
@@ -67,7 +70,7 @@ signals:
     void sig_playing();
 
     // Done inserting tracks in the playlist
-    void insertDone();
+    void sig_insert_done();
 
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int afteridx) = 0;

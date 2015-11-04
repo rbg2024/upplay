@@ -1,0 +1,52 @@
+/* Copyright (C) 2014 J.F.Dockes
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the
+ *   Free Software Foundation, Inc.,
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+#ifndef _RANDPLAY_H_INCLUDED_
+#define _RANDPLAY_H_INCLUDED_
+
+#include <vector>
+#include <algorithm>
+
+#include <QObject>
+
+#include <libupnpp/config.h>
+#include <libupnpp/control/cdirectory.hxx>
+
+#include "HelperStructs/Helper.h"
+
+class RandPlayer : public QObject {
+    Q_OBJECT;
+
+public:
+    enum PlayMode {PM_TRACKS, PM_ALBS};
+
+    RandPlayer(PlayMode mode,
+               const std::vector<UPnPClient::UPnPDirObject>& entries,
+               QObject *parent = 0);
+
+public slots:
+    void playNextSlice();
+
+signals:
+    void sig_randplay_done();
+    void sig_tracks_to_playlist(const MetaDataList&);
+    
+private:
+    PlayMode m_playmode;
+    std::vector<UPnPClient::UPnPDirObject> m_entries;
+};
+
+#endif /* _RANDPLAY_H_INCLUDED_ */

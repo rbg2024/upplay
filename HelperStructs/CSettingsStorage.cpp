@@ -82,12 +82,12 @@ bool CSettingsStorage::isRunFirstTime ()
 static const QString PlaylistModeKey("PlaylistMode");
 void CSettingsStorage::setPlaylistMode(const Playlist_Mode& mode)
 {
-    qDebug() << "setPlaylistMode: " << mode.toInt();
+    //qDebug() << "setPlaylistMode: " << mode.toInt();
     setValue(PlaylistModeKey, mode.toInt());
 }
 Playlist_Mode CSettingsStorage::getPlaylistMode()
 {
-    qDebug() << "getPlaylistMode: " << value(PlaylistModeKey).toInt();
+    //qDebug() << "getPlaylistMode: " << value(PlaylistModeKey).toInt();
     return Playlist_Mode(value(PlaylistModeKey).toInt());
 }
 

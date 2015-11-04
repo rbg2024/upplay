@@ -29,7 +29,8 @@
 #include "HelperStructs/CSettingsStorage.h"
 
 DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
-    : QWidget(parent), ui(new Ui::DirBrowser), m_pl(pl), m_insertactive(false)
+    : QWidget(parent), ui(new Ui::DirBrowser), m_pl(pl), m_insertactive(false),
+      m_randplayer(0)
 {
     QKeySequence seq;
     QShortcut *sc;
@@ -105,7 +106,7 @@ void DirBrowser::setPlaylist(Playlist *pl)
         setupTabConnections(i);
     }
     if (m_pl)
-        connect(m_pl, SIGNAL(insertDone()), this, SLOT(onInsertDone()));
+        connect(m_pl, SIGNAL(sig_insert_done()), this, SLOT(onInsertDone()));
 }
 
 void DirBrowser::setStyleSheet(bool dark)
@@ -385,6 +386,7 @@ void DirBrowser::setupTabConnections(int i)
 void DirBrowser::setupTabConnections(CDBrowser *cdb)
 {
     cdb->setDirBrowser(this);
+
     disconnect(cdb, SIGNAL(sig_now_in(QWidget *, const QString&)), 0, 0);
     connect(cdb, SIGNAL(sig_now_in(QWidget *, const QString&)), 
             this, SLOT(changeTabTitle(QWidget *, const QString&)));
@@ -393,9 +395,11 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
     if (m_pl)
         connect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
                 m_pl, SLOT(psl_add_tracks(const MetaDataList&)));
+
     disconnect(cdb, SIGNAL(sig_searchcaps_changed()), 0, 0);
     connect(cdb, SIGNAL(sig_searchcaps_changed()), 
             this, SLOT(onSearchcapsChanged()));
+
     disconnect(cdb,
                SIGNAL(sig_browse_in_new_tab(QString,
                                             std::vector<CDBrowser::CtPathElt>)),
@@ -405,6 +409,61 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
                                          std::vector<CDBrowser::CtPathElt>)),
             this, SLOT(onBrowseInNewTab(QString, 
                                         std::vector<CDBrowser::CtPathElt>)));
+
+    disconnect(cdb,
+               SIGNAL(sig_tracks_to_randplay(RandPlayer::PlayMode,
+                               const std::vector<UPnPClient::UPnPDirObject>&)),
+               0, 0);
+    connect(cdb,
+            SIGNAL(sig_tracks_to_randplay(RandPlayer::PlayMode,
+                                const std::vector<UPnPClient::UPnPDirObject>&)),
+            this, SLOT(onEnterRandPlay(RandPlayer::PlayMode,
+                              const std::vector<UPnPClient::UPnPDirObject>&)));
+
+    disconnect(cdb, SIGNAL(sig_rand_stop()), 0, 0);
+    connect(cdb, SIGNAL(sig_rand_stop()), this, SLOT(onRandStop()));
+}
+
+void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const
+                                 std::vector<UPnPClient::UPnPDirObject>& ents)
+{
+    qDebug() << "DirBrowser::onEnterRandPlay: " << ents.size() << " tracks";
+    if (m_randplayer) {
+        delete m_randplayer;
+        m_randplayer = 0;
+    }
+    if ((m_randplayer = new RandPlayer(mode, ents, this)) == 0) {
+        qDebug() << "Out of memory";
+        return;
+    }
+    connect(m_randplayer, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
+            this, SLOT(onRandTracksToPlaylist(const MetaDataList&)));
+    connect(m_pl, SIGNAL(sig_playlist_done()),
+            m_randplayer, SLOT(playNextSlice()));
+    m_randplayer->playNextSlice();
+}
+
+void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
+{
+    if (!m_pl)
+        return;
+
+    Playlist_Mode mode = m_pl->mode();
+    bool replace_saved = mode.replace;
+    mode.replace = true;
+    m_pl->psl_change_mode(mode);
+
+    m_pl->psl_add_tracks(mdl);
+
+    mode.replace = replace_saved;
+    m_pl->psl_change_mode(mode);
+    m_pl->psl_play();
+}
+
+void DirBrowser::onRandStop()
+{
+    delete m_randplayer;
+    m_randplayer = 0;
 }
 
 void DirBrowser::onBrowseInNewTab(QString UDN,
