@@ -78,6 +78,7 @@ SOURCES += \
         application.cpp \
         dirbrowser/dirbrowser.cpp \
         dirbrowser/cdbrowser.cpp \
+        dirbrowser/rreaper.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
         playlist/PlaylistOH.cpp \
