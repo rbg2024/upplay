@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include <qglobal.h>
 #include <QHBoxLayout>
@@ -126,17 +127,17 @@ int ConfTabsW::addForeignPanel(ConfPanelWIF* w, const QString& title)
     return tabWidget->addTab(qw, title);
 }
 
-void ConfTabsW::addParam(int tabindex,
-                         ParamType tp, const QString& varname,
-                         const QString& label, const QString& tooltip, 
-                         int ival, int maxval, 
-                         const QStringList* sl)
+ConfParamW *ConfTabsW::addParam(int tabindex,
+                             ParamType tp, const QString& varname,
+                             const QString& label, const QString& tooltip, 
+                             int ival, int maxval, 
+                             const QStringList* sl)
 {
     ConfLink lnk = (*m_makelink)(varname);
 
     ConfPanelW *panel = (ConfPanelW*)tabWidget->widget(tabindex);
     if (panel == 0) 
-        return;
+        return 0;
 
     ConfParamW *cp;
     switch (tp) {
@@ -167,6 +168,31 @@ void ConfTabsW::addParam(int tabindex,
 
     }
     panel->addWidget(cp);
+    m_params.push_back(cp);
+    return cp;
+}
+
+bool ConfTabsW::enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert)
+{
+    if (std::find(m_params.begin(), m_params.end(), boolw) == m_params.end() ||
+        std::find(m_params.begin(), m_params.end(), otherw) == m_params.end()) {
+        cerr << "ConfTabsW::enableLink: param not found\n";
+        return false;
+    }
+    ConfParamBoolW *bw = dynamic_cast<ConfParamBoolW*>(boolw);
+    if (bw == 0) {
+        cerr << "ConfTabsW::enableLink: not a boolw\n";
+        return false;
+    }
+    otherw->setEnabled(revert?!bw->m_cb->isChecked():bw->m_cb->isChecked());
+    if (revert) {
+        connect(bw->m_cb, SIGNAL(toggled(bool)),
+                otherw, SLOT(setDisabled(bool)));
+    } else {
+        connect(bw->m_cb, SIGNAL(toggled(bool)),
+                otherw, SLOT(setEnabled(bool)));
+    }
+    return true;
 }
 
 ConfPanelW::ConfPanelW(QWidget *parent)

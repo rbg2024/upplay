@@ -88,6 +88,7 @@ public:
  * for setting parameter values 
  */
 class ConfPanelW;
+class ConfParamW;
 class ConfTabsW : public QDialog {
     Q_OBJECT;
 
@@ -105,10 +106,11 @@ public:
     int addForeignPanel(ConfPanelWIF* w, const QString& title);
 
     /** Add parameter setter to specified tab */
-    void addParam(int tabindex, ParamType tp, 
-                  const QString& varname, const QString& label,
-                  const QString& tooltip, int isdirorminval = 0, 
-                  int maxval = 0, const QStringList* sl = 0);
+    ConfParamW *addParam(int tabindex, ParamType tp, 
+                      const QString& varname, const QString& label,
+                      const QString& tooltip, int isdirorminval = 0, 
+                      int maxval = 0, const QStringList* sl = 0);
+    bool enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert = false);
                                                 
 public slots:
     void acceptChanges();
@@ -121,7 +123,10 @@ signals:
 private:
     ConfLinkFact *m_makelink;
     std::vector<ConfPanelW *> m_panels;
+    // "Foreign" panels
     std::vector<ConfPanelWIF *> m_widgets;
+    // All params
+    std::vector<ConfParamW *> m_params;
     QTabWidget       *tabWidget;
     QDialogButtonBox *buttonBox;
 };
