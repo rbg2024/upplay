@@ -56,21 +56,46 @@ void UPPrefs::onShowPrefs()
     if (m_w == 0) {
         m_w = new ConfTabsW(m_parent, "UPPlay Preferences", &lnkfact);
         int idx = m_w->addPanel("Application");
+
+        // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
-        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "showartwithalb", 
-                      "Show some artist information in album lists",
-                      "List the beginning of artist info when listing albums.\n"
-                      "The exact amount can be adjusted with the "
-                      "following entry");
+
+        // Truncate artist information in directory listings?
+        ConfParamW *b1 =
+            m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "truncateartistindir", 
+                          "Truncate artist information in track lists",
+                          "Truncate very long artist info so that the table "
+                          "does not become weird");
         QSettings settings;
-        if (!settings.contains("artwithalblen")) {
-            settings.setValue("artwithalblen", 15);
+        QString pname("truncateartistlen");
+        if (!settings.contains(pname)) {
+            settings.setValue(pname, 30);
         }
-        m_w->addParam(idx, ConfTabsW::CFPT_INT, "artwithalblen", 
-                      "Max artist info size in album lists.",
-                      "Use 0 for no truncation", 0, 100);
+        ConfParamW *w1 =
+            m_w->addParam(idx, ConfTabsW::CFPT_INT, pname, 
+                          "Max artist info size in track lists.",
+                          "", 0, 100);
+        m_w->enableLink(b1, w1);
+
+
+        // Show some artist information with albums ?
+        b1 = m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "showartwithalb", 
+                           "Show some artist information in album lists",
+                           "List the beginning of artist info when listing "
+                           "albums.\nThe exact amount can be adjusted with the "
+                           "following entry");
+        pname = "artwithalblen";
+        if (!settings.contains(pname)) {
+            settings.setValue(pname, 15);
+        }
+        w1 = m_w->addParam(idx, ConfTabsW::CFPT_INT, pname, 
+                           "Max artist info size in album lists.",
+                           "", 0, 100);
+        m_w->enableLink(b1, w1);
+        
+
         idx = m_w->addForeignPanel(new SortprefsW(m_w), "Directory Sorting");
 
         connect(m_w, SIGNAL(sig_prefsChanged()), 
