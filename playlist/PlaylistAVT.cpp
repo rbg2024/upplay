@@ -149,13 +149,14 @@ void PlaylistAVT::psl_prepare_for_end_of_track()
     send_next_playing_signal();
 }
 
-void PlaylistAVT::psl_next_track()
+// fwd was pressed -> next track
+void PlaylistAVT::psl_forward()
 {
-    qDebug() << "PlaylistAVT::psl_next_track()";
+    qDebug() << "PlaylistAVT::psl_forward()";
 
     int track_num = -1;
     if(m_meta.empty()) {
-        qDebug() << "PlaylistAVT::psl_next_track(): empty playlist";
+        qDebug() << "PlaylistAVT::psl_forward(): empty playlist";
         goto out;
     }
 
@@ -173,13 +174,13 @@ void PlaylistAVT::psl_next_track()
     } else {
         if (m_play_idx >= int(m_meta.size()) -1) {
             // last track
-            qDebug() << "PlaylistAVT::psl_next_track(): was last, stop or loop";
+            qDebug() << "PlaylistAVT::psl_forward(): was last, stop or loop";
             if (CSettingsStorage::getInstance()->getPlaylistMode().repAll) {
                 track_num = 0;
             }
         } else {
             track_num = m_play_idx + 1;
-            qDebug() << "PlaylistAVT::psl_next_track(): new tnum " << track_num;
+            qDebug() << "PlaylistAVT::psl_forward(): new tnum " << track_num;
         }
     }
 
@@ -190,7 +191,7 @@ out:
             set_for_playing(track_num);
         } else {
             remove_row(track_num);
-            psl_next_track();
+            psl_forward();
         }
     } else {
         set_for_playing(-1);
@@ -235,12 +236,6 @@ void PlaylistAVT::psl_stop()
     set_for_playing(-1);
     emit sig_stop();
     playlist_updated();
-}
-
-// fwd was pressed -> next track
-void PlaylistAVT::psl_forward()
-{
-    psl_next_track();
 }
 
 // GUI -->
