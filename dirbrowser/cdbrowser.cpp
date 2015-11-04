@@ -537,7 +537,8 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
 /** @arg idx index in entries array
     @arg e array entry
 */
-static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
+static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e,
+                          int maxartlen)
 {
     QString out;
     string val;
@@ -558,6 +559,10 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e)
     val.clear();
     e.getprop("upnp:artist", val);
     out += "<td class=\"tk_artist\">";
+    if (maxartlen > 0 && int(val.size()) > maxartlen) {
+        int len = maxartlen-3 >= 0 ? maxartlen-3 : 0;
+        val = val.substr(0,len) + "...";
+    }
     out += QString::fromUtf8(escapeHtml(val).c_str());
     out += "</td>";
     
@@ -625,11 +630,17 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
         m_entries.push_back(*it);
         html += CTToHtml(m_entries.size()-1, *it);
     }
+    QSettings settings;
+    int maxartlen = 0;
+    if (settings.value("truncateartistindir").toBool()) {
+        maxartlen = settings.value("truncateartistlen").toInt();
+    }
+
     for (std::vector<UPnPDirObject>::iterator it = dc->m_items.begin();
          it != dc->m_items.end(); it++) {
         //qDebug() << "Item: " << it->dump().c_str();;
         m_entries.push_back(*it);
-        html += ItemToHtml(m_entries.size()-1, *it);
+        html += ItemToHtml(m_entries.size()-1, *it, maxartlen);
     }
     appendHtml("entrylist", html);
     delete dc;
@@ -707,11 +718,16 @@ void CDBrowser::onBrowseDone(int)
         sort(m_entries.begin(), m_entries.end(), cmpo);
         initContainerHtml();
         QString html;
+        int maxartlen = 0;
+        QSettings settings;
+        if (settings.value("truncateartistindir").toBool()) {
+            maxartlen = settings.value("truncateartistlen").toInt();
+        }
         for (unsigned i = 0; i < m_entries.size(); i++) {
             if (m_entries[i].m_type == UPnPDirObject::container) {
                 html += CTToHtml(i, m_entries[i]);
             } else {
-                html += ItemToHtml(i, m_entries[i]);
+                html += ItemToHtml(i, m_entries[i], maxartlen);
             }
         }
         appendHtml("entrylist", html);
