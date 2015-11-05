@@ -31,7 +31,7 @@ class RandPlayer : public QObject {
     Q_OBJECT;
 
 public:
-    enum PlayMode {PM_TRACKS, PM_ALBS};
+    enum PlayMode {PM_TRACKS, PM_GROUPS};
 
     RandPlayer(PlayMode mode,
                const std::vector<UPnPClient::UPnPDirObject>& entries,

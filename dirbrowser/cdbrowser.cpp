@@ -842,7 +842,7 @@ enum PopupMode {
     PUP_BACK,
     PUP_OPEN_IN_NEW_TAB,
     PUP_RAND_PLAY_TRACKS,
-    PUP_RAND_PLAY_ALBS,
+    PUP_RAND_PLAY_GROUPS,
     PUP_RAND_STOP,
 };
 
@@ -930,8 +930,8 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         act->setData(v);
         popup->addAction(act);
 
-        act = new QAction(tr("Random play by albums"), this);
-        v = QVariant(int(PUP_RAND_PLAY_ALBS));
+        act = new QAction(tr("Random play by groups"), this);
+        v = QVariant(int(PUP_RAND_PLAY_GROUPS));
         act->setData(v);
         popup->addAction(act);
 
@@ -1047,7 +1047,7 @@ void CDBrowser::recursiveAdd(QAction *act)
         m_browsers->setInsertActive(true);
     ContentDirectory::ServiceKind kind = cds->getKind();
     if (kind == ContentDirectory::CDSKIND_MINIM &&
-        m_popupmode != PUP_RAND_PLAY_ALBS) {
+        m_popupmode != PUP_RAND_PLAY_GROUPS) {
         // Use search() rather than a tree walk for Minim, it is much
         // more efficient, except for rand play albums, where we want
         // to preserve the paths (for discrimination)
@@ -1124,9 +1124,9 @@ void CDBrowser::rreaperDone(int status)
            m_recwalkentries.size() << endl);
     deleteReaders();
     if (m_popupmode == PUP_RAND_PLAY_TRACKS ||
-        m_popupmode == PUP_RAND_PLAY_ALBS) {
+        m_popupmode == PUP_RAND_PLAY_GROUPS) {
         // Sort list
-        if (m_popupmode == PUP_RAND_PLAY_ALBS) {
+        if (m_popupmode == PUP_RAND_PLAY_GROUPS) {
             vector<string> sortcrits;
             sortcrits.push_back("upplay:ctpath");
             sortcrits.push_back("upnp:album");
@@ -1135,7 +1135,7 @@ void CDBrowser::rreaperDone(int status)
             sort(m_recwalkentries.begin(), m_recwalkentries.end(), cmpo);
         }
         RandPlayer::PlayMode mode = m_popupmode == PUP_RAND_PLAY_TRACKS ?
-            RandPlayer::PM_TRACKS : RandPlayer::PM_ALBS;
+            RandPlayer::PM_TRACKS : RandPlayer::PM_GROUPS;
         LOGDEB("CDBrowser::rreaperDone: emitting sig_tracks_to_randplay, mode "
                << mode << endl);
         emit sig_tracks_to_randplay(mode, m_recwalkentries);

@@ -38,6 +38,13 @@ RandPlayer::RandPlayer(PlayMode mode,
     }
 }
 
+static bool sameValues(const string& alb, const string& ctp,
+                       UPnPClient::UPnPDirObject& e)
+{
+    return !e.f2s("upnp:album", false).compare(alb) &&
+        !e.f2s("upplay:ctpath", false).compare(ctp);
+}
+
 void RandPlayer::playNextSlice()
 {
     qDebug() << "RandPlayer: " << m_entries.size() << " remaining";
@@ -58,32 +65,38 @@ void RandPlayer::playNextSlice()
         ents.insert(ents.begin(), m_entries.begin(), last);
         m_entries.erase(m_entries.begin(), last);
     } else {
-        // Pick a random start, seek back to beginning of album, then
+        // Pick a random start, seek back to beginning of group, then
         // forward to end
         double fstart = (double(qrand()) / double(RAND_MAX)) *
             (m_entries.size() - 1);
         int istart = round(fstart);
-        
+
+        // Reference values
         string alb = m_entries[istart].f2s("upnp:album", false);
+        string ctpath = m_entries[istart].f2s("upplay:ctpath", false);
         qDebug() << "RandPlayer: albs. istart" << istart << " album " <<
             alb.c_str();
 
+        // Look back to beginning of section
         while (istart > 0) {
             istart--;
-            if (m_entries[istart].f2s("upnp:album", false).compare(alb)) {
+            if (!sameValues(alb, ctpath, m_entries[istart])) {
                 istart++;
                 break;
             }
         }
         qDebug() << "RandPlayer: albs. final istart" << istart;
 
+        // Look forward to end, and store entries
         vector<UPnPClient::UPnPDirObject>::iterator last =
             m_entries.begin() + istart;
         while (last != m_entries.end()) {
-            if (last->f2s("upnp:album", false).compare(alb))
+            if (!sameValues(alb, ctpath, *last)) {
                 break;
+            }
             ents.push_back(*last++);
         }
+        // Erase used entries.
         m_entries.erase(m_entries.begin() + istart, last);
     }
 
