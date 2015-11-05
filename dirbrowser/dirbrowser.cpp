@@ -440,6 +440,8 @@ void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const
             this, SLOT(onRandTracksToPlaylist(const MetaDataList&)));
     connect(m_pl, SIGNAL(sig_playlist_done()),
             m_randplayer, SLOT(playNextSlice()));
+    connect(m_randplayer, SIGNAL(sig_randplay_done()),
+            this, SLOT(onRandDone()));
     m_randplayer->playNextSlice();
 }
 
@@ -458,6 +460,13 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
     mode.replace = replace_saved;
     m_pl->psl_change_mode(mode);
     m_pl->psl_play();
+}
+
+void DirBrowser::onRandDone()
+{
+    // Is it a good idea to delete randplay from here as we're
+    // connected to its signal ? Could use a QTimer
+    onRandStop();
 }
 
 void DirBrowser::onRandStop()

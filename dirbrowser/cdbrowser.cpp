@@ -848,15 +848,18 @@ enum PopupMode {
 
 void CDBrowser::createPopupMenu(const QPoint& pos)
 {
-    if (!m_browsers || m_browsers->insertActive())
+    if (!m_browsers || m_browsers->insertActive()) {
+        qDebug() << "CDBrowser::createPopupMenu: no popup: insert active";
         return;
-    qDebug() << "void CDBrowser::createPopupMenu(const QPoint& pos)";
+    }
+    qDebug() << "CDBrowser::createPopupMenu";
 
 #ifdef USING_WEBENGINE
 #warning tobedone
 #else
     QWebHitTestResult htr = page()->mainFrame()->hitTestContent(pos);
     if (htr.isNull()) {
+        qDebug() << "CDBrowser::createPopupMenu: no popup: no hit";
 	return;
     }
     QWebElement el = htr.enclosingBlockElement();
@@ -1125,6 +1128,8 @@ void CDBrowser::rreaperDone(int status)
     deleteReaders();
     if (m_popupmode == PUP_RAND_PLAY_TRACKS ||
         m_popupmode == PUP_RAND_PLAY_GROUPS) {
+        if (m_browsers)
+            m_browsers->setInsertActive(false);
         // Sort list
         if (m_popupmode == PUP_RAND_PLAY_GROUPS) {
             vector<string> sortcrits;

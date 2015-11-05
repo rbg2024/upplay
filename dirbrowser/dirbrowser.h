@@ -64,6 +64,7 @@ public slots:
     void onEnterRandPlay(RandPlayer::PlayMode mode, const
                          std::vector<UPnPClient::UPnPDirObject>&);
     void onRandStop();
+    void onRandDone();
     
 private:
     void setupTabConnections(int i);
