@@ -36,7 +36,7 @@ public:
 
     virtual void run();
     void setCancel();
-
+    static std::string ttpathPrintable(const std::string in);
 
 signals:
     void sliceAvailable(UPnPClient::UPnPDirContent*);

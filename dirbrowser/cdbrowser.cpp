@@ -680,6 +680,10 @@ public:
             sprintf(num, "%010d", i);
             storage = num;
             return storage;
+        } else if (!nm.compare("upplay:ctpath")) {
+            //qDebug() << "TTPATH: " <<
+            //    RecursiveReaper::ttpathPrintable(prop).c_str();
+            return prop;
         } else {
             return prop;
         }
@@ -1042,9 +1046,11 @@ void CDBrowser::recursiveAdd(QAction *act)
     if (m_browsers)
         m_browsers->setInsertActive(true);
     ContentDirectory::ServiceKind kind = cds->getKind();
-    if (kind == ContentDirectory::CDSKIND_MINIM) {
+    if (kind == ContentDirectory::CDSKIND_MINIM &&
+        m_popupmode != PUP_RAND_PLAY_ALBS) {
         // Use search() rather than a tree walk for Minim, it is much
-        // more efficient.
+        // more efficient, except for rand play albums, where we want
+        // to preserve the paths (for discrimination)
         UPnPDirContent dirbuf;
         string ss("upnp:class = \"object.item.audioItem.musicTrack\"");
         int err = cds->search(m_popupobjid, ss, dirbuf);
@@ -1122,6 +1128,7 @@ void CDBrowser::rreaperDone(int status)
         // Sort list
         if (m_popupmode == PUP_RAND_PLAY_ALBS) {
             vector<string> sortcrits;
+            sortcrits.push_back("upplay:ctpath");
             sortcrits.push_back("upnp:album");
             sortcrits.push_back("upnp:originalTrackNumber");
             DirObjCmp cmpo(sortcrits);

@@ -44,6 +44,19 @@ public:
 
 static const char cchar_pthsep = '\x01';
 
+string RecursiveReaper::ttpathPrintable(const std::string in)
+{
+    string out;
+    for (unsigned int i = 0;i < in.size(); i++) {
+        if (in[i] == cchar_pthsep) {
+            out += "||";
+        } else {
+            out += in[i];
+        }
+    }
+    return out;
+}
+
 RecursiveReaper::RecursiveReaper(UPnPClient::CDSH server, string objid, 
                                  QObject *parent)
     : QThread(parent)
@@ -126,9 +139,9 @@ bool RecursiveReaper::scanContainer(const CtDesc* ctdesc)
             //qDebug()<< "scanContainer: pushing objid " << it->m_id.c_str()
             // << " title " << it->m_title.c_str();
             m->allctobjids.insert(it->m_id);
-            m->ctobjids.push(CtDesc(it->m_id, ""
-                                    /* ctdesc->m_ttpath + cchar_pthsep +
-                                       it->m_title */));
+            m->ctobjids.push(CtDesc(it->m_id,
+                                    ctdesc->m_ttpath + cchar_pthsep +
+                                    it->m_title));
         }
         slice.m_containers.clear();
 
@@ -139,7 +152,7 @@ bool RecursiveReaper::scanContainer(const CtDesc* ctdesc)
             for (vector<UPnPClient::UPnPDirObject>::iterator it = 
                      slice.m_items.begin();
                  it != slice.m_items.end(); it++) {
-                // it->m_props["upplay:ctpath"] = ctdesc->m_ttpath;
+                it->m_props["upplay:ctpath"] = ctdesc->m_ttpath;
             }
             emit sliceAvailable(&slice);
         }
