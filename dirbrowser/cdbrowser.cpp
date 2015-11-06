@@ -38,6 +38,7 @@
 #include <QMenu>
 #include <QApplication>
 #include <QByteArray>
+#include <QProgressDialog>
 
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
@@ -88,8 +89,8 @@ void CDWebPage::javaScriptConsoleMessage(
 
 
 CDBrowser::CDBrowser(QWidget* parent)
-    : QWebView(parent), m_reader(0), m_reaper(0), m_browsers(0), 
-      m_lastbutton(Qt::LeftButton)
+    : QWebView(parent), m_reader(0), m_reaper(0), m_progressD(0),
+      m_browsers(0), m_lastbutton(Qt::LeftButton)
 {
     setPage(new CDWebPage(this));
 #ifndef USING_WEBENGINE
@@ -1080,6 +1081,13 @@ void CDBrowser::recursiveAdd(QAction *act)
         rreaperDone(0);
 
     } else {
+        delete m_progressD;
+        m_progressD = new QProgressDialog("Exploring Directory",
+                                          tr("Cancel"), 0, 0, this);
+        // can't get setMinimumDuration to work
+        m_progressD->setMinimumDuration(2000);
+        time(&m_progstart);
+        
         m_recwalkentries.clear();
         m_recwalkdedup.clear();
         m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
@@ -1119,6 +1127,17 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
         }
     }
     delete dc;
+    if (m_progressD) {
+        if (m_progressD->wasCanceled()) {
+            delete m_progressD;
+            m_progressD = 0;
+            m_reaper->setCancel();
+        } else {
+            if (time(0) - m_progstart >= 1) {
+                m_progressD->show();
+            }
+        }
+    }
 }
 
 void CDBrowser::rreaperDone(int status)

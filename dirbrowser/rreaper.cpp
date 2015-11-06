@@ -35,6 +35,9 @@ struct CtDesc {
 
 class RecursiveReaper::Internal {
 public:
+    Internal()
+        : status(UPNP_E_SUCCESS), cancel(false) {
+    }
     UPnPClient::CDSH serv;
     queue<CtDesc> ctobjids;
     STD_UNORDERED_SET<string> allctobjids;

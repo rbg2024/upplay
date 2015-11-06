@@ -19,6 +19,7 @@
 #define _CDBROWSER_H_INCLUDED_
 
 /** CDBrowser displays Content Directory data inside a DirBrowser Tab */
+#include <time.h>
 
 #include <vector>
 #include <iostream>
@@ -51,6 +52,7 @@
 class ContentDirectoryQO;
 class RecursiveReaper;
 class DirBrowser;
+class QProgressDialog;
 
 class CDBrowser : public QWebView
 {
@@ -137,6 +139,10 @@ class CDBrowser : public QWebView
     RecursiveReaper    *m_reaper;
     void deleteReaders();
 
+    // Busy dialog for lengthy ops
+    QProgressDialog *m_progressD;
+    time_t           m_progstart;
+    
     // Content of the currently visited container or search
     std::vector<UPnPClient::UPnPDirObject> m_entries;
     // Scroll position to be restored when we're done reading. This is
