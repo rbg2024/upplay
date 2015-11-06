@@ -1082,7 +1082,7 @@ void CDBrowser::recursiveAdd(QAction *act)
 
     } else {
         delete m_progressD;
-        m_progressD = new QProgressDialog("Exploring Directory",
+        m_progressD = new QProgressDialog("Exploring Directory          ",
                                           tr("Cancel"), 0, 0, this);
         // can't get setMinimumDuration to work
         m_progressD->setMinimumDuration(2000);
@@ -1136,6 +1136,9 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
             if (time(0) - m_progstart >= 1) {
                 m_progressD->show();
             }
+            m_progressD->setLabelText(
+                tr("Exploring Directory: %1 tracks").
+                arg(m_recwalkentries.size()));
         }
     }
 }
