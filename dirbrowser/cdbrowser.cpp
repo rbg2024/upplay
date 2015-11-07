@@ -1148,6 +1148,8 @@ void CDBrowser::rreaperDone(int status)
     LOGDEB("CDBrowser::rreaperDone: status: " << status << ". Entries: " <<
            m_recwalkentries.size() << endl);
     deleteReaders();
+    delete m_progressD;
+    m_progressD = 0;
     if (m_popupmode == PUP_RAND_PLAY_TRACKS ||
         m_popupmode == PUP_RAND_PLAY_GROUPS) {
         if (m_browsers)
