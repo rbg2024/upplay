@@ -12,7 +12,7 @@ QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
 QMAKE_CXXFLAGS += -std=c++0x
 
 
-CONFIG  += qt warn_on thread release debug
+CONFIG  += qt warn_on thread debug
 
 RESOURCES += GUI/upplay.qrc
 
@@ -113,4 +113,31 @@ unix {
   iconb.files += GUI/icons/upplay.png
   iconb.path = $$PREFIX/share/pixmaps/
   INSTALLS += target bdata desktop gdata icona iconb
+}
+
+windows {
+    contains(QMAKE_CC, gcc){
+        # MingW
+        QMAKE_CXXFLAGS += -std=c++11 -Wno-unused-parameter
+    }
+    contains(QMAKE_CC, cl){
+        # Visual Studio
+    }
+  DEFINES += WIN32
+  DEFINES -= UNICODE
+  DEFINES -= _UNICODE
+  DEFINES += _MBCS
+  DEFINES += PSAPI_VERSION=1
+  INCLUDEPATH += c:/users/bill/documents/upnp/libupnpp
+  INCLUDEPATH += c:/users/bill/documents/upnp/pupnp/include
+  LIBS += -Lc:/Users/Bill/Documents/UPnP/libupnpp/windows/build-libupnpp-Desktop_Qt_5_5_0_MinGW_32bit-Debug/debug -lupnpp
+  LIBS += c:/users/bill/documents/upnp/expat-2.1.0/.libs/libexpat.a
+  LIBS += c:/users/bill/documents/upnp/curl-7.43.0/lib/libcurl.a
+  LIBS += c:/users/bill/documents/upnp/pupnp/upnp/.libs/libupnp.a
+  LIBS += c:/users/bill/documents/upnp/pupnp/ixml/.libs/libixml.a
+  LIBS += c:/users/bill/documents/upnp/pupnp/threadutil/.libs/libthreadutil.a
+  LIBS += -liphlpapi
+  LIBS += -lwldap32
+  LIBS += -lws2_32
+  LIBS += -lshlwapi
 }
