@@ -99,7 +99,6 @@ private slots:
     void stopClicked(bool b = true);
     void backwardClicked(bool b = true);
     void forwardClicked(bool b = true);
-    void coverClicked();
     void setProgressJump(int percent);
     void jump_forward();
     void jump_backward();

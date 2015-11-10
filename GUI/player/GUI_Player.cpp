@@ -194,15 +194,21 @@ void GUI_Player::update_track(const MetaData& md)
     ui->lab_rating->show();
 
     // sometimes ignore the date
+    QString albtxt;
     if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
-        ui->lab_album->setText(Helper::get_album_w_disc(md));
+        albtxt = Helper::get_album_w_disc(md);
     } else {
-        ui->lab_album->setText(Helper::get_album_w_disc(md) + " (" + 
-                               QString::number(md.year) + ")");
+        albtxt = Helper::get_album_w_disc(md) + " (" +
+            QString::number(md.year) + ")";
     }
-
+    ui->lab_album->setText(albtxt);
+    ui->lab_album->setToolTip(QString::fromUtf8("<i></i>") + albtxt);
     ui->lab_artist->setText(md.artist);
+    ui->lab_artist->setToolTip(QString::fromUtf8("<i></i>") +
+                               escapeHtml(md.artist));
     ui->lab_title->setText(md.title);
+    ui->lab_title->setToolTip(QString::fromUtf8("<i></i>") +
+                               escapeHtml(md.title));
 
     m_trayIcon->songChangedMessage(md);
 

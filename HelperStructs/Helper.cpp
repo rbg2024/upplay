@@ -28,9 +28,11 @@
 #include <iostream>
 #include <sstream>
 
+#include <Qt>
 #include <QDir>
 #include <QUrl>
 #include <QString>
+#include <QTextDocument>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QList>
@@ -180,20 +182,6 @@ QString Helper::getHomeDataPath()
     return homedir.absoluteFilePath(rpath);
 }
 
-QString Helper::get_cover_path(QString artist, QString album, QString extension)
-{
-    QString cover_dir = getHomeDataPath() + QDir::separator() + "covers";
-
-    if (!QFile::exists(cover_dir)) {
-        QDir().mkdir(cover_dir);
-    }
-
-    QString cover_token = calc_cover_token(artist, album);
-    QString cover_path =  cover_dir + QDir::separator() + cover_token +
-                          "." + extension;
-    return cover_path;
-}
-
 QString Helper::createLink(QString name, QString target, bool underline)
 {
 
@@ -295,4 +283,29 @@ bool Helper::read_file_into_str(QString filename, QString* content)
     }
 
     return false;
+}
+
+// Escape things that would look like HTML markup
+string escapeHtml(const string &in)
+{
+    string out;
+    for (string::size_type pos = 0; pos < in.length(); pos++) {
+	switch(in.at(pos)) {
+	case '<': out += "&lt;"; break;
+	case '>': out += "&gt;"; break;
+	case '&': out += "&amp;"; break;
+	case '"': out += "&quot;"; break;
+	default: out += in.at(pos); break;
+	}
+    }
+    return out;
+}
+
+QString escapeHtml(const QString& in)
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    return in.toHtmlEscaped();
+#else
+    return Qt::escape(in);
+#endif
 }

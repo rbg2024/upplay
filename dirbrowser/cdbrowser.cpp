@@ -60,22 +60,6 @@ using namespace UPnPClient;
 
 static const string minimFoldersViewPrefix("0$folders");
 
-// Escape things that would look like HTML markup
-static string escapeHtml(const string &in)
-{
-    string out;
-    for (string::size_type pos = 0; pos < in.length(); pos++) {
-	switch(in.at(pos)) {
-	case '<': out += "&lt;"; break;
-	case '>': out += "&gt;"; break;
-	case '&': out += "&amp;"; break;
-	case '"': out += "&quot;"; break;
-	default: out += in.at(pos); break;
-	}
-    }
-    return out;
-}
-
 void CDWebPage::javaScriptConsoleMessage(
 #ifdef USING_WEBENGINE
     JavaScriptConsoleMessageLevel,

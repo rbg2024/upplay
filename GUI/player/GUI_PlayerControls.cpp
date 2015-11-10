@@ -52,8 +52,11 @@ void GUI_Player::stopClicked(bool b)
     m_playing = false;
 
     ui->lab_title->setText(tr("Upplay ") + m_settings->getVersion());
+    ui->lab_title->setToolTip("");
     ui->lab_artist->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
+    ui->lab_artist->setToolTip("");
     ui->lab_album->setText(tr("Copyright 2011-2013"));
+    ui->lab_album->setToolTip("");
     ui->lab_version->show();
     ui->lab_rating->hide();
 

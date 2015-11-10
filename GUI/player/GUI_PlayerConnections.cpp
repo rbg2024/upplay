@@ -32,7 +32,6 @@ void GUI_Player::setupConnections()
             SLOT(stopClicked()));
     connect(ui->btn_mute, SIGNAL(released()), this,
             SLOT(muteButtonPressed()));
-    connect(ui->albumCover, SIGNAL(clicked()), this, SLOT(coverClicked()));
 
     // file
     connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),

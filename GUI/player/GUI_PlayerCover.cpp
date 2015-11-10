@@ -23,21 +23,6 @@
 #include <QImageReader>
 #include <QImage>
 
-void GUI_Player::coverClicked()
-{
-    QString searchstring;
-    if (m_metadata.album.size() != 0 || m_metadata.artist != 0) {
-        searchstring = m_metadata.album + " " + m_metadata.artist;
-    } else {
-        searchstring = m_metadata.title + " " + m_metadata.artist;
-    }
-
-    searchstring = searchstring.trimmed();
-
-    QString targetpath = 
-        Helper::get_cover_path(m_metadata.artist, m_metadata.album);
-}
-
 void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 {
     qDebug() << "GUI_Player::sl_cover_fetch_done";
