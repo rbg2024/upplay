@@ -20,7 +20,7 @@
 #include <QTime>
 
 #include "randplayer.h"
-
+#include "HelperStructs/Helper.h"
 #include "upadapt/upputils.h"
 
 using namespace std;
@@ -37,12 +37,67 @@ RandPlayer::RandPlayer(PlayMode mode,
         std::random_shuffle(m_entries.begin(), m_entries.end());
     }
 }
+RandPlayer::~RandPlayer()
+{
+    emit sig_next_group_html("");
+}
 
 static bool sameValues(const string& alb, const string& ctp,
                        UPnPClient::UPnPDirObject& e)
 {
     return !e.f2s("upnp:album", false).compare(alb) &&
         !e.f2s("upplay:ctpath", false).compare(ctp);
+}
+
+void RandPlayer::selectNextGroup()
+{
+    m_nextgroup.clear();
+    
+    // Pick a random start, seek back to beginning of group, then
+    // forward to end
+    double fstart = (double(qrand()) / double(RAND_MAX)) *
+        (m_entries.size() - 1);
+    int istart = round(fstart);
+
+    // Reference values
+    string alb = m_entries[istart].f2s("upnp:album", false);
+    string ctpath = m_entries[istart].f2s("upplay:ctpath", false);
+    qDebug() << "RandPlayer: albs. istart" << istart << " album " <<
+        alb.c_str();
+
+    // Look back to beginning of section
+    while (istart > 0) {
+        istart--;
+        if (!sameValues(alb, ctpath, m_entries[istart])) {
+            istart++;
+            break;
+        }
+    }
+    qDebug() << "RandPlayer: albs. final istart" << istart;
+
+    // Look forward to end, and store entries
+    vector<UPnPClient::UPnPDirObject>::iterator last =
+        m_entries.begin() + istart;
+    while (last != m_entries.end()) {
+        if (!sameValues(alb, ctpath, *last)) {
+            break;
+        }
+        m_nextgroup.push_back(*last++);
+    }
+    // Erase used entries.
+    m_entries.erase(m_entries.begin() + istart, last);
+}
+
+QString RandPlayer::groupHtml(std::vector<UPnPClient::UPnPDirObject>& ents)
+{
+    string html = "<i></i>";
+    for (vector<UPnPClient::UPnPDirObject>::iterator it = ents.begin();
+         it != ents.end(); it++) {
+        html += string("<b>") + escapeHtml(it->m_title) + "</b><br />";
+        html += escapeHtml(it->f2s("upnp:album", false)) + "<br />";
+        html += escapeHtml(it->f2s("upnp:artist", false)) + "<br />";
+    }
+    return QString::fromUtf8(html.c_str());
 }
 
 void RandPlayer::playNextSlice()
@@ -65,39 +120,19 @@ void RandPlayer::playNextSlice()
         ents.insert(ents.begin(), m_entries.begin(), last);
         m_entries.erase(m_entries.begin(), last);
     } else {
-        // Pick a random start, seek back to beginning of group, then
-        // forward to end
-        double fstart = (double(qrand()) / double(RAND_MAX)) *
-            (m_entries.size() - 1);
-        int istart = round(fstart);
-
-        // Reference values
-        string alb = m_entries[istart].f2s("upnp:album", false);
-        string ctpath = m_entries[istart].f2s("upplay:ctpath", false);
-        qDebug() << "RandPlayer: albs. istart" << istart << " album " <<
-            alb.c_str();
-
-        // Look back to beginning of section
-        while (istart > 0) {
-            istart--;
-            if (!sameValues(alb, ctpath, m_entries[istart])) {
-                istart++;
-                break;
+        if (m_nextgroup.empty()) {
+            // 1st time
+            selectNextGroup();
+            if (m_nextgroup.empty()) {
+                // ??
+                emit sig_randplay_done();
+                return;
             }
         }
-        qDebug() << "RandPlayer: albs. final istart" << istart;
 
-        // Look forward to end, and store entries
-        vector<UPnPClient::UPnPDirObject>::iterator last =
-            m_entries.begin() + istart;
-        while (last != m_entries.end()) {
-            if (!sameValues(alb, ctpath, *last)) {
-                break;
-            }
-            ents.push_back(*last++);
-        }
-        // Erase used entries.
-        m_entries.erase(m_entries.begin() + istart, last);
+        ents = m_nextgroup;
+        selectNextGroup();
+        emit sig_next_group_html(groupHtml(m_nextgroup));
     }
 
     qDebug() << "RandPlayer: sending " << ents.size() << " entries to pl";

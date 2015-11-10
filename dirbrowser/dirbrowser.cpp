@@ -442,6 +442,8 @@ void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const
             m_randplayer, SLOT(playNextSlice()));
     connect(m_randplayer, SIGNAL(sig_randplay_done()),
             this, SLOT(onRandDone()));
+    connect(m_randplayer, SIGNAL(sig_next_group_html(QString)),
+            this, SIGNAL(sig_next_group_html(QString)));
     m_randplayer->playNextSlice();
 }
 

@@ -151,6 +151,15 @@ void GUI_Playlist::no_focus()
     emit sig_no_focus();
 }
 
+void GUI_Playlist::psl_next_group_html(QString html)
+{
+    if (html.isEmpty()) {
+        this->ui->btn_clear->setToolTip(tr("Clear Playlist"));
+    } else {
+        this->ui->btn_clear->setToolTip(html);
+    }
+}
+
 // initialize gui
 // maybe the button state (pressed/unpressed) should be loaded from db here
 void GUI_Playlist::initGUI()

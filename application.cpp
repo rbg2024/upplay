@@ -386,6 +386,8 @@ void Application::renderer_connections()
     CONNECT(m_ui_playlist, row_activated(int),
             m_playlist, psl_change_track(int));
     CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
+    CONNECT(m_cdb, sig_next_group_html(QString),
+            m_ui_playlist, psl_next_group_html(QString));
 
 }
 

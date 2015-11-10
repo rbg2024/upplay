@@ -65,7 +65,10 @@ public slots:
                          std::vector<UPnPClient::UPnPDirObject>&);
     void onRandStop();
     void onRandDone();
-    
+
+signals:
+    void sig_next_group_html(QString);
+
 private:
     void setupTabConnections(int i);
     void setupTabConnections(CDBrowser* w);
