@@ -67,7 +67,6 @@ signals:
 protected:
     void set_for_playing(int row);
     void send_next_playing_signal();
-    void psl_next_track();
     bool checkTrack(const MetaData&) {return true;}
 
 private slots:

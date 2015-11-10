@@ -34,6 +34,8 @@ using namespace std;
 
 #include "playlist/PlaylistAVT.h"
 #include "playlist/PlaylistOH.h"
+#include "GUI/prefs/prefs.h"
+
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
@@ -49,8 +51,9 @@ using namespace UPnPClient;
 #ifndef deleteZ
 #define deleteZ(X) {delete X; X = 0;}
 #endif
+
 #define CONNECT(a,b,c,d) m_app->connect(a, SIGNAL(b), c, SLOT(d), \
-                                      Qt::UniqueConnection)
+                                        Qt::UniqueConnection)
 
 UPnPDeviceDirectory *superdir;
 
@@ -103,6 +106,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     if (rdr->rdc()) {
+        qDebug() << "Application::setupRenderer: using Rendering Control";
         m_rdco = new RenderingControlQO(rdr->rdc());
     } else {
         if (!rdr->ohvl()) {
@@ -110,15 +114,18 @@ bool Application::setupRenderer(const string& uid)
                 endl;
             return false;
         }
+        qDebug() << "Application::setupRenderer: using OHVolume";
         m_ohvlo =  new OHVolumeQO(rdr->ohvl());
     }
 
     bool needavt = true;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
+        qDebug() << "Application::setupRenderer: using OHPlaylist";
         m_ohplo = new OHPlayer(ohpl);
         OHTMH ohtm = rdr->ohtm();
         if (ohtm) {
+            qDebug() << "Application::setupRenderer: OHTm ok, no need for avt";
             m_ohtmo = new OHTimeQO(ohtm);
             // no need for AVT then
             needavt = false;
@@ -126,6 +133,7 @@ bool Application::setupRenderer(const string& uid)
         m_playlist = new PlaylistOH();
     } else {
         m_ohplo = 0;
+        qDebug() << "Application::setupRenderer: using AVT playlist";
         m_playlist = new PlaylistAVT(rdr->desc()->UDN);
     }
 
@@ -378,6 +386,8 @@ void Application::renderer_connections()
     CONNECT(m_ui_playlist, row_activated(int),
             m_playlist, psl_change_track(int));
     CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
+    CONNECT(m_cdb, sig_next_group_html(QString),
+            m_ui_playlist, psl_next_group_html(QString));
 
 }
 
@@ -389,6 +399,9 @@ void Application::init_connections()
     CONNECT(m_player, sig_choose_renderer(), this, chooseRenderer());
     CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
     CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));
+    static UPPrefs g_prefs(m_player);
+    CONNECT(m_player, sig_preferences(), &g_prefs, onShowPrefs());
+    CONNECT(&g_prefs, sig_prefsChanged(), m_cdb, onSortprefs());
 }
 
 

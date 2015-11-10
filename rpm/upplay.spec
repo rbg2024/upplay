@@ -1,6 +1,6 @@
 Summary:        Linux UPnP audio control point
 Name:           upplay
-Version:        0.10.0
+Version:        1.0.0
 Release:        1%{?dist}
 Group:          Applications/Multimedia
 License:        GPLv2+
@@ -8,7 +8,7 @@ URL:            http://www.lesbonscomptes.com/upplay
 Source0:        http://www.lesbonscomptes.com/upplay/upplay-%{version}.tar.gz
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
-BuildRequires:  libupnpp1
+BuildRequires:  libupnpp
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -41,5 +41,7 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
+* Sun Feb 22 2015 Jean-Francois Dockes <jf@dockes.org> - 1.0.0
+- Minor improvements (sorting, volume control)
 * Sun Feb 22 2015 Jean-Francois Dockes <jf@dockes.org> - 0.10.0
 - Initial

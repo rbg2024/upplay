@@ -74,6 +74,7 @@ public slots:
     void setMode(Playlist_Mode mode);
     void setPlayerMode(Playlist_Mode mode);
     void psl_show_small_playlist_items(bool small_items);
+    void psl_next_group_html(QString html);
 
 private slots:
     void selection_changed(MetaDataList&);

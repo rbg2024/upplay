@@ -2,15 +2,16 @@ TEMPLATE        = app
 LANGUAGE        = C++
 
 QT += script webkit network
-
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
+#QT += script widgets network webenginewidgets
+
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 0.10.1
+VERSION = 1.0.0
 
-QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\"
+QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
-
+#QMAKE_CXXFLAGS += -DUSING_WEBENGINE
 
 CONFIG  += qt warn_on thread debug
 
@@ -30,6 +31,8 @@ HEADERS += \
         GUI/playlist/model/PlaylistItemModel.h \
         GUI/playlist/view/PlaylistView.h \
         GUI/prefs/sortprefs.h \
+        GUI/prefs/prefs.h \
+        GUI/prefs/confgui.h \
         GUI/renderchoose/renderchoose.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
@@ -39,6 +42,7 @@ HEADERS += \
         dirbrowser/dirbrowser.h \
         dirbrowser/cdbrowser.h \
         dirbrowser/rreaper.h \
+        dirbrowser/randplayer.h \
         playlist/Playlist.h \
         playlist/PlaylistAVT.h \
         playlist/PlaylistOH.h \
@@ -66,12 +70,17 @@ SOURCES += \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.cpp \
         GUI/playlist/model/PlaylistItemModel.cpp \
         GUI/playlist/view/PlaylistView.cpp \
+        GUI/prefs/prefs.cpp \
+        GUI/prefs/confgui.cpp \
+        GUI/prefs/sortprefs.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
         application.cpp \
         dirbrowser/dirbrowser.cpp \
         dirbrowser/cdbrowser.cpp \
+        dirbrowser/rreaper.cpp \
+        dirbrowser/randplayer.cpp \
         playlist/Playlist.cpp \
         playlist/PlaylistAVT.cpp \
         playlist/PlaylistOH.cpp \
@@ -102,7 +111,7 @@ unix {
   target.path = "$$PREFIX/bin"
 
   bdata.files = dirbrowser/cdbrowser.css dirbrowser/dark.css \
-              dirbrowser/standard.css
+              dirbrowser/standard.css dirbrowser/containerscript.js
   bdata.path = $$PREFIX/share/upplay/cdbrowser   
   gdata.files = GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/

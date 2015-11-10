@@ -37,7 +37,7 @@ class PlaylistOH : public Playlist {
 
 public:
     PlaylistOH(QObject * parent = 0)
-        : Playlist(parent) {}
+        : Playlist(parent), m_gotnzid(false) {}
 
     virtual ~PlaylistOH() {}
 
@@ -69,6 +69,8 @@ public slots:
 
     // Set from scratch after reading changes from device
     void psl_new_ohpl(const MetaDataList&);
+private:
+    bool m_gotnzid;
 };
 
 #endif /* PLAYLISTOH_H_ */

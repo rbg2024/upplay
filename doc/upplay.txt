@@ -1,4 +1,4 @@
-= The Upplay Qt-X11-Unix UPnP audio control point
+= Upplay manual
 
 image::legend-upplay-main.png[]
 
@@ -15,6 +15,9 @@ Playlist entries:
 - Click entry, then click the play button to play
 - Select and drag-drop to reorder
 - Right click and select 'Remove' to delete current selection
+- Right click and select 'Sort by track number' to reorder tracks (useful
+  when tracks from an album directory were sent in wrong order by the Media
+  Server).
 
 Playlist buttons:
 
@@ -28,7 +31,7 @@ Playlist buttons:
   entries. Not too sure what this is good for...
 
 You can clear the current playlist by clicking the broom icon above it on
-the left.
+the right.
 
 == Directory browser section
 

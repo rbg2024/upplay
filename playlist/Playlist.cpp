@@ -77,15 +77,23 @@ void Playlist::psl_new_transport_state(int tps, const char *)
     case AUDIO_UNKNOWN:
     case AUDIO_STOPPED:
     default:
+        //qDebug() << "Playlist::psl_new_transport_state: STOPPED";
         emit sig_stopped();
         break;
     case AUDIO_PLAYING:
+        //qDebug() << "Playlist::psl_new_transport_state: PLAYING";
         emit sig_playing();
         break;
     case AUDIO_PAUSED:
+        //qDebug() << "Playlist::psl_new_transport_state: PAUSED";
         emit sig_paused();
         break;
     }
+}
+
+Playlist_Mode Playlist::mode()
+{
+    return CSettingsStorage::getInstance()->getPlaylistMode();
 }
 
 // GUI -->
@@ -156,6 +164,8 @@ static void mdsort(const MetaDataList& inlist, MetaDataList& outlist,
 void Playlist::psl_sort_by_tno()
 {
     vector<MetaDataCmp::SortCrit> crits;
+    // Makes no sense to sort by tno independantly of album
+    crits.push_back(MetaDataCmp::SC_ALB);
     crits.push_back(MetaDataCmp::SC_TNO);
     MetaDataList md;
     mdsort(m_meta, md, crits);
@@ -203,7 +213,7 @@ void Playlist::psl_add_tracks(const MetaDataList& v_md)
         psl_play();
     }
 
-    emit insertDone();
+    emit sig_insert_done();
 }
 
 static string maybemakesavedir()
@@ -248,6 +258,6 @@ void Playlist::psl_save_playlist()
 
 void Playlist::psl_selection_min_row(int row)
 {
-    qDebug() << "Playlist::psl_selection_min_row: now: " << row;
+    //qDebug() << "Playlist::psl_selection_min_row: now: " << row;
     m_selection_min_row = row;
 }

@@ -18,12 +18,23 @@
 #ifndef _CDBROWSER_H_INCLUDED_
 #define _CDBROWSER_H_INCLUDED_
 
+/** CDBrowser displays Content Directory data inside a DirBrowser Tab */
+#include <time.h>
+
 #include <vector>
 #include <iostream>
 #include "libupnpp/config.h"
 #include <set>
 
+#ifdef USING_WEBENGINE
+#include <QWebEngineView>
+#define QWebView QWebEngineView
+#define QWebPage QWebEnginePage
+#define QWebSettings QWebEngineSettings
+#else
 #include <QWebView>
+#endif
+
 #include <QVariant>
 #include <QTimer>
 #include <QPoint>
@@ -36,9 +47,12 @@
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/globals.h"
 
+#include "randplayer.h"
+
 class ContentDirectoryQO;
 class RecursiveReaper;
 class DirBrowser;
+class QProgressDialog;
 
 class CDBrowser : public QWebView
 {
@@ -72,14 +86,18 @@ class CDBrowser : public QWebView
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
     void setStyleSheet(bool);
     void refresh();
+
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
+    void sig_tracks_to_randplay(RandPlayer::PlayMode,
+                                const std::vector<UPnPClient::UPnPDirObject>&);
     void sig_now_in(QWidget *, const QString&);
     void sig_searchcaps_changed();
     void sig_browse_in_new_tab(QString UDN,
                                std::vector<CDBrowser::CtPathElt>);
-
- protected slots:
+    void sig_rand_stop();
+                        
+ public slots:
     virtual void appendHtml(const QString&, const QString& html);
     virtual void onLinkClicked(const QUrl &);
     virtual void createPopupMenu(const QPoint&);
@@ -97,6 +115,7 @@ class CDBrowser : public QWebView
     void search(const string& objid, const string& iss, QPoint scrollpos = 
                 QPoint());
     void curpathClicked(unsigned int i);
+    void waitForPage();
 
     // When displaying the servers list, we periodically check the
     // server pool state. The last seen Media Server descriptions are
@@ -120,6 +139,10 @@ class CDBrowser : public QWebView
     RecursiveReaper    *m_reaper;
     void deleteReaders();
 
+    // Busy dialog for lengthy ops
+    QProgressDialog *m_progressD;
+    time_t           m_progstart;
+    
     // Content of the currently visited container or search
     std::vector<UPnPClient::UPnPDirObject> m_entries;
     // Scroll position to be restored when we're done reading. This is
@@ -169,5 +192,60 @@ public:
         }
     QString m_s;
 };
+
+
+
+#ifdef USING_WEBENGINE
+
+class CDWebPage: public QWebEnginePage {
+    Q_OBJECT
+
+public:
+    CDWebPage(CDBrowser *parent) 
+    : QWebEnginePage((QWidget *)parent), m_browser(parent) {
+    }
+
+protected:
+
+    virtual bool acceptNavigationRequest(const QUrl& url, 
+                                         NavigationType, 
+                                         bool) {
+        qDebug() << "acceptNavigationRequest: url: " << url.toString();
+        m_browser->onLinkClicked(url);
+        return false;
+    }
+
+    virtual void javaScriptConsoleMessage(
+        JavaScriptConsoleMessageLevel level,
+        const QString& msg, int lineNum, const QString & sourceID);
+
+private:
+    CDBrowser *m_browser;
+};
+
+#define QWebView QWebEngineView
+#define QWebPage QWebEnginePage
+#define QWebSettings QWebEngineSettings
+
+#else // Using Qt Webkit
+
+// We only subclass QWebPage in order to display the JS error messages
+class CDWebPage: public QWebPage {
+    Q_OBJECT;
+
+ public:
+    CDWebPage(QWidget* parent = 0) : QWebPage(parent) {
+    }
+    virtual void javaScriptConsoleMessage(const QString& msg, int lineNum, 
+					  const QString & sourceID);
+};
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#define  SCRIPTOWNERSHIP QWebFrame::ScriptOwnership
+#else
+#define  SCRIPTOWNERSHIP QScriptEngine::ScriptOwnership
+#endif
+
+#endif
 
 #endif /* _CDBROWSER_H_INCLUDED_ */

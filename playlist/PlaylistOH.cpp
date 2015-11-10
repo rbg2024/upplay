@@ -33,9 +33,18 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 
 void PlaylistOH::psl_trackIdChanged(int id)
 {
-    //qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
-    if (id <= 0)
+    qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
+
+    if (id <= 0) {
+        if (m_gotnzid) {
+            m_gotnzid = false;
+            qDebug() << "PlaylistOH::psl_trackIdChanged: playlist_done";
+            emit sig_playlist_done();
+        }
         return;
+    } else {
+        m_gotnzid = true;
+    }
 
     for (vector<MetaData>::iterator it = m_meta.begin(); 
          it != m_meta.end(); it++) {

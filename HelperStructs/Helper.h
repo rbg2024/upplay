@@ -18,7 +18,7 @@
 #ifndef _HELPER_H
 #define _HELPER_H
 #include <time.h>
-
+#include <string>
 #include <QString>
 #include <QList>
 #include <QWidget>
@@ -71,5 +71,8 @@ bool read_file_into_str(QString filename, QString* content);
 
 };
 
+// Escape things that would look like HTML markup
+std::string escapeHtml(const string &in);
+QString escapeHtml(const QString& in);
 
 #endif

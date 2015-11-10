@@ -3,6 +3,10 @@ p.cdserver {
     margin: 7px 0px 0px 0px;
 }
 
+a {
+    text-decoration: none;
+}
+
 /* The current path indicator is an ul inside a browsepath div */
 #browsepath {
     font-size: 80%;

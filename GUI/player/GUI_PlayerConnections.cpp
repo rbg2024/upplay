@@ -32,7 +32,6 @@ void GUI_Player::setupConnections()
             SLOT(stopClicked()));
     connect(ui->btn_mute, SIGNAL(released()), this,
             SLOT(muteButtonPressed()));
-    connect(ui->albumCover, SIGNAL(clicked()), this, SLOT(coverClicked()));
 
     // file
     connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),
@@ -56,13 +55,9 @@ void GUI_Player::setupConnections()
             SLOT(small_playlist_items_toggled(bool)));
     connect(ui->action_Fullscreen, SIGNAL(toggled(bool)), this,
             SLOT(show_fullscreen_toggled(bool)));
+    connect(ui->action_Preferences, SIGNAL(triggered(bool)), this,
+            SIGNAL(sig_preferences()));
 
-
-    // preferencesF
-    connect(ui->action_min2tray, SIGNAL(toggled(bool)), this,
-            SLOT(min2tray_toggled(bool)));
-    connect(ui->action_sortprefs, SIGNAL(triggered(bool)), this,
-            SIGNAL(sig_sortprefs()));
 
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
@@ -72,6 +67,8 @@ void GUI_Player::setupConnections()
             this, SLOT(volumeChangedByTick(int)));
 
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this,
+            SLOT(volumeChanged(int)));
+    connect(ui->volumeSlider, SIGNAL(sliderMoved(int)), this,
             SLOT(volumeChanged(int)));
     connect(ui->songProgress, SIGNAL(valueChanged(int)), this,
             SLOT(setProgressJump(int)));

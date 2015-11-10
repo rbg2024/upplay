@@ -749,14 +749,9 @@
     <addaction name="separator"/>
     <addaction name="action_Dark"/>
     <addaction name="action_Fullscreen"/>
-   </widget>
-   <widget class="QMenu" name="menuPreferences">
-    <property name="title">
-     <string>Preferences</string>
-    </property>
-    <addaction name="action_min2tray"/>
-    <addaction name="action_sortprefs"/>
-   </widget>
+    <addaction name="separator"/>
+    <addaction name="action_Preferences"/>
+</widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>Help</string>
@@ -809,28 +804,20 @@
     <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
-  <action name="action_min2tray">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Close to tray</string>
-   </property>
-  </action>
-  <action name="action_sortprefs">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Sort preferences</string>
-   </property>
-  </action>
   <action name="action_Fullscreen">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Fullscreen </string>
+    <string>Fullscreen</string>
+   </property>
+  </action>
+  <action name="action_Preferences">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
   <action name="action_smallPlaylistItems">

@@ -106,13 +106,6 @@ void GUI_Player::show_notification_toggled(bool active)
     m_settings->setShowNotifications(active);
 }
 
-// prvt slot
-void GUI_Player::min2tray_toggled(bool b)
-{
-    m_settings->setMinimizeToTray(b);
-    m_min2tray = b;
-}
-
 void GUI_Player::only_one_instance_toggled(bool)
 {
 }

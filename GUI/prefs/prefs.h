@@ -1,4 +1,4 @@
-/*
+/* Copyright (C) 2015 J.F.Dockes
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
  *   the Free Software Foundation; either version 2 of the License, or
@@ -14,34 +14,34 @@
  *   Free Software Foundation, Inc.,
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#ifndef _SORTPREFS_H_INCLUDED_
-#define _SORTPREFS_H_INCLUDED_
+#ifndef UPPLAY_PREFS_H_INCLUDED
+#define UPPLAY_PREFS_H_INCLUDED
 
-#include <vector>
-#include <string>
+#include <QWidget>
 
-#include "confgui.h"
+namespace confgui {
+class ConfTabsW;
+}
 
-#include "ui_sortprefs.h"
-
-class SortprefsW : public QWidget, public Ui::SortprefsW, 
-                   public confgui::ConfPanelWIF {
-
+class UPPrefs : public QObject {
     Q_OBJECT
 
 public:
 
-    SortprefsW(QWidget *parent = 0)
-	: QWidget(parent)
-    {
-	setupUi(this);
-        critsLW->setDragDropMode(QAbstractItemView::InternalMove);
+    UPPrefs(QWidget *parent) 
+        : m_parent(parent), m_w(0) {
     }
 
-public:
+public slots:
 
-    void loadValues();
-    void storeValues();
+    void onShowPrefs();
+
+signals:
+    void sig_prefsChanged();
+
+private:
+    QWidget *m_parent;
+    confgui::ConfTabsW *m_w;
 };
 
-#endif /* _SORTPREFS_H_INCLUDED_ */
+#endif
