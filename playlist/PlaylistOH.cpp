@@ -36,15 +36,8 @@ void PlaylistOH::psl_currentTrackId(int id)
     qDebug() << "PlaylistOH::psl_currentTrackId: " << id;
 
     if (id <= 0) {
-        if (m_gotnzid) {
-            m_gotnzid = false;
-            qDebug() << "PlaylistOH::psl_currentTrackId: playlist_done";
-            emit sig_playlist_done();
-        }
         return;
-    } else {
-        m_gotnzid = true;
-    }
+    } 
 
     for (vector<MetaData>::iterator it = m_meta.begin(); 
          it != m_meta.end(); it++) {
@@ -52,6 +45,9 @@ void PlaylistOH::psl_currentTrackId(int id)
             if (m_play_idx != it - m_meta.begin()) {
                 emit sig_playing_track_changed(it - m_meta.begin());
                 m_play_idx = it - m_meta.begin();
+                if (m_play_idx == int(m_meta.size()) - 1) {
+                    m_lastsong = true;
+                }
                 //qDebug() << " new track index " << m_play_idx;
             }
             // If the track id change was caused by the currently
@@ -59,16 +55,38 @@ void PlaylistOH::psl_currentTrackId(int id)
             // not change but the metadata did, so emit metadata in
             // all cases.
             emit sig_track_metadata(*it);
+            m_cursongsecs = it->length_ms / 1000;
             return;
         }
     }
+    resetPosState();
     LOGINF("PlaylistOH::psl_currentTrackId: track not found in array" << endl);
+}
+
+void PlaylistOH::psl_secs_in_song_impl(quint32 secs)
+{
+    if (m_lastsong && m_cursongsecs > 0 && int(secs) > int(m_cursongsecs) - 3) {
+        //qDebug() << "PlaylistOH::psl_secs_in_song_impl: close to end";
+        m_closetoend = true;
+    }
+}
+
+void PlaylistOH::psl_new_transport_state_impl(int, const char *sst)
+{
+    //qDebug() << "PlaylistOH::psl_new_transport_state_impl: " << sst;
+    if (m_tpstate == AUDIO_STOPPED && m_closetoend == true) {
+        resetPosState();
+        emit sig_playlist_done();
+    }
 }
 
 void PlaylistOH::psl_clear_playlist_impl()
 {
     // Tell the Open Home Playlist to do it.
     emit sig_clear_playlist();
+    // If we're playing, signal playlist done (this is to inform the
+    // "random play by group" thing to start next group
+    emit sig_playlist_done();
 }
 
 void PlaylistOH::psl_play() 

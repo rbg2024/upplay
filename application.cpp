@@ -274,7 +274,7 @@ void Application::renderer_connections()
         // Connections from OpenHome renderer to local playlist
         CONNECT(m_ohplo, metadataArrayChanged(const MetaDataList&),
                 m_playlist, psl_new_ohpl(const MetaDataList&));
-        CONNECT(m_ohplo, currentTrackId(int), ploh, psl_trackIdChanged(int));
+        CONNECT(m_ohplo, currentTrackId(int), ploh, psl_currentTrackId(int));
         CONNECT(m_ohplo, audioStateChanged(int, const char *),
                 m_playlist, psl_new_transport_state(int, const char *));
         CONNECT(m_ohplo, playlistModeChanged(Playlist_Mode),
@@ -336,9 +336,13 @@ void Application::renderer_connections()
     if (m_ohtmo) {
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
                 m_player, setCurrentPosition(quint32));
+        CONNECT(m_ohtmo, secsInSongChanged(quint32),
+                m_playlist, psl_secs_in_song(quint32));
     } else if (m_avto) {
         CONNECT(m_avto, secsInSongChanged(quint32),
                 m_player, setCurrentPosition(quint32));
+        CONNECT(m_avto, secsInSongChanged(quint32),
+                m_playlist, psl_secs_in_song(quint32));
     }
     if (m_ohvlo) {
         CONNECT(m_player, sig_volume_changed(int), m_ohvlo, setVolume(int));

@@ -64,7 +64,7 @@ void Playlist::remove_row(int row)
     psl_remove_rows(remove_list);
 }
 
-void Playlist::psl_new_transport_state(int tps, const char *)
+void Playlist::psl_new_transport_state(int tps, const char *sst)
 {
 //    qDebug() << "Playlist::psl_new_transport_state " << s <<
 //        " play_idx " << m_play_idx;
@@ -89,6 +89,7 @@ void Playlist::psl_new_transport_state(int tps, const char *)
         emit sig_paused();
         break;
     }
+    psl_new_transport_state_impl(tps, sst);
 }
 
 Playlist_Mode Playlist::mode()
