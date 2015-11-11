@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Upplay"
-#define MyAppVersion "0.10"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "J.F. Dockes"
 #define MyAppURL "http://www.lesbonscomptes.com/upplay"
 #define MyAppExeName "upplay.exe"
@@ -22,8 +22,9 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 LicenseFile=C:\Users\Bill\Documents\COPYING.txt
-OutputDir=C:\Users\Bill\Documents\UPnP\upplay\innosetup
+OutputDir=C:\Temp
 OutputBaseFilename=upplaysetup-{#MyAppVersion}
+SetupIconFile=C:\install\upplay\upplay.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -34,7 +35,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Bill\Documents\UPnP\upplay\Upplay\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\install\upplay\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

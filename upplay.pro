@@ -7,13 +7,14 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 #QT += script widgets network webenginewidgets
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 1.0.0
+VERSION = 1.1.0
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
 #QMAKE_CXXFLAGS += -DUSING_WEBENGINE
 
-CONFIG  += qt warn_on thread debug
+buildtype = release
+CONFIG  += qt warn_on thread $$buildtype
 
 RESOURCES += GUI/upplay.qrc
 
@@ -139,7 +140,7 @@ windows {
   DEFINES += PSAPI_VERSION=1
   INCLUDEPATH += c:/users/bill/documents/upnp/libupnpp
   INCLUDEPATH += c:/users/bill/documents/upnp/pupnp/include
-  LIBS += -Lc:/Users/Bill/Documents/UPnP/libupnpp/windows/build-libupnpp-Desktop_Qt_5_5_0_MinGW_32bit-Debug/debug -lupnpp
+  LIBS += -L../libupnpp/windows/build-libupnpp-Desktop_Qt_5_5_0_MinGW_32bit-$$buildtype/$$buildtype -lupnpp
   LIBS += c:/users/bill/documents/upnp/expat-2.1.0/.libs/libexpat.a
   LIBS += c:/users/bill/documents/upnp/curl-7.43.0/lib/libcurl.a
   LIBS += c:/users/bill/documents/upnp/pupnp/upnp/.libs/libupnp.a
