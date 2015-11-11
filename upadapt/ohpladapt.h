@@ -43,7 +43,7 @@ public:
                 this, SLOT(translateMetaData()));
         connect(this, SIGNAL(tpStateChanged(int)), 
                 this, SLOT(playerState(int)));
-        connect(this, SIGNAL(trackIdChanged(int)),
+        connect(this, SIGNAL(currentTrackId(int)),
                 this, SLOT(onTrackIdChanged(int)));
         connect(this, SIGNAL(shuffleChanged(bool)), 
                 this, SLOT(onShuffleState(bool)));

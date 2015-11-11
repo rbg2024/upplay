@@ -37,7 +37,8 @@ class PlaylistOH : public Playlist {
 
 public:
     PlaylistOH(QObject * parent = 0)
-        : Playlist(parent), m_gotnzid(false) {}
+        : Playlist(parent), m_cursongsecs(0), m_lastsong(false),
+          m_closetoend(false) {}
 
     virtual ~PlaylistOH() {}
 
@@ -49,8 +50,12 @@ signals:
     void sig_row_activated(int);
 
 public slots:
-    void psl_trackIdChanged(int id);
 
+    // These receives changes from the remote state.
+    void psl_currentTrackId(int id);
+    void psl_new_transport_state_impl(int, const char *);
+    void psl_secs_in_song_impl(quint32 s);
+    
     // The following are connected to GUI signals, for responding to
     // user actions.
     void psl_change_track_impl(int idx) {
@@ -70,7 +75,17 @@ public slots:
     // Set from scratch after reading changes from device
     void psl_new_ohpl(const MetaDataList&);
 private:
-    bool m_gotnzid;
+    // Position in current song, 0 if unknown
+    quint32 m_cursongsecs;
+    // Current song is last in playlist
+    bool m_lastsong;
+    // Playing the last 5 S of last song
+    bool m_closetoend;
+
+    void resetPosState() {
+        m_cursongsecs = 0;
+        m_lastsong = m_closetoend = false;
+    }
 };
 
 #endif /* PLAYLISTOH_H_ */

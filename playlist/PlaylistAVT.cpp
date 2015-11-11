@@ -205,6 +205,7 @@ void PlaylistAVT::psl_clear_playlist_impl()
 {
     emit sig_stop();
     playlist_updated();
+    emit sig_playlist_done();
 }
 
 void PlaylistAVT::psl_play()
