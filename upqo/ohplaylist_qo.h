@@ -65,7 +65,7 @@ public:
             // do this because it's quite possible that we emit the
             // first signal before we are connected
             m_curid = value;
-            emit trackIdChanged(value);
+            emit currentTrackId(value);
         } else if (!strcmp(nm, "TransportState")) {
             emit tpStateChanged(value);
         } else if (!strcmp(nm, "Shuffle")) {
@@ -189,7 +189,7 @@ public slots:
     }
 
 signals:
-    void trackIdChanged(int);
+    void currentTrackId(int);
     void trackArrayChanged();
     void tpStateChanged(int);
     void shuffleChanged(bool);
@@ -284,7 +284,7 @@ private slots:
         qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
             "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit trackArrayChanged();
-        emit trackIdChanged(m_curid);
+        emit currentTrackId(m_curid);
     out:
         return;
     }

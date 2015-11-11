@@ -31,14 +31,14 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
 }
 
-void PlaylistOH::psl_trackIdChanged(int id)
+void PlaylistOH::psl_currentTrackId(int id)
 {
-    qDebug() << "PlaylistOH::psl_trackIdChanged: " << id;
+    qDebug() << "PlaylistOH::psl_currentTrackId: " << id;
 
     if (id <= 0) {
         if (m_gotnzid) {
             m_gotnzid = false;
-            qDebug() << "PlaylistOH::psl_trackIdChanged: playlist_done";
+            qDebug() << "PlaylistOH::psl_currentTrackId: playlist_done";
             emit sig_playlist_done();
         }
         return;
@@ -62,7 +62,7 @@ void PlaylistOH::psl_trackIdChanged(int id)
             return;
         }
     }
-    LOGINF("PlaylistOH::psl_trackIdChanged: track not found in array" << endl);
+    LOGINF("PlaylistOH::psl_currentTrackId: track not found in array" << endl);
 }
 
 void PlaylistOH::psl_clear_playlist_impl()
