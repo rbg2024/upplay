@@ -452,6 +452,14 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
     if (!m_pl)
         return;
 
+    // We'll get a playlist_done when the old list is replaced, don't
+    // want this to trigger a new slice... We should distinguish a
+    // playlist clear from the ui (which we want to trigger a new
+    // slice) from this one, but temporarily disconnecting is just
+    // simpler.
+    disconnect(m_pl, SIGNAL(sig_playlist_done()),
+               m_randplayer, SLOT(playNextSlice()));
+    
     Playlist_Mode mode = m_pl->mode();
     bool replace_saved = mode.replace;
     mode.replace = true;
@@ -462,6 +470,9 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
     mode.replace = replace_saved;
     m_pl->psl_change_mode(mode);
     m_pl->psl_play();
+
+    connect(m_pl, SIGNAL(sig_playlist_done()),
+            m_randplayer, SLOT(playNextSlice()));
 }
 
 void DirBrowser::onRandDone()
