@@ -145,6 +145,10 @@ dirbrowser/dark.css
 dirbrowser/dirbrowser.cpp
 dirbrowser/dirbrowser.h
 dirbrowser/dirbrowser.ui
+dirbrowser/dirbrowser.ui.webengine
+dirbrowser/randplayer.cpp
+dirbrowser/randplayer.h
+dirbrowser/rreaper.cpp
 dirbrowser/rreaper.h
 dirbrowser/standard.css
 doc/
@@ -153,6 +157,8 @@ doc/legend-upplay-main.png
 doc/legend-upplay-main.xcf
 doc/searching.html
 doc/searching.txt
+doc/upplay-mingw.html
+doc/upplay-mingw.txt
 doc/upplay-releases.txt
 doc/upplay.html
 doc/upplay.txt
@@ -188,6 +194,7 @@ upqo/renderingcontrol_qo.h
 windows/
 windows/innosetup/
 windows/innosetup/upplay-setup.iss
+windows/mkinstdir.sh
 windows/upplay.sln
 windows/upplay.vcxproj
 windows/upplay.vcxproj.filters
