@@ -17,7 +17,8 @@
 #include <cstdlib>
 
 #include <QDebug>
-#include <QTime>
+
+#include <time.h>
 
 #include "randplayer.h"
 #include "HelperStructs/Helper.h"
@@ -32,7 +33,7 @@ RandPlayer::RandPlayer(PlayMode mode,
                        QObject *parent)
     : QObject(parent), m_playmode(mode), m_entries(entries)
 {
-    qsrand(QTime::currentTime().msec());
+    qsrand((unsigned int)time(0));
     if (m_playmode == PM_TRACKS) {
         std::random_shuffle(m_entries.begin(), m_entries.end());
     }
