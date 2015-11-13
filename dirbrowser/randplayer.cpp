@@ -43,11 +43,33 @@ RandPlayer::~RandPlayer()
     emit sig_next_group_html("");
 }
 
-static bool sameValues(const string& alb, const string& ctp,
+static bool sameValues(UPnPClient::UPnPDirObject& ref,
                        UPnPClient::UPnPDirObject& e)
 {
-    return !e.f2s("upnp:album", false).compare(alb) &&
-        !e.f2s("upplay:ctpath", false).compare(ctp);
+    return !e.f2s("upnp:album", false).compare(ref.f2s("upnp:album", false)) &&
+        !e.f2s("upplay:ctpath", false).compare(ref.f2s("upplay:ctpath", false));
+}
+
+// When playing by groups, if we just select random tracks and play
+// the group they're in, big groups get selected more probably. So we
+// random select in the group starts instead; And yes it's inefficient
+// to recompute the group starts each time, we could do it once and
+// then prune the list in parallel with the main list. But... you
+// know... so many MIPS! We're only doing this every few minutes, and
+// doing otherwise is not that simple (all posterior start indices
+// need to be recomputed after we erase a group etc.)
+static vector<unsigned int>
+findGStarts(vector<UPnPClient::UPnPDirObject>& ents)
+{
+    vector<unsigned int> out;
+    UPnPClient::UPnPDirObject ref;
+    for (unsigned int i = 0; i < ents.size(); i++) {
+        if (!sameValues(ref, ents[i])) {
+            out.push_back(i);
+            ref = ents[i];
+        }
+    }
+    return out;
 }
 
 void RandPlayer::selectNextGroup()
@@ -55,34 +77,34 @@ void RandPlayer::selectNextGroup()
     m_nextgroup.clear();
     if (m_entries.empty())
         return;
-    
-    // Pick a random start, seek back to beginning of group, then
-    // forward to end
+
+    vector<unsigned int> vgstarts = findGStarts(m_entries);
+
+    // Pick a random start
     double fstart = (double(qrand()) / double(RAND_MAX)) *
-        (m_entries.size() - 1);
-    int istart = round(fstart);
+        (vgstarts.size() - 1);
+    int istart = vgstarts[round(fstart)];
 
     // Reference values
-    string alb = m_entries[istart].f2s("upnp:album", false);
-    string ctpath = m_entries[istart].f2s("upplay:ctpath", false);
-    qDebug() << "RandPlayer: albs. istart" << istart << " album " <<
-        alb.c_str();
+    auto entref = m_entries[istart];
 
-    // Look back to beginning of section
+    // Look back to beginning of section. Not needed any more now that
+    // we pick up group starts. Just in case we change our minds
     while (istart > 0) {
         istart--;
-        if (!sameValues(alb, ctpath, m_entries[istart])) {
+        if (!sameValues(entref, m_entries[istart])) {
             istart++;
             break;
         }
     }
-    qDebug() << "RandPlayer: albs. final istart" << istart;
 
-    // Look forward to end, and store entries
+    // Look forward to end, and store entries. Could use the next
+    // group index instead. Just kept the initial code where we
+    // selected a random track
     vector<UPnPClient::UPnPDirObject>::iterator last =
         m_entries.begin() + istart;
     while (last != m_entries.end()) {
-        if (!sameValues(alb, ctpath, *last)) {
+        if (!sameValues(entref, *last)) {
             break;
         }
         m_nextgroup.push_back(*last++);

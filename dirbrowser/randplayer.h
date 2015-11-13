@@ -55,7 +55,6 @@ private:
     std::vector<UPnPClient::UPnPDirObject> m_entries;
     // Next group to play, for preview
     std::vector<UPnPClient::UPnPDirObject> m_nextgroup;
-
     void selectNextGroup();
     QString groupHtml(std::vector<UPnPClient::UPnPDirObject>& ents);
 };
