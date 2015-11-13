@@ -22,10 +22,12 @@
 #include <QIcon>
 #include <QImageReader>
 #include <QImage>
+#include <QTemporaryFile>
+#include <QDir>
 
 void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 {
-    qDebug() << "GUI_Player::sl_cover_fetch_done";
+    // qDebug() << "GUI_Player::sl_cover_fetch_done";
     if (reply->error() != QNetworkReply::NoError) {
         sl_no_cover_available();
         return;
@@ -37,26 +39,43 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     if ((scolon = smime.indexOf(";")) > 0) {
         smime = smime.left(scolon);
     }
-    QByteArray imtype;
+    const char *imtype;
+    const char *suffix;
     if (!smime.compare("image/png", Qt::CaseInsensitive)) {
         imtype = "PNG";
-    } else     if (!smime.compare("image/jpeg", Qt::CaseInsensitive)) {
+        suffix = ".png";
+    } else if (!smime.compare("image/jpeg", Qt::CaseInsensitive)) {
         imtype = "JPG";
-    } else     if (!smime.compare("image/gif", Qt::CaseInsensitive)) {
+        suffix = ".jpg";
+    } else if (!smime.compare("image/gif", Qt::CaseInsensitive)) {
         imtype = "GIF";
+        suffix = ".gif";
     } else {
         qDebug() << "GUI_Player::sl_cover_fetch_done: unsupported mime type: "<<
             smime;
         sl_no_cover_available();
         return;
     }
-    QImageReader reader((QIODevice*)reply, imtype);
-    reader.setAutoDetectImageFormat(false);
+    QByteArray imdata = reply->readAll();
+
+    QString tpath = 
+        QDir(QDir::tempPath()).absoluteFilePath(QString::fromUtf8("XXXXXX")
+                                                + suffix);
+
+    if (m_covertempfile) {
+        delete(m_covertempfile);
+        m_covertempfile = 0;
+    }
+    m_covertempfile = new QTemporaryFile(tpath, this);
+    if (m_covertempfile) {
+        m_covertempfile->open();
+        m_covertempfile->write(imdata);
+        m_covertempfile->close();
+    }
 
     QImage image;
-    if (!reader.read(&image)) {
-        qDebug() << "GUI_Player::sl_vover_fetch_done: image read failed " << 
-            reader.errorString();
+    if (!image.loadFromData(imdata, imtype)) {
+        qDebug() << "GUI_Player::sl_cover_fetch_done: image read failed ";
         sl_no_cover_available();
         return;
     }
@@ -64,6 +83,12 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     QPixmap pixmap;
     pixmap.convertFromImage(image);
     ui->albumCover->setIcon(QIcon(pixmap));
+
+    QString htmlfrag("<img src=\"");
+    htmlfrag += m_covertempfile->fileName();
+    htmlfrag += "\">";
+    ui->albumCover->setToolTip(htmlfrag);
+
     ui->albumCover->repaint();
     reply->deleteLater();
 }

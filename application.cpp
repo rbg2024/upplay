@@ -245,6 +245,7 @@ Application::Application(QApplication* qapp, int,
 
 Application::~Application()
 {
+    delete m_player;
 }
 
 void Application::reconnectOrChoose()

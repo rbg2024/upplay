@@ -43,6 +43,7 @@ class GUI_Notifications;
 class GUI_Startup_Dialog;
 class CoverLookup;
 class GUI_Alternate_Covers;
+class QTemporaryFile;
 
 class GUI_Player : public QMainWindow {
     Q_OBJECT
@@ -177,7 +178,7 @@ private:
     int                 m_library_stretch_factor;
     CSettingsStorage*   m_settings;
     QTranslator*        m_translator;
-
+    QTemporaryFile*     m_covertempfile;
 
     void setupTrayActions ();
 

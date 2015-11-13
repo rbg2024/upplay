@@ -23,6 +23,7 @@
 #include <QPalette>
 #include <QUrl>
 #include <QtNetwork/QNetworkRequest>
+#include <QTemporaryFile>
 
 #include "ui_GUI_Player.h"
 #include "GUI/player/GUI_Player.h"
@@ -59,7 +60,8 @@ void signal_handler(int sig)
 #endif
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Upplay), m_completeLength_ms(0)
+    QMainWindow(parent), ui(new Ui::Upplay), m_completeLength_ms(0),
+    m_covertempfile(0)
 {
     ui->setupUi(this);
     initGUI();
@@ -133,7 +135,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
 GUI_Player::~GUI_Player()
 {
-    delete ui;
+    delete m_covertempfile;
 }
 
 void GUI_Player::setRendererName(const QString& nm)
