@@ -52,6 +52,8 @@ static bool sameValues(const string& alb, const string& ctp,
 void RandPlayer::selectNextGroup()
 {
     m_nextgroup.clear();
+    if (m_entries.empty())
+        return;
     
     // Pick a random start, seek back to beginning of group, then
     // forward to end
@@ -104,7 +106,7 @@ void RandPlayer::playNextSlice()
 {
     qDebug() << "RandPlayer: " << m_entries.size() << " remaining";
 
-    if (m_entries.empty()) {
+    if (m_entries.empty() && m_nextgroup.empty()) {
         emit sig_randplay_done();
         return;
     }
@@ -121,10 +123,10 @@ void RandPlayer::playNextSlice()
         m_entries.erase(m_entries.begin(), last);
     } else {
         if (m_nextgroup.empty()) {
-            // 1st time
+            // 1st time: non-empty list, and empty next-group
             selectNextGroup();
             if (m_nextgroup.empty()) {
-                // ??
+                // ?? This should really not happen !
                 emit sig_randplay_done();
                 return;
             }
