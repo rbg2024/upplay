@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.7" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Upplay manual</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -415,12 +421,6 @@ div.unbreakable { page-break-inside: avoid; }
  *
  * */
 
-tt {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
-
 div.tableblock {
   margin-top: 1.0em;
   margin-bottom: 1.5em;
@@ -453,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -539,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -754,6 +750,8 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="paragraph"><p>Play, Pause, Stop, Next, Previous, Seek, and Adjust volume. I would guess that
 these don&#8217;t need explanations.</p></div>
+<div class="paragraph"><p>Most elements displaying information about the current track have tooltips
+which can display a bigger and more readable version.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -840,37 +838,66 @@ If you perform searches, your search history will be stacked at the end
 <div class="paragraph"><p>Left-Clicking a track title will send it to the playlist, according to the
 current playlist add mode.</p></div>
 <div class="paragraph"><p>Left-Clicking a directory title will get you there.</p></div>
-<div class="paragraph"><p>Right-clicking a track title will propose three actions:</p></div>
+<div class="paragraph"><p>Right-clicking a track title will propose the following actions:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Send to playlist: same as left-clicking.
+<code>Back</code>
 </p>
 </li>
 <li>
 <p>
-Send all to playlist: send all tracks from this directory.
+<code>Send to playlist</code>: same as left-clicking.
 </p>
 </li>
 <li>
 <p>
-Send all from here to playlist: this track and the following ones go to
+<code>Send all to playlist</code>: send all tracks from this directory.
+</p>
+</li>
+<li>
+<p>
+<code>Send all from here to playlist</code>: this track and the following ones go to
    the playlist.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Right-clicking a directory (in the list or in the path) will propose two
-actions:</p></div>
+<div class="paragraph"><p>Right-clicking a directory (in the list or in the path) will propose the
+following actions:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Send to playlist: this is a recursive walk, it will send all tracks from
+<code>Back</code>
+</p>
+</li>
+<li>
+<p>
+<code>Send to playlist</code>: this is a recursive walk, it will send all tracks from
   the subtree to the playlist. Don&#8217;t do this at the root of a big tree&#8230;
 </p>
 </li>
 <li>
 <p>
-Open in new tab.
+`Open in new tab.
+</p>
+</li>
+<li>
+<p>
+<code>Random play by tracks</code>: this is analogous to <code>Send to playlist</code>, but the
+  list is shuffled, and sent to the Renderer by slices, so you can use a very
+  big list without swamping it.
+</p>
+</li>
+<li>
+<p>
+<code>Random play by groups</code>: this will play groups of tracks, corresponding to
+  the lowest level of directories in the subtree, typically albums, but
+  these may also be MinimServer Groups for example.
+</p>
+</li>
+<li>
+<p>
+<code>Stop random play</code>: if currently playing.
 </p>
 </li>
 </ul></div>
@@ -879,7 +906,7 @@ Open in new tab.
 the path at the top will open the element in a new tab. This can be
 particularly useful if you want to go back to a previous search without
 losing the current display.</p></div>
-<div class="paragraph"><p><tt>^f</tt> or <tt>/</tt> will open the search panel, <tt>Esc</tt> will close it (or the x-cross
+<div class="paragraph"><p><code>^f</code> or <code>/</code> will open the search panel, <code>Esc</code> will close it (or the x-cross
 button at the right).</p></div>
 <div class="paragraph"><p><a href="searching.html">more detail on search</a>.</p></div>
 </div>
@@ -922,7 +949,8 @@ the color scheme for a dark one and other interesting experiences.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-03 07:51:39 CEST
+Last updated
+ 2015-11-13 11:00:21 CET
 </div>
 </div>
 </body>

@@ -7,6 +7,9 @@ image::legend-upplay-main.png[]
 Play, Pause, Stop, Next, Previous, Seek, and Adjust volume. I would guess that
 these don't need explanations.
 
+Most elements displaying information about the current track have tooltips
+which can display a bigger and more readable version.
+
 == Playlist section
 
 Playlist entries:
@@ -50,19 +53,29 @@ current playlist add mode.
 
 Left-Clicking a directory title will get you there.
 
-Right-clicking a track title will propose three actions:
+Right-clicking a track title will propose the following actions:
 
- - Send to playlist: same as left-clicking.
- - Send all to playlist: send all tracks from this directory.
- - Send all from here to playlist: this track and the following ones go to
+ - `Back`
+ - `Send to playlist`: same as left-clicking.
+ - `Send all to playlist`: send all tracks from this directory.
+ - `Send all from here to playlist`: this track and the following ones go to
    the playlist.
+ 
 
-Right-clicking a directory (in the list or in the path) will propose two
-actions:
+Right-clicking a directory (in the list or in the path) will propose the
+following actions:
 
-- Send to playlist: this is a recursive walk, it will send all tracks from
+- `Back`
+- `Send to playlist`: this is a recursive walk, it will send all tracks from
   the subtree to the playlist. Don't do this at the root of a big tree...
-- Open in new tab.
+- `Open in new tab.
+- `Random play by tracks`: this is analogous to `Send to playlist`, but the
+  list is shuffled, and sent to the Renderer by slices, so you can use a very
+  big list without swamping it.
+- `Random play by groups`: this will play groups of tracks, corresponding to
+  the lowest level of directories in the subtree, typically albums, but
+  these may also be MinimServer Groups for example.
+- `Stop random play`: if currently playing.
 
 Right-clicking empty space will propose to go back (or up).
 
