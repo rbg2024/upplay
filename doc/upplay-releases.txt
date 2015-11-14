@@ -1,5 +1,14 @@
 = Upplay release history
 
+== Version 1.1
+
+- Tooltips to help read the information in the "currently playing" area.
+- Options to add artist information to albums lists, and truncate long artist
+  information in track lists.
+- Random playing of arbitrary-sized subtrees either as individual tracks or
+  as groups/albums
+- Windows port in sync with other platforms.
+
 == Version 1.0
 
 Upplay now seems stable, and leaves the 0.x behind. Mostly to make it clear

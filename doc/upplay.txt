@@ -61,7 +61,6 @@ Right-clicking a track title will propose the following actions:
  - `Send all from here to playlist`: this track and the following ones go to
    the playlist.
  
-
 Right-clicking a directory (in the list or in the path) will propose the
 following actions:
 
@@ -76,6 +75,9 @@ following actions:
   the lowest level of directories in the subtree, typically albums, but
   these may also be MinimServer Groups for example.
 - `Stop random play`: if currently playing.
+
+While in "Random play by group" mode, the playlist broom tooltip displays
+the next group. Clicking the button will skip to it.
 
 Right-clicking empty space will propose to go back (or up).
 

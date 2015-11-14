@@ -2,10 +2,10 @@ upplay (1.1.0-1) unstable; urgency=low
 
   * More preferences (directory: display artists with albums lists,
      truncate artists in track lists)
-  * Random albums play
+  * Random tracks and albums play
   * Improve Back action availability
 
- -- Jean-Francois Dockes <jf@dockes.org>  Wed, 04 Nov 2015 22:20:00 +0100
+ -- Jean-Francois Dockes <jf@dockes.org>  Wed, 13 Nov 2015 22:20:00 +0100
 
 upplay (1.0.0-1) unstable; urgency=low
 
