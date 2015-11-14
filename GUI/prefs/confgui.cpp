@@ -163,7 +163,7 @@ ConfParamW *ConfTabsW::addParam(int tabindex,
 	cp = new ConfParamDNLW(this, lnk, label, tooltip);
         break;
     case CFPT_CSTRL:
-	cp = ConfParamCSLW(this, lnk, label, tooltip, *sl);
+	cp = new ConfParamCSLW(this, lnk, label, tooltip, *sl);
         break;
 
     }
