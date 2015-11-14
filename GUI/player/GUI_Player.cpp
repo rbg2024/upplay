@@ -111,15 +111,23 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     if (!is_fullscreen) {
         QSize size = m_settings->getPlayerSize();
         QPoint pos = m_settings->getPlayerPos();
-        if (size.width() != -1) {
-            // Use the defaults if the prefs are not set yet
-            QRect rect = this->geometry();
-            rect.setX(pos.x());
-            rect.setY(pos.y());
-            rect.setWidth(size.width());
-            rect.setHeight(size.height());
-            this->setGeometry(rect);
+#ifdef _WIN32
+        qDebug() << "Init size " << size << " pos " << pos;
+        if (pos.x() < 20 || pos.y() < 30) {
+            pos = QPoint(20, 30);
         }
+        if (size.width() < 0 || size.height() < 0) {
+            size = QSize(800, 600);
+        }
+        qDebug() << "Req size " << size << " pos " << pos;
+#endif
+        // Use the defaults if the prefs are not set yet
+        QRect rect = this->geometry();
+        rect.setX(pos.x());
+        rect.setY(pos.y());
+        rect.setWidth(size.width());
+        rect.setHeight(size.height());
+        this->setGeometry(rect);
     }
     
     m_library_width = 600;

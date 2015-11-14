@@ -30,6 +30,8 @@ ReleaseBuild=y
 gccpath=`which gcc`
 MINGWBIN=`dirname $gccpath`
 
+test -z "$MINGWBIN" && fatal cannot find gcc
+
 # Where to copy the Qt Dlls from:
 QTBIN=C:/Qt/5.5/mingw492_32/bin
 PATH=$QTBIN:$PATH
