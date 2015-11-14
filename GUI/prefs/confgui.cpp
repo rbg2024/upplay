@@ -139,7 +139,7 @@ ConfParamW *ConfTabsW::addParam(int tabindex,
     if (panel == 0) 
         return 0;
 
-    ConfParamW *cp;
+    ConfParamW *cp = 0;
     switch (tp) {
     case CFPT_BOOL:
         cp = new ConfParamBoolW(this, lnk, label, tooltip);
@@ -163,7 +163,7 @@ ConfParamW *ConfTabsW::addParam(int tabindex,
 	cp = new ConfParamDNLW(this, lnk, label, tooltip);
         break;
     case CFPT_CSTRL:
-	ConfParamCSLW(this, lnk, label, tooltip, *sl);
+	cp = ConfParamCSLW(this, lnk, label, tooltip, *sl);
         break;
 
     }
