@@ -31,7 +31,7 @@
 #include "HelperStructs/MetaData.h"
 #include "GUI/playlist/model/PlaylistItemModel.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
-#include "GUI/ContextMenu.h"
+#include "ContextMenu.h"
 
 class PlaylistView : public QListView {
 

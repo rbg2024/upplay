@@ -21,8 +21,7 @@
 
 #include "HelperStructs/CustomMimeData.h"
 #include "HelperStructs/Helper.h"
-#include "GUI/ContextMenu.h"
-#include "GUI/playlist/view/PlaylistView.h"
+#include "PlaylistView.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
 
 

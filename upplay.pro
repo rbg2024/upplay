@@ -19,10 +19,9 @@ CONFIG  += qt warn_on thread $$buildtype
 RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
-        GUI/ContextMenu.h \
+        GUI/player/DirectSlider.h  \
         GUI/player/GUI_Player.h \
         GUI/player/GUI_TrayIcon.h \
-        GUI/player/DirectSlider.h  \
         GUI/playlist/GUI_Playlist.h \
         GUI/playlist/delegate/PlaylistItemDelegate.h \
         GUI/playlist/delegate/PlaylistItemDelegateInterface.h \
@@ -30,10 +29,11 @@ HEADERS += \
         GUI/playlist/entry/GUI_PlaylistEntryBig.h \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.h \
         GUI/playlist/model/PlaylistItemModel.h \
+        GUI/playlist/view/ContextMenu.h \
         GUI/playlist/view/PlaylistView.h \
-        GUI/prefs/sortprefs.h \
-        GUI/prefs/prefs.h \
         GUI/prefs/confgui.h \
+        GUI/prefs/prefs.h \
+        GUI/prefs/sortprefs.h \
         GUI/renderchoose/renderchoose.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
@@ -57,22 +57,22 @@ HEADERS += \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \
-        GUI/ContextMenu.cpp \
+        GUI/player/DirectSlider.cpp \
         GUI/player/GUI_Player.cpp \
         GUI/player/GUI_PlayerConnections.cpp \
         GUI/player/GUI_PlayerControls.cpp \
         GUI/player/GUI_PlayerCover.cpp \
         GUI/player/GUI_PlayerMenubar.cpp \
         GUI/player/GUI_TrayIcon.cpp \
-        GUI/player/DirectSlider.cpp \
         GUI/playlist/GUI_Playlist.cpp \
         GUI/playlist/delegate/PlaylistItemDelegate.cpp \
         GUI/playlist/entry/GUI_PlaylistEntryBig.cpp \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.cpp \
         GUI/playlist/model/PlaylistItemModel.cpp \
+        GUI/playlist/view/ContextMenu.cpp \
         GUI/playlist/view/PlaylistView.cpp \
-        GUI/prefs/prefs.cpp \
         GUI/prefs/confgui.cpp \
+        GUI/prefs/prefs.cpp \
         GUI/prefs/sortprefs.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
