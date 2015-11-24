@@ -31,16 +31,18 @@
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "Playlist.h"
+#include "upadapt/ohpladapt.h"
 
 class PlaylistOH : public Playlist {
     Q_OBJECT
 
 public:
-    PlaylistOH(QObject * parent = 0)
-        : Playlist(parent), m_cursongsecs(0), m_lastsong(false),
-          m_closetoend(false) {}
+    // We take ownership of the OHPlayer object
+    PlaylistOH(OHPlayer *ohpl, QObject * parent = 0);
 
-    virtual ~PlaylistOH() {}
+    virtual ~PlaylistOH() {
+        delete m_ohplo;
+    }
 
 signals:
     // All our signals are connected to the OHPlaylist object
@@ -74,14 +76,18 @@ public slots:
 
     // Set from scratch after reading changes from device
     void psl_new_ohpl(const MetaDataList&);
+    void psl_seek_pc(int);
+
 private:
+    // My link to the OpenHome Renderer
+    OHPlayer *m_ohplo;
     // Position in current song, 0 if unknown
     quint32 m_cursongsecs;
     // Current song is last in playlist
     bool m_lastsong;
     // Playing the last 5 S of last song
     bool m_closetoend;
-
+    
     void resetPosState() {
         m_cursongsecs = 0;
         m_lastsong = m_closetoend = false;

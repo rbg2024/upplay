@@ -69,7 +69,6 @@ private:
     RenderingControlQO *m_rdco;
     AVTPlayer    *m_avto;
 
-    OHPlayer     *m_ohplo;
     OHTimeQO     *m_ohtmo;
     OHVolumeQO   *m_ohvlo;
 

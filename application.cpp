@@ -92,7 +92,6 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(m_playlist);
     deleteZ(m_rdco);
     deleteZ(m_avto);
-    deleteZ(m_ohplo);
     deleteZ(m_ohtmo);
     deleteZ(m_ohvlo);
 
@@ -122,7 +121,6 @@ bool Application::setupRenderer(const string& uid)
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
         qDebug() << "Application::setupRenderer: using OHPlaylist";
-        m_ohplo = new OHPlayer(ohpl);
         OHTMH ohtm = rdr->ohtm();
         if (ohtm) {
             qDebug() << "Application::setupRenderer: OHTm ok, no need for avt";
@@ -130,11 +128,7 @@ bool Application::setupRenderer(const string& uid)
             // no need for AVT then
             needavt = false;
         }
-        m_playlist = new PlaylistOH();
-    } else {
-        m_ohplo = 0;
-        qDebug() << "Application::setupRenderer: using AVT playlist";
-        m_playlist = new PlaylistAVT(rdr->desc()->UDN);
+        m_playlist = new PlaylistOH(new OHPlayer(ohpl));
     }
 
     if (needavt) {
@@ -145,6 +139,11 @@ bool Application::setupRenderer(const string& uid)
         m_avto = new AVTPlayer(rdr->avt());
     }
 
+    if (!ohpl) {
+        qDebug() << "Application::setupRenderer: using AVT playlist";
+        m_playlist = new PlaylistAVT(m_avto, rdr->desc()->UDN);
+    }
+    
     m_cdb->setPlaylist(m_playlist);
 
     QString fn = QString::fromUtf8(rdr->desc()->friendlyName.c_str());
@@ -203,7 +202,7 @@ void Application::chooseRenderer()
 Application::Application(QApplication* qapp, int,
                          QTranslator* translator, QObject *parent)
     : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
-      m_avto(0), m_ohplo(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
+      m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
       m_settings(0), m_app(qapp), m_initialized(false)
 {
     m_settings = CSettingsStorage::getInstance();
@@ -264,75 +263,6 @@ void Application::reconnectOrChoose()
 
 void Application::renderer_connections()
 {
-    if (m_ohplo) {
-        qDebug() << "Connecting ohplo::metadataArrayChanged(MetaDataList& mdv)";
-        PlaylistOH *ploh = dynamic_cast<PlaylistOH*>(m_playlist);
-        if (ploh == 0) {
-            cerr << "OpenHome player but Playlist not openhome!";
-            abort();
-        }
-
-        // Connections from OpenHome renderer to local playlist
-        CONNECT(m_ohplo, metadataArrayChanged(const MetaDataList&),
-                m_playlist, psl_new_ohpl(const MetaDataList&));
-        CONNECT(m_ohplo, currentTrackId(int), ploh, psl_currentTrackId(int));
-        CONNECT(m_ohplo, audioStateChanged(int, const char *),
-                m_playlist, psl_new_transport_state(int, const char *));
-        CONNECT(m_ohplo, playlistModeChanged(Playlist_Mode),
-                m_ui_playlist, setPlayerMode(Playlist_Mode));
-        CONNECT(m_ohplo, connectionLost(), this, reconnectOrChoose());
-
-        // Connections from local playlist to openhome
-        CONNECT(ploh, sig_clear_playlist(),
-                m_ohplo, clear());
-        CONNECT(ploh, sig_insert_tracks(const MetaDataList&, int),
-                m_ohplo, insertTracks(const MetaDataList&, int));
-        CONNECT(ploh, sig_tracks_removed(const QList<int>&),
-                m_ohplo, removeTracks(const QList<int>&));
-        CONNECT(ploh, sig_row_activated(int), m_ohplo, seekIndex(int));
-        CONNECT(m_playlist, sig_mode_changed(Playlist_Mode),
-                m_ohplo, changeMode(Playlist_Mode));
-        CONNECT(m_playlist, sig_sync(), m_ohplo, sync());
-        CONNECT(m_playlist, sig_pause(), m_ohplo, pause());
-        CONNECT(m_playlist, sig_stop(),  m_ohplo, stop());
-        CONNECT(m_playlist, sig_resume_play(), m_ohplo, play());
-        CONNECT(m_playlist, sig_forward(), m_ohplo, next());
-        CONNECT(m_playlist, sig_backward(), m_ohplo, previous());
-
-        CONNECT(m_player, search(int), m_ohplo, seekPC(int));
-
-    } else {
-        if (m_avto == 0) {
-            cerr << "No OpenHome Playlist and no AVTRansport ??";
-            return;
-        }
-        PlaylistAVT *plavt = dynamic_cast<PlaylistAVT*>(m_playlist);
-        if (plavt == 0) {
-            cerr << "!OpenHome player but Playlist not AVT !";
-            abort();
-        }
-        CONNECT(plavt, sig_play_now(const MetaData&, int, bool),
-                m_avto, changeTrack(const MetaData&, int, bool));
-        CONNECT(plavt, sig_next_track_to_play(const MetaData&),
-                m_avto, infoNextTrack(const MetaData&));
-        CONNECT(m_avto, endOfTrackIsNear(),
-                plavt, psl_prepare_for_end_of_track());
-        CONNECT(m_avto, newTrackPlaying(const QString&),
-                plavt, psl_ext_track_change(const QString&));
-        CONNECT(m_avto, sig_currentMetadata(const MetaData&),
-                plavt, psl_onCurrentMetadata(const MetaData&));
-        // the search (actually seek) param is in percent
-        CONNECT(m_player, search(int), m_avto, seekPC(int));
-
-        CONNECT(m_avto, audioStateChanged(int, const char*), m_playlist,
-                psl_new_transport_state(int, const char *));
-        CONNECT(m_avto, stoppedAtEOT(), m_playlist, psl_forward());
-        CONNECT(m_avto, connectionLost(), this, reconnectOrChoose());
-        CONNECT(m_playlist, sig_stop(),  m_avto, stop());
-        CONNECT(m_playlist, sig_resume_play(), m_avto, play());
-        CONNECT(m_playlist, sig_pause(), m_avto, pause());
-    }
-
     // Use either ohtime or avt for time updates
     if (m_ohtmo) {
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
@@ -369,7 +299,11 @@ void Application::renderer_connections()
     CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
     CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
     CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
+    CONNECT(m_player, search(int), m_playlist, psl_seek_pc(int));
 
+    CONNECT(m_playlist, connectionLost(), this, reconnectOrChoose());
+    CONNECT(m_playlist, playlistModeChanged(Playlist_Mode),
+            m_ui_playlist, setPlayerMode(Playlist_Mode));
     CONNECT(m_playlist, sig_track_metadata(const MetaData&),
             m_player, update_track(const MetaData&));
     CONNECT(m_playlist, sig_stopped(),  m_player, stopped());
@@ -393,7 +327,6 @@ void Application::renderer_connections()
     CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
     CONNECT(m_cdb, sig_next_group_html(QString),
             m_ui_playlist, psl_next_group_html(QString));
-
 }
 
 // Connections which make sense without a renderer.

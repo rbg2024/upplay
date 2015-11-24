@@ -37,13 +37,13 @@
 using namespace std;
 
 PlaylistAVT::PlaylistAVT(QObject *parent)
-  : Playlist(parent)
+    : Playlist(parent), m_avto(0)
 {
     QTimer::singleShot(0, this, SLOT(playlist_updated()));
 }
 
-PlaylistAVT::PlaylistAVT(const string& _udn, QObject *parent)
-  : Playlist(parent)
+PlaylistAVT::PlaylistAVT(AVTPlayer *avtp, const string& _udn, QObject *parent)
+    : Playlist(parent), m_avto(avtp)
 {
     string udn(_udn);
     if (udn.find("uuid:") == 0) {
@@ -58,12 +58,33 @@ PlaylistAVT::PlaylistAVT(const string& _udn, QObject *parent)
     string oldsaved = qs2utf8s(Helper::getHomeDataPath()) + "savedQueue";
     if (!udn.empty()) {
         QFile os(QString::fromLocal8Bit(oldsaved.c_str()));
-        if (os.exists() && !QFile::exists(QString::fromLocal8Bit(m_savefile.c_str()))) {
+        if (os.exists() &&
+            !QFile::exists(QString::fromLocal8Bit(m_savefile.c_str()))) {
             os.rename(QString::fromLocal8Bit(m_savefile.c_str()));
         }
     }
 
     m_meta.unSerialize(u8s2qs(m_savefile));
+
+    connect(this, SIGNAL(sig_play_now(const MetaData&, int, bool)),
+            m_avto, SLOT(changeTrack(const MetaData&, int, bool)));
+    connect(this, SIGNAL(sig_next_track_to_play(const MetaData&)),
+            m_avto, SLOT(infoNextTrack(const MetaData&)));
+    connect(m_avto, SIGNAL(endOfTrackIsNear()),
+            this, SLOT(psl_prepare_for_end_of_track()));
+    connect(m_avto, SIGNAL(newTrackPlaying(const QString&)),
+            this, SLOT(psl_ext_track_change(const QString&)));
+    connect(m_avto, SIGNAL(sig_currentMetadata(const MetaData&)),
+            this, SLOT(psl_onCurrentMetadata(const MetaData&)));
+    
+    connect(m_avto, SIGNAL(audioStateChanged(int, const char*)),
+            this, SLOT(psl_new_transport_state(int, const char *)));
+    connect(m_avto, SIGNAL(stoppedAtEOT()), this,  SLOT(psl_forward()));
+    connect(m_avto,  SIGNAL(connectionLost()), this, SLOT(reconnectOrChoose()));
+    connect(this, SIGNAL(sig_stop()),  m_avto, SLOT(stop()));
+    connect(this, SIGNAL(sig_resume_play()), m_avto, SLOT(play()));
+    connect(this, SIGNAL(sig_pause()), m_avto, SLOT(pause()));
+    
     QTimer::singleShot(0, this, SLOT(playlist_updated()));
 }
 
@@ -115,6 +136,11 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
             return;
         }
     }
+}
+
+void PlaylistAVT::psl_seek_pc(int pc)
+{
+    m_avto->seekPC(pc);
 }
 
 void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)

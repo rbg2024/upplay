@@ -30,13 +30,14 @@
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "Playlist.h"
+#include "upadapt/avtadapt.h"
 
 class PlaylistAVT : public Playlist {
     Q_OBJECT
 
 public:
     PlaylistAVT(QObject *parent = 0);
-    PlaylistAVT(const std::string& UDN, QObject *parent = 0);
+    PlaylistAVT(AVTPlayer *avtp, const std::string& UDN, QObject *parent = 0);
     virtual ~PlaylistAVT() {}
 
 public slots:
@@ -54,7 +55,8 @@ public slots:
     void psl_forward();
     void psl_backward();
     void psl_remove_rows(const QList<int> &, bool select_next=true);
-
+    void psl_seek_pc(int);
+    
 signals:
     // This is for player action
     void sig_play_now(const MetaData&, int pos = 0, bool play = true);
@@ -72,6 +74,7 @@ protected:
 private slots:
     void playlist_updated();
 private:
+    AVTPlayer *m_avto;
     std::string m_savefile;
 };
 

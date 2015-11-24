@@ -23,12 +23,47 @@
 
 using namespace UPnPP;
 
+    // We take ownership of the OHPlayer object
+PlaylistOH::PlaylistOH(OHPlayer *ohpl, QObject * parent)
+    : Playlist(parent), m_ohplo(ohpl), m_cursongsecs(0), m_lastsong(false),
+      m_closetoend(false)
+{
+    // Connections from OpenHome renderer to local playlist
+    connect(m_ohplo, SIGNAL(metadataArrayChanged(const MetaDataList&)),
+            this, SLOT(psl_new_ohpl(const MetaDataList&)));
+    connect(m_ohplo, SIGNAL(currentTrackId(int)),
+            this, SLOT(psl_currentTrackId(int)));
+    connect(m_ohplo, SIGNAL(audioStateChanged(int, const char *)),
+            this, SLOT(psl_new_transport_state(int, const char *)));
+
+    // Connections from local playlist to openhome
+    connect(this, SIGNAL(sig_clear_playlist()), m_ohplo, SLOT(clear()));
+    connect(this, SIGNAL(sig_insert_tracks(const MetaDataList&, int)),
+            m_ohplo, SLOT(insertTracks(const MetaDataList&, int)));
+    connect(this, SIGNAL(sig_tracks_removed(const QList<int>&)),
+            m_ohplo, SLOT(removeTracks(const QList<int>&)));
+    connect(this, SIGNAL(sig_row_activated(int)),
+            m_ohplo, SLOT(seekIndex(int)));
+    connect(this, SIGNAL(sig_mode_changed(Playlist_Mode)),
+            m_ohplo, SLOT(changeMode(Playlist_Mode)));
+    connect(this, SIGNAL(sig_sync()), m_ohplo, SLOT(sync()));
+    connect(this, SIGNAL(sig_pause()), m_ohplo, SLOT(pause()));
+    connect(this, SIGNAL(sig_stop()),  m_ohplo, SLOT(stop()));
+    connect(this, SIGNAL(sig_resume_play()), m_ohplo, SLOT(play()));
+    connect(this, SIGNAL(sig_forward()), m_ohplo, SLOT(next()));
+    connect(this, SIGNAL(sig_backward()), m_ohplo, SLOT(previous()));
+}
 
 void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOH::psl_new_ohpl: " << mdv.size() << " entries";
     m_meta = mdv;
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
+}
+
+void PlaylistOH::psl_seek_pc(int pc)
+{
+    m_ohplo->seekPC(pc);
 }
 
 void PlaylistOH::psl_currentTrackId(int id)
@@ -73,6 +108,7 @@ void PlaylistOH::psl_secs_in_song_impl(quint32 secs)
 
 void PlaylistOH::psl_new_transport_state_impl(int, const char *sst)
 {
+    Q_UNUSED(sst);
     //qDebug() << "PlaylistOH::psl_new_transport_state_impl: " << sst;
     if (m_tpstate == AUDIO_STOPPED && m_closetoend == true) {
         resetPosState();

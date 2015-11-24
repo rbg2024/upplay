@@ -72,6 +72,10 @@ signals:
     // Done inserting tracks in the playlist
     void sig_insert_done();
 
+    // Only ever emitted by the openhome variant
+    void connectionLost();
+    void playlistModeChanged(Playlist_Mode);
+                                           
 public slots:
     virtual void psl_insert_tracks(const MetaDataList&, int afteridx) = 0;
     virtual void psl_add_tracks(const MetaDataList&);
@@ -83,6 +87,8 @@ public slots:
         m_insertion_point = -1;
         psl_change_track_impl(num);
     }
+    virtual void psl_seek_pc(int) = 0;
+
     virtual void psl_change_track_impl(int) = 0;
 
     // Information from the remote end
