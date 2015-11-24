@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2012
- *
- * This file is part of sayonara-player
+ * Copyright (C) 2015 J.F. Dockes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * created by Lucio Carreras,
- * Sep 14, 2012
- *
  */
-#include <QDebug>
-#include <QStyle>
-#include <QEvent>
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QAbstractSlider>
-#include <QStyleOptionSlider>
-
-#include "GUI/player/DirectSlider.h"
+#include "directslider.h"
 
 #include <cmath>
+
+#include <QDebug>
+#include <QEvent>
+#include <QMouseEvent>
+#include <QStyleOptionSlider>
 
 // A slider where a click sets the position to the click location
 // instead of moving by a fixed amount as does the standard widget.
@@ -39,15 +31,21 @@
 static int adjustedVal(double halfHandleWidth, int pos, int sz, 
                        int min, int max)
 {
-    if ( pos < halfHandleWidth )
+    if (pos < halfHandleWidth)
         pos = halfHandleWidth;
-    if ( pos > sz - halfHandleWidth )
+    if (pos > sz - halfHandleWidth)
         pos = sz - halfHandleWidth;
-    // get new dimensions accounting for slider handle width
+    // Get new dimensions accounting for slider handle width
     double newWidth = (sz - halfHandleWidth) - halfHandleWidth;
     double normalizedPosition = (pos - halfHandleWidth)  / newWidth ;
 
     return min + ((max-min) * normalizedPosition);
+}
+
+void DirectSlider::setValueNoSigs(int val) {
+    blockSignals(true);
+    setValue(val);
+    blockSignals(false);
 }
 
 void DirectSlider::mousePressEvent(QMouseEvent *event)

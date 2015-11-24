@@ -19,7 +19,7 @@ CONFIG  += qt warn_on thread $$buildtype
 RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
-        GUI/player/DirectSlider.h  \
+        GUI/widgets/directslider.h  \
         GUI/player/GUI_Player.h \
         GUI/player/GUI_TrayIcon.h \
         GUI/playlist/GUI_Playlist.h \
@@ -57,7 +57,7 @@ HEADERS += \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \
-        GUI/player/DirectSlider.cpp \
+        GUI/widgets/directslider.cpp \
         GUI/player/GUI_Player.cpp \
         GUI/player/GUI_PlayerConnections.cpp \
         GUI/player/GUI_PlayerControls.cpp \

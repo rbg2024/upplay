@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2012  
- *
- * This file is part of sayonara-player
+ * Copyright (C) 2015 J.F. Dockes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * created by Lucio Carreras, 
- * Sep 14, 2012 
  *
  */
 
@@ -33,26 +28,18 @@ class QMouseEvent;
 // instead of moving by a fixed amount as does the standard widget.
 // http://stackoverflow.com/questions/11132597/qslider-mouse-direct-jump
 class DirectSlider: public QSlider {
-
     Q_OBJECT
 
 public:
-    DirectSlider(QWidget* parent=0)
-        : QSlider(parent)
-        {}
-
-    virtual ~DirectSlider() {}
-
-public slots:
-
-    void setValueNoSigs(int val) {
-        blockSignals(true);
-        setValue(val);
-        blockSignals(false);
+    DirectSlider(QWidget* parent = 0)
+        : QSlider(parent) {
     }
 
+public slots:
+    void setValueNoSigs(int val);
+
 protected:
-    virtual void mousePressEvent ( QMouseEvent * event );
+    virtual void mousePressEvent (QMouseEvent *event);
 };
 
 #endif /* DIRECTSLIDER_H_ */
