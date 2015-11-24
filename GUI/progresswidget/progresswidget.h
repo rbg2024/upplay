@@ -32,18 +32,18 @@ public:
 public slots:
     // All times are in seconds
 
-    virtual void setTotalTime(int value);
+    virtual void setTotalTime(int secs);
 
     // Set value and do whatever we do when it changes (emit
     // signals)
-    virtual void seek(int value);
+    virtual void seek(int secs);
     // Increment/decrement value and do whatever we do when it
     // changes (emit signals). steps are in units of step_unit (x %)
     virtual void step(int steps);
     virtual void set_step_value_pc(int percent);
     virtual void set_step_value_secs(int secs);
     // Set-up display, keep quiet
-    virtual void setUi(int value);
+    virtual void setUi(int secs);
 
     virtual void setSkinSuffix(const QString& s) {
         m_skinSuffix = s;
@@ -51,9 +51,17 @@ public slots:
 
 private slots:
     // Connected to slider
-    virtual void onProgressSliderChanged(int value);
+    virtual void onProgressSliderChanged(int pc);
 
 private:
+    void showTimes(int secs);
+
+    int m_totalsecs;
+    // Values for step in percent or secs. Only one can be valid (> 0)
+    // Initial default 2%
+    int m_step_pc;
+    int m_step_secs;
+    
     QString m_skinSuffix;
 };
 

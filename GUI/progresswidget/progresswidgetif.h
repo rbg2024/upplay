@@ -51,7 +51,7 @@ public slots:
     
 signals:
     // Emitted when requested position changes, either because the
-    // user acted on the slider, or seek() was called
+    // user acted on the slider, or seek() was called. Value in seconds
     void progressChanged(int);
 };
 

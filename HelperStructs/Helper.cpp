@@ -89,6 +89,12 @@ QString cvtNum2String(int num, int digits)
 QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
         bool show_days)
 {
+    QString sign;
+    if (msec < 0) {
+        msec = -msec;
+        sign = "-";
+    }
+        
     bool show_hrs = false;
 
     int sec = msec / 1000;
@@ -121,7 +127,7 @@ QString Helper::cvtMsecs2TitleLengthString(long int msec, bool colon,
         final_str +=  cvtNum2String(min, 2) + "m " + cvtNum2String(secs, 2);
     }
 
-    return final_str;
+    return sign + final_str;
 
 }
 
