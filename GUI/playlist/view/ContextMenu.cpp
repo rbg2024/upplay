@@ -20,7 +20,7 @@
 
 
 
-#include "GUI/ContextMenu.h"
+#include "ContextMenu.h"
 #include "HelperStructs/Helper.h"
 
 #include <QAction>

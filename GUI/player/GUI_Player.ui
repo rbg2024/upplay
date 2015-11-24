@@ -856,7 +856,7 @@
   <customwidget>
    <class>DirectSlider</class>
    <extends>QSlider</extends>
-   <header>GUI/player/DirectSlider.h</header>
+   <header>GUI/widgets/directslider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
