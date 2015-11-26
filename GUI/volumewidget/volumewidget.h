@@ -23,10 +23,10 @@
 #include "volumewidgetif.h"
 #include "ui_volumewidget.h"
 
-class VolumeWidget: public VolumeWidgetIF, public Ui::VolumeWidget {
+class VolumeWidget: public VolumeWidgetIF {
     Q_OBJECT;
 public:
-    VolumeWidget(QWidget *parent = 0);
+    VolumeWidget(QWidget *parent = 0, bool horiz = false);
 
 public slots:
     // Volume range is always enforced as 0-100
@@ -55,8 +55,17 @@ private:
     void init();
     void setupButton(int);
     
+    Ui::VolumeWidget *ui;
     bool m_mute;
     QString m_skinSuffix;
 };
 
+class VolumeHWidget : public VolumeWidget {
+public:
+    VolumeHWidget(QWidget *parent = 0)
+        : VolumeWidget(parent, true) {
+    }
+};
+
+    
 #endif /* _VOLUMEWIDGET_H_INCLUDED_ */

@@ -23,8 +23,6 @@
 using namespace std;
 
 #include <QApplication>
-#include <QObject>
-#include <QTimer>
 
 #include "volumewidget.h"
 
@@ -74,7 +72,7 @@ int main(int argc, char **argv)
     if (argc > 0)
         Usage();
 
-    VolumeWidget w;
+    VolumeHWidget w;
     w.show();
     return app.exec();
 }

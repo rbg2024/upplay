@@ -20,15 +20,20 @@
 
 #include <QDebug>
 
-VolumeWidget::VolumeWidget(QWidget *parent)
-    : VolumeWidgetIF(parent)
+VolumeWidget::VolumeWidget(QWidget *parent, bool horiz)
+    : VolumeWidgetIF(parent), ui(new Ui::VolumeWidget)
 {
-    setupUi(this);
-    volumeSlider->setMinimum(0);
-    volumeSlider->setMaximum(100);
-    connect(volumeSlider, SIGNAL(valueChanged(int)),
+    ui->setupUi(this, horiz);
+    init();
+}
+
+void VolumeWidget::init()
+{
+    ui->volumeSlider->setMinimum(0);
+    ui->volumeSlider->setMaximum(100);
+    connect(ui->volumeSlider, SIGNAL(valueChanged(int)),
             this, SLOT(onVolumeSliderChanged(int)));
-    connect(btn_mute, SIGNAL(clicked()),
+    connect(ui->btn_mute, SIGNAL(clicked()),
             this, SLOT(onMuteClicked()));
     setUi(20);
     setMuteUi(m_mute = false);
@@ -54,13 +59,13 @@ void VolumeWidget::onMuteClicked()
 void VolumeWidget::set(int value)
 {
     setupButton(value);
-    volumeSlider->setValueNoSigs(value);
+    ui->volumeSlider->setValueNoSigs(value);
     emit volumeChanged(value);
 }
 
 void VolumeWidget::step(int steps)
 {
-    int current = volumeSlider->value();
+    int current = ui->volumeSlider->value();
     current += steps;
     if (current < 0)
         current = 0;
@@ -73,7 +78,7 @@ void VolumeWidget::setUi(int value)
 {
     if (!m_mute) {
         setupButton(value);
-        volumeSlider->setValueNoSigs(value);
+        ui->volumeSlider->setValueNoSigs(value);
     }
 }
 
@@ -81,18 +86,18 @@ void VolumeWidget::setMuteUi(bool ismute)
 {
     m_mute = ismute;
     //qDebug() << "VolumeWidget::setMuteUi(" << m_mute << ")";
-    volumeSlider->setDisabled(m_mute);
+    ui->volumeSlider->setDisabled(m_mute);
     if (m_mute) {
-        btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
+        ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
     } else {
-        setupButton(volumeSlider->value());
+        setupButton(ui->volumeSlider->value());
     }
 }
 
 void VolumeWidget::setSkinName(const QString& s)
 {
     m_skinSuffix = s.isEmpty() ? "" : "_" + s;
-    setupButton(volumeSlider->value());
+    setupButton(ui->volumeSlider->value());
 }
 
 void VolumeWidget::setupButton(int value)
@@ -111,5 +116,5 @@ void VolumeWidget::setupButton(int value)
     }
 
     //qDebug() << "VolumeWidget::setupButton: fn: " << butFilename;
-    btn_mute->setIcon(QIcon(butFilename));
+    ui->btn_mute->setIcon(QIcon(butFilename));
 }
