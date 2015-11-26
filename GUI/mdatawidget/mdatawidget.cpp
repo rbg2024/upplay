@@ -38,16 +38,14 @@ void MDataWidget::setData(const MetaData& md)
         albtxt = md.album.trimmed() + " (" +
             QString::number(md.year) + ")";
     }
-    albtxt = escapeHtml(albtxt);
     lab_album->setText(albtxt);
-    lab_album->setToolTip(QString::fromUtf8("<i></i>") + albtxt);
+    lab_album->setToolTip(QString::fromUtf8("<i></i>") + escapeHtml(albtxt));
 
-    QString artxt = escapeHtml(md.artist);
-    lab_artist->setText(artxt);
-    lab_artist->setToolTip(QString::fromUtf8("<i></i>") + artxt);
+    lab_artist->setText(md.artist);
+    lab_artist->setToolTip(QString::fromUtf8("<i></i>") +
+                           escapeHtml(md.artist));
 
-    QString ttxt = escapeHtml(md.title);
-    lab_title->setText(ttxt);
-    lab_title->setToolTip(QString::fromUtf8("<i></i>") + ttxt);
+    lab_title->setText(md.title);
+    lab_title->setToolTip(QString::fromUtf8("<i></i>") + escapeHtml(md.title));
 }
 
