@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     if (argc > 0)
         Usage();
 
-    VolumeWidget w(50, false);
+    VolumeWidget w;
     w.show();
     return app.exec();
 }
