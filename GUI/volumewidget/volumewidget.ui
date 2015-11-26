@@ -28,7 +28,7 @@
      <property name="spacing">
       <number>0</number>
      </property>
-     <item>
+     <item alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="btn_mute">
        <property name="maximumSize">
         <size>
@@ -57,7 +57,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignHCenter">
       <widget class="DirectSlider" name="volumeSlider">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
@@ -76,9 +76,6 @@
        </property>
        <property name="invertedControls">
         <bool>false</bool>
-       </property>
-       <property name="tickInterval">
-        <number>25</number>
        </property>
       </widget>
      </item>
