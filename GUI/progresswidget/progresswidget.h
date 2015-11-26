@@ -29,6 +29,8 @@ class ProgressWidget: public ProgressWidgetIF, public Ui::ProgressWidget {
 public:
     ProgressWidget(QWidget *parent = 0);
 
+    virtual int currentValuePc();
+                                
 public slots:
     // All times are in seconds
 
@@ -40,8 +42,8 @@ public slots:
     // Increment/decrement value and do whatever we do when it
     // changes (emit signals). steps are in units of step_unit (x %)
     virtual void step(int steps);
-    virtual void set_step_value_pc(int percent);
-    virtual void set_step_value_secs(int secs);
+    virtual void setStepValuePc(int percent);
+    virtual void setStepValueSecs(int secs);
     // Set-up display, keep quiet
     virtual void setUi(int secs);
 

@@ -10,9 +10,24 @@
     <height>58</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
       <widget class="DirectSlider" name="songProgress">
        <property name="sizePolicy">
@@ -58,8 +73,17 @@
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="curTime">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="font">
           <font>
            <pointsize>7</pointsize>
@@ -72,7 +96,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string notr="true"/>
+          <string notr="true">0:00</string>
          </property>
         </widget>
        </item>
@@ -94,6 +118,12 @@
        </item>
        <item>
         <widget class="QLabel" name="endTime">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="font">
           <font>
            <pointsize>7</pointsize>
@@ -103,7 +133,7 @@
           <number>0</number>
          </property>
          <property name="text">
-          <string notr="true"/>
+          <string notr="true">0:00</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -120,7 +150,7 @@
   <customwidget>
    <class>DirectSlider</class>
    <extends>QSlider</extends>
-   <header>../widgets/directslider.h</header>
+   <header>GUI/widgets/directslider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

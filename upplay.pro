@@ -20,8 +20,17 @@ RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
         GUI/widgets/directslider.h  \
-        GUI/player/GUI_Player.h \
-        GUI/player/GUI_TrayIcon.h \
+        GUI/mainw/mainw.h \
+        GUI/mainw/trayicon.h \
+        GUI/playerwidget/playerwidget.h \
+        GUI/mdatawidget/mdatawidget.h \
+        GUI/mdatawidget/mdatawidgetif.h \
+        GUI/volumewidget/volumewidget.h \
+        GUI/volumewidget/volumewidgetif.h \
+        GUI/playctlwidget/playctlwidget.h \
+        GUI/playctlwidget/playctlwidgetif.h \
+        GUI/progresswidget/progresswidget.h \
+        GUI/progresswidget/progresswidgetif.h \
         GUI/playlist/GUI_Playlist.h \
         GUI/playlist/delegate/PlaylistItemDelegate.h \
         GUI/playlist/delegate/PlaylistItemDelegateInterface.h \
@@ -58,12 +67,17 @@ HEADERS += \
 
 SOURCES += \
         GUI/widgets/directslider.cpp \
-        GUI/player/GUI_Player.cpp \
-        GUI/player/GUI_PlayerConnections.cpp \
-        GUI/player/GUI_PlayerControls.cpp \
-        GUI/player/GUI_PlayerCover.cpp \
-        GUI/player/GUI_PlayerMenubar.cpp \
-        GUI/player/GUI_TrayIcon.cpp \
+        GUI/mainw/mainw.cpp \
+        GUI/mainw/mw_connections.cpp  \
+        GUI/mainw/mw_controls.cpp  \
+        GUI/mainw/mw_cover.cpp  \
+        GUI/mainw/mw_menubar.cpp  \
+        GUI/mainw/trayicon.cpp \
+        GUI/playerwidget/playerwidget.cpp \
+        GUI/mdatawidget/mdatawidget.cpp \
+        GUI/volumewidget/volumewidget.cpp \
+        GUI/playctlwidget/playctlwidget.cpp \
+        GUI/progresswidget/progresswidget.cpp \
         GUI/playlist/GUI_Playlist.cpp \
         GUI/playlist/delegate/PlaylistItemDelegate.cpp \
         GUI/playlist/entry/GUI_PlaylistEntryBig.cpp \
@@ -89,8 +103,13 @@ SOURCES += \
         upplay.cpp 
 
 FORMS   = \
+        GUI/mainw/mainw.ui \
+        GUI/playerwidget/playerwidget.ui \
+        GUI/mdatawidget/mdatawidget.ui \
+        GUI/volumewidget/volumewidget.ui \
+        GUI/playctlwidget/playctlwidget.ui \
+        GUI/progresswidget/progresswidget.ui \
         dirbrowser/dirbrowser.ui \
-        GUI/player/GUI_Player.ui \
         GUI/playlist/GUI_Playlist.ui \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.ui \

@@ -31,6 +31,7 @@ public:
     }
     virtual ~ProgressWidgetIF() {}
 
+    virtual int currentValuePc() = 0;
 public slots:
     // All times are in seconds
 
@@ -42,17 +43,20 @@ public slots:
     // Increment/decrement value and do whatever we do when it
     // changes (emit signals). steps are in units of step_unit (x %)
     virtual void step(int steps) = 0;
-    virtual void set_step_value_pc(int percent) = 0;
-    virtual void set_step_value_secs(int secs) = 0;
+    virtual void setStepValuePc(int percent) = 0;
+    virtual void setStepValueSecs(int secs) = 0;
     // Set-up display, keep quiet
     virtual void setUi(int value) = 0;
+
+    // Change skin if we can
     virtual void setSkinSuffix(const QString&) {
     }
     
 signals:
-    // Emitted when requested position changes, either because the
-    // user acted on the slider, or seek() was called. Value in seconds
-    void progressChanged(int);
+    // Emitted when the requested position changes, either because the
+    // user acted on the slider, or seek() was called. Value in
+    // seconds
+    void seekRequested(int secs);
 };
 
 #endif /* _PROGRESSWIDGETIF_H_INCLUDED_ */

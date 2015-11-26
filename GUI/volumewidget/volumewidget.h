@@ -26,7 +26,7 @@
 class VolumeWidget: public VolumeWidgetIF, public Ui::VolumeWidget {
     Q_OBJECT;
 public:
-    VolumeWidget(int volume, bool ismute, QWidget *parent = 0);
+    VolumeWidget(QWidget *parent = 0);
 
 public slots:
     // Volume range is always enforced as 0-100
@@ -41,10 +41,8 @@ public slots:
     virtual void setUi(int value);
     virtual void setMuteUi(bool);
 
-    virtual void setSkinSuffix(const QString& s) {
-        m_skinSuffix = s;
-    }
-
+    virtual void setSkinName(const QString& s);
+                                              
 private slots:
     // Connected to slider
     virtual void onVolumeSliderChanged(int value);

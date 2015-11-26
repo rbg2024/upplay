@@ -31,8 +31,8 @@
 #include <QDebug>
 #include <QtNetwork/QNetworkAccessManager>
 
-#include "ui_GUI_Player.h"
-#include "GUI/player/GUI_TrayIcon.h"
+#include "ui_mainw.h"
+#include "trayicon.h"
 #include "HelperStructs/Helper.h"
 
 class GUI_Playlist;
@@ -80,7 +80,7 @@ signals:
     void forward();
     void sig_mute(bool ison);
     void sig_volume_changed (int);
-    void search(int pos_percent);
+    void sig_seek(int secs);
 
     /* File */
     void sig_choose_renderer();
@@ -96,16 +96,13 @@ signals:
     void sig_preferences();
 
 private slots:
-    void playClicked(bool b = true);
-    void stopClicked(bool b = true);
+    void playClicked();
+    void stopClicked();
     void backwardClicked(bool b = true);
     void forwardClicked(bool b = true);
-    void setProgressJump(int percent);
     void jump_forward();
     void jump_backward();
 
-    void muteButtonPressed();
-    void volumeChanged(int volume_percent);
     void volumeChangedByTick(int val);
     void volumeHigher();
     void volumeLower();
@@ -182,9 +179,6 @@ private:
 
     void setupTrayActions ();
 
-    void setVolume(int vol, bool dostore, bool doemit);
-    void setupVolButton(int percent);
-    void initGUI();
     void setupConnections();
     void total_time_changed(qint64);
     void fetch_cover(const QString&);

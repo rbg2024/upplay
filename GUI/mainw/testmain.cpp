@@ -26,7 +26,7 @@ using namespace std;
 #include <QObject>
 #include <QTimer>
 
-#include "GUI_Player.h"
+#include "mainw.h"
 
 //using namespace UPnPClient;
 

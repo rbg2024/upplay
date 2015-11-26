@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "mainw.h"
+
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPalette>
@@ -25,9 +27,7 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QTemporaryFile>
 
-#include "ui_GUI_Player.h"
-#include "GUI/player/GUI_Player.h"
-#include "GUI/player/GUI_TrayIcon.h"
+#include "trayicon.h"
 #include "GUI/playlist/GUI_Playlist.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
@@ -64,23 +64,23 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     m_covertempfile(0)
 {
     ui->setupUi(this);
-    initGUI();
+
+    ui->action_viewLibrary->setText(tr("&Library"));
+    ui->action_Fullscreen->setShortcut(QKeySequence("F11"));
+    ui->action_Dark->setShortcut(QKeySequence("F10"));
+
     m_translator = translator;
     m_settings = CSettingsStorage::getInstance();
     m_netmanager = new QNetworkAccessManager(this);
     connect(m_netmanager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(sl_cover_fetch_done(QNetworkReply*)));
 
-    ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
-
-    ui->lab_rating->hide();
-    ui->lab_album->setText(tr("Copyright 2011-2013"));
-
-    ui->lab_title->setText(tr("Upplay ") + m_settings->getVersion());
-    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ?
-                             m_settings->getVersion() :
-                             m_renderer_friendly_name);
-    ui->lab_artist->setText(tr("Based on Sayonara, by") + " Lucio Carreras");
+    MetaData md;
+    md.title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
+    md.artist = m_renderer_friendly_name.isEmpty() ?
+        "No renderer connected" :
+        tr("Renderer: ") + m_renderer_friendly_name;
+    ui->player_w->mdata()->setData(md);
 
     m_metadata_available = false;
     m_playing = false;
@@ -89,13 +89,13 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui_playlist = 0;
 
-    ui_startup_dialog = 0;//new GUI_Startup_Dialog(this);
+    ui_startup_dialog = 0;
 
     m_skinSuffix = "";
     m_class_name = "Player";
 
-    m_cov_lookup = 0;//new CoverLookup();
-    m_alternate_covers = 0;//new GUI_Alternate_Covers(this->centralWidget(), m_class_name);
+    m_cov_lookup = 0;
+    m_alternate_covers = 0;
 
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
     ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
@@ -151,9 +151,6 @@ GUI_Player::~GUI_Player()
 void GUI_Player::setRendererName(const QString& nm)
 {
     m_renderer_friendly_name = nm;
-    ui->lab_version->setText(m_renderer_friendly_name.isEmpty() ?
-                             m_settings->getVersion() :
-                             m_renderer_friendly_name);
 }
 
 QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list)
@@ -175,21 +172,6 @@ QAction* GUI_Player::createAction(QKeySequence seq)
     return createAction(seq_list);
 }
 
-void GUI_Player::initGUI()
-{
-    ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_1.png"));
-    ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
-    ui->btn_stop->setIcon(QIcon(Helper::getIconPath() + "stop.png"));
-    ui->btn_fw->setIcon(QIcon(Helper::getIconPath() + "fwd.png"));
-    ui->btn_bw->setIcon(QIcon(Helper::getIconPath() + "bwd.png"));
-
-    ui->action_viewLibrary->setText(tr("&Library"));
-
-    ui->action_Fullscreen->setShortcut(QKeySequence("F11"));
-    ui->action_Dark->setShortcut(QKeySequence("F10"));
-
-}
-
 // This is called from the playlist when new track info is known
 // (possibly up from the audio player)
 void GUI_Player::update_track(const MetaData& md)
@@ -202,68 +184,26 @@ void GUI_Player::update_track(const MetaData& md)
     m_completeLength_ms = md.length_ms;
     total_time_changed(md.length_ms);
 
-    ui->lab_version->hide();
-    ui->lab_rating->show();
-
-    // sometimes ignore the date
-    QString albtxt;
-    if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
-        albtxt = Helper::get_album_w_disc(md);
-    } else {
-        albtxt = Helper::get_album_w_disc(md) + " (" +
-            QString::number(md.year) + ")";
-    }
-    ui->lab_album->setText(albtxt);
-    ui->lab_album->setToolTip(QString::fromUtf8("<i></i>") + albtxt);
-    ui->lab_artist->setText(md.artist);
-    ui->lab_artist->setToolTip(QString::fromUtf8("<i></i>") +
-                               escapeHtml(md.artist));
-    ui->lab_title->setText(md.title);
-    ui->lab_title->setToolTip(QString::fromUtf8("<i></i>") +
-                               escapeHtml(md.title));
-
+    ui->player_w->mdata()->setData(md);
+    
     m_trayIcon->songChangedMessage(md);
-
-    QString tmp = QString("<font color=\"#FFAA00\" size=\"+10\">");
-    if (md.bitrate < 96000) {
-        tmp += "*";
-    } else if (md.bitrate < 128000) {
-        tmp += "**";
-    } else if (md.bitrate < 160000) {
-        tmp += "***";
-    } else if (md.bitrate < 256000) {
-        tmp += "****";
-    } else {
-        tmp += "*****";
-    }
-    tmp += "</font>";
-
-    ui->lab_rating->setText(tmp);
-    ui->lab_rating->setToolTip(
-        QString("<font color=\"#000000\">") +
-        QString::number(md.bitrate / 1000) +
-        QString(" kBit/s") +
-        QString("</font>"));
 
     this->setWindowTitle(QString("Upplay - ") + md.title);
 
     if (!md.albumArtURI.isEmpty()) {
         fetch_cover(md.albumArtURI);
     } else {
-        ui->albumCover->setIcon(QIcon(Helper::getIconPath() + "logo.png"));
+        ui->player_w->albumCover->setIcon(QIcon(Helper::getIconPath() +
+                                                "logo.png"));
     }
 
-    ui->btn_bw->setEnabled(true);
-    ui->btn_fw->setEnabled(true);
-
-    ui->btn_play->setVisible(true);
-    ui->btn_play->setEnabled(true);
+    ui->player_w->progress()->setEnabled(true);
 
     m_trayIcon->set_enable_play(true);
     m_trayIcon->set_enable_fwd(true);
     m_trayIcon->set_enable_bwd(true);
 
-    ui->songProgress->setEnabled(true);
+    ui->player_w->progress()->setEnabled(true);
 
     m_metadata_available = true;
 
@@ -302,7 +242,7 @@ void GUI_Player::changeSkin(bool dark)
     m_settings->setPlayerStyle(dark ? 1 : 0);
     this->m_trayIcon->change_skin(stylesheet);
 
-    setupVolButton(ui->volumeSlider->value());
+    ui->player_w->volume()->setSkinName(dark ? "dark" : "");
     emit sig_skin_changed(dark);
 }
 
@@ -315,10 +255,11 @@ void GUI_Player::setupTrayActions()
     connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(stopClicked()));
     connect(m_trayIcon, SIGNAL(sig_bwd_clicked()), this, SLOT(backwardClicked()));
     connect(m_trayIcon, SIGNAL(sig_fwd_clicked()), this, SLOT(forwardClicked()));
-    connect(m_trayIcon, SIGNAL(sig_mute_clicked()), this, SLOT(muteButtonPressed()));
-    connect(m_trayIcon, SIGNAL(sig_close_clicked()), this, SLOT(really_close()));
     connect(m_trayIcon, SIGNAL(sig_play_clicked()), this, SLOT(playClicked()));
     connect(m_trayIcon, SIGNAL(sig_pause_clicked()), this, SLOT(playClicked()));
+    connect(m_trayIcon, SIGNAL(sig_mute_clicked()), this, SLOT(muteButtonPressed()));
+
+    connect(m_trayIcon, SIGNAL(sig_close_clicked()), this, SLOT(really_close()));
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
 
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
@@ -415,21 +356,22 @@ void GUI_Player::setPlaylist(GUI_Playlist* playlist)
 void GUI_Player::stopped()
 {
     //qDebug() << "void GUI_Player::stopped()";
+    ui->player_w->playctl()->onStopped();
     m_metadata_available = false;
     m_metadata = MetaData();
-    stopClicked(false);
 }
+
 void GUI_Player::playing()
 {
     //qDebug() << "void GUI_Player::playing()";
-    ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+    ui->player_w->playctl()->onPlaying();
     m_playing = true;
     m_trayIcon->setPlaying(m_playing);
 }
 void GUI_Player::paused()
 {
     //qDebug() << "void GUI_Player::paused()";
-    ui->btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    ui->player_w->playctl()->onPaused();
     m_playing = false;
     m_trayIcon->setPlaying(m_playing);
 }

@@ -61,9 +61,9 @@ void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
     emit sig_playlist_updated(m_meta, m_play_idx, 0);
 }
 
-void PlaylistOH::psl_seek_pc(int pc)
+void PlaylistOH::psl_seek(int secs)
 {
-    m_ohplo->seekPC(pc);
+    m_ohplo->seek(secs);
 }
 
 void PlaylistOH::psl_currentTrackId(int id)

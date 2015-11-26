@@ -138,9 +138,9 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
     }
 }
 
-void PlaylistAVT::psl_seek_pc(int pc)
+void PlaylistAVT::psl_seek(int secs)
 {
-    m_avto->seekPC(pc);
+    m_avto->seek(secs);
 }
 
 void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)

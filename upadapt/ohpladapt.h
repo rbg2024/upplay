@@ -53,8 +53,8 @@ public:
 
 public slots:
 
-    // Seek to time in percent
-    void seekPC(int pc) {
+    // Seek to time in seconds
+    void seek(int secs) {
         if (m_songsecs == -1) {
             STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator
                 poolit = m_metapool.find(m_id);
@@ -70,8 +70,7 @@ public slots:
         if (m_songsecs == -1) {
             return;
         }
-        int seeksecs = (m_songsecs * pc) / 100;
-        seekSecondAbsolute(seeksecs);
+        seekSecondAbsolute(secs);
     }
 
     // Insert after idx

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GUI/player/GUI_Player.h"
+#include "mainw.h"
 
 #include <QtNetwork/QNetworkReply>
 #include <QIcon>
@@ -82,14 +82,14 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 
     QPixmap pixmap;
     pixmap.convertFromImage(image);
-    ui->albumCover->setIcon(QIcon(pixmap));
+    ui->player_w->albumCover->setIcon(QIcon(pixmap));
 
     QString htmlfrag("<img src=\"");
     htmlfrag += m_covertempfile->fileName();
     htmlfrag += "\">";
-    ui->albumCover->setToolTip(htmlfrag);
+    ui->player_w->albumCover->setToolTip(htmlfrag);
 
-    ui->albumCover->repaint();
+    ui->player_w->albumCover->repaint();
     reply->deleteLater();
 }
 
@@ -97,5 +97,5 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 void GUI_Player::sl_no_cover_available()
 {
     QString coverpath = Helper::getIconPath() + "logo.png";
-    ui->albumCover->setIcon(QIcon(coverpath));
+    ui->player_w->albumCover->setIcon(QIcon(coverpath));
 }

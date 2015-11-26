@@ -45,7 +45,7 @@ void ProgressWidget::seek(int secs)
         secs = m_totalsecs;
     }
     setUi(secs);
-    emit progressChanged(secs);
+    emit seekRequested(secs);
         
 }
 
@@ -54,10 +54,10 @@ void ProgressWidget::step(int steps)
     int secs = m_step_pc > 0 ? (m_step_pc * steps * m_totalsecs) / 100 :
         m_step_secs * steps;
     setUi(secs);
-    emit progressChanged(secs);
+    emit seekRequested(secs);
 }
 
-void ProgressWidget::set_step_value_pc(int percent)
+void ProgressWidget::setStepValuePc(int percent)
 {
     if (percent > 0 && percent <= 100) {
         m_step_secs = -1;
@@ -65,7 +65,7 @@ void ProgressWidget::set_step_value_pc(int percent)
     }
 }
 
-void ProgressWidget::set_step_value_secs(int secs)
+void ProgressWidget::setStepValueSecs(int secs)
 {
     m_step_secs = secs;
     if (secs < 0) {
@@ -91,14 +91,18 @@ void ProgressWidget::showTimes(int secs)
 
 void ProgressWidget::setUi(int secs)
 {
-    int pc = (secs * 100) / m_totalsecs;
+    int pc = m_totalsecs ? (secs * 100) / m_totalsecs : 0;
     songProgress->setValueNoSigs(pc);
     showTimes(secs);
 }
 
+int ProgressWidget::currentValuePc()
+{
+    return songProgress->value();
+}
+
 void ProgressWidget::onProgressSliderChanged(int pc)
 {
-    //qDebug() << "GUI_Player::setProgressJump: " << percent << " %";
     if (pc > 100) {
         pc = 100;
     } else if (pc < 0) {
@@ -106,6 +110,6 @@ void ProgressWidget::onProgressSliderChanged(int pc)
     }
     int secs = (pc * m_totalsecs) / 100;
     showTimes(secs);
-    emit progressChanged(secs);
+    emit seekRequested(secs);
 }
 

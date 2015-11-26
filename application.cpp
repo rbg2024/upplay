@@ -28,8 +28,6 @@ using namespace std;
 #include <QMessageBox>
 
 #include "application.h"
-#include "GUI/player/GUI_Player.h"
-#include "GUI/playlist/GUI_Playlist.h"
 #include "GUI/renderchoose/renderchoose.h"
 
 #include "playlist/PlaylistAVT.h"
@@ -299,7 +297,7 @@ void Application::renderer_connections()
     CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
     CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
     CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
-    CONNECT(m_player, search(int), m_playlist, psl_seek_pc(int));
+    CONNECT(m_player, sig_seek(int), m_playlist, psl_seek(int));
 
     CONNECT(m_playlist, connectionLost(), this, reconnectOrChoose());
     CONNECT(m_playlist, playlistModeChanged(Playlist_Mode),

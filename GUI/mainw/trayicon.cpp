@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "trayicon.h"
+
 #include <QAction>
 #include <QMenu>
 #include <QEvent>
@@ -30,7 +32,6 @@
 
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
-#include "GUI/player/GUI_TrayIcon.h"
 
 
 GUI_TrayIcon::GUI_TrayIcon(QObject *parent)

@@ -87,7 +87,7 @@ public slots:
         m_insertion_point = -1;
         psl_change_track_impl(num);
     }
-    virtual void psl_seek_pc(int) = 0;
+    virtual void psl_seek(int secs) = 0;
 
     virtual void psl_change_track_impl(int) = 0;
 

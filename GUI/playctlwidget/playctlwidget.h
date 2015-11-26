@@ -36,7 +36,8 @@ public slots:
     virtual void onPaused();
     virtual void onPlaying();
 
-private slots:
+    // These are connected to the buttons and trigger signals, but can also be
+    // used, e.g. for keyboard shortcuts
     virtual void onPlayClicked();
     virtual void onStopClicked();
     virtual void onBackwardClicked();

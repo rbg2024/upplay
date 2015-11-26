@@ -1,5 +1,3 @@
-/* GUI_PlayerConnections.cpp */
-
 /* Copyright (C) 2013  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -18,21 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GUI/player/GUI_Player.h"
+#include "mainw.h"
 
 void GUI_Player::setupConnections()
 {
-    connect(ui->btn_play, SIGNAL(clicked(bool)), this,
-            SLOT(playClicked(bool)));
-    connect(ui->btn_fw, SIGNAL(clicked(bool)), this,
-            SLOT(forwardClicked(bool)));
-    connect(ui->btn_bw, SIGNAL(clicked(bool)), this,
-            SLOT(backwardClicked(bool)));
-    connect(ui->btn_stop, SIGNAL(clicked()), this,
-            SLOT(stopClicked()));
-    connect(ui->btn_mute, SIGNAL(released()), this,
-            SLOT(muteButtonPressed()));
+    connect(ui->player_w->playctl(), SIGNAL(playrequested()),
+            this, SLOT(playClicked()));
+    connect(ui->player_w->playctl(), SIGNAL(forwardrequested()),
+            this, SLOT(forwardClicked(bool)));
+    connect(ui->player_w->playctl(), SIGNAL(backwardrequested()),
+            this, SLOT(backwardClicked(bool)));
+    connect(ui->player_w->playctl(), SIGNAL(stoprequested()),
+            this, SLOT(stopClicked()));
 
+    connect(ui->player_w->volume(), SIGNAL(muteChanged(bool)),
+            this, SIGNAL(sig_mute(bool)));
+    connect(ui->player_w->volume(), SIGNAL(volumeChanged(int)),
+            this, SIGNAL(sig_volume_changed(int)));
+
+    connect(ui->player_w->progress(), SIGNAL(seekRequested(int)),
+            this, SIGNAL(seek(int)));
+    
     // file
     connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),
             this, SIGNAL(sig_choose_renderer()));
@@ -66,41 +70,53 @@ void GUI_Player::setupConnections()
     connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)), 
             this, SLOT(volumeChangedByTick(int)));
 
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this,
-            SLOT(volumeChanged(int)));
-    connect(ui->volumeSlider, SIGNAL(sliderMoved(int)), this,
-            SLOT(volumeChanged(int)));
-    connect(ui->songProgress, SIGNAL(valueChanged(int)), this,
-            SLOT(setProgressJump(int)));
 
     QList<QKeySequence> lst;
-    lst << QKeySequence(Qt::Key_MediaTogglePlayPause) << QKeySequence(Qt::Key_MediaPlay) << QKeySequence(Qt::Key_MediaPause) << QKeySequence(Qt::Key_Space);
+    lst << QKeySequence(Qt::Key_MediaTogglePlayPause) <<
+        QKeySequence(Qt::Key_MediaPlay) << QKeySequence(Qt::Key_MediaPause) <<
+        QKeySequence(Qt::Key_Space);
     QAction* play_pause_action = createAction(lst);
-    connect(play_pause_action, SIGNAL(triggered()), ui->btn_play, SLOT(click()));
+    connect(play_pause_action, SIGNAL(triggered()),
+            ui->player_w->playctl(), SLOT(onPlayClicked()));
 
     QList<QKeySequence> lst_fwd;
-    lst_fwd << QKeySequence(Qt::Key_MediaNext) << QKeySequence(Qt::ControlModifier | Qt::Key_Right);
+    lst_fwd << QKeySequence(Qt::Key_MediaNext) <<
+        QKeySequence(Qt::ControlModifier | Qt::Key_Right);
     QAction* fwd_action = createAction(lst_fwd);
-    connect(fwd_action, SIGNAL(triggered()), ui->btn_fw, SLOT(click()));
+    connect(fwd_action, SIGNAL(triggered()),
+            ui->player_w->playctl(), SLOT(onForwardClicked()));
 
     QList<QKeySequence> lst_bwd;
-    lst_bwd << QKeySequence(Qt::Key_MediaPrevious) << QKeySequence(Qt::ControlModifier | Qt::Key_Left);
+    lst_bwd << QKeySequence(Qt::Key_MediaPrevious) <<
+        QKeySequence(Qt::ControlModifier | Qt::Key_Left);
     QAction* bwd_action = createAction(lst_bwd);
-    connect(bwd_action, SIGNAL(triggered()), ui->btn_bw, SLOT(click()));
+    connect(bwd_action, SIGNAL(triggered()),
+            ui->player_w->playctl(), SLOT(onBackwardClicked()));
 
-    QAction* stop_action = createAction(QKeySequence(Qt::ControlModifier | Qt::Key_Space));
-    connect(stop_action, SIGNAL(triggered()), ui->btn_stop, SLOT(click()));
+    QAction* stop_action = createAction(QKeySequence(Qt::ControlModifier |
+                                                     Qt::Key_Space));
+    connect(stop_action, SIGNAL(triggered()),
+            ui->player_w->playctl(), SLOT(onStopClicked()));
 
-    QAction* louder_action = createAction(QKeySequence(Qt::AltModifier | Qt::Key_Up));
+
+
+    QAction* louder_action = createAction(QKeySequence(Qt::AltModifier |
+                                                       Qt::Key_Up));
     connect(louder_action, SIGNAL(triggered()), this, SLOT(volumeHigher()));
 
-    QAction* leiser_action = createAction(QKeySequence(Qt::AltModifier | Qt::Key_Down));
+    QAction* leiser_action = createAction(QKeySequence(Qt::AltModifier |
+                                                       Qt::Key_Down));
     connect(leiser_action, SIGNAL(triggered()), this, SLOT(volumeLower()));
 
-    QAction* two_perc_plus_action = createAction(QKeySequence(Qt::AltModifier | Qt::Key_Right));
-    connect(two_perc_plus_action, SIGNAL(triggered()), this, SLOT(jump_forward()));
 
-    QAction* two_perc_minus_action = createAction(QKeySequence(Qt::AltModifier | Qt::Key_Left));
-    connect(two_perc_minus_action, SIGNAL(triggered()), this, SLOT(jump_backward()));
+    QAction* two_perc_plus_action = createAction(QKeySequence(Qt::AltModifier |
+                                                              Qt::Key_Right));
+    connect(two_perc_plus_action, SIGNAL(triggered()),
+            this, SLOT(jump_forward()));
+
+    QAction* two_perc_minus_action = createAction(QKeySequence(Qt::AltModifier |
+                                                               Qt::Key_Left));
+    connect(two_perc_minus_action, SIGNAL(triggered()),
+            this, SLOT(jump_backward()));
 
 }

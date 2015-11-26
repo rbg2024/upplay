@@ -48,7 +48,7 @@ public slots:
     virtual void volumeLower() {
         step(-5);
     }
-    virtual void setSkinSuffix(const QString&) {
+    virtual void setSkinName(const QString&) {
     }
     
 signals:

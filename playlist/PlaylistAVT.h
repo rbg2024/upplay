@@ -55,7 +55,7 @@ public slots:
     void psl_forward();
     void psl_backward();
     void psl_remove_rows(const QList<int> &, bool select_next=true);
-    void psl_seek_pc(int);
+    void psl_seek(int);
     
 signals:
     // This is for player action

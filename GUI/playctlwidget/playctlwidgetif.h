@@ -30,11 +30,18 @@ public:
 
 public slots:
     // These are used to set the ui state in sync with externally
-    // caused player state changes
+    // caused player state changes. No signals are emitted.
     virtual void onStopped() = 0;
     virtual void onPaused() = 0;
     virtual void onPlaying() = 0;
 
+    // These are connected to the buttons and trigger signals, but can also be
+    // used, e.g. for keyboard shortcuts
+    virtual void onPlayClicked() = 0;
+    virtual void onStopClicked() = 0;
+    virtual void onBackwardClicked() = 0;
+    virtual void onForwardClicked() = 0;
+    
 signals:
     void playrequested();
     void pauserequested();

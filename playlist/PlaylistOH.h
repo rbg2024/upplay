@@ -76,7 +76,7 @@ public slots:
 
     // Set from scratch after reading changes from device
     void psl_new_ohpl(const MetaDataList&);
-    void psl_seek_pc(int);
+    void psl_seek(int);
 
 private:
     // My link to the OpenHome Renderer

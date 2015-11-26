@@ -20,8 +20,8 @@
 
 #include <QDebug>
 
-VolumeWidget::VolumeWidget(int volume, bool ismute, QWidget *parent)
-    : VolumeWidgetIF(parent), m_mute(ismute)
+VolumeWidget::VolumeWidget(QWidget *parent)
+    : VolumeWidgetIF(parent)
 {
     setupUi(this);
     volumeSlider->setMinimum(0);
@@ -30,8 +30,8 @@ VolumeWidget::VolumeWidget(int volume, bool ismute, QWidget *parent)
             this, SLOT(onVolumeSliderChanged(int)));
     connect(btn_mute, SIGNAL(clicked()),
             this, SLOT(onButtonClicked()));
-    setUi(volume);
-    setMuteUi(m_mute);
+    setUi(20);
+    setMuteUi(m_mute = false);
 }
 
 void VolumeWidget::onVolumeSliderChanged(int value)
@@ -75,7 +75,7 @@ void VolumeWidget::setUi(int value)
 void VolumeWidget::setMuteUi(bool ismute)
 {
     m_mute = ismute;
-    qDebug() << "VolumeWidget::setMuteUi(" << m_mute << ")";
+    //qDebug() << "VolumeWidget::setMuteUi(" << m_mute << ")";
     volumeSlider->setDisabled(m_mute);
     if (m_mute) {
         btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
@@ -84,9 +84,15 @@ void VolumeWidget::setMuteUi(bool ismute)
     }
 }
 
+void VolumeWidget::setSkinName(const QString& s)
+{
+    m_skinSuffix = s.isEmpty() ? "" : "_" + s;
+    setupButton(volumeSlider->value());
+}
+
 void VolumeWidget::setupButton(int value)
 {
-    qDebug() << "VolumeWidget::setupButton(" << value << ")";
+    //qDebug() << "VolumeWidget::setupButton(" << value << ")";
     QString butFilename = Helper::getIconPath() + "vol_";
 
     if (value <= 1) {
@@ -99,6 +105,6 @@ void VolumeWidget::setupButton(int value)
         butFilename += QString("3") + m_skinSuffix + ".png";
     }
 
-    qDebug() << "VolumeWidget::setupButton: fn: " << butFilename;
+    //qDebug() << "VolumeWidget::setupButton: fn: " << butFilename;
     btn_mute->setIcon(QIcon(butFilename));
 }

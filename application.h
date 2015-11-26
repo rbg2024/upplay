@@ -37,7 +37,7 @@
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 
-#include "GUI/player/GUI_Player.h"
+#include "GUI/mainw/mainw.h"
 #include "GUI/playlist/GUI_Playlist.h"
 #include "playlist/Playlist.h"
 

@@ -1,10 +1,3 @@
-/*
- * GUI_PlayerMenubar.cpp
- *
- *  Created on: 10.10.2012
- *      Author: luke
- */
-
 /* Copyright (C) 2012  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -23,16 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GUI/player/GUI_Player.h"
+#include "mainw.h"
 
 #include <QDir>
 #include <QFileDialog>
 #include <QMessageBox>
-
-
-/** FILE **/
-
-/** FILE END **/
 
 
 /** VIEW **/
