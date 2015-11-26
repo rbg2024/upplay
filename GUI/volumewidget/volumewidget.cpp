@@ -29,7 +29,7 @@ VolumeWidget::VolumeWidget(QWidget *parent)
     connect(volumeSlider, SIGNAL(valueChanged(int)),
             this, SLOT(onVolumeSliderChanged(int)));
     connect(btn_mute, SIGNAL(clicked()),
-            this, SLOT(onButtonClicked()));
+            this, SLOT(onMuteClicked()));
     setUi(20);
     setMuteUi(m_mute = false);
 }
@@ -40,7 +40,12 @@ void VolumeWidget::onVolumeSliderChanged(int value)
     emit volumeChanged(value);
 }
 
-void VolumeWidget::onButtonClicked()
+void VolumeWidget::toggleMute()
+{
+    onMuteClicked();
+}
+
+void VolumeWidget::onMuteClicked()
 {
     setMuteUi(!m_mute);
     emit muteChanged(m_mute);
@@ -68,8 +73,8 @@ void VolumeWidget::setUi(int value)
 {
     if (!m_mute) {
         setupButton(value);
+        volumeSlider->setValueNoSigs(value);
     }
-    volumeSlider->setValueNoSigs(value);
 }
 
 void VolumeWidget::setMuteUi(bool ismute)

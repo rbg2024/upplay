@@ -32,12 +32,16 @@ public:
 public slots:
     // Volume range is always enforced as 0-100
 
-    // Set value and do whatever we do when volume changes (emit
-    // signals)
+    // Set volume value and do whatever we do when volume changes
+    // (emit signals)
     virtual void set(int value) = 0;
     // Increment/decrement value and do whatever we do when volume
     // changes (emit signals)
     virtual void step(int steps) = 0;
+
+    // Do what we do when mute is clicked
+    virtual void toggleMute() = 0;
+    
     // Set-up display, keep quiet
     virtual void setUi(int value) = 0;
     virtual void setMuteUi(bool) = 0;

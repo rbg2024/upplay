@@ -110,6 +110,6 @@ void ProgressWidget::onProgressSliderChanged(int pc)
     }
     int secs = (pc * m_totalsecs) / 100;
     showTimes(secs);
+    qDebug() << "ProgressWidget: emitting seekRequested(" << secs << ")";
     emit seekRequested(secs);
 }
-

@@ -103,12 +103,6 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
 
 GUI_TrayIcon::~GUI_TrayIcon()
 {
-    delete m_playAction;
-    delete m_stopAction;
-    delete m_bwdAction;
-    delete m_fwdAction;
-    delete m_muteAction;
-    delete m_closeAction;
 }
 
 void GUI_TrayIcon::change_skin(QString stylesheet)
@@ -185,7 +179,6 @@ void GUI_TrayIcon::set_enable_stop(bool b)
 
 void GUI_TrayIcon::set_enable_mute(bool)
 {
-
 }
 
 void GUI_TrayIcon::set_enable_fwd(bool b)
@@ -202,7 +195,6 @@ void GUI_TrayIcon::set_enable_show(bool b)
 {
     m_showAction->setEnabled(b);
 }
-
 
 void GUI_TrayIcon::play_clicked()
 {
@@ -277,11 +269,9 @@ void GUI_TrayIcon::setPlaying(bool playing)
     m_playing = playing;
 
     if (playing) {
-        //setIcon(m_pauseIcon);
         m_playAction->setIcon(m_pauseIcon);
         m_playAction->setText(tr("Pause"));
     } else {
-        //setIcon(m_playIcon);
         m_playAction->setIcon(m_playIcon);
         m_playAction->setText(tr("Play"));
     }

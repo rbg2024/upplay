@@ -35,8 +35,9 @@ public slots:
     virtual void onPaused() = 0;
     virtual void onPlaying() = 0;
 
-    // These are connected to the buttons and trigger signals, but can also be
-    // used, e.g. for keyboard shortcuts
+    // These are connected to the buttons and trigger signals, but can
+    // also be called, e.g. to enable keyboard shortcuts to have the
+    // same effect as button clicks
     virtual void onPlayClicked() = 0;
     virtual void onStopClicked() = 0;
     virtual void onBackwardClicked() = 0;

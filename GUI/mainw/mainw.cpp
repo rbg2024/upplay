@@ -75,16 +75,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     connect(m_netmanager, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(sl_cover_fetch_done(QNetworkReply*)));
 
-    MetaData md;
-    md.title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
-    md.artist = m_renderer_friendly_name.isEmpty() ?
-        "No renderer connected" :
-        tr("Renderer: ") + m_renderer_friendly_name;
-    ui->player_w->mdata()->setData(md);
-
     m_metadata_available = false;
-    m_playing = false;
-    m_mute = false;
     m_overridemin2tray = false;
 
     ui_playlist = 0;
@@ -140,6 +131,7 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui_info_dialog = 0;
 
     changeSkin(m_settings->getPlayerStyle() == 1);
+    idleDisplay();
 }
 
 
@@ -176,6 +168,7 @@ QAction* GUI_Player::createAction(QKeySequence seq)
 // (possibly up from the audio player)
 void GUI_Player::update_track(const MetaData& md)
 {
+    qDebug() << "GUI_Player::update_track()";
     if (!m_metadata.compare(md)) {
         return;
     }
@@ -206,10 +199,7 @@ void GUI_Player::update_track(const MetaData& md)
     ui->player_w->progress()->setEnabled(true);
 
     m_metadata_available = true;
-
-    this->repaint();
 }
-
 
 void GUI_Player::fetch_cover(const QString& URI)
 {
@@ -257,7 +247,8 @@ void GUI_Player::setupTrayActions()
     connect(m_trayIcon, SIGNAL(sig_fwd_clicked()), this, SLOT(forwardClicked()));
     connect(m_trayIcon, SIGNAL(sig_play_clicked()), this, SLOT(playClicked()));
     connect(m_trayIcon, SIGNAL(sig_pause_clicked()), this, SLOT(playClicked()));
-    connect(m_trayIcon, SIGNAL(sig_mute_clicked()), this, SLOT(muteButtonPressed()));
+    connect(m_trayIcon, SIGNAL(sig_mute_clicked()),
+            ui->player_w->volume(), SLOT(toggleMute()));
 
     connect(m_trayIcon, SIGNAL(sig_close_clicked()), this, SLOT(really_close()));
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
@@ -359,21 +350,20 @@ void GUI_Player::stopped()
     ui->player_w->playctl()->onStopped();
     m_metadata_available = false;
     m_metadata = MetaData();
+    idleDisplay();
 }
 
 void GUI_Player::playing()
 {
     //qDebug() << "void GUI_Player::playing()";
     ui->player_w->playctl()->onPlaying();
-    m_playing = true;
-    m_trayIcon->setPlaying(m_playing);
+    m_trayIcon->setPlaying(true);
 }
 void GUI_Player::paused()
 {
     //qDebug() << "void GUI_Player::paused()";
     ui->player_w->playctl()->onPaused();
-    m_playing = false;
-    m_trayIcon->setPlaying(m_playing);
+    m_trayIcon->setPlaying(false);
 }
 
 /** LIBRARY AND PLAYLIST END **/

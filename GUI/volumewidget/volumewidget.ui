@@ -69,7 +69,7 @@
         <number>50</number>
        </property>
        <property name="tracking">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="invertedAppearance">
         <bool>false</bool>

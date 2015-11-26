@@ -96,13 +96,17 @@ signals:
     void sig_preferences();
 
 private slots:
+    // These are connected to ui signals (either tray or main ctl),
+    // and coordinate stuff.
     void playClicked();
+    void pauseClicked();
     void stopClicked();
-    void backwardClicked(bool b = true);
-    void forwardClicked(bool b = true);
+    void backwardClicked();
+    void forwardClicked();
     void jump_forward();
     void jump_backward();
-
+    void onMuteChanged(bool);
+    
     void volumeChangedByTick(int val);
     void volumeHigher();
     void volumeLower();
@@ -158,16 +162,14 @@ private:
     GUI_Alternate_Covers*   m_alternate_covers;
 
     QString                 m_class_name;
-    QString m_renderer_friendly_name;
+    QString                 m_renderer_friendly_name;
     quint32                 m_completeLength_ms;
-    bool                    m_playing;
-    bool                    m_mute;
     GUI_TrayIcon *          m_trayIcon;
 
     QString                 m_skinSuffix;
 
-    MetaData			m_metadata;
-    MetaData			m_metadata_corrected;
+    MetaData            m_metadata;
+    MetaData            m_metadata_corrected;
     bool                m_metadata_available;
     bool                m_overridemin2tray;
 
@@ -178,7 +180,8 @@ private:
     QTemporaryFile*     m_covertempfile;
 
     void setupTrayActions ();
-
+    void idleDisplay();
+    
     void setupConnections();
     void total_time_changed(qint64);
     void fetch_cover(const QString&);

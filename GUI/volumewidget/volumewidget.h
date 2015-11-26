@@ -37,6 +37,9 @@ public slots:
     // Increment/decrement value and do whatever we do when volume
     // changes (emit signals)
     virtual void step(int steps);
+
+    virtual void toggleMute();
+    
     // Set-up display, keep quiet
     virtual void setUi(int value);
     virtual void setMuteUi(bool);
@@ -46,7 +49,7 @@ public slots:
 private slots:
     // Connected to slider
     virtual void onVolumeSliderChanged(int value);
-    virtual void onButtonClicked();
+    virtual void onMuteClicked();
 
 private:
     void init();

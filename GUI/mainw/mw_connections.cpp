@@ -22,20 +22,22 @@ void GUI_Player::setupConnections()
 {
     connect(ui->player_w->playctl(), SIGNAL(playrequested()),
             this, SLOT(playClicked()));
+    connect(ui->player_w->playctl(), SIGNAL(pauserequested()),
+            this, SLOT(pauseClicked()));
     connect(ui->player_w->playctl(), SIGNAL(forwardrequested()),
-            this, SLOT(forwardClicked(bool)));
+            this, SLOT(forwardClicked()));
     connect(ui->player_w->playctl(), SIGNAL(backwardrequested()),
-            this, SLOT(backwardClicked(bool)));
+            this, SLOT(backwardClicked()));
     connect(ui->player_w->playctl(), SIGNAL(stoprequested()),
             this, SLOT(stopClicked()));
 
     connect(ui->player_w->volume(), SIGNAL(muteChanged(bool)),
-            this, SIGNAL(sig_mute(bool)));
+            this, SLOT(onMuteChanged(bool)));
     connect(ui->player_w->volume(), SIGNAL(volumeChanged(int)),
             this, SIGNAL(sig_volume_changed(int)));
 
     connect(ui->player_w->progress(), SIGNAL(seekRequested(int)),
-            this, SIGNAL(seek(int)));
+            this, SIGNAL(sig_seek(int)));
     
     // file
     connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),

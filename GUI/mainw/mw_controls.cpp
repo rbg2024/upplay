@@ -26,30 +26,43 @@ using namespace std;
 /** Slots connected to player or trayicon signals **/
 void GUI_Player::playClicked()
 {
-    if (!m_metadata_available) {
-        emit play();
-        return;
-    }
-
-    if (m_playing) {
-        emit pause();
-    } else {
-        emit play();
-    }
-
-    m_playing = !m_playing;
-    m_trayIcon->setPlaying(m_playing);
+    // We don't know which control caused this, so make sure all ui are setup
+    m_trayIcon->setPlaying(true);
     ui->player_w->playctl()->onPlaying();
+
+    emit play();
+}
+
+void GUI_Player::pauseClicked()
+{
+    // We don't know which control caused this, so make sure all ui are setup
+    m_trayIcon->setPlaying(false);
+    ui->player_w->playctl()->onPaused();
+
+    emit pause();
 }
 
 void GUI_Player::stopClicked()
 {
     m_trayIcon->setPlaying(false);
     m_trayIcon->stop();
-    m_playing = false;
 
     ui->player_w->playctl()->onStopped();
-    
+
+    idleDisplay();
+    emit stop();
+}
+
+void GUI_Player::onMuteChanged(bool mute)
+{
+    m_trayIcon->setMute(mute);
+    ui->player_w->volume()->setMuteUi(mute);
+
+    emit sig_mute(mute);
+}
+
+void GUI_Player::idleDisplay()
+{
     MetaData md;
     md.title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
     md.artist = m_renderer_friendly_name.isEmpty() ?
@@ -62,10 +75,9 @@ void GUI_Player::stopClicked()
 
     ui->player_w->albumCover->setIcon(QIcon(Helper::getIconPath() +
                                             "logo.png"));
-    emit stop();
 }
 
-void GUI_Player::backwardClicked(bool)
+void GUI_Player::backwardClicked()
 {
     // ui->albumCover->setFocus();
     int cur_pos_sec =
@@ -78,7 +90,7 @@ void GUI_Player::backwardClicked(bool)
     }
 }
 
-void GUI_Player::forwardClicked(bool)
+void GUI_Player::forwardClicked()
 {
     //ui->albumCover->setFocus();
     emit forward();
@@ -126,13 +138,11 @@ void GUI_Player::setVolume(int pc)
 // Called from audio when volume has been changed by another player.
 void GUI_Player::setVolumeUi(int pc)
 {
-    if (!m_mute)
-        ui->player_w->volume()->setUi(pc);
+    ui->player_w->volume()->setUi(pc);
 }
 
 void GUI_Player::setMuteUi(bool ismute)
 {
-    m_mute = ismute;
     ui->player_w->volume()->setMuteUi(ismute);
 }
 

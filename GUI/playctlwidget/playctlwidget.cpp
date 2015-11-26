@@ -28,32 +28,33 @@ PlayCtlWidget::PlayCtlWidget(QWidget *parent)
     connect(btn_bw, SIGNAL(clicked()), this, SLOT(onBackwardClicked()));
 }
 
-
-// Public slots tell us about the world state
 void PlayCtlWidget::onStopped()
 {
     btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    m_playing = false;
 }
 
 void PlayCtlWidget::onPaused()
 {
     btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    m_playing = false;
 }
 
 void PlayCtlWidget::onPlaying()
 {
     btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+    m_playing = true;
 }
 
-
-// Private slots: connected to buttons
 void PlayCtlWidget::onPlayClicked()
 {
    if (m_playing) {
        btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+       //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting pausereq()";
        emit pauserequested();
    } else {
        btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+       //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting playreq()";
        emit playrequested();
    }
 
@@ -65,6 +66,7 @@ void PlayCtlWidget::onStopClicked()
     btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
     m_playing = false;
 
+    //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting stopreq()";
     emit stoprequested();
 }
 
