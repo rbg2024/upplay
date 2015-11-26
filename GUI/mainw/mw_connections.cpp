@@ -21,18 +21,18 @@
 void GUI_Player::setupConnections()
 {
     connect(ui->player_w->playctl(), SIGNAL(playrequested()),
-            this, SLOT(playClicked()));
+            this, SLOT(onPlayActivated()));
     connect(ui->player_w->playctl(), SIGNAL(pauserequested()),
-            this, SLOT(pauseClicked()));
+            this, SLOT(onPauseActivated()));
     connect(ui->player_w->playctl(), SIGNAL(forwardrequested()),
-            this, SLOT(forwardClicked()));
+            this, SLOT(onForwardActivated()));
     connect(ui->player_w->playctl(), SIGNAL(backwardrequested()),
-            this, SLOT(backwardClicked()));
+            this, SLOT(onBackwardActivated()));
     connect(ui->player_w->playctl(), SIGNAL(stoprequested()),
-            this, SLOT(stopClicked()));
+            this, SLOT(onStopActivated()));
 
     connect(ui->player_w->volume(), SIGNAL(muteChanged(bool)),
-            this, SLOT(onMuteChanged(bool)));
+            this, SLOT(onMuteActivated(bool)));
     connect(ui->player_w->volume(), SIGNAL(volumeChanged(int)),
             this, SIGNAL(sig_volume_changed(int)));
 
@@ -70,7 +70,7 @@ void GUI_Player::setupConnections()
 
     connect(ui->action_help, SIGNAL(triggered(bool)), this, SLOT(help(bool)));
     connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)), 
-            this, SLOT(volumeChangedByTick(int)));
+            this, SLOT(onVolumeStepActivated(int)));
 
 
     QList<QKeySequence> lst;
@@ -104,21 +104,21 @@ void GUI_Player::setupConnections()
 
     QAction* louder_action = createAction(QKeySequence(Qt::AltModifier |
                                                        Qt::Key_Up));
-    connect(louder_action, SIGNAL(triggered()), this, SLOT(volumeHigher()));
+    connect(louder_action, SIGNAL(triggered()), this, SLOT(onVolumeHigherActivated()));
 
     QAction* leiser_action = createAction(QKeySequence(Qt::AltModifier |
                                                        Qt::Key_Down));
-    connect(leiser_action, SIGNAL(triggered()), this, SLOT(volumeLower()));
+    connect(leiser_action, SIGNAL(triggered()), this, SLOT(onVolumeLowerActivated()));
 
 
     QAction* two_perc_plus_action = createAction(QKeySequence(Qt::AltModifier |
                                                               Qt::Key_Right));
     connect(two_perc_plus_action, SIGNAL(triggered()),
-            this, SLOT(jump_forward()));
+            this, SLOT(onJumpForwardActivated()));
 
     QAction* two_perc_minus_action = createAction(QKeySequence(Qt::AltModifier |
                                                                Qt::Key_Left));
     connect(two_perc_minus_action, SIGNAL(triggered()),
-            this, SLOT(jump_backward()));
+            this, SLOT(onJumpBackwardActivated()));
 
 }

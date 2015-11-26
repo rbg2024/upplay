@@ -24,7 +24,7 @@ using namespace std;
 #include "trayicon.h"
 
 /** Slots connected to player or trayicon signals **/
-void GUI_Player::playClicked()
+void GUI_Player::onPlayActivated()
 {
     // We don't know which control caused this, so make sure all ui are setup
     m_trayIcon->setPlaying(true);
@@ -33,7 +33,7 @@ void GUI_Player::playClicked()
     emit play();
 }
 
-void GUI_Player::pauseClicked()
+void GUI_Player::onPauseActivated()
 {
     // We don't know which control caused this, so make sure all ui are setup
     m_trayIcon->setPlaying(false);
@@ -42,7 +42,7 @@ void GUI_Player::pauseClicked()
     emit pause();
 }
 
-void GUI_Player::stopClicked()
+void GUI_Player::onStopActivated()
 {
     m_trayIcon->setPlaying(false);
     m_trayIcon->stop();
@@ -53,7 +53,7 @@ void GUI_Player::stopClicked()
     emit stop();
 }
 
-void GUI_Player::onMuteChanged(bool mute)
+void GUI_Player::onMuteActivated(bool mute)
 {
     m_trayIcon->setMute(mute);
     ui->player_w->volume()->setMuteUi(mute);
@@ -77,11 +77,11 @@ void GUI_Player::idleDisplay()
                                             "logo.png"));
 }
 
-void GUI_Player::backwardClicked()
+void GUI_Player::onBackwardActivated()
 {
     // ui->albumCover->setFocus();
     int cur_pos_sec =
-        (m_completeLength_ms * ui->player_w->progress()->currentValuePc())
+        (m_metadata.length_ms * ui->player_w->progress()->currentValuePc())
         / 100000;
     if (cur_pos_sec > 3) {
         emit sig_seek(0);
@@ -90,7 +90,7 @@ void GUI_Player::backwardClicked()
     }
 }
 
-void GUI_Player::forwardClicked()
+void GUI_Player::onForwardActivated()
 {
     //ui->albumCover->setFocus();
     emit forward();
@@ -101,16 +101,15 @@ void GUI_Player::forwardClicked()
 
 void GUI_Player::total_time_changed(qint64 total_time)
 {
-    m_completeLength_ms = total_time;
     ui->player_w->progress()->setTotalTime(total_time/1000);
 }
 
-void GUI_Player::jump_forward()
+void GUI_Player::onJumpForwardActivated()
 {
     ui->player_w->progress()->step(1);
 }
 
-void GUI_Player::jump_backward()
+void GUI_Player::onJumpBackwardActivated()
 {
     ui->player_w->progress()->step(-1);
 }
@@ -146,19 +145,19 @@ void GUI_Player::setMuteUi(bool ismute)
     ui->player_w->volume()->setMuteUi(ismute);
 }
 
-void GUI_Player::volumeChangedByTick(int val)
+void GUI_Player::onVolumeStepActivated(int val)
 {
     int vol_step = m_trayIcon->get_vol_step();
     ui->player_w->volume()->step(vol_step * val);
 }
 
-void GUI_Player::volumeHigher()
+void GUI_Player::onVolumeHigherActivated()
 {
     //qDebug() << "GUI_PLayer::volumeHigher";
     ui->player_w->volume()->volumeHigher();
 }
 
-void GUI_Player::volumeLower()
+void GUI_Player::onVolumeLowerActivated()
 {
     //qDebug() << "GUI_PLayer::volumeLower";
     ui->player_w->volume()->volumeLower();

@@ -60,8 +60,7 @@ void signal_handler(int sig)
 #endif
 
 GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Upplay), m_completeLength_ms(0),
-    m_covertempfile(0)
+    QMainWindow(parent), ui(new Ui::Upplay), m_covertempfile(0)
 {
     ui->setupUi(this);
 
@@ -80,13 +79,8 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 
     ui_playlist = 0;
 
-    ui_startup_dialog = 0;
-
     m_skinSuffix = "";
     m_class_name = "Player";
-
-    m_cov_lookup = 0;
-    m_alternate_covers = 0;
 
     bool showSmallPlaylistItems = m_settings->getShowSmallPlaylist();
     ui->action_smallPlaylistItems->setChecked(showSmallPlaylistItems);
@@ -174,7 +168,6 @@ void GUI_Player::update_track(const MetaData& md)
     }
     m_metadata = md;
 
-    m_completeLength_ms = md.length_ms;
     total_time_changed(md.length_ms);
 
     ui->player_w->mdata()->setData(md);
@@ -242,11 +235,15 @@ void GUI_Player::setupTrayActions()
 {
     m_trayIcon = new GUI_TrayIcon(this);
 
-    connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(stopClicked()));
-    connect(m_trayIcon, SIGNAL(sig_bwd_clicked()), this, SLOT(backwardClicked()));
-    connect(m_trayIcon, SIGNAL(sig_fwd_clicked()), this, SLOT(forwardClicked()));
-    connect(m_trayIcon, SIGNAL(sig_play_clicked()), this, SLOT(playClicked()));
-    connect(m_trayIcon, SIGNAL(sig_pause_clicked()), this, SLOT(playClicked()));
+    connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(onStopActivated()));
+    connect(m_trayIcon, SIGNAL(sig_bwd_clicked()),
+            this, SLOT(onBackwardActivated()));
+    connect(m_trayIcon, SIGNAL(sig_fwd_clicked()),
+            this, SLOT(onForwardActivated()));
+    connect(m_trayIcon, SIGNAL(sig_play_clicked()),
+            this, SLOT(onPlayActivated()));
+    connect(m_trayIcon, SIGNAL(sig_pause_clicked()),
+            this, SLOT(onPauseActivated()));
     connect(m_trayIcon, SIGNAL(sig_mute_clicked()),
             ui->player_w->volume(), SLOT(toggleMute()));
 
@@ -257,7 +254,7 @@ void GUI_Player::setupTrayActions()
             this, SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
 
     connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)),
-            this, SLOT(volumeChangedByTick(int)));
+            this, SLOT(onVolumeStepActivated(int)));
 
     m_trayIcon->setPlaying(false);
 

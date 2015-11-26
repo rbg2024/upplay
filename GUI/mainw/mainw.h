@@ -40,9 +40,6 @@ class GUI_Library_windowed;
 class GUI_InfoDialog;
 class GUI_LibraryPath;
 class GUI_Notifications;
-class GUI_Startup_Dialog;
-class CoverLookup;
-class GUI_Alternate_Covers;
 class QTemporaryFile;
 
 class GUI_Player : public QMainWindow {
@@ -53,19 +50,18 @@ public:
 
 public slots:
 
-    void update_track(const MetaData& in);
-    void setCurrentPosition(quint32 pos_sec);
-
     void really_close(bool=false);
-
     void trayItemActivated (QSystemTrayIcon::ActivationReason reason);
 
+    // For restoring from settings
+    void setVolume(int vol);
+    
     // Reflect externally triggered audio changes in ui
+    void update_track(const MetaData& in);
+    void setCurrentPosition(quint32 pos_sec);
     void stopped();
     void playing();
     void paused();
-
-    void setVolume(int vol);
     void setVolumeUi(int volume_percent);
     void setMuteUi(bool);
 
@@ -98,18 +94,17 @@ signals:
 private slots:
     // These are connected to ui signals (either tray or main ctl),
     // and coordinate stuff.
-    void playClicked();
-    void pauseClicked();
-    void stopClicked();
-    void backwardClicked();
-    void forwardClicked();
-    void jump_forward();
-    void jump_backward();
-    void onMuteChanged(bool);
-    
-    void volumeChangedByTick(int val);
-    void volumeHigher();
-    void volumeLower();
+    void onPlayActivated();
+    void onPauseActivated();
+    void onStopActivated();
+    void onBackwardActivated();
+    void onForwardActivated();
+    void onJumpForwardActivated();
+    void onJumpBackwardActivated();
+    void onMuteActivated(bool);
+    void onVolumeStepActivated(int val);
+    void onVolumeHigherActivated();
+    void onVolumeLowerActivated();
 
     /* File */
 
@@ -156,20 +151,15 @@ private:
     GUI_LibraryPath*        ui_libpath;
     GUI_InfoDialog*         ui_info_dialog;
     GUI_Notifications*      ui_notifications;
-    GUI_Startup_Dialog*     ui_startup_dialog;
-    CoverLookup*            m_cov_lookup;
     QNetworkAccessManager  *m_netmanager;
-    GUI_Alternate_Covers*   m_alternate_covers;
 
     QString                 m_class_name;
     QString                 m_renderer_friendly_name;
-    quint32                 m_completeLength_ms;
     GUI_TrayIcon *          m_trayIcon;
 
     QString                 m_skinSuffix;
 
     MetaData            m_metadata;
-    MetaData            m_metadata_corrected;
     bool                m_metadata_available;
     bool                m_overridemin2tray;
 
