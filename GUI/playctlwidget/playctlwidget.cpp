@@ -28,6 +28,11 @@ PlayCtlWidget::PlayCtlWidget(QWidget *parent)
     connect(btn_bw, SIGNAL(clicked()), this, SLOT(onBackwardClicked()));
 }
 
+QWidget *PlayCtlWidget::stopWidget()
+{
+    return btn_stop;
+}
+
 void PlayCtlWidget::onStopped()
 {
     btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));

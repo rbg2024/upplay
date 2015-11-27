@@ -42,6 +42,8 @@ public slots:
     virtual void onStopClicked() = 0;
     virtual void onBackwardClicked() = 0;
     virtual void onForwardClicked() = 0;
+
+    virtual QWidget *stopWidget() = 0;
     
 signals:
     void playrequested();

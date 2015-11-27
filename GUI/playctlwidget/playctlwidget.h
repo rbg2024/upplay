@@ -43,6 +43,9 @@ public slots:
     virtual void onBackwardClicked();
     virtual void onForwardClicked();
 
+    // Give access to the stop button in case they want to hide it.
+    virtual QWidget *stopWidget();
+    
 private:
     bool m_playing;
 };
