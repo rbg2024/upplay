@@ -22,8 +22,11 @@
 #endif
 
 #include "GUI/widgets/directslider.h"
+#include "GUI/volumewidget/soundslider.h"
 
 QT_BEGIN_NAMESPACE
+static const char *qt_slider_colours =
+    "153;210;153;20;210;20;255;199;15;245;39;29";
 
 class Ui_VolumeWidget
 {
@@ -31,8 +34,8 @@ public:
     QVBoxLayout *topLayout;
     QBoxLayout *actualLayout;
     QPushButton *btn_mute;
-    DirectSlider *volumeSlider;
-
+    QAbstractSlider *volumeSlider;
+    
     void setupUi(QWidget *VolumeWidget, bool horiz = false)
     {
         Qt::AlignmentFlag alignment;
@@ -76,7 +79,16 @@ public:
 
         actualLayout->addWidget(btn_mute, 0, alignment);
 
-        volumeSlider = new DirectSlider(VolumeWidget);
+        if (horiz) {
+            // Use the vlc widget
+            volumeSlider = new SoundSlider(VolumeWidget,
+                                           12.8, strdup(qt_slider_colours));
+            // But this alsow works with a normal slider
+            //volumeSlider = new DirectSlider(VolumeWidget);
+        } else {
+            volumeSlider = new DirectSlider(VolumeWidget);
+        }
+
         volumeSlider->setObjectName(QStringLiteral("volumeSlider"));
         volumeSlider->setFocusPolicy(Qt::NoFocus);
         volumeSlider->setMaximum(100);

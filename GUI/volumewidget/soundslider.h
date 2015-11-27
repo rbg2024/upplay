@@ -31,11 +31,24 @@
 
 #include <QAbstractSlider>
 #include <QPainter>
+#include <QDebug>
 
 /* Sound Slider inherited directly from QAbstractSlider */
 class QPaintEvent;
 
-#define SOUNDMAX  125 // 125 % (+6dB) 
+
+/* VLC used // 125 % (+6dB) */
+#define SOUNDMAX  100
+
+#ifndef Q_DECL_OVERRIDE
+#define Q_DECL_OVERRIDE
+#endif
+#ifndef DPI_REF_VALUE
+#define DPI_REF_VALUE 96.0
+#endif
+#ifndef AOUT_VOLUME_DEFAULT
+#define AOUT_VOLUME_DEFAULT 256
+#endif
 
 class SoundSlider : public QAbstractSlider
 {

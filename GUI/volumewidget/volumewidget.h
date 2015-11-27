@@ -21,7 +21,10 @@
 #include <QString>
 
 #include "volumewidgetif.h"
-#include "ui_volumewidget.h"
+
+namespace Ui {
+    class VolumeWidget;
+}
 
 class VolumeWidget: public VolumeWidgetIF {
     Q_OBJECT;

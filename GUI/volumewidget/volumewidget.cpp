@@ -17,6 +17,7 @@
 
 #include "volumewidget.h"
 #include "HelperStructs/Helper.h"
+#include "ui_volumewidget.h"
 
 #include <QDebug>
 
@@ -59,7 +60,9 @@ void VolumeWidget::onMuteClicked()
 void VolumeWidget::set(int value)
 {
     setupButton(value);
-    ui->volumeSlider->setValueNoSigs(value);
+    ui->volumeSlider->blockSignals(true);
+    ui->volumeSlider->setValue(value);
+    ui->volumeSlider->blockSignals(false);
     emit volumeChanged(value);
 }
 
@@ -78,7 +81,9 @@ void VolumeWidget::setUi(int value)
 {
     if (!m_mute) {
         setupButton(value);
-        ui->volumeSlider->setValueNoSigs(value);
+        ui->volumeSlider->blockSignals(true);
+        ui->volumeSlider->setValue(value);
+        ui->volumeSlider->blockSignals(false);
     }
 }
 
@@ -86,6 +91,19 @@ void VolumeWidget::setMuteUi(bool ismute)
 {
     m_mute = ismute;
     //qDebug() << "VolumeWidget::setMuteUi(" << m_mute << ")";
+    // Ok, this is not nice, but I don't feel like defining the class
+    // hierarchy which would allow a saner approach (SounSlider
+    // derives from QAbstractSlider, DirectSlider from QSlider...
+    SoundSlider *ssp = dynamic_cast<SoundSlider*>(ui->volumeSlider);
+    DirectSlider *dsp = dynamic_cast<DirectSlider*>(ui->volumeSlider);
+    if (ssp) {
+        ssp->setMuted(ismute);
+    } else if (dsp) {
+        dsp->setDisabled(ismute);
+    } else {
+        qDebug() << "VolumeWidget::setMuteUi: slider neither Direct nor Sound";
+    }
+    
     ui->volumeSlider->setDisabled(m_mute);
     if (m_mute) {
         ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));

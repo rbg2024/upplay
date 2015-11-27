@@ -22,9 +22,13 @@
 #include <iostream>
 using namespace std;
 
-#include <QApplication>
-
 #include "volumewidget.h"
+
+#include <QApplication>
+#include <QWidget>
+#include <QObject>
+
+#include "vw.h"
 
 static const char *thisprog;
 
@@ -73,6 +77,11 @@ int main(int argc, char **argv)
         Usage();
 
     VolumeHWidget w;
+//    VolumeWidget w;
+    TestReceiver r;
+    app.connect(&w, SIGNAL(volumeChanged(int)), &r, SLOT(onVolumeChanged(int)));
+    app.connect(&w, SIGNAL(muteChanged(bool)), &r, SLOT(onMuteChanged(bool)));
     w.show();
+    w.setUi(50);
     return app.exec();
 }

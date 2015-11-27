@@ -35,6 +35,13 @@
 #include <QPainter>
 #include <QColor>
 #include <QPaintEvent>
+#include <QBitmap>
+
+#ifndef __MIN
+#define __MIN(A,B) ((A)<(B)?(A):(B))
+#define __MAX(A,B) ((A)>(B)?(A):(B))
+#define qfu( i ) QString::fromUtf8( i )
+#endif
 
 #define WLENGTH_BASE   80 // px
 #define WHEIGHT_BASE   22  // px
@@ -58,14 +65,14 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     b_mouseOutside = true;
     b_isMuted = false;
 
-    const QPixmap pixOutsideRaw( ":/toolbar/volslide-outside" );
+    const QPixmap pixOutsideRaw( ":/volslide-outside" );
     const QSize pixOutsideSize(
                 static_cast<qreal>(pixOutsideRaw.width()) * scalingFactorX,
                 static_cast<qreal>(pixOutsideRaw.height()) * scalingFactorY
             );
     pixOutside = pixOutsideRaw.scaled(pixOutsideSize);
 
-    const QPixmap tempRaw( ":/toolbar/volslide-inside" );
+    const QPixmap tempRaw( ":/volslide-inside" );
     const QSize tempSize(
                     static_cast<qreal>(tempRaw.width()) * scalingFactorX,
                     static_cast<qreal>(tempRaw.height()) * scalingFactorY
@@ -120,8 +127,10 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     float f_mid_point = ( 100.0 / maximum() );
     QColor * foo;
     add_colors( gradient, gradient2, 0.0, 0, 1, 2 );
-    add_colors( gradient, gradient2, f_mid_point - 0.05, 3, 4, 5 );
-    add_colors( gradient, gradient2, f_mid_point + 0.05, 6, 7, 8 );
+    if (f_mid_point + 0.05 <= 1.0) {
+        add_colors( gradient, gradient2, f_mid_point - 0.05, 3, 4, 5 );
+        add_colors( gradient, gradient2, f_mid_point + 0.05, 6, 7, 8 );
+    }
     add_colors( gradient, gradient2, 1.0, 9, 10, 11 );
 
     painter.begin( &pixGradient );
