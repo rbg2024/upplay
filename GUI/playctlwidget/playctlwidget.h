@@ -44,7 +44,7 @@ public slots:
     virtual void onForwardClicked();
 
     // Give access to the stop button in case they want to hide it.
-    virtual QWidget *stopWidget();
+    virtual QLayoutItem *takeStopWidget();
     
 private:
     bool m_playing;

@@ -28,9 +28,9 @@ PlayCtlWidget::PlayCtlWidget(QWidget *parent)
     connect(btn_bw, SIGNAL(clicked()), this, SLOT(onBackwardClicked()));
 }
 
-QWidget *PlayCtlWidget::stopWidget()
+QLayoutItem *PlayCtlWidget::takeStopWidget()
 {
-    return btn_stop;
+    return horizontalLayout->takeAt(1);
 }
 
 void PlayCtlWidget::onStopped()

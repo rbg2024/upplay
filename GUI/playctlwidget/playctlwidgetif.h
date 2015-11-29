@@ -17,7 +17,7 @@
 #ifndef _PLAYCTLWIDGETIF_H_INCLUDED_
 #define _PLAYCTLWIDGETIF_H_INCLUDED_
 #include <QWidget>
-
+#include <QLayoutItem>
 
 class PlayCtlWidgetIF : public QWidget {
     Q_OBJECT;
@@ -43,7 +43,7 @@ public slots:
     virtual void onBackwardClicked() = 0;
     virtual void onForwardClicked() = 0;
 
-    virtual QWidget *stopWidget() = 0;
+    virtual QLayoutItem *takeStopWidget() = 0;
     
 signals:
     void playrequested();
