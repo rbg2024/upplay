@@ -31,7 +31,12 @@
 #include <QDebug>
 #include <QtNetwork/QNetworkAccessManager>
 
+#ifdef UPPLAY_HORIZONTAL_LAYOUT
+#include "ui_mainhw.h"
+#else
 #include "ui_mainw.h"
+#endif
+
 #include "trayicon.h"
 #include "HelperStructs/Helper.h"
 

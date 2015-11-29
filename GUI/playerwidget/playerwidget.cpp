@@ -14,16 +14,27 @@
  *   Free Software Foundation, Inc.,
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#include "playerwidget.h"
+#include "playerhwidget.h"
+#include "playervwidget.h"
 
-PlayerWidget::PlayerWidget(QWidget *parent)
+PlayerVWidget::PlayerVWidget(QWidget *parent)
     : QWidget(parent)
 {
         setupUi(this);
 
         // Reproduce the old setup by moving the stop button around
-        QLayoutItem *item = playctl_w->horizontalLayout->takeAt(1);
+        QLayoutItem *item = playctl_w->takeStopWidget();
+        // Curiously this does not work
+        //bottomHLayout->addItem(item);
+        // But this does
         bottomHLayout->addWidget(item->widget());
-        item->invalidate();
-        delete item;
+        // I guess that this should be done, but I also suspect that
+        // I'm seeing related memory issues
+        //      item->invalidate(); delete item;
+}
+
+PlayerHWidget::PlayerHWidget(QWidget *parent)
+    : QWidget(parent)
+{
+        setupUi(this);
 }

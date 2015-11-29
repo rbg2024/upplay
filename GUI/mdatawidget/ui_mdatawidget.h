@@ -40,13 +40,19 @@ public:
         horizontalLayout_2 = new QHBoxLayout(MDataWidget);
         horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
 
-        int titlehmin = 20;
-        int otherhmin = 20;
+        int titlehmin = 18;
+        int otherhmin = titlehmin;
+        int titlehmax = titlehmin;
+        int otherhmax = titlehmin;
+        Qt::Alignment align(Qt::AlignHCenter|Qt::AlignTop);
         if (horiz) {
             actualLayout = new QHBoxLayout();
         } else {
             titlehmin = 50;
             otherhmin = 30;
+            titlehmax = 50;
+            otherhmax = 30;
+            align = Qt::AlignCenter;
             actualLayout = new QVBoxLayout();
         }
 
@@ -55,7 +61,7 @@ public:
         lab_title = new QLabel(MDataWidget);
         lab_title->setObjectName(QString::fromUtf8("lab_title"));
         lab_title->setMinimumSize(QSize(0, titlehmin));
-        lab_title->setMaximumSize(QSize(16777215, 50));
+        lab_title->setMaximumSize(QSize(16777215, titlehmax));
         QFont font;
         font.setPointSize(10);
         font.setBold(true);
@@ -77,7 +83,7 @@ public:
         lab_artist = new QLabel(MDataWidget);
         lab_artist->setObjectName(QString::fromUtf8("lab_artist"));
         lab_artist->setMinimumSize(QSize(0, otherhmin));
-        lab_artist->setMaximumSize(QSize(16777215, 30));
+        lab_artist->setMaximumSize(QSize(16777215, otherhmax));
         QFont font1;
         font1.setPointSize(6);
         font1.setStyleStrategy(QFont::PreferAntialias);
@@ -96,7 +102,7 @@ public:
         lab_album = new QLabel(MDataWidget);
         lab_album->setObjectName(QString::fromUtf8("lab_album"));
         lab_album->setMinimumSize(QSize(0, otherhmin));
-        lab_album->setMaximumSize(QSize(16777215, 30));
+        lab_album->setMaximumSize(QSize(16777215, otherhmax));
         lab_album->setFont(font1);
         lab_album->setStyleSheet(QString::fromUtf8(""));
         lab_album->setText(QString::fromUtf8(""));

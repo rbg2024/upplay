@@ -83,6 +83,7 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     QPixmap pixmap;
     pixmap.convertFromImage(image);
     ui->player_w->albumCover->setIcon(QIcon(pixmap));
+    ui->player_w->albumCover->setIconSize(ui->player_w->albumCover->size());
 
     QString htmlfrag("<img src=\"");
     htmlfrag += m_covertempfile->fileName();

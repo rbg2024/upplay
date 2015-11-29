@@ -15,21 +15,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef _PLAYERWIDGET_H_INCLUDED_
-#define _PLAYERWIDGET_H_INCLUDED_
+#ifndef _PLAYERVWIDGET_H_INCLUDED_
+#define _PLAYERVWIDGET_H_INCLUDED_
 #include <QWidget>
 
-#include "ui_playerwidget.h"
+#include "ui_playervwidget.h"
 
 class VolumeWidgetIF;
 class ProgressWidgetIF;
 class MDataWidgetIF;
 class PlayCtlWidgetIF;
 
-class PlayerWidget : public QWidget, public Ui::PlayerWidget {
+class PlayerVWidget : public QWidget, public Ui::PlayerVWidget {
     Q_OBJECT;
 public:
-    PlayerWidget(QWidget *parent = 0);
+    PlayerVWidget(QWidget *parent = 0);
 
     VolumeWidgetIF* volume() {
         return volumectl_w;
@@ -42,6 +42,9 @@ public:
     }
     MDataWidget* mdata() {
         return mdata_w;
+    }
+    virtual QLayoutItem *takeCoverWidget() {
+        return horizontalLayout->takeAt(0);
     }
 };
 

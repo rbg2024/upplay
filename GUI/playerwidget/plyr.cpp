@@ -26,7 +26,7 @@ using namespace std;
 #include <QObject>
 #include <QTimer>
 
-#include "playerwidget.h"
+#include "playerhwidget.h"
 #include "../../HelperStructs/Helper.h"
 #include "../../HelperStructs/MetaData.h"
 
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
     md.title = "The Track Title";
     md.artist = " The Great artist";
 
-    PlayerWidget w;
+    PlayerHWidget w;
     w.mdata()->setData(md);
     w.show();
 

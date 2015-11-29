@@ -44,7 +44,7 @@ public:
         return mdata_w;
     }
     virtual QLayoutItem *takeCoverWidget() {
-        return bottomHLayout->takeAt(1);
+        return bottomHLayout->takeAt(0);
     }
 };
 

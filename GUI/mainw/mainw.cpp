@@ -307,9 +307,28 @@ QWidget* GUI_Player::getParentOfLibrary()
 
 void GUI_Player::setPlaylistWidget(QWidget* w)
 {
+    if (ui->playlist_widget) {
+        w->setSizePolicy(ui->playlist_widget->sizePolicy());
+    } else {
+        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(2);
+        sizePolicy.setVerticalStretch(2);
+        sizePolicy.setHeightForWidth(w->sizePolicy().hasHeightForWidth());
+        w->setSizePolicy(sizePolicy);
+    }
     delete ui->playlist_widget;
     ui->playlist_widget = w;
     ui->verticalLayout->addWidget(ui->playlist_widget);
+
+#ifdef UPPLAY_HORIZONTAL_LAYOUT
+    QLayoutItem *cover = ui->player_w->takeCoverWidget();
+    QWidget *cw = cover->widget();
+    cw->setMaximumSize(QSize(9000, 9000));
+    cw->setSizePolicy(ui->coverWidget->sizePolicy());
+    ui->verticalLayout->insertWidget(0, cw, 1);
+    delete ui->coverWidget;
+    ui->verticalLayout->update();
+#endif
 }
 
 void GUI_Player::setLibraryWidget(QWidget* w)
@@ -389,7 +408,8 @@ void GUI_Player::resizeEvent(QResizeEvent*e)
 {
     QMainWindow::resizeEvent(e);
     m_settings->setPlayerSize(this->size());
-    ui_playlist->resize(ui->playlist_widget->size());
+    if (ui_playlist)
+        ui_playlist->resize(ui->playlist_widget->size());
 }
 
 void GUI_Player::keyPressEvent(QKeyEvent* e)

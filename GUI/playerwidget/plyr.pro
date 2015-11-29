@@ -6,11 +6,13 @@ QMAKE_CXXFLAGS += -std=c++0x
 CONFIG  += qt warn_on thread release 
 
 HEADERS += \
-        ../playerwidget/playerwidget.h \
+        ../playerwidget/playerhwidget.h \
+        ../playerwidget/playervwidget.h \
         ../mdatawidget/mdatawidget.h \
         ../mdatawidget/mdatawidgetif.h \
         ../volumewidget/volumewidget.h \
         ../volumewidget/volumewidgetif.h \
+        ../volumewidget/soundslider.h \
         ../playctlwidget/playctlwidget.h \
         ../playctlwidget/playctlwidgetif.h \
         ../progresswidget/progresswidget.h \
@@ -19,9 +21,10 @@ HEADERS += \
         ../../HelperStructs/CSettingsStorage.h
 
 SOURCES += plyr.cpp \
-        ../mdatawidget/mdatawidget.cpp \
         ../playerwidget/playerwidget.cpp \
+        ../mdatawidget/mdatawidget.cpp \
         ../volumewidget/volumewidget.cpp \
+        ../volumewidget/soundslider.cpp \
         ../playctlwidget/playctlwidget.cpp \
         ../progresswidget/progresswidget.cpp \
         ../widgets/directslider.cpp \
@@ -29,8 +32,8 @@ SOURCES += plyr.cpp \
         ../../HelperStructs/CSettingsStorage.cpp
         
 FORMS   = \
-        ../playerwidget/playerwidget.ui \
-        ../mdatawidget/mdatawidget.ui \
+        ../playerwidget/playerhwidget.ui \
+        ../playerwidget/playervwidget.ui \
         ../volumewidget/volumewidget.ui \
         ../playctlwidget/playctlwidget.ui \
         ../progresswidget/progresswidget.ui

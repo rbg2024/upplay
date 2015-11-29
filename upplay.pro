@@ -16,17 +16,22 @@ QMAKE_CXXFLAGS += -std=c++0x
 buildtype = release
 CONFIG  += qt warn_on thread $$buildtype
 
+# DEFINES += UPPLAY_HORIZONTAL_LAYOUT
+
+
 RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
         GUI/widgets/directslider.h  \
         GUI/mainw/mainw.h \
         GUI/mainw/trayicon.h \
-        GUI/playerwidget/playerwidget.h \
+        GUI/playerwidget/playerhwidget.h \
+        GUI/playerwidget/playervwidget.h \
         GUI/mdatawidget/mdatawidget.h \
         GUI/mdatawidget/mdatawidgetif.h \
         GUI/volumewidget/volumewidget.h \
         GUI/volumewidget/volumewidgetif.h \
+        GUI/volumewidget/soundslider.h  \
         GUI/playctlwidget/playctlwidget.h \
         GUI/playctlwidget/playctlwidgetif.h \
         GUI/progresswidget/progresswidget.h \
@@ -76,6 +81,7 @@ SOURCES += \
         GUI/playerwidget/playerwidget.cpp \
         GUI/mdatawidget/mdatawidget.cpp \
         GUI/volumewidget/volumewidget.cpp \
+        GUI/volumewidget/soundslider.cpp  \
         GUI/playctlwidget/playctlwidget.cpp \
         GUI/progresswidget/progresswidget.cpp \
         GUI/playlist/GUI_Playlist.cpp \
@@ -104,9 +110,9 @@ SOURCES += \
 
 FORMS   = \
         GUI/mainw/mainw.ui \
-        GUI/playerwidget/playerwidget.ui \
-        GUI/mdatawidget/mdatawidget.ui \
-        GUI/volumewidget/volumewidget.ui \
+        GUI/mainw/mainhw.ui \
+        GUI/playerwidget/playerhwidget.ui \
+        GUI/playerwidget/playervwidget.ui \
         GUI/playctlwidget/playctlwidget.ui \
         GUI/progresswidget/progresswidget.ui \
         dirbrowser/dirbrowser.ui \
