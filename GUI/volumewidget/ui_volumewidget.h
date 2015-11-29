@@ -9,15 +9,12 @@
 #ifndef UI_VOLUMEWIDGET_H
 #define UI_VOLUMEWIDGET_H
 
-#include <QtCore/qglobal.h>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
-#else
-#include <QtGui/QPushButton>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QWidget>
+#include <qglobal.h>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
 #define QStringLiteral(X) X
 #endif
 
