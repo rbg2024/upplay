@@ -26,8 +26,9 @@ class MDataWidgetIF : public QWidget {
     Q_OBJECT;
 
 public:
-    MDataWidgetIF(QWidget *parent = 0)
+    MDataWidgetIF(QWidget *parent = 0, bool horiz = false)
         : QWidget(parent) {
+        Q_UNUSED(horiz);
     }
     virtual ~MDataWidgetIF() {}
 

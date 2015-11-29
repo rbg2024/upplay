@@ -21,10 +21,10 @@
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/Helper.h"
 
-MDataWidget::MDataWidget(QWidget *parent)
+MDataWidget::MDataWidget(QWidget *parent, bool horiz)
     : MDataWidgetIF(parent)
 {
-    setupUi(this);
+    setupUi(this, horiz);
 }
 
 void MDataWidget::setData(const MetaData& md)

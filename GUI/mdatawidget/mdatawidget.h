@@ -27,12 +27,18 @@ class MDataWidget : public MDataWidgetIF, public Ui::MDataWidget {
     Q_OBJECT;
 
 public:
-    MDataWidget(QWidget *parent = 0);
+    MDataWidget(QWidget *parent = 0, bool horiz = false);
     virtual ~MDataWidget() {}
 
 public slots:
     virtual void setData(const MetaData& md);
 };
 
+class MDataHWidget : public MDataWidget {
+public:
+    MDataHWidget(QWidget *parent = 0)
+        : MDataWidget(parent, true) {
+    }
+};
 
 #endif /* _MDATAWIDGET_H_INCLUDED_ */

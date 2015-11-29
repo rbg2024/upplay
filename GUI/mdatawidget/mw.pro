@@ -12,7 +12,7 @@ SOURCES += mw.cpp mdatawidget.cpp \
         ../../HelperStructs/Helper.cpp \
         ../../HelperStructs/CSettingsStorage.cpp
         
-FORMS   = mdatawidget.ui
+#FORMS   = mdatawidget.ui
 
 unix {
   UI_DIR = .ui
