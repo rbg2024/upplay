@@ -75,4 +75,6 @@ bool read_file_into_str(QString filename, QString* content);
 std::string escapeHtml(const string &in);
 QString escapeHtml(const QString& in);
 
+template <class T> void stringsToString(const T &tokens, std::string &s);
+template <class T> std::string stringsToString(const T &tokens);
 #endif

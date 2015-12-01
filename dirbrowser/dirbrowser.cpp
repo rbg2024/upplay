@@ -122,6 +122,7 @@ void DirBrowser::setStyleSheet(bool dark)
     }
 }
 
+    
 void DirBrowser::addTab()
 {
     QWidget *tab = new QWidget(this);
@@ -151,6 +152,13 @@ void DirBrowser::closeTab(int i)
     delete w;
 }
 
+static const QString UPnPSearchCheat(
+    "Album/Artist etc.: just enter a value.<br>"
+    "UPnP search string example:<br>"
+    "upnp:artist contains \"bach\" and "
+    "dc:title contains \"allegro\""
+    );
+
 // Adjust the search panel according the the server caps for the
 // active tab
 void DirBrowser::onCurrentTabChanged(int)
@@ -159,6 +167,9 @@ void DirBrowser::onCurrentTabChanged(int)
     set<string> caps;
     if (cdb)
         cdb->getSearchCaps(caps);
+    QString strcaps = u8s2qs("<i></i>Server searchable fields: ") +
+                             u8s2qs(stringsToString(caps));
+
     while(ui->propsCMB->count())
         ui->propsCMB->removeItem(0);
     if (caps.empty()) {
@@ -181,7 +192,10 @@ void DirBrowser::onCurrentTabChanged(int)
             }
             scs += u8s2qs(it->first.c_str()) + " ";
         }
-        qDebug() << "Search caps: " << scs;
+        ui->propsCMB->addItem(tr("UPnP search string"),
+                              QVariant(u8s2qs("*")));
+        ui->propsCMB->setToolTip(strcaps);
+        ui->searchCMB->setToolTip(UPnPSearchCheat);
         onSearchKindChanged(ui->serverSearchCB->checkState());
     }
 }
@@ -275,14 +289,15 @@ void DirBrowser::onSearchTextChanged(const QString& text)
         }
     }
 }
+
 void DirBrowser::searchNext()
 {
-    doSearch(ui->searchCMB->currentText(), false);
+    doSearch(ui->searchCMB->currentText().trimmed(), false);
 }
 
 void DirBrowser::searchPrev()
 {
-    doSearch(ui->searchCMB->currentText(), true);
+    doSearch(ui->searchCMB->currentText().trimmed(), true);
 }
 
 void DirBrowser::returnPressedInSearch()
@@ -299,19 +314,27 @@ void DirBrowser::returnPressedInSearch()
 
 void DirBrowser::serverSearch()
 {
-    QString text = ui->searchCMB->lineEdit()->text();
+    QString text = ui->searchCMB->lineEdit()->text().trimmed();
     int i = ui->propsCMB->currentIndex();
     string prop = qs2utf8s(ui->propsCMB->itemData(i).toString());
     if (text != "") {
         string iss = qs2utf8s(text);
-        string ss(prop);
-        ss += " contains \"";
-        for (unsigned i = 0; i < iss.size(); i++) {
-            if (iss[i] == '"' || iss[i] == '\\')
-                ss += string("\\");
-            ss += iss[i];
-        }
-        ss += '"';
+        // prop can be either a field name (e.g. dc:date,
+        // upnp:artist), or "*" in which case the user is responsible
+        // for entering an appropriate search"
+        string ss;
+        if (prop == "*") {
+            ss = iss;
+        } else {
+            ss.assign(prop);
+            ss += " contains \"";
+            for (unsigned i = 0; i < iss.size(); i++) {
+                if (iss[i] == '"' || iss[i] == '\\')
+                    ss += string("\\");
+                ss += iss[i];
+            }
+            ss += '"';
+        } 
         CDBrowser *cdb = currentBrowser();
         if (cdb)
             cdb->search(ss);

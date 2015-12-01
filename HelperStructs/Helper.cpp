@@ -27,6 +27,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <set>
+#include <vector>
+#include <list>
 
 #include <Qt>
 #include <QDir>
@@ -315,3 +318,40 @@ QString escapeHtml(const QString& in)
     return Qt::escape(in);
 #endif
 }
+
+template <class T> void stringsToString(const T &tokens, string &s) 
+{
+    for (typename T::const_iterator it = tokens.begin();
+	 it != tokens.end(); it++) {
+	bool hasblanks = false;
+	if (it->find_first_of(" \t\n") != string::npos)
+	    hasblanks = true;
+	if (it != tokens.begin())
+	    s.append(1, ' ');
+	if (hasblanks)
+	    s.append(1, '"');
+	for (unsigned int i = 0; i < it->length(); i++) {
+	    char car = it->at(i);
+	    if (car == '"') {
+		s.append(1, '\\');
+		s.append(1, car);
+	    } else {
+		s.append(1, car);
+	    }
+	}
+	if (hasblanks)
+	    s.append(1, '"');
+    }
+}
+template void stringsToString<list<string> >(const list<string> &, string &);
+template void stringsToString<vector<string> >(const vector<string> &,string &);
+template void stringsToString<set<string> >(const set<string> &, string &);
+template <class T> string stringsToString(const T &tokens)
+{
+    string out;
+    stringsToString<T>(tokens, out);
+    return out;
+}
+template string stringsToString<list<string> >(const list<string> &);
+template string stringsToString<vector<string> >(const vector<string> &);
+template string stringsToString<set<string> >(const set<string> &);
