@@ -180,7 +180,8 @@ void Helper::setStyleSubDir(const QString& subd)
 
 QString Helper::getIconDir()
 {
-    return ":/icons/";
+    return QDir(getSharePath()).filePath("icons");
+//    return ":/icons/";
 }
 
 QString Helper::getIconPath(const QString& icnm)

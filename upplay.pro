@@ -19,8 +19,6 @@ CONFIG  += qt warn_on thread $$buildtype
 # DEFINES += UPPLAY_HORIZONTAL_LAYOUT
 
 
-RESOURCES += GUI/upplay.qrc
-
 HEADERS += \
         GUI/widgets/directslider.h  \
         GUI/mainw/mainw.h \
@@ -143,11 +141,14 @@ unix {
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
   desktop.path = $$PREFIX/share/applications/
-  icona.files += GUI/icons/upplay.png
+  icona.files = GUI/icons/upplay.png
   icona.path = $$PREFIX/share/icons/hicolor/48x48/apps/
-  iconb.files += GUI/icons/upplay.png
+  iconb.files = GUI/icons/upplay.png
   iconb.path = $$PREFIX/share/pixmaps/
-  INSTALLS += target bdata desktop gdata icona iconb
+  iconc.files = GUI/icons/*.png GUI/icons/dark/*.png
+  iconc.path = $$PREFIX/share/upplay/icons
+
+  INSTALLS += target bdata desktop gdata icona iconb iconc
 }
 
 windows {

@@ -63,6 +63,7 @@ copyupplay()
     chkcp $UPP/GUI/standard.css $DESTDIR/share
     chkcp $UPP/GUI/dark.css $DESTDIR/share
     chkcp $UPP/GUI/icons/upplay.ico $DESTDIR
+    chkcp -rp $UPP/GUI/icons $DESTDIR
     chkcp $GUIBIN $DESTDIR
 }
 
