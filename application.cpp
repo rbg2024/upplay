@@ -228,7 +228,7 @@ Application::Application(QApplication* qapp, int,
     }
 
     m_player->setWindowTitle("Upplay " + version);
-    m_player->setWindowIcon(QIcon(Helper::getIconPath() + "logo.png"));
+    m_player->setWindowIcon(QIcon(Helper::getIconPath("logo.png")));
     m_player->setPlaylist(m_ui_playlist);
     m_player->setStyle(m_settings->getPlayerStyle());
     m_player->show();

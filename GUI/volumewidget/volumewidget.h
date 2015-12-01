@@ -47,7 +47,7 @@ public slots:
     virtual void setUi(int value);
     virtual void setMuteUi(bool);
 
-    virtual void setSkinName(const QString& s);
+    virtual void updateSkin();
                                               
 private slots:
     // Connected to slider
@@ -60,7 +60,6 @@ private:
     
     Ui::VolumeWidget *ui;
     bool m_mute;
-    QString m_skinSuffix;
 };
 
 class VolumeHWidget : public VolumeWidget {

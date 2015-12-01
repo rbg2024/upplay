@@ -106,31 +106,29 @@ void VolumeWidget::setMuteUi(bool ismute)
     
     ui->volumeSlider->setDisabled(m_mute);
     if (m_mute) {
-        ui->btn_mute->setIcon(QIcon(Helper::getIconPath() + "vol_mute.png"));
+        ui->btn_mute->setIcon(QIcon(Helper::getIconPath("vol_mute.png")));
     } else {
         setupButton(ui->volumeSlider->value());
     }
 }
 
-void VolumeWidget::setSkinName(const QString& s)
+void VolumeWidget::updateSkin()
 {
-    m_skinSuffix = s.isEmpty() ? "" : "_" + s;
     setupButton(ui->volumeSlider->value());
 }
 
 void VolumeWidget::setupButton(int value)
 {
     //qDebug() << "VolumeWidget::setupButton(" << value << ")";
-    QString butFilename = Helper::getIconPath() + "vol_";
-
+    QString butFilename;
     if (value <= 1) {
-        butFilename += QString("mute") + m_skinSuffix + ".png";
+        butFilename = Helper::getIconPath("vol_mute.png");
     } else if (value < 40) {
-        butFilename += QString("1") + m_skinSuffix + ".png";
+        butFilename += Helper::getIconPath("vol_1.png");
     } else if (value < 80) {
-        butFilename += QString("2") + m_skinSuffix + ".png";
+        butFilename += Helper::getIconPath("vol_2.png");
     } else {
-        butFilename += QString("3") + m_skinSuffix + ".png";
+        butFilename += Helper::getIconPath("vol_3.png");
     }
 
     //qDebug() << "VolumeWidget::setupButton: fn: " << butFilename;

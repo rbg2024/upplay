@@ -179,8 +179,8 @@ void GUI_Player::update_track(const MetaData& md)
     if (!md.albumArtURI.isEmpty()) {
         fetch_cover(md.albumArtURI);
     } else {
-        ui->player_w->albumCover->setIcon(QIcon(Helper::getIconPath() +
-                                                "logo.png"));
+        ui->player_w->albumCover->setIcon(
+            QIcon(Helper::getIconPath("logo.png")));
     }
 
     ui->player_w->progress()->setEnabled(true);
@@ -217,15 +217,15 @@ void GUI_Player::changeSkin(bool dark)
     this->setStyleSheet(stylesheet);
 
     if (dark) {
-        m_skinSuffix = QString("_dark");
+        Helper::setStyleSubDir("dark");
     } else {
-        m_skinSuffix = QString("");
+        Helper::setStyleSubDir("");
     }
 
     m_settings->setPlayerStyle(dark ? 1 : 0);
     this->m_trayIcon->change_skin(stylesheet);
 
-    ui->player_w->volume()->setSkinName(dark ? "dark" : "");
+    ui->player_w->volume()->updateSkin();
     emit sig_skin_changed(dark);
 }
 

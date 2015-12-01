@@ -35,30 +35,30 @@ QLayoutItem *PlayCtlWidget::takeStopWidget()
 
 void PlayCtlWidget::onStopped()
 {
-    btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    btn_play->setIcon(QIcon(Helper::getIconPath("play.png")));
     m_playing = false;
 }
 
 void PlayCtlWidget::onPaused()
 {
-    btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    btn_play->setIcon(QIcon(Helper::getIconPath("play.png")));
     m_playing = false;
 }
 
 void PlayCtlWidget::onPlaying()
 {
-    btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+    btn_play->setIcon(QIcon(Helper::getIconPath("pause.png")));
     m_playing = true;
 }
 
 void PlayCtlWidget::onPlayClicked()
 {
    if (m_playing) {
-       btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+       btn_play->setIcon(QIcon(Helper::getIconPath("play.png")));
        //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting pausereq()";
        emit pauserequested();
    } else {
-       btn_play->setIcon(QIcon(Helper::getIconPath() + "pause.png"));
+       btn_play->setIcon(QIcon(Helper::getIconPath("pause.png")));
        //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting playreq()";
        emit playrequested();
    }
@@ -68,7 +68,7 @@ void PlayCtlWidget::onPlayClicked()
 
 void PlayCtlWidget::onStopClicked()
 {
-    btn_play->setIcon(QIcon(Helper::getIconPath() + "play.png"));
+    btn_play->setIcon(QIcon(Helper::getIconPath("play.png")));
     m_playing = false;
 
     //qDebug() << "PlayCtlWidget::onPlayClicked(): emitting stopreq()";

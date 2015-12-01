@@ -35,7 +35,9 @@ QString cvtMsecs2TitleLengthString(long int msec, bool colon = true,
 QString cvtQString2FirstUpper(QString str);
 QString calc_filesize_str(qint64 filesize);
 
-QString getIconPath();
+void setStyleSubDir(const QString& subd);
+QString getIconDir();
+QString getIconPath(const QString& nm);
 QString getSharePath();
 QString getHomeDataPath();
 QString createLink(QString name, QString target = "", bool underline = true);

@@ -97,6 +97,6 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 
 void GUI_Player::sl_no_cover_available()
 {
-    QString coverpath = Helper::getIconPath() + "logo.png";
+    QString coverpath = Helper::getIconPath("logo.png");
     ui->player_w->albumCover->setIcon(QIcon(coverpath));
 }

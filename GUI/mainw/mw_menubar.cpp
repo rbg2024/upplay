@@ -125,7 +125,7 @@ void GUI_Player::about(bool b)
 
     QMessageBox infobox(this);
     infobox.setParent(this);
-    QPixmap p =  QPixmap(Helper::getIconPath() + "logo.png").
+    QPixmap p =  QPixmap(Helper::getIconPath("logo.png")).
         scaled(150, 150, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     infobox.setIconPixmap(p);
     infobox.setWindowFlags(Qt::Dialog);

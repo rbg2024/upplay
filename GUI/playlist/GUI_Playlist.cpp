@@ -164,16 +164,13 @@ void GUI_Playlist::psl_next_group_html(QString html)
 // maybe the button state (pressed/unpressed) should be loaded from db here
 void GUI_Playlist::initGUI()
 {
-
-    QString icon_path = Helper::getIconPath();
-
-    ui->btn_repAll->setIcon(QIcon(icon_path + "repAll.png"));
-    ui->btn_shuffle->setIcon(QIcon(icon_path + "shuffle.png"));
-    ui->btn_append->setIcon(QIcon(icon_path + "append.png"));
-    ui->btn_replace->setIcon(QIcon(icon_path + "broom.png"));
-    ui->btn_playAdded->setIcon(QIcon(icon_path + "dynamic.png"));
-    ui->btn_clear->setIcon(QIcon(icon_path + "broom.png"));
-    ui->btn_numbers->setIcon(QIcon(icon_path + "numbers.png"));
+    ui->btn_repAll->setIcon(QIcon(Helper::getIconPath("repAll.png")));
+    ui->btn_shuffle->setIcon(QIcon(Helper::getIconPath("shuffle.png")));
+    ui->btn_append->setIcon(QIcon(Helper::getIconPath("append.png")));
+    ui->btn_replace->setIcon(QIcon(Helper::getIconPath("broom.png")));
+    ui->btn_playAdded->setIcon(QIcon(Helper::getIconPath("dynamic.png")));
+    ui->btn_clear->setIcon(QIcon(Helper::getIconPath("broom.png")));
+    ui->btn_numbers->setIcon(QIcon(Helper::getIconPath("numbers.png")));
 }
 
 // Slot: comes from listview

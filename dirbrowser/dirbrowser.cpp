@@ -40,8 +40,7 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
     ui->tabs->setTabsClosable(true);
 
     QToolButton *plusbut = new QToolButton(this);
-    QString icon_path = Helper::getIconPath();
-    QIcon icon = QIcon(icon_path + "/addtab.png");
+    QIcon icon = QIcon(Helper::getIconPath("addtab.png"));
     plusbut->setIcon(icon);
     ui->tabs->setCornerWidget(plusbut, Qt::TopRightCorner);
     plusbut->setCursor(Qt::ArrowCursor);
@@ -60,7 +59,7 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
     connect(ui->tabs, SIGNAL(tabCloseRequested(int)), 
             this, SLOT(closeTab(int)));
             
-    icon = QIcon(icon_path + "/cross.png");
+    icon = QIcon(Helper::getIconPath("cross.png"));
     ui->closeSearchTB->setIcon(icon);
     connect(ui->closeSearchTB, SIGNAL(clicked()), 
             this, SLOT(closeSearchPanel()));

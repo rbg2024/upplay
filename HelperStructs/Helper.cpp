@@ -172,9 +172,27 @@ QString Helper::getSharePath()
     return path;
 }
 
-QString Helper::getIconPath()
+static QString styleSubDir;
+void Helper::setStyleSubDir(const QString& subd)
+{
+    styleSubDir = subd;
+}
+
+QString Helper::getIconDir()
 {
     return ":/icons/";
+}
+
+QString Helper::getIconPath(const QString& icnm)
+{
+    if (!styleSubDir.isEmpty()) {
+        QDir styledir(QDir(getIconDir()).filePath(styleSubDir));
+        //qDebug() << "getIconPath(): testing " << styledir.filePath(icnm);
+        if (QFile::exists(styledir.filePath(icnm))) {
+            return styledir.filePath(icnm);
+        }
+    }
+    return QDir(getIconDir()).filePath(icnm);
 }
 
 QString Helper::getHomeDataPath()

@@ -40,13 +40,13 @@
   <file>icons/slider_ver_bg.png</file>
   <file>icons/stop.png</file>
   <file>icons/vol_1.png</file>
-  <file>icons/vol_1_dark.png</file>
   <file>icons/vol_2.png</file>
-  <file>icons/vol_2_dark.png</file>
   <file>icons/vol_3.png</file>
-  <file>icons/vol_3_dark.png</file>
   <file>icons/vol_mute.png</file>
-  <file>icons/vol_mute_dark.png</file>
+  <file>icons/dark/vol_1.png</file>
+  <file>icons/dark/vol_2.png</file>
+  <file>icons/dark/vol_3.png</file>
+  <file>icons/dark/vol_mute.png</file>
   <file alias="volslide-inside">icons/volume-slider-inside.png</file>
   <file alias="volslide-outside">icons/volume-slider-outside.png</file>
 </qresource>

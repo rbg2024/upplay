@@ -42,10 +42,9 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     m_playing = false;
     m_mute = false;
 
-    QString icon_path = Helper::getIconPath();
-    QIcon play_icon = QIcon(icon_path + "/play.png");
-    QIcon pause_icon = QIcon(icon_path + "/pause.png");
-    QIcon sayo_icon = QIcon(icon_path + "/logo.png");
+    QIcon play_icon = QIcon(Helper::getIconPath("/play.png"));
+    QIcon pause_icon = QIcon(Helper::getIconPath("/pause.png"));
+    QIcon sayo_icon = QIcon(Helper::getIconPath("/logo.png"));
     QPixmap play_pixmap = play_icon.pixmap(24, 24);
     QPixmap pause_pixmap = pause_icon.pixmap(24, 24);
     QPixmap sayo_pixmap = sayo_icon.pixmap(24, 24);
@@ -65,17 +64,17 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     _md_set = false;
 
     m_playAction = new QAction(tr("Play"), this);
-    m_playAction->setIcon(QIcon(icon_path + "play.png"));
+    m_playAction->setIcon(QIcon(Helper::getIconPath("play.png")));
     m_stopAction = new QAction(tr("Stop"), this);
-    m_stopAction->setIcon(QIcon(icon_path + "stop.png"));
+    m_stopAction->setIcon(QIcon(Helper::getIconPath("stop.png")));
     m_bwdAction = new QAction(tr("Previous"), this);
-    m_bwdAction->setIcon(QIcon(icon_path + "bwd.png"));
+    m_bwdAction->setIcon(QIcon(Helper::getIconPath("bwd.png")));
     m_fwdAction = new QAction(tr("Next"), this);
-    m_fwdAction->setIcon(QIcon(icon_path + "fwd.png"));
+    m_fwdAction->setIcon(QIcon(Helper::getIconPath("fwd.png")));
     m_muteAction = new QAction(tr("Mute"), this);
-    m_muteAction->setIcon(QIcon(icon_path + "vol_mute.png"));
+    m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_mute.png")));
     m_closeAction = new QAction(tr("Close"), this);
-    m_closeAction->setIcon(QIcon(icon_path + "close.png"));
+    m_closeAction->setIcon(QIcon(Helper::getIconPath("close.png")));
     m_showAction = new QAction(tr("Show"), this);
 
     m_trayContextMenu = new QMenu();
@@ -253,12 +252,10 @@ void GUI_TrayIcon::setMute(bool mute)
     }
 
     if (!mute) {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_mute" +
-                                    suffix + ".png"));
+        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_mute.png")));
         m_muteAction->setText(tr("Mute"));
     }  else {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath() + "vol_3" +
-                                    suffix + ".png"));
+        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_3.png")));
         m_muteAction->setText(tr("Unmute"));
     }
 }
