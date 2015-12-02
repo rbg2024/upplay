@@ -54,11 +54,24 @@ PlaylistOH::PlaylistOH(OHPlayer *ohpl, QObject * parent)
     connect(this, SIGNAL(sig_backward()), m_ohplo, SLOT(previous()));
 }
 
+static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
+{
+    if (mdv1.size() != mdv2.size())
+        return false;
+    for (unsigned int i = 0; i < mdv1.size(); i++) {
+        if (mdv1[i].filepath.compare(mdv2[i].filepath))
+            return false;
+    }
+    return true;
+}
+
 void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOH::psl_new_ohpl: " << mdv.size() << " entries";
-    m_meta = mdv;
-    emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    if (!samelist(mdv, m_meta)) {
+        m_meta = mdv;
+        emit sig_playlist_updated(m_meta, m_play_idx, 0);
+    }
 }
 
 void PlaylistOH::psl_seek(int secs)
@@ -78,13 +91,16 @@ void PlaylistOH::psl_currentTrackId(int id)
          it != m_meta.end(); it++) {
         if (it->id == id) {
             if (m_play_idx != it - m_meta.begin()) {
-                emit sig_playing_track_changed(it - m_meta.begin());
                 m_play_idx = it - m_meta.begin();
                 if (m_play_idx == int(m_meta.size()) - 1) {
                     m_lastsong = true;
                 }
                 //qDebug() << " new track index " << m_play_idx;
             }
+            // Emit the current index in any case to let the playlist
+            // UI scroll to show the currently playing track (some
+            // time after a user interaction scrolled it off)
+            emit sig_playing_track_changed(m_play_idx);
             // If the track id change was caused by the currently
             // playing track having been removed, the play index did
             // not change but the metadata did, so emit metadata in

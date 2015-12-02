@@ -18,16 +18,25 @@
 #include <QDebug>
 #include <QUrl>
 #include <QScrollBar>
+#include <QTimer>
 
 #include "HelperStructs/CustomMimeData.h"
 #include "HelperStructs/Helper.h"
 #include "PlaylistView.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
 
+// We avoid scrolling to make the currently playing track visible if the
+// user is currently active (e.g. selecting tracks). Reset after 10 S
+static const int user_activity_timeout_ms = 10 * 1000;
 
-PlaylistView::PlaylistView(QWidget* parent) : QListView(parent)
+PlaylistView::PlaylistView(QWidget* parent)
+    : QListView(parent), m_usertimer(new QTimer(this))
 {
-
+    m_usertimer->setSingleShot(true);
+    m_usertimer->setInterval(user_activity_timeout_ms);
+    
+    setMouseTracking(true);
+    
     _drag_allowed = true;
     _inner_drag_drop = false;
     _parent = parent;
@@ -44,9 +53,16 @@ PlaylistView::PlaylistView(QWidget* parent) : QListView(parent)
     this->setAlternatingRowColors(true);
     this->setMovement(QListView::Free);
 
-    connect(this, SIGNAL(pressed(const QModelIndex&)), this, SLOT(row_pressed(const QModelIndex&)));
-    connect(this, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(row_double_clicked(const QModelIndex&)));
-    connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(row_released(const QModelIndex&)));
+    connect(this, SIGNAL(pressed(const QModelIndex&)),
+            this, SLOT(row_pressed(const QModelIndex&)));
+    connect(this, SIGNAL(doubleClicked(const QModelIndex&)),
+            this, SLOT(row_double_clicked(const QModelIndex&)));
+    connect(this, SIGNAL(clicked(const QModelIndex&)),
+            this, SLOT(row_released(const QModelIndex&)));
+    connect(horizontalScrollBar(), SIGNAL(sliderPressed()),
+            m_usertimer, SLOT(start()));
+    connect(verticalScrollBar(), SIGNAL(sliderPressed()),
+            m_usertimer, SLOT(start()));
 }
 
 PlaylistView::~PlaylistView()
@@ -56,9 +72,9 @@ PlaylistView::~PlaylistView()
     delete _model;
 }
 
-
 void PlaylistView::mousePressEvent(QMouseEvent* event)
 {
+    m_usertimer->start(user_activity_timeout_ms);
 
     QPoint pos_org = event->pos();
     QPoint pos = QWidget::mapToGlobal(pos_org);
@@ -104,6 +120,7 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
 
 void PlaylistView::mouseMoveEvent(QMouseEvent* event)
 {
+    m_usertimer->start(user_activity_timeout_ms);
 
     QPoint pos = event->pos();
     int distance =  abs(pos.x() - _drag_pos.x()) +  abs(pos.y() - _drag_pos.y());
@@ -116,6 +133,7 @@ void PlaylistView::mouseMoveEvent(QMouseEvent* event)
 
 void PlaylistView::mouseReleaseEvent(QMouseEvent* event)
 {
+    m_usertimer->start(user_activity_timeout_ms);
 
     switch (event->button()) {
 
@@ -178,6 +196,7 @@ void PlaylistView::goto_row(int row)
 
 void PlaylistView::keyPressEvent(QKeyEvent* event)
 {
+    m_usertimer->start(user_activity_timeout_ms);
 
     int key = event->key();
 
@@ -338,9 +357,12 @@ int PlaylistView::get_num_rows()
     return _model->rowCount();
 }
 
+#define CAN_AUTOSCROLL (!(m_usertimer->isActive() ||                    \
+                          horizontalScrollBar()->isSliderDown() ||      \
+                          verticalScrollBar()->isSliderDown()))
+
 void PlaylistView::set_current_track(int row)
 {
-
     for (int i = 0; i < _model->rowCount(); i++) {
         QModelIndex idx = _model->index(i);
         MetaData md;
@@ -354,7 +376,10 @@ void PlaylistView::set_current_track(int row)
     }
 
     QModelIndex new_idx = _model->index(row);
-    scrollTo(new_idx,  QListView::EnsureVisible);
+
+    // Don't move the playlist around if the user is doing something
+    if (CAN_AUTOSCROLL)
+        scrollTo(new_idx,  QListView::EnsureVisible);
 }
 
 
@@ -415,8 +440,9 @@ void PlaylistView::fill(MetaDataList& v_metadata, int cur_play_idx)
     _model->set_selected(_cur_selected_rows);
     this->select_rows(_cur_selected_rows);
 
-    this->scrollTo(idx_cur_playing, QListView::EnsureVisible);
-
+    // Don't move the playlist around if the user is doing something
+    if (CAN_AUTOSCROLL)
+        this->scrollTo(idx_cur_playing, QListView::EnsureVisible);
 }
 
 void PlaylistView::row_pressed(const QModelIndex&)

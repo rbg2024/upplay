@@ -27,11 +27,14 @@
 #include <QModelIndex>
 #include <QMouseEvent>
 #include <QListView>
+#include <QTimer>
 
 #include "HelperStructs/MetaData.h"
 #include "GUI/playlist/model/PlaylistItemModel.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
 #include "ContextMenu.h"
+
+class QTimer;
 
 class PlaylistView : public QListView {
 
@@ -113,7 +116,10 @@ private:
 
 private:
     QWidget*        _parent;
-
+    // Timer active if the user did something recently: avoid moving the
+    // playlist around
+    QTimer*         m_usertimer; 
+    
     bool            _drag;
     bool            _drag_allowed;
     bool            _inner_drag_drop;
