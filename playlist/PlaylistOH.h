@@ -44,6 +44,10 @@ public:
         delete m_ohplo;
     }
 
+    virtual void update_state() {
+        m_ohplo->fetchState();
+    }
+    
 signals:
     // All our signals are connected to the OHPlaylist object
     void sig_clear_playlist();

@@ -325,6 +325,8 @@ void Application::renderer_connections()
     CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
     CONNECT(m_cdb, sig_next_group_html(QString),
             m_ui_playlist, psl_next_group_html(QString));
+
+    m_playlist->update_state();
 }
 
 // Connections which make sense without a renderer.

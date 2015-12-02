@@ -42,7 +42,8 @@ public:
     }
     virtual void get_metadata(MetaDataList&);
     virtual Playlist_Mode mode();
-
+    virtual void update_state() {}
+    
 signals:
     // New playlist (for displaying in ui_playlist)
     void sig_playlist_updated(MetaDataList&, int playidx, int/*unused*/);

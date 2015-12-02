@@ -188,6 +188,20 @@ public slots:
         return ret == 0;
     }
 
+    /// Read state from the remote. Used when starting up, to avoid
+    /// having to wait for events.
+    virtual void fetchState() {
+        std::vector<int> ids;
+        int tok;
+        m_srv->idArray(&ids, &tok);
+        onIdArrayChanged(ids);
+        if (m_srv->id(&tok) == 0)
+            emit currentTrackId(tok);
+        UPnPClient::OHPlaylist::TPState tpst;
+        if (m_srv->transportState(&tpst) == 0)
+            emit tpStateChanged(tpst);
+    }
+    
 signals:
     void currentTrackId(int);
     void trackArrayChanged();
