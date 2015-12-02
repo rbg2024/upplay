@@ -22,10 +22,14 @@ PlayCtlWidget::PlayCtlWidget(QWidget *parent)
     : PlayCtlWidgetIF(parent), m_playing(false)
 {
     setupUi(this);
-    connect(btn_play, SIGNAL(clicked()), this, SLOT(onPlayClicked()));
-    connect(btn_stop, SIGNAL(clicked()), this, SLOT(onStopClicked()));
-    connect(btn_fw, SIGNAL(clicked()), this, SLOT(onForwardClicked()));
+    btn_bw->setIcon(QIcon(Helper::getIconPath("bwd.png")));
     connect(btn_bw, SIGNAL(clicked()), this, SLOT(onBackwardClicked()));
+    btn_fw->setIcon(QIcon(Helper::getIconPath("fwd.png")));
+    connect(btn_fw, SIGNAL(clicked()), this, SLOT(onForwardClicked()));
+    btn_play->setIcon(QIcon(Helper::getIconPath("play.png")));
+    connect(btn_play, SIGNAL(clicked()), this, SLOT(onPlayClicked()));
+    btn_stop->setIcon(QIcon(Helper::getIconPath("stop.png")));
+    connect(btn_stop, SIGNAL(clicked()), this, SLOT(onStopClicked()));
 }
 
 QLayoutItem *PlayCtlWidget::takeStopWidget()

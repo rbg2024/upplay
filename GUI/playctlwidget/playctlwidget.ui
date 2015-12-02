@@ -65,7 +65,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>:/icons/bwd.png</normaloff>:/icons/bwd.png</iconset>
+         <normaloff>../icons/bwd.png</normaloff>../icons/bwd.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -100,7 +100,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
+         <normaloff>../icons/stop.png</normaloff>../icons/stop.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -141,7 +141,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
+         <normaloff>../icons/play.png</normaloff>../icons/play.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -194,7 +194,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>:/icons/fwd.png</normaloff>:/icons/fwd.png</iconset>
+         <normaloff>../icons/fwd.png</normaloff>../icons/fwd.png</iconset>
        </property>
        <property name="iconSize">
         <size>

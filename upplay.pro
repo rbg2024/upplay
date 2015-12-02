@@ -145,10 +145,12 @@ unix {
   icona.path = $$PREFIX/share/icons/hicolor/48x48/apps/
   iconb.files = GUI/icons/upplay.png
   iconb.path = $$PREFIX/share/pixmaps/
-  iconc.files = GUI/icons/*.png GUI/icons/dark/*.png
+  iconc.files = GUI/icons/*.png
   iconc.path = $$PREFIX/share/upplay/icons
+  icond.files = GUI/icons/*.png GUI/icons/dark/*.png
+  icond.path = $$PREFIX/share/upplay/icons/dark
 
-  INSTALLS += target bdata desktop gdata icona iconb iconc
+  INSTALLS += target bdata desktop gdata icona iconb iconc icond
 }
 
 windows {

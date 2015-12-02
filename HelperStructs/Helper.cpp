@@ -175,13 +175,14 @@ QString Helper::getSharePath()
 static QString styleSubDir;
 void Helper::setStyleSubDir(const QString& subd)
 {
+    //qDebug() << "Helper::setStyleSubDir: " << subd;
     styleSubDir = subd;
 }
 
 QString Helper::getIconDir()
 {
+    //return ":/icons/";
     return QDir(getSharePath()).filePath("icons");
-//    return ":/icons/";
 }
 
 QString Helper::getIconPath(const QString& icnm)
