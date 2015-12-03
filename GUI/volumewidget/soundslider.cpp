@@ -37,6 +37,8 @@
 #include <QPaintEvent>
 #include <QBitmap>
 
+#include "../../HelperStructs/Helper.h"
+
 #ifndef __MIN
 #define __MIN(A,B) ((A)<(B)?(A):(B))
 #define __MAX(A,B) ((A)>(B)?(A):(B))
@@ -65,14 +67,14 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
     b_mouseOutside = true;
     b_isMuted = false;
 
-    const QPixmap pixOutsideRaw( ":/volslide-outside" );
+    const QPixmap pixOutsideRaw(Helper::getIconPath("volume-slider-outside.png"));
     const QSize pixOutsideSize(
                 static_cast<qreal>(pixOutsideRaw.width()) * scalingFactorX,
                 static_cast<qreal>(pixOutsideRaw.height()) * scalingFactorY
             );
     pixOutside = pixOutsideRaw.scaled(pixOutsideSize);
 
-    const QPixmap tempRaw( ":/volslide-inside" );
+    const QPixmap tempRaw(Helper::getIconPath("volume-slider-inside.png"));
     const QSize tempSize(
                     static_cast<qreal>(tempRaw.width()) * scalingFactorX,
                     static_cast<qreal>(tempRaw.height()) * scalingFactorY
