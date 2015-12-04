@@ -16,34 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "application.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 
-using namespace std;
-
 #include <QApplication>
-#include <QMap>
-#include <QSharedMemory>
 #include <QMessageBox>
 
-#include "application.h"
-#include "GUI/renderchoose/renderchoose.h"
-
-#include "playlist/PlaylistAVT.h"
-#include "playlist/PlaylistOH.h"
-#include "GUI/prefs/prefs.h"
-
-#include "HelperStructs/Helper.h"
-#include "HelperStructs/CSettingsStorage.h"
-#include "HelperStructs/Style.h"
-#include "HelperStructs/globals.h"
-
 #include "libupnpp/upnpplib.hxx"
+#include "libupnpp/control/discovery.hxx"
 #include "libupnpp/control/mediarenderer.hxx"
 #include "libupnpp/control/renderingcontrol.hxx"
-#include "libupnpp/control/discovery.hxx"
 
+#include "GUI/mainw/mainw.h"
+#include "GUI/playlist/GUI_Playlist.h"
+#include "GUI/prefs/prefs.h"
+#include "GUI/renderchoose/renderchoose.h"
+#include "HelperStructs/CSettingsStorage.h"
+#include "HelperStructs/Helper.h"
+#include "HelperStructs/Style.h"
+#include "HelperStructs/globals.h"
+#include "dirbrowser/dirbrowser.h"
+#include "playlist/Playlist.h"
+#include "playlist/PlaylistAVT.h"
+#include "playlist/PlaylistOH.h"
+#include "upadapt/avtadapt.h"
+#include "upadapt/ohpladapt.h"
+#include "upqo/ohtime_qo.h"
+#include "upqo/ohvolume_qo.h"
+#include "upqo/renderingcontrol_qo.h"
+
+using namespace std;
 using namespace UPnPClient;
 
 #ifndef deleteZ
@@ -78,6 +83,54 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
         cerr << "getDevByFname failed" << endl;
     }
     return MRDH();
+}
+
+
+Application::Application(QApplication* qapp, QObject *parent)
+    : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
+      m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
+      m_settings(0), m_app(qapp), m_initialized(false)
+{
+    m_settings = CSettingsStorage::getInstance();
+
+    QString version = getVersion();
+    m_settings->setVersion(version);
+
+    m_player = new GUI_Player(this);
+
+    m_ui_playlist = new GUI_Playlist(m_player->getParentOfPlaylist(), 0);
+    m_player->setPlaylistWidget(m_ui_playlist);
+
+    m_cdb = new DirBrowser(m_player->getParentOfLibrary(), 0);
+    m_player->setLibraryWidget(m_cdb);
+
+    init_connections();
+    string uid = qs2utf8s(m_settings->getPlayerUID());
+    if (uid.empty()) {
+        QTimer::singleShot(0, this, SLOT(chooseRenderer()));
+    } else {
+        if (!setupRenderer(uid)) {
+            cerr << "Can't connect to previous media renderer" << endl;
+            QTimer::singleShot(0, this, SLOT(chooseRenderer()));
+        }
+    }
+
+    m_player->setWindowTitle("Upplay " + version);
+    m_player->setWindowIcon(QIcon(Helper::getIconPath("logo.png")));
+    m_player->setPlaylist(m_ui_playlist);
+    m_player->setStyle(m_settings->getPlayerStyle());
+    m_player->show();
+
+    m_ui_playlist->resize(m_player->getParentOfPlaylist()->size());
+
+    m_player->ui_loaded();
+
+    m_initialized = true;
+}
+
+Application::~Application()
+{
+    delete m_player;
 }
 
 bool Application::is_initialized()
@@ -144,10 +197,7 @@ bool Application::setupRenderer(const string& uid)
     
     m_cdb->setPlaylist(m_playlist);
 
-    QString fn = QString::fromUtf8(rdr->desc()->friendlyName.c_str());
-    if (m_player) {
-        m_player->setRendererName(fn);
-    }
+    m_renderer_friendly_name = u8s2qs(rdr->desc()->friendlyName);
 
     renderer_connections();
 
@@ -165,7 +215,16 @@ void Application::chooseRenderer()
     RenderChooseDLG dlg(m_player);
     for (vector<UPnPDeviceDesc>::iterator it = devices.begin(); 
          it != devices.end(); it++) {
-        dlg.rndsLW->addItem(QString::fromUtf8(it->friendlyName.c_str()));
+        QString fname = u8s2qs(it->friendlyName);
+        if (!m_renderer_friendly_name.compare(fname)) {
+            QListWidgetItem *item = new QListWidgetItem(fname);
+            QFont font = dlg.rndsLW->font();
+            font.setBold(true);
+            item->setFont(font);
+            dlg.rndsLW->addItem(item);
+        } else {
+            dlg.rndsLW->addItem(fname);
+        }
     }
     if (!dlg.exec()) {
         return;
@@ -181,13 +240,14 @@ void Application::chooseRenderer()
         m_playlist->get_metadata(curmeta);
     }
 
-    QString friendlyname = QString::fromUtf8(devices[row].friendlyName.c_str());
+    m_renderer_friendly_name = u8s2qs(devices[row].friendlyName);
     if (!setupRenderer(devices[row].UDN)) {
         QMessageBox::warning(0, "Upplay", tr("Can't connect to ") +
-                             friendlyname);
+                             m_renderer_friendly_name);
+        m_renderer_friendly_name = "";
         return;
     }
-    m_settings->setPlayerUID(QString::fromUtf8(devices[row].UDN.c_str()));
+    m_settings->setPlayerUID(u8s2qs(devices[row].UDN));
 
     if (m_playlist && !dlg.keepRB->isChecked()) {
         if (dlg.replRB->isChecked()) {
@@ -197,52 +257,12 @@ void Application::chooseRenderer()
     }
 }
 
-Application::Application(QApplication* qapp, int,
-                         QTranslator* translator, QObject *parent)
-    : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
-      m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
-      m_settings(0), m_app(qapp), m_initialized(false)
+void Application::getIdleMeta(MetaData* mdp)
 {
-    m_settings = CSettingsStorage::getInstance();
-
-    QString version = getVersion();
-    m_settings->setVersion(version);
-
-    m_player = new GUI_Player(translator);
-
-    m_ui_playlist = new GUI_Playlist(m_player->getParentOfPlaylist(), 0);
-    m_player->setPlaylistWidget(m_ui_playlist);
-
-    m_cdb = new DirBrowser(m_player->getParentOfLibrary(), 0);
-    m_player->setLibraryWidget(m_cdb);
-
-    init_connections();
-    string uid = qs2utf8s(m_settings->getPlayerUID());
-    if (uid.empty()) {
-        QTimer::singleShot(0, this, SLOT(chooseRenderer()));
-    } else {
-        if (!setupRenderer(uid)) {
-            cerr << "Can't connect to previous media renderer" << endl;
-            QTimer::singleShot(0, this, SLOT(chooseRenderer()));
-        }
-    }
-
-    m_player->setWindowTitle("Upplay " + version);
-    m_player->setWindowIcon(QIcon(Helper::getIconPath("logo.png")));
-    m_player->setPlaylist(m_ui_playlist);
-    m_player->setStyle(m_settings->getPlayerStyle());
-    m_player->show();
-
-    m_ui_playlist->resize(m_player->getParentOfPlaylist()->size());
-
-    m_player->ui_loaded();
-
-    m_initialized = true;
-}
-
-Application::~Application()
-{
-    delete m_player;
+    mdp->title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
+    mdp->artist = m_renderer_friendly_name.isEmpty() ?
+        "No renderer connected" :
+        tr("Renderer: ") + m_renderer_friendly_name;
 }
 
 void Application::reconnectOrChoose()
@@ -346,9 +366,4 @@ void Application::init_connections()
 QString Application::getVersion()
 {
     return UPPLAY_VERSION;
-}
-
-QMainWindow* Application::getMainWindow()
-{
-    return this->m_player;
 }

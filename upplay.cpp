@@ -31,7 +31,7 @@ using namespace std;
 
 #include "application.h"
 
-using namespace UPnPClient;
+using namespace UPnPP;
 
 static const char *thisprog;
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
         }
     }
 
-    Application application(&app, params.size(), 0);
+    Application application(&app);
     if(!application.is_initialized()) 
         return 1;
 

@@ -24,74 +24,65 @@
 #include <string>
 
 #include <QObject>
-
 #include <QApplication>
-#include <QStringList>
-#include <QMainWindow>
-#include <QTranslator>
 
-#include "dirbrowser/dirbrowser.h"
-#include "upqo/renderingcontrol_qo.h"
-#include "upqo/ohtime_qo.h"
-#include "upqo/ohvolume_qo.h"
-#include "upadapt/avtadapt.h"
-#include "upadapt/ohpladapt.h"
-
-#include "GUI/mainw/mainw.h"
-#include "GUI/playlist/GUI_Playlist.h"
-#include "playlist/Playlist.h"
-
-#include "HelperStructs/Helper.h"
-#include "HelperStructs/CSettingsStorage.h"
-#include "HelperStructs/Style.h"
-#include "HelperStructs/globals.h"
+class AVTPlayer;
+class CSettingsStorage;
+class DirBrowser;
+class GUI_Player;
+class GUI_Playlist;
+class MetaData;
+class OHProductQO;
+class OHRadioQO;
+class OHTimeQO;
+class OHVolumeQO;
+class Playlist;
+class RenderingControlQO;
 
 class Application : public QObject
 {
-    Q_OBJECT
+    Q_OBJECT;
 
-    public:
-    Application(QApplication* qapp, int n_files, QTranslator* translator, 
-                QObject *parent = 0);
+public:
+    Application(QApplication* qapp, QObject *parent = 0);
     virtual ~Application();
 
-signals:
-    
+    bool is_initialized();
+    QString getVersion();
+                        
+    void getIdleMeta(MetaData* mdp);
+                        
 public slots:
     void chooseRenderer();
     void reconnectOrChoose();
 
 private:
+
     GUI_Player   *m_player;
     Playlist     *m_playlist;
-    DirBrowser    *m_cdb;
+    DirBrowser   *m_cdb;
 
     RenderingControlQO *m_rdco;
     AVTPlayer    *m_avto;
-
     OHTimeQO     *m_ohtmo;
     OHVolumeQO   *m_ohvlo;
-
+    OHProductQO  *m_ohpro;
+    OHRadioQO    *m_ohrdo;
+    
     GUI_Playlist *m_ui_playlist;
 
     CSettingsStorage *m_settings;
-    QApplication *m_app;
+    QApplication     *m_app;
 
-    bool                 m_initialized;
+    bool             m_initialized;
+
+    QString          m_renderer_friendly_name;
 
     void init_connections();
     void renderer_connections();
     bool setupRenderer(const std::string& uid);
 
-public:
-    void setFiles2Play(QStringList filelist);
-    QMainWindow* getMainWindow();
-    bool is_initialized();
-
-private:
-    QString getVersion();
 };
 
 
 #endif // APPLICATION_H
-

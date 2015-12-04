@@ -22,6 +22,7 @@ using namespace std;
 
 #include "mainw.h"
 #include "trayicon.h"
+#include "application.h"
 
 /** Slots connected to player or trayicon signals **/
 void GUI_Player::onPlayActivated()
@@ -64,10 +65,7 @@ void GUI_Player::onMuteActivated(bool mute)
 void GUI_Player::idleDisplay()
 {
     MetaData md;
-    md.title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
-    md.artist = m_renderer_friendly_name.isEmpty() ?
-        "No renderer connected" :
-        tr("Renderer: ") + m_renderer_friendly_name;
+    m_upapp->getIdleMeta(&md);
     ui->player_w->mdata()->setData(md);
 
     this->setWindowTitle("Upplay");

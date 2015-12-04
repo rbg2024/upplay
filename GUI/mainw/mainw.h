@@ -46,11 +46,12 @@ class GUI_InfoDialog;
 class GUI_LibraryPath;
 class GUI_Notifications;
 class QTemporaryFile;
+class Application;
 
 class GUI_Player : public QMainWindow {
     Q_OBJECT
 public:
-    explicit GUI_Player(QTranslator* translator, QWidget *parent = 0);
+    explicit GUI_Player(Application *upapp, QWidget *parent = 0);
     ~GUI_Player();
 
 public slots:
@@ -69,8 +70,6 @@ public slots:
     void paused();
     void setVolumeUi(int volume_percent);
     void setMuteUi(bool);
-
-    void setRendererName(const QString& nm);
 
 signals:
     /* Player*/
@@ -149,7 +148,9 @@ protected:
 
 private:
 
-    Ui::Upplay *ui;
+    Application      *m_upapp;
+
+    Ui::Upplay       *ui;
 
     GUI_Playlist*           ui_playlist;
     GUI_Library_windowed*   ui_library;
@@ -159,7 +160,6 @@ private:
     QNetworkAccessManager  *m_netmanager;
 
     QString                 m_class_name;
-    QString                 m_renderer_friendly_name;
     GUI_TrayIcon *          m_trayIcon;
 
     QString                 m_skinSuffix;
@@ -171,7 +171,6 @@ private:
     int                 m_library_width;
     int                 m_library_stretch_factor;
     CSettingsStorage*   m_settings;
-    QTranslator*        m_translator;
     QTemporaryFile*     m_covertempfile;
 
     void setupTrayActions ();

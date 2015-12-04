@@ -32,6 +32,7 @@
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
+#include "application.h"
 
 GUI_Player* obj_ref = 0;
 
@@ -59,8 +60,8 @@ void signal_handler(int sig)
 
 #endif
 
-GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::Upplay), m_covertempfile(0)
+GUI_Player::GUI_Player(Application *upapp, QWidget *parent) :
+    QMainWindow(parent), m_upapp(upapp), ui(new Ui::Upplay), m_covertempfile(0)
 {
     ui->setupUi(this);
 
@@ -68,7 +69,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
     ui->action_Fullscreen->setShortcut(QKeySequence("F11"));
     ui->action_Dark->setShortcut(QKeySequence("F10"));
 
-    m_translator = translator;
     m_settings = CSettingsStorage::getInstance();
     m_netmanager = new QNetworkAccessManager(this);
     connect(m_netmanager, SIGNAL(finished(QNetworkReply*)),
@@ -132,11 +132,6 @@ GUI_Player::GUI_Player(QTranslator* translator, QWidget *parent) :
 GUI_Player::~GUI_Player()
 {
     delete m_covertempfile;
-}
-
-void GUI_Player::setRendererName(const QString& nm)
-{
-    m_renderer_friendly_name = nm;
 }
 
 QAction* GUI_Player::createAction(QList<QKeySequence>& seq_list)
