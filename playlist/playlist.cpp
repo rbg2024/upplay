@@ -36,13 +36,12 @@ using namespace std;
 
 Playlist::Playlist(QObject* parent) 
     : QObject (parent), m_play_idx(-1), m_selection_min_row(-1),
-      m_insertion_point(-1), m_tpstate(AUDIO_UNKNOWN), m_pause(false)
+      m_insertion_point(-1), m_tpstate(AUDIO_UNKNOWN)
 
 {
     m_play_idx = -1;
     m_selection_min_row = -1;
     m_tpstate = AUDIO_UNKNOWN;
-    m_pause = false;
 }
 
 // GUI -->

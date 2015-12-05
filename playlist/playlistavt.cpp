@@ -236,8 +236,6 @@ void PlaylistAVT::psl_clear_playlist_impl()
 
 void PlaylistAVT::psl_play()
 {
-    m_pause = false;
-
     if (m_meta.empty()) {
         return;
     }
@@ -255,7 +253,6 @@ void PlaylistAVT::psl_play()
 
 void PlaylistAVT::psl_pause()
 {
-    m_pause = true;
     emit sig_pause();
 }
 

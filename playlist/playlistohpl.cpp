@@ -17,14 +17,14 @@
 
 #include <QDebug>
 
-#include "playlistoh.h"
+#include "playlistohpl.h"
 
 #include "libupnpp/log.hxx"
 
 using namespace UPnPP;
 
     // We take ownership of the OHPlayer object
-PlaylistOH::PlaylistOH(OHPlayer *ohpl, QObject * parent)
+PlaylistOHPL::PlaylistOHPL(OHPlayer *ohpl, QObject * parent)
     : Playlist(parent), m_ohplo(ohpl), m_cursongsecs(0), m_lastsong(false),
       m_closetoend(false)
 {
@@ -65,23 +65,23 @@ static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
     return true;
 }
 
-void PlaylistOH::psl_new_ohpl(const MetaDataList& mdv)
+void PlaylistOHPL::psl_new_ohpl(const MetaDataList& mdv)
 {
-    qDebug() << "PlaylistOH::psl_new_ohpl: " << mdv.size() << " entries";
+    qDebug() << "PlaylistOHPL::psl_new_ohpl: " << mdv.size() << " entries";
     if (!samelist(mdv, m_meta)) {
         m_meta = mdv;
         emit sig_playlist_updated(m_meta, m_play_idx, 0);
     }
 }
 
-void PlaylistOH::psl_seek(int secs)
+void PlaylistOHPL::psl_seek(int secs)
 {
     m_ohplo->seek(secs);
 }
 
-void PlaylistOH::psl_currentTrackId(int id)
+void PlaylistOHPL::psl_currentTrackId(int id)
 {
-    qDebug() << "PlaylistOH::psl_currentTrackId: " << id;
+    qDebug() << "PlaylistOHPL::psl_currentTrackId: " << id;
 
     if (id <= 0) {
         return;
@@ -111,28 +111,28 @@ void PlaylistOH::psl_currentTrackId(int id)
         }
     }
     resetPosState();
-    LOGINF("PlaylistOH::psl_currentTrackId: track not found in array" << endl);
+    LOGINF("PlaylistOHPL::psl_currentTrackId: track not found in array" << endl);
 }
 
-void PlaylistOH::psl_secs_in_song_impl(quint32 secs)
+void PlaylistOHPL::psl_secs_in_song_impl(quint32 secs)
 {
     if (m_lastsong && m_cursongsecs > 0 && int(secs) > int(m_cursongsecs) - 3) {
-        //qDebug() << "PlaylistOH::psl_secs_in_song_impl: close to end";
+        //qDebug() << "PlaylistOHPL::psl_secs_in_song_impl: close to end";
         m_closetoend = true;
     }
 }
 
-void PlaylistOH::psl_new_transport_state_impl(int, const char *sst)
+void PlaylistOHPL::psl_new_transport_state_impl(int, const char *sst)
 {
     Q_UNUSED(sst);
-    //qDebug() << "PlaylistOH::psl_new_transport_state_impl: " << sst;
+    //qDebug() << "PlaylistOHPL::psl_new_transport_state_impl: " << sst;
     if (m_tpstate == AUDIO_STOPPED && m_closetoend == true) {
         resetPosState();
         emit sig_playlist_done();
     }
 }
 
-void PlaylistOH::psl_clear_playlist_impl()
+void PlaylistOHPL::psl_clear_playlist_impl()
 {
     // Tell the Open Home Playlist to do it.
     emit sig_clear_playlist();
@@ -141,46 +141,43 @@ void PlaylistOH::psl_clear_playlist_impl()
     emit sig_playlist_done();
 }
 
-void PlaylistOH::psl_play() 
+void PlaylistOHPL::psl_play() 
 {
     if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
         emit sig_row_activated(m_selection_min_row);
     } else {
         emit sig_resume_play();
     }
-    m_pause = false;
 }
 
-void PlaylistOH::psl_pause() 
+void PlaylistOHPL::psl_pause() 
 {
-    m_pause = true;
     emit sig_pause();
 }
 
-void PlaylistOH::psl_stop() 
+void PlaylistOHPL::psl_stop() 
 {
-    m_pause = true;
     emit sig_stop();
 }
 
-void PlaylistOH::psl_forward() 
+void PlaylistOHPL::psl_forward() 
 {
     emit sig_forward();
 }
 
-void PlaylistOH::psl_backward() 
+void PlaylistOHPL::psl_backward() 
 {
     emit sig_backward();
 }
 
-void PlaylistOH::psl_insert_tracks(const MetaDataList& meta, int afteridx)
+void PlaylistOHPL::psl_insert_tracks(const MetaDataList& meta, int afteridx)
 {
-    qDebug() << "PlaylistOH::psl_insert_tracks ntracks " << meta.size() << 
+    qDebug() << "PlaylistOHPL::psl_insert_tracks ntracks " << meta.size() << 
         " afteridx" << afteridx;
     emit sig_insert_tracks(meta, afteridx);
 }
 
-void PlaylistOH::psl_remove_rows(const QList<int>& rows, bool)
+void PlaylistOHPL::psl_remove_rows(const QList<int>& rows, bool)
 {
     if (rows.contains(m_play_idx)) {
         m_play_idx = -1;

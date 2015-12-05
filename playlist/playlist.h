@@ -135,7 +135,6 @@ protected:
     int m_selection_min_row;
     int m_insertion_point;
     int m_tpstate;
-    bool m_pause;
 
     virtual void remove_row(int row);
     virtual bool valid_row(int row) {
