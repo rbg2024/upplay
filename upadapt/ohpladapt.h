@@ -32,6 +32,8 @@ using namespace std;
 
 using namespace UPnPP;
 
+// Note: can't call this OHPlaylist because UPnPClient has it too (and we
+// sometimes use the unqualified name)
 class OHPlayer : public OHPlaylistQO {
 Q_OBJECT
 

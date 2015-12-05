@@ -67,7 +67,6 @@ private:
     OHTimeQO     *m_ohtmo;
     OHVolumeQO   *m_ohvlo;
     OHProductQO  *m_ohpro;
-    OHRadioQO    *m_ohrdo;
     
     GUI_Playlist *m_ui_playlist;
 

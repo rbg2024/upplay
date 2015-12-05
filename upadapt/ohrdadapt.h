@@ -37,12 +37,14 @@ using namespace std;
 
 using namespace UPnPP;
 
-class OHRadio : public OHRadioQO {
+// Note: can't call this OHRadio because UPnPClient has it too (and we
+// sometimes use the unqualified name)
+class OHRad : public OHRadioQO {
 Q_OBJECT
 
 public:
-    OHRadio(UPnPClient::OHRDH ohpl, QObject *parent = 0)
-        : OHRadioQO(ohpl, parent) {
+    OHRad(UPnPClient::OHRDH ohrd, QObject *parent = 0)
+        : OHRadioQO(ohrd, parent) {
         connect(this, SIGNAL(trackArrayChanged()),
                 this, SLOT(translateMetaData()));
         connect(this, SIGNAL(tpStateChanged(int)), 
@@ -73,6 +75,7 @@ private slots:
             s = "Stopped";
             break;
         }
+        //qDebug() << "OHRad::playerState: " << s.c_str();
         if (as != AUDIO_UNKNOWN) {
             emit audioStateChanged(as, s.c_str());
         }

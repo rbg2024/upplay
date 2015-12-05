@@ -58,7 +58,8 @@ HEADERS += \
         dirbrowser/randplayer.h \
         playlist/playlist.h \
         playlist/playlistavt.h \
-        playlist/playlistoh.h \
+        playlist/playlistohpl.h \
+        playlist/playlistohrd.h \
         upadapt/avtadapt.h \
         upadapt/ohpladapt.h \
         upadapt/ohrdadapt.h \
@@ -105,7 +106,8 @@ SOURCES += \
         dirbrowser/randplayer.cpp \
         playlist/playlist.cpp \
         playlist/playlistavt.cpp \
-        playlist/playlistoh.cpp \
+        playlist/playlistohpl.cpp \
+        playlist/playlistohrd.cpp \
         upadapt/upputils.cpp \
         upqo/ohpool.cpp \
         upplay.cpp 

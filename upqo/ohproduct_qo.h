@@ -46,11 +46,30 @@ public:
             emit sourceIndexChanged(value);
         } 
     }
-    virtual void changed(const char * /*nm*/, const char * /*value*/)
-    {
+    virtual void changed(const char * /*nm*/, const char * /*value*/) {
         //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
     }
 
+    enum SourceType{OHPR_SourceUnknown, OHPR_SourcePlaylist, OHPR_SourceRadio,
+                    OHPR_SourceReceiver};
+    SourceType getSourceType() {
+        int idx;
+        std::vector<UPnPClient::OHProduct::Source> srcs;
+        if (sourceIndex(&idx) && getSources(srcs)) {
+            if (idx >= 0 && idx < int(srcs.size())) {
+                std::string stype = srcs[idx].type;
+                if (!stype.compare("Playlist")) {
+                    return OHPR_SourcePlaylist;
+                } else if (!stype.compare("Radio")) {
+                    return OHPR_SourceRadio;
+                } else if (!stype.compare("Receiver")) {
+                    return OHPR_SourceReceiver;
+                }
+            }
+        }
+        return OHPR_SourceUnknown;
+    }
+ 
 public slots:
     virtual bool sourceIndex(int *idxp) {
         return m_srv->sourceIndex(idxp) == 0;

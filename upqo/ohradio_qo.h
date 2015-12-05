@@ -45,7 +45,7 @@ public:
     //   translate this into actual track information)
     
     virtual void changed(const char *nm, int value) {
-        //qDebug() << "OHRD: Changed: " << nm << " (int): " << value;
+        qDebug() << "OHRadioQO: changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "Id")) {
             emit currentTrackId(value);
         } else if (!strcmp(nm, "TransportState")) {
@@ -54,11 +54,11 @@ public:
     }
     virtual void changed(const char *nm, std::vector<int> ids) {
         Q_UNUSED(nm);
-        //qDebug() << "OHRD: Changed: " << nm << " (vector<int>)";
+        qDebug() << "OHRadioQO: changed: " << nm << " (vector<int>)";
         emit __idArrayChanged(ids);
     }
-    virtual void changed(const char * /*nm*/, const char * /*value*/) {
-        //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
+    virtual void changed(const char * nm, const char *value) {
+        qDebug() << "OHRadioQO: changed: " << nm << " (char*): " << value;
     }
 
 public slots:
@@ -66,6 +66,7 @@ public slots:
     // Read state from the remote. Used when starting up, to avoid
     // having to wait for events.
     virtual void fetchState() {
+        qDebug() << "OHRadioQO::fetchState()";
         std::vector<int> ids;
         int tok;
         if (idArray(&ids, &tok))
@@ -80,21 +81,37 @@ public slots:
     }
 
     virtual bool play() {
-        //qDebug() << "OHPL::play()";
+        //qDebug() << "OHRadioQO::play()";
         return m_srv->play() == 0;
     }
 
     virtual bool stop() {
-        //qDebug() << "OHPL::stop()";
+        //qDebug() << "OHRadioQO::stop()";
         return m_srv->stop() == 0;
     }
 
     virtual bool pause() {
-        //qDebug() << "OHPL::pause()";
-        return m_srv->pause() == 0;
+        //qDebug() << "OHRadioQO::pause()";
+        m_srv->pause();
+        // Pause generally silently fails to accomplish
+        // anything. Fetch and signal the actual device state so that
+        // the playctl buttons reflect it
+        UPnPClient::OHPlaylist::TPState tpst;
+        if (m_srv->transportState(&tpst) == 0) {
+            //qDebug() << "OHPL::pause(): tpstate: " << tpst;
+            emit tpStateChanged(tpst);
+        }
+        return true;
     }
 
-    virtual bool setId(int id) {
+    virtual bool setIdx(int idx) {
+        //qDebug() << "OHRadioQO::setIdx: idx: " << idx;
+        if (idx < 0 || idx >= int(m_idsv.size()))
+            return false;
+
+        int id = m_idsv[idx];
+        //qDebug() << "OHRadioQO::setIdx: id: " << id;
+        
         STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator it;
         if ((it = m_metapool.find(id)) == m_metapool.end()) {
             qDebug() << "OHRadioQO::setId: id not found";

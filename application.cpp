@@ -41,7 +41,8 @@
 #include "dirbrowser/dirbrowser.h"
 #include "playlist/playlist.h"
 #include "playlist/playlistavt.h"
-#include "playlist/playlistoh.h"
+#include "playlist/playlistohpl.h"
+#include "playlist/playlistohrd.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 #include "upqo/ohtime_qo.h"
@@ -90,7 +91,7 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 
 Application::Application(QApplication* qapp, QObject *parent)
     : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
-      m_avto(0), m_ohtmo(0), m_ohvlo(0),m_ohpro(0), m_ohrdo(0),
+      m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ohpro(0),
       m_ui_playlist(0), m_settings(0), m_app(qapp), m_initialized(false)
 {
     m_settings = CSettingsStorage::getInstance();
@@ -148,7 +149,6 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(m_ohtmo);
     deleteZ(m_ohvlo);
     deleteZ(m_ohpro);
-    deleteZ(m_ohrdo);
     
     // Create media renderer object. We don't use it directly but it
     // gives handles to the services. Note that the lib will return
@@ -173,6 +173,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     bool needavt = true;
+    OHProductQO::SourceType ohprtp = OHProductQO::OHPR_SourceUnknown;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
         qDebug() << "Application::setupRenderer: using OHPlaylist";
@@ -183,10 +184,26 @@ bool Application::setupRenderer(const string& uid)
             // no need for AVT then
             needavt = false;
         }
-        m_playlist = new PlaylistOH(new OHPlayer(ohpl));
         OHPRH ohpr = rdr->ohpr();
         if (ohpr) {
             m_ohpro = new OHProductQO(ohpr);
+            ohprtp = m_ohpro->getSourceType();
+        }
+        switch(ohprtp) {
+        case OHProductQO::OHPR_SourceRadio:
+        {
+            OHRDH ohrd = rdr->ohrd();
+            if (!ohrd) {
+                cerr << "Renderer: radio mode, but can't connect" << endl;
+                return false;
+            }
+            m_playlist = new PlaylistOHRD(new OHRad(ohrd));
+        }
+        break;
+        case OHProductQO::OHPR_SourceReceiver:
+        case OHProductQO::OHPR_SourcePlaylist:
+        default:
+            m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
         }
     }
 
