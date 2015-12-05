@@ -17,7 +17,7 @@
 
 #include <QDebug>
 
-#include "PlaylistOH.h"
+#include "playlistoh.h"
 
 #include "libupnpp/log.hxx"
 

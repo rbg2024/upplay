@@ -28,7 +28,7 @@
 #include <QFileDialog>
 
 #include "upadapt/upputils.h"
-#include "Playlist.h"
+#include "playlist.h"
 #include "HelperStructs/Helper.h"
 
 

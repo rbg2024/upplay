@@ -29,7 +29,7 @@
 #include "HelperStructs/PlaylistMode.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
-#include "Playlist.h"
+#include "playlist.h"
 #include "upadapt/avtadapt.h"
 
 class PlaylistAVT : public Playlist {

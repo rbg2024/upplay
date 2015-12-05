@@ -56,16 +56,19 @@ HEADERS += \
         dirbrowser/cdbrowser.h \
         dirbrowser/rreaper.h \
         dirbrowser/randplayer.h \
-        playlist/Playlist.h \
-        playlist/PlaylistAVT.h \
-        playlist/PlaylistOH.h \
+        playlist/playlist.h \
+        playlist/playlistavt.h \
+        playlist/playlistoh.h \
         upadapt/avtadapt.h \
         upadapt/ohpladapt.h \
+        upadapt/ohrdadapt.h \
         upqo/avtransport_qo.h \
         upqo/cdirectory_qo.h \
         upqo/ohplaylist_qo.h \
         upqo/ohtime_qo.h \
         upqo/ohvolume_qo.h \
+        upqo/ohproduct_qo.h \
+        upqo/ohradio_qo.h \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \
@@ -100,10 +103,11 @@ SOURCES += \
         dirbrowser/cdbrowser.cpp \
         dirbrowser/rreaper.cpp \
         dirbrowser/randplayer.cpp \
-        playlist/Playlist.cpp \
-        playlist/PlaylistAVT.cpp \
-        playlist/PlaylistOH.cpp \
+        playlist/playlist.cpp \
+        playlist/playlistavt.cpp \
+        playlist/playlistoh.cpp \
         upadapt/upputils.cpp \
+        upqo/ohpool.cpp \
         upplay.cpp 
 
 FORMS   = \

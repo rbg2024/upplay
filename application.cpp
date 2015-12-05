@@ -39,13 +39,15 @@
 #include "HelperStructs/Style.h"
 #include "HelperStructs/globals.h"
 #include "dirbrowser/dirbrowser.h"
-#include "playlist/Playlist.h"
-#include "playlist/PlaylistAVT.h"
-#include "playlist/PlaylistOH.h"
+#include "playlist/playlist.h"
+#include "playlist/playlistavt.h"
+#include "playlist/playlistoh.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 #include "upqo/ohtime_qo.h"
 #include "upqo/ohvolume_qo.h"
+#include "upqo/ohproduct_qo.h"
+#include "upqo/ohradio_qo.h"
 #include "upqo/renderingcontrol_qo.h"
 
 using namespace std;
@@ -88,8 +90,8 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 
 Application::Application(QApplication* qapp, QObject *parent)
     : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
-      m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ui_playlist(0),
-      m_settings(0), m_app(qapp), m_initialized(false)
+      m_avto(0), m_ohtmo(0), m_ohvlo(0),m_ohpro(0), m_ohrdo(0),
+      m_ui_playlist(0), m_settings(0), m_app(qapp), m_initialized(false)
 {
     m_settings = CSettingsStorage::getInstance();
 
@@ -145,7 +147,9 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(m_avto);
     deleteZ(m_ohtmo);
     deleteZ(m_ohvlo);
-
+    deleteZ(m_ohpro);
+    deleteZ(m_ohrdo);
+    
     // Create media renderer object. We don't use it directly but it
     // gives handles to the services. Note that the lib will return
     // anything implementing either renderingcontrol or ohproduct
@@ -180,6 +184,10 @@ bool Application::setupRenderer(const string& uid)
             needavt = false;
         }
         m_playlist = new PlaylistOH(new OHPlayer(ohpl));
+        OHPRH ohpr = rdr->ohpr();
+        if (ohpr) {
+            m_ohpro = new OHProductQO(ohpr);
+        }
     }
 
     if (needavt) {
@@ -206,6 +214,8 @@ bool Application::setupRenderer(const string& uid)
 
 void Application::chooseRenderer()
 {
+    MetaData md;
+    getIdleMeta(&md);
     vector<UPnPDeviceDesc> devices;
     if (!MediaRenderer::getDeviceDescs(devices) || devices.empty()) {
         QMessageBox::warning(0, "Upplay",
@@ -259,10 +269,28 @@ void Application::chooseRenderer()
 
 void Application::getIdleMeta(MetaData* mdp)
 {
+    QString sourcetype;
+    if (m_ohpro) {
+        vector<OHProduct::Source> sources;
+        if (m_ohpro->getSources(sources)) {
+            int idx;
+            if (m_ohpro->sourceIndex(&idx)) {
+                if (idx >= 0 && idx < int(sources.size())) {
+                    sourcetype = u8s2qs(sources[idx].name);
+                }
+            }
+        }
+    }
+
     mdp->title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
-    mdp->artist = m_renderer_friendly_name.isEmpty() ?
-        "No renderer connected" :
-        tr("Renderer: ") + m_renderer_friendly_name;
+    if (m_renderer_friendly_name.isEmpty()) {
+        mdp->artist = "No renderer connected";
+    } else {
+        mdp->artist = tr("Renderer: ") + m_renderer_friendly_name;
+        if (!sourcetype.isEmpty()) {
+            mdp->artist += QString::fromUtf8(" (") + sourcetype + ")";
+        }
+    }
 }
 
 void Application::reconnectOrChoose()

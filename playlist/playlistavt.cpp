@@ -30,7 +30,7 @@
 
 #include <libupnpp/control/avtransport.hxx>
 
-#include "PlaylistAVT.h"
+#include "playlistavt.h"
 #include "HelperStructs/Helper.h"
 #include "upadapt/upputils.h"
 

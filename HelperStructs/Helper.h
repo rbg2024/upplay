@@ -18,7 +18,10 @@
 #ifndef _HELPER_H
 #define _HELPER_H
 #include <time.h>
+
 #include <string>
+#include <vector>
+
 #include <QString>
 #include <QList>
 #include <QWidget>
@@ -79,4 +82,7 @@ QString escapeHtml(const QString& in);
 
 template <class T> void stringsToString(const T &tokens, std::string &s);
 template <class T> std::string stringsToString(const T &tokens);
+
+extern std::string ivtos(const std::vector<int>& nids);
+
 #endif

@@ -31,7 +31,7 @@
 #include "GUI_Playlist.h"
 #include "ui_GUI_Playlist.h"
 #include "GUI/playlist/delegate/PlaylistItemDelegate.h"
-#include "playlist/Playlist.h"
+#include "playlist/playlist.h"
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/PlaylistMode.h"
 

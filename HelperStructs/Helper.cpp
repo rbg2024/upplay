@@ -375,3 +375,14 @@ template <class T> string stringsToString(const T &tokens)
 template string stringsToString<list<string> >(const list<string> &);
 template string stringsToString<vector<string> >(const vector<string> &);
 template string stringsToString<set<string> >(const set<string> &);
+
+string ivtos(const vector<int>& nids)
+{
+    string sids;
+    for (unsigned int i = 0; i < nids.size(); i++) {
+        char cbuf[30];
+        sprintf(cbuf, "%d", nids[i]);
+        sids += string(cbuf) + " ";
+    }
+    return sids;
+}

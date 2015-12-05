@@ -30,7 +30,7 @@
 #include "HelperStructs/PlaylistMode.h"
 #include "HelperStructs/globals.h"
 #include "HelperStructs/CSettingsStorage.h"
-#include "Playlist.h"
+#include "playlist.h"
 #include "upadapt/ohpladapt.h"
 
 class PlaylistOH : public Playlist {

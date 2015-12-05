@@ -19,7 +19,7 @@
 #include "ui_dirbrowser.h"
 
 #include "HelperStructs/MetaData.h"
-#include "playlist/Playlist.h"
+#include "playlist/playlist.h"
 #include "cdbrowser.h"
 
 // The DirBrowser object has multiple tabs, each displaying the server

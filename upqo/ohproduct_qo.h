@@ -46,13 +46,17 @@ public:
             emit sourceIndexChanged(value);
         } 
     }
+    virtual void changed(const char * /*nm*/, const char * /*value*/)
+    {
+        //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
+    }
 
 public slots:
     virtual bool sourceIndex(int *idxp) {
         return m_srv->sourceIndex(idxp) == 0;
     }
     virtual bool getSources(std::vector<UPnPClient::OHProduct::Source>& srcs) {
-        return m_srv->getSources(srcs) == 0
+        return m_srv->getSources(srcs) == 0;
     }
     virtual bool setSourceIndex(int index) {
         return m_srv->setSourceIndex(index) == 0;

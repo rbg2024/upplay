@@ -37,7 +37,7 @@ Q_OBJECT
 
 public:
     OHPlayer(UPnPClient::OHPLH ohpl, QObject *parent = 0)
-        : OHPlaylistQO(ohpl, parent), m_id(-1), m_songsecs(-1),
+        : OHPlaylistQO(ohpl, parent), m_songsecs(-1),
           m_ininsert(false) {
         connect(this, SIGNAL(trackArrayChanged()),
                 this, SLOT(translateMetaData()));
@@ -57,7 +57,7 @@ public slots:
     void seek(int secs) {
         if (m_songsecs == -1) {
             STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator
-                poolit = m_metapool.find(m_id);
+                poolit = m_metapool.find(m_curid);
             if (poolit != m_metapool.end()) {
                 UPnPClient::UPnPDirObject& ude = poolit->second;
                 std::string sval;
@@ -185,8 +185,7 @@ private slots:
         m_mode.repAll = st;
         emit playlistModeChanged(m_mode);
     }
-    void onTrackIdChanged(int id) {
-        m_id = id;
+    void onTrackIdChanged(int) {
         m_songsecs = -1;
     }
 
@@ -220,14 +219,12 @@ private slots:
         emit metadataArrayChanged(mdv);
     }
 
-
 signals:
     void audioStateChanged(int as, const char *);
     void metadataArrayChanged(const MetaDataList& mdv);
     void playlistModeChanged(Playlist_Mode);
 
 private:
-    int m_id; // Current playing track
     int m_songsecs;
     Playlist_Mode m_mode;
     bool m_ininsert;
