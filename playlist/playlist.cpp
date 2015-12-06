@@ -63,9 +63,9 @@ void Playlist::remove_row(int row)
     psl_remove_rows(remove_list);
 }
 
-void Playlist::psl_new_transport_state(int tps, const char *sst)
+void Playlist::onRemoteTpState(int tps, const char *sst)
 {
-//    qDebug() << "Playlist::psl_new_transport_state " << s <<
+//    qDebug() << "Playlist::onRemoteTpState " << s <<
 //        " play_idx " << m_play_idx;
 //    if (m_play_idx >= 0 && m_play_idx < int(m_meta.size())) 
 //        qDebug() << "     meta[idx].pl_playing " << 
@@ -76,19 +76,19 @@ void Playlist::psl_new_transport_state(int tps, const char *sst)
     case AUDIO_UNKNOWN:
     case AUDIO_STOPPED:
     default:
-        //qDebug() << "Playlist::psl_new_transport_state: STOPPED";
+        //qDebug() << "Playlist::onRemoteTpState: STOPPED";
         emit sig_stopped();
         break;
     case AUDIO_PLAYING:
-        //qDebug() << "Playlist::psl_new_transport_state: PLAYING";
+        //qDebug() << "Playlist::onRemoteTpState: PLAYING";
         emit sig_playing();
         break;
     case AUDIO_PAUSED:
-        //qDebug() << "Playlist::psl_new_transport_state: PAUSED";
+        //qDebug() << "Playlist::onRemoteTpState: PAUSED";
         emit sig_paused();
         break;
     }
-    psl_new_transport_state_impl(tps, sst);
+    onRemoteTpState_impl(tps, sst);
 }
 
 Playlist_Mode Playlist::mode()

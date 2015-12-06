@@ -26,6 +26,7 @@
 #include <QMessageBox>
 
 #include "libupnpp/upnpplib.hxx"
+#include "libupnpp/log.hxx"
 #include "libupnpp/control/discovery.hxx"
 #include "libupnpp/control/mediarenderer.hxx"
 #include "libupnpp/control/renderingcontrol.hxx"
@@ -42,6 +43,7 @@
 #include "playlist/playlist.h"
 #include "playlist/playlistavt.h"
 #include "playlist/playlistohpl.h"
+#include "playlist/playlistohrcv.h"
 #include "playlist/playlistohrd.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
@@ -160,7 +162,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     if (rdr->rdc()) {
-        qDebug() << "Application::setupRenderer: using Rendering Control";
+        LOGDEB("Application::setupRenderer: using Rendering Control\n");
         m_rdco = new RenderingControlQO(rdr->rdc());
     } else {
         if (!rdr->ohvl()) {
@@ -168,7 +170,7 @@ bool Application::setupRenderer(const string& uid)
                 endl;
             return false;
         }
-        qDebug() << "Application::setupRenderer: using OHVolume";
+        LOGDEB("Application::setupRenderer: using OHVolume\n");
         m_ohvlo =  new OHVolumeQO(rdr->ohvl());
     }
 
@@ -176,10 +178,10 @@ bool Application::setupRenderer(const string& uid)
     OHProductQO::SourceType ohprtp = OHProductQO::OHPR_SourceUnknown;
     OHPLH ohpl = rdr->ohpl();
     if (ohpl) {
-        qDebug() << "Application::setupRenderer: using OHPlaylist";
+        LOGDEB("Application::setupRenderer: using OHPlaylist\n");
         OHTMH ohtm = rdr->ohtm();
         if (ohtm) {
-            qDebug() << "Application::setupRenderer: OHTm ok, no need for avt";
+            LOGDEB("Application::setupRenderer: OHTm ok, no need for avt\n");
             m_ohtmo = new OHTimeQO(ohtm);
             // no need for AVT then
             needavt = false;
@@ -197,10 +199,16 @@ bool Application::setupRenderer(const string& uid)
                 cerr << "Renderer: radio mode, but can't connect" << endl;
                 return false;
             }
-            m_playlist = new PlaylistOHRD(new OHRad(ohrd));
+            OHIFH ohif = rdr->ohif();
+            m_playlist = new PlaylistOHRD(new OHRad(ohrd), ohif ?
+                                          new OHInf(ohif) : 0);
         }
         break;
         case OHProductQO::OHPR_SourceReceiver:
+        {
+            m_playlist = new PlaylistOHRCV(0);
+        }
+        break;
         case OHProductQO::OHPR_SourcePlaylist:
         default:
             m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
@@ -216,7 +224,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     if (!ohpl) {
-        qDebug() << "Application::setupRenderer: using AVT playlist";
+        LOGDEB("Application::setupRenderer: using AVT playlist\n");
         m_playlist = new PlaylistAVT(m_avto, rdr->desc()->UDN);
     }
     
@@ -331,12 +339,12 @@ void Application::renderer_connections()
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
                 m_player, setCurrentPosition(quint32));
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
-                m_playlist, psl_secs_in_song(quint32));
+                m_playlist, onRemoteSecsInSong(quint32));
     } else if (m_avto) {
         CONNECT(m_avto, secsInSongChanged(quint32),
                 m_player, setCurrentPosition(quint32));
         CONNECT(m_avto, secsInSongChanged(quint32),
-                m_playlist, psl_secs_in_song(quint32));
+                m_playlist, onRemoteSecsInSong(quint32));
     }
     if (m_ohvlo) {
         CONNECT(m_player, sig_volume_changed(int), m_ohvlo, setVolume(int));

@@ -30,11 +30,11 @@ PlaylistOHPL::PlaylistOHPL(OHPlayer *ohpl, QObject * parent)
 {
     // Connections from OpenHome renderer to local playlist
     connect(m_ohplo, SIGNAL(metadataArrayChanged(const MetaDataList&)),
-            this, SLOT(psl_new_ohpl(const MetaDataList&)));
+            this, SLOT(onRemoteMetaArray(const MetaDataList&)));
     connect(m_ohplo, SIGNAL(currentTrackId(int)),
-            this, SLOT(psl_currentTrackId(int)));
+            this, SLOT(onRemoteCurrentTrackid(int)));
     connect(m_ohplo, SIGNAL(audioStateChanged(int, const char *)),
-            this, SLOT(psl_new_transport_state(int, const char *)));
+            this, SLOT(onRemoteTpState(int, const char *)));
 
     // Connections from local playlist to openhome
     connect(this, SIGNAL(sig_clear_playlist()), m_ohplo, SLOT(clear()));
@@ -65,9 +65,9 @@ static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
     return true;
 }
 
-void PlaylistOHPL::psl_new_ohpl(const MetaDataList& mdv)
+void PlaylistOHPL::onRemoteMetaArray(const MetaDataList& mdv)
 {
-    qDebug() << "PlaylistOHPL::psl_new_ohpl: " << mdv.size() << " entries";
+    qDebug() << "PlaylistOHPL::onRemoteMetaArray: " << mdv.size() << " entries";
     if (!samelist(mdv, m_meta)) {
         m_meta = mdv;
         emit sig_playlist_updated(m_meta, m_play_idx, 0);
@@ -79,9 +79,9 @@ void PlaylistOHPL::psl_seek(int secs)
     m_ohplo->seek(secs);
 }
 
-void PlaylistOHPL::psl_currentTrackId(int id)
+void PlaylistOHPL::onRemoteCurrentTrackid(int id)
 {
-    qDebug() << "PlaylistOHPL::psl_currentTrackId: " << id;
+    qDebug() << "PlaylistOHPL::onRemoteCurrentTrackid: " << id;
 
     if (id <= 0) {
         return;
@@ -111,21 +111,21 @@ void PlaylistOHPL::psl_currentTrackId(int id)
         }
     }
     resetPosState();
-    LOGINF("PlaylistOHPL::psl_currentTrackId: track not found in array" << endl);
+    LOGINF("PlaylistOHPL::onRemoteCurrentTrackid: track not found in array" << endl);
 }
 
-void PlaylistOHPL::psl_secs_in_song_impl(quint32 secs)
+void PlaylistOHPL::onRemoteSecsInSong_impl(quint32 secs)
 {
     if (m_lastsong && m_cursongsecs > 0 && int(secs) > int(m_cursongsecs) - 3) {
-        //qDebug() << "PlaylistOHPL::psl_secs_in_song_impl: close to end";
+        //qDebug() << "PlaylistOHPL::onRemoteSecsInSong_impl: close to end";
         m_closetoend = true;
     }
 }
 
-void PlaylistOHPL::psl_new_transport_state_impl(int, const char *sst)
+void PlaylistOHPL::onRemoteTpState_impl(int, const char *sst)
 {
     Q_UNUSED(sst);
-    //qDebug() << "PlaylistOHPL::psl_new_transport_state_impl: " << sst;
+    //qDebug() << "PlaylistOHPL::onRemoteTpState_impl: " << sst;
     if (m_tpstate == AUDIO_STOPPED && m_closetoend == true) {
         resetPosState();
         emit sig_playlist_done();

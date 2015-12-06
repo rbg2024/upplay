@@ -23,17 +23,17 @@
 
 using namespace UPnPP;
 
-    // We take ownership of the OHPlayer object
-PlaylistOHRD::PlaylistOHRD(OHRad *ohrd, QObject * parent)
-    : Playlist(parent), m_ohrdo(ohrd)
+// We take ownership of the OHRad and OhInf objects. The latter can be NULL
+PlaylistOHRD::PlaylistOHRD(OHRad *ohrd, OHInf *ohif, QObject * parent)
+    : Playlist(parent), m_ohrdo(ohrd), m_ohifo(ohif)
 {
     // Connections from OpenHome renderer to local playlist
     connect(m_ohrdo, SIGNAL(metadataArrayChanged(const MetaDataList&)),
-            this, SLOT(psl_new_ohrd(const MetaDataList&)));
+            this, SLOT(onRemoteMetaArray(const MetaDataList&)));
     connect(m_ohrdo, SIGNAL(currentTrackId(int)),
-            this, SLOT(psl_currentTrackId(int)));
+            this, SLOT(onRemoteCurrentTrackid(int)));
     connect(m_ohrdo, SIGNAL(audioStateChanged(int, const char *)),
-            this, SLOT(psl_new_transport_state(int, const char *)));
+            this, SLOT(onRemoteTpState(int, const char *)));
 
     // Connections from local playlist to openhome
     connect(this, SIGNAL(sig_row_activated(int)),
@@ -41,6 +41,10 @@ PlaylistOHRD::PlaylistOHRD(OHRad *ohrd, QObject * parent)
     connect(this, SIGNAL(sig_pause()), m_ohrdo, SLOT(pause()));
     connect(this, SIGNAL(sig_stop()),  m_ohrdo, SLOT(stop()));
     connect(this, SIGNAL(sig_resume_play()), m_ohrdo, SLOT(play()));
+    if (m_ohifo) {
+        connect(m_ohifo, SIGNAL(metatextChanged(const MetaData&)),
+                this, SIGNAL(sig_track_metadata(const MetaData&)));
+    }
 }
 
 static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
@@ -54,7 +58,7 @@ static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
     return true;
 }
 
-void PlaylistOHRD::psl_new_ohrd(const MetaDataList& mdv)
+void PlaylistOHRD::onRemoteMetaArray(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOHRD::psl_new_ohrd: " << mdv.size() << " entries";
     if (!samelist(mdv, m_meta)) {
@@ -63,9 +67,9 @@ void PlaylistOHRD::psl_new_ohrd(const MetaDataList& mdv)
     }
 }
 
-void PlaylistOHRD::psl_currentTrackId(int id)
+void PlaylistOHRD::onRemoteCurrentTrackid(int id)
 {
-    qDebug() << "PlaylistOHRD::psl_currentTrackId: " << id;
+    qDebug() << "PlaylistOHRD::onRemoteCurrentTrackid: " << id;
 
     if (id <= 0) {
         return;
@@ -83,11 +87,27 @@ void PlaylistOHRD::psl_currentTrackId(int id)
             // playing track having been removed, the play index did
             // not change but the metadata did, so emit metadata in
             // all cases.
-            emit sig_track_metadata(*it);
+            MetaData md;
+            if (m_ohifo && m_ohifo->metatext(md)) {
+                emit sig_track_metadata(md);
+            } else {
+                emit sig_track_metadata(*it);
+            }
             return;
         }
     }
-    LOGINF("PlaylistOHRD::psl_currentTrackId: track not found in array" << endl);
+    LOGINF("PlaylistOHRD::onRemoteCurrentTrackid: track not found in array" << endl);
+}
+
+void PlaylistOHRD::update_state()
+{
+    m_ohrdo->fetchState();
+    if (m_ohifo) {
+        MetaData md;
+        if (m_ohifo->metatext(md)) {
+            emit sig_track_metadata(md);
+        }
+    }
 }
 
 void PlaylistOHRD::psl_play() 

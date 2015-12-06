@@ -78,7 +78,7 @@ PlaylistAVT::PlaylistAVT(AVTPlayer *avtp, const string& _udn, QObject *parent)
             this, SLOT(psl_onCurrentMetadata(const MetaData&)));
     
     connect(m_avto, SIGNAL(audioStateChanged(int, const char*)),
-            this, SLOT(psl_new_transport_state(int, const char *)));
+            this, SLOT(onRemoteTpState(int, const char *)));
     connect(m_avto, SIGNAL(stoppedAtEOT()), this,  SLOT(psl_forward()));
     connect(m_avto,  SIGNAL(connectionLost()), this, SLOT(reconnectOrChoose()));
     connect(this, SIGNAL(sig_stop()),  m_avto, SLOT(stop()));

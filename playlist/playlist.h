@@ -93,13 +93,13 @@ public slots:
     virtual void psl_change_track_impl(int) = 0;
 
     // Information from the remote end
-    virtual void psl_new_transport_state(int, const char *);
+    virtual void onRemoteTpState(int, const char *);
     // Maybe also tell the subclass about these
-    virtual void psl_new_transport_state_impl(int, const char *) {}
-    void psl_secs_in_song(quint32 s) {
-        psl_secs_in_song_impl(s);
+    virtual void onRemoteTpState_impl(int, const char *) {}
+    void onRemoteSecsInSong(quint32 s) {
+        onRemoteSecsInSong_impl(s);
     }
-    virtual void psl_secs_in_song_impl(quint32) {}
+    virtual void onRemoteSecsInSong_impl(quint32) {}
     
     // Mode change requested by UI
     virtual void psl_change_mode(const Playlist_Mode&);

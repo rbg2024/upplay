@@ -59,12 +59,15 @@ HEADERS += \
         playlist/playlist.h \
         playlist/playlistavt.h \
         playlist/playlistohpl.h \
+        playlist/playlistohrcv.h \
         playlist/playlistohrd.h \
         upadapt/avtadapt.h \
+        upadapt/ohifadapt.h \
         upadapt/ohpladapt.h \
         upadapt/ohrdadapt.h \
         upqo/avtransport_qo.h \
         upqo/cdirectory_qo.h \
+        upqo/ohinfo_qo.h \
         upqo/ohplaylist_qo.h \
         upqo/ohtime_qo.h \
         upqo/ohvolume_qo.h \

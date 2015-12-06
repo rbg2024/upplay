@@ -45,7 +45,7 @@ public:
     //   translate this into actual track information)
     
     virtual void changed(const char *nm, int value) {
-        qDebug() << "OHRadioQO: changed: " << nm << " (int): " << value;
+        //qDebug() << "OHRadioQO: changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "Id")) {
             emit currentTrackId(value);
         } else if (!strcmp(nm, "TransportState")) {
@@ -54,11 +54,13 @@ public:
     }
     virtual void changed(const char *nm, std::vector<int> ids) {
         Q_UNUSED(nm);
-        qDebug() << "OHRadioQO: changed: " << nm << " (vector<int>)";
+        //qDebug() << "OHRadioQO: changed: " << nm << " (vector<int>)";
         emit __idArrayChanged(ids);
     }
     virtual void changed(const char * nm, const char *value) {
-        qDebug() << "OHRadioQO: changed: " << nm << " (char*): " << value;
+        Q_UNUSED(nm);
+        Q_UNUSED(value);
+        //qDebug() << "OHRadioQO: changed: " << nm << " (char*): " << value;
     }
 
 public slots:
@@ -66,7 +68,7 @@ public slots:
     // Read state from the remote. Used when starting up, to avoid
     // having to wait for events.
     virtual void fetchState() {
-        qDebug() << "OHRadioQO::fetchState()";
+        //qDebug() << "OHRadioQO::fetchState()";
         std::vector<int> ids;
         int tok;
         if (idArray(&ids, &tok))
@@ -143,8 +145,8 @@ private slots:
         if (!ohupdmetapool(nids, m_curid, m_metapool, m_srv))
             return;
 
-        qDebug() << "OHPL::onIdArrayChanged: emit trackArrayChanged(). " <<
-            "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
+        //qDebug() << "OHRad::onIdArrayChanged: emit trackArrayChanged(). " <<
+        // "idsv size" << m_idsv.size() << " pool size " << m_metapool.size();
         emit trackArrayChanged();
         emit currentTrackId(m_curid);
     }

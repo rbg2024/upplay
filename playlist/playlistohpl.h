@@ -49,9 +49,9 @@ signals:
 public slots:
 
     // These receives changes from the remote state.
-    void psl_currentTrackId(int id);
-    void psl_new_transport_state_impl(int, const char *);
-    void psl_secs_in_song_impl(quint32 s);
+    void onRemoteCurrentTrackid(int id);
+    void onRemoteTpState_impl(int, const char *);
+    void onRemoteSecsInSong_impl(quint32 s);
     
     // The following are connected to GUI signals, for responding to
     // user actions.
@@ -70,7 +70,7 @@ public slots:
     void psl_insert_tracks(const MetaDataList&, int);
 
     // Process playlist data from device
-    void psl_new_ohpl(const MetaDataList&);
+    void onRemoteMetaArray(const MetaDataList&);
 
     void psl_seek(int);
 

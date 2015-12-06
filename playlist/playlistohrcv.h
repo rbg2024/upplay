@@ -14,64 +14,48 @@
  *   Free Software Foundation, Inc.,
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#ifndef PLAYLISTOHRD_H_
-#define PLAYLISTOHRD_H_
+#ifndef PLAYLISTOHRCV_H_
+#define PLAYLISTOHRCV_H_
 
 #include <QDebug>
 
 #include "HelperStructs/MetaData.h"
 #include "playlist.h"
-#include "upadapt/ohrdadapt.h"
-#include "upadapt/ohifadapt.h"
 
-class PlaylistOHRD : public Playlist {
+class PlaylistOHRCV : public Playlist {
     Q_OBJECT
 
 public:
-    // We take ownership of the OHRadio object
-    PlaylistOHRD(OHRad *ohrd, OHInf *ohif, QObject *parent = 0);
-
-    virtual ~PlaylistOHRD() {
-        delete m_ohrdo;
-        delete m_ohifo;
+    PlaylistOHRCV(void *, QObject *parent = 0)
+        : Playlist(parent) {
     }
 
-    virtual void update_state();
+    virtual ~PlaylistOHRCV() {
+    }
+
+    virtual void update_state() {
+        MetaDataList mdv;
+        MetaData md;
+        mdv.push_back(md);
+        md.title = "Songcast receiver mode";
+        emit sig_playlist_updated(mdv, 0, 0);
+        emit sig_track_metadata(md);
+    }
 
 signals:
     void sig_track_metadata(const MetaData&);
-    void sig_row_activated(int);
-
 public slots:
 
-    // These receives changes from the remote state.
-    void onRemoteCurrentTrackid(int id);
-    void onRemoteTpState_impl(int, const char *) {}
-    void onRemoteSecsInSong_impl(quint32) {}
-    
-    // The following are connected to GUI signals, for responding to
-    // user actions.
-    void psl_change_track_impl(int idx) {
-        qDebug() << "psl_change_track: " << idx;
-        emit sig_row_activated(idx);
-    }
+    void psl_change_track_impl(int) {}
     void psl_clear_playlist_impl() {}
-    void psl_play();
-    void psl_pause();
-    void psl_stop(); 
+    void psl_play() {}
+    void psl_pause() {}
+    void psl_stop() {}
     void psl_forward() {}
     void psl_backward() {}
     void psl_remove_rows(const QList<int>&, bool = true) {}
     void psl_insert_tracks(const MetaDataList&, int) {}
-
-    // Set from scratch after reading changes from device
-    void onRemoteMetaArray(const MetaDataList&);
     void psl_seek(int) {}
-
-private:
-    // My link to the OpenHome Renderer
-    OHRad *m_ohrdo;
-    OHInf *m_ohifo;
 };
 
-#endif /* PLAYLISTOHRD_H_ */
+#endif /* PLAYLISTOHRCV_H_ */
