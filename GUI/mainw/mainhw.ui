@@ -127,7 +127,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionChange_Media_Renderer"/>
+    <addaction name="actionSelect_Media_Renderer"/>
+    <addaction name="actionSelect_OH_Source"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Playlist"/>
     <addaction name="actionLoad_Playlist"/>
@@ -225,9 +226,14 @@
     <string>Small Playlist Items</string>
    </property>
   </action>
-  <action name="actionChange_Media_Renderer">
+  <action name="actionSelect_Media_Renderer">
    <property name="text">
     <string>Change Media Renderer</string>
+   </property>
+  </action>
+  <action name="actionSelect_OH_Source">
+   <property name="text">
+    <string>Select Source</string>
    </property>
   </action>
   <action name="action_viewSearchPanel">

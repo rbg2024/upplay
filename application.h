@@ -57,8 +57,10 @@ public:
                         
 public slots:
     void chooseRenderer();
+    void chooseSource();
     void reconnectOrChoose();
     void onSourceTypeChanged(OHProductQO::SourceType);
+
 private:
 
     GUI_Player   *m_player;

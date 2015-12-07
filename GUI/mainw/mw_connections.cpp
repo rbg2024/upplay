@@ -40,8 +40,10 @@ void GUI_Player::setupConnections()
             this, SIGNAL(sig_seek(int)));
     
     // file
-    connect(ui->actionChange_Media_Renderer, SIGNAL(triggered(bool)),
+    connect(ui->actionSelect_Media_Renderer, SIGNAL(triggered(bool)),
             this, SIGNAL(sig_choose_renderer()));
+    connect(ui->actionSelect_OH_Source, SIGNAL(triggered(bool)),
+            this, SIGNAL(sig_choose_source()));
     connect(ui->actionSave_Playlist, SIGNAL(triggered(bool)),
             this, SIGNAL(sig_save_playlist()));
     connect(ui->actionLoad_Playlist, SIGNAL(triggered(bool)),

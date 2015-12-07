@@ -224,6 +224,10 @@ void GUI_Player::changeSkin(bool dark)
     emit sig_skin_changed(dark);
 }
 
+void GUI_Player::enableSourceSelect(bool enb)
+{
+    ui->actionSelect_OH_Source->setEnabled(enb);
+}
 
 /** TRAY ICON **/
 void GUI_Player::setupTrayActions()

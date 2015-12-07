@@ -71,6 +71,8 @@ public slots:
     void setVolumeUi(int volume_percent);
     void setMuteUi(bool);
 
+    void enableSourceSelect(bool);
+    
 signals:
     /* Player*/
     void play();
@@ -84,6 +86,7 @@ signals:
 
     /* File */
     void sig_choose_renderer();
+    void sig_choose_source();
     void sig_save_playlist();
     void sig_load_playlist();
 

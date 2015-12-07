@@ -35,6 +35,7 @@
 #include "GUI/playlist/GUI_Playlist.h"
 #include "GUI/prefs/prefs.h"
 #include "GUI/renderchoose/renderchoose.h"
+#include "GUI/sourcechoose/sourcechoose.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/Style.h"
@@ -102,7 +103,8 @@ Application::Application(QApplication* qapp, QObject *parent)
     m_settings->setVersion(version);
 
     m_player = new GUI_Player(this);
-
+    m_player->enableSourceSelect(false);
+    
     m_ui_playlist = new GUI_Playlist(m_player->getParentOfPlaylist(), 0);
     m_player->setPlaylistWidget(m_ui_playlist);
 
@@ -198,6 +200,54 @@ void Application::chooseRenderer()
     }
 }
 
+void Application::chooseSource()
+{
+    if (!m_ohpro) {
+        qDebug() << "Application::chooseSource: called but not an OH renderer?";
+        m_player->enableSourceSelect(false);
+        return;
+    }
+    vector<UPnPClient::OHProduct::Source> srcs;
+    if (!m_ohpro->getSources(srcs)) {
+        return;
+    }
+    qDebug() << "Application::chooseSource: got " << srcs.size() << " sources";
+    int cur = -1;
+    m_ohpro->sourceIndex(&cur);
+
+    vector<int> rowtoidx;
+    SourceChooseDLG dlg(m_player);
+    for (unsigned int i = 0; i < srcs.size(); i++) {
+        QString stype = u8s2qs(srcs[i].type);
+        if (int(i) == cur) {
+            QListWidgetItem *item = new QListWidgetItem(stype);
+            QFont font = dlg.rndsLW->font();
+            font.setBold(true);
+            item->setFont(font);
+            dlg.rndsLW->addItem(item);
+            rowtoidx.push_back(i);
+        } else {
+            if (!stype.compare("Radio") || !stype.compare("Playlist")) {
+                rowtoidx.push_back(i);
+                dlg.rndsLW->addItem(stype);
+            }
+        }
+    }
+    if (!dlg.exec()) {
+        return;
+    }
+
+    int row = dlg.rndsLW->currentRow();
+    if (row < 0 || row >= int(rowtoidx.size())) {
+        qDebug() << "Internal error: bad row after source choose dlg";
+        return;
+    }
+    int idx = rowtoidx[row];
+    if (idx != cur) {
+        m_ohpro->setSourceIndex(idx);
+    }
+}
+
 void Application::reconnectOrChoose()
 {
     string uid = qs2utf8s(m_settings->getPlayerUID());
@@ -239,6 +289,7 @@ bool Application::setupRenderer(const string& uid)
         m_ohpro = new OHProductQO(ohpr);
         connect(m_ohpro, SIGNAL(sourceTypeChanged(OHProductQO::SourceType)),
                 this, SLOT(onSourceTypeChanged(OHProductQO::SourceType)));
+        m_player->enableSourceSelect(true);
 
         // Create appropriate Playlist object depending on type of source
         createPlaylistForOpenHomeSource();
@@ -251,6 +302,8 @@ bool Application::setupRenderer(const string& uid)
             // no need for AVT then
             needavt = false;
         }
+    } else {
+        m_player->enableSourceSelect(false);
     }
 
     // It would be possible in theory to be connected to an openhome
@@ -461,6 +514,7 @@ void Application::init_connections()
     CONNECT(m_player, show_small_playlist_items(bool),
             m_ui_playlist, psl_show_small_playlist_items(bool));
     CONNECT(m_player, sig_choose_renderer(), this, chooseRenderer());
+    CONNECT(m_player, sig_choose_source(), this, chooseSource());
     CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
     CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));
     static UPPrefs g_prefs(m_player);

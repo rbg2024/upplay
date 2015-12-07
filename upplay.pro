@@ -47,6 +47,7 @@ HEADERS += \
         GUI/prefs/prefs.h \
         GUI/prefs/sortprefs.h \
         GUI/renderchoose/renderchoose.h \
+        GUI/sourcechoose/sourcechoose.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
@@ -127,7 +128,8 @@ FORMS   = \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.ui \
         GUI/prefs/sortprefs.ui \
-        GUI/renderchoose/renderchoose.ui
+        GUI/renderchoose/renderchoose.ui \
+        GUI/sourcechoose/sourcechoose.ui
 
 unix {
   UI_DIR = .ui
