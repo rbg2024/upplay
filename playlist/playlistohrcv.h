@@ -26,8 +26,8 @@ class PlaylistOHRCV : public Playlist {
     Q_OBJECT
 
 public:
-    PlaylistOHRCV(void *, QObject *parent = 0)
-        : Playlist(parent) {
+    PlaylistOHRCV(const QString& fnm, QObject *parent = 0)
+        : Playlist(parent), m_renderer(fnm) {
     }
 
     virtual ~PlaylistOHRCV() {
@@ -36,8 +36,9 @@ public:
     virtual void update_state() {
         MetaDataList mdv;
         MetaData md;
-        mdv.push_back(md);
         md.title = "Songcast receiver mode";
+        md.artist = tr("Renderer: ") + m_renderer;
+        mdv.push_back(md);
         emit sig_playlist_updated(mdv, 0, 0);
         emit sig_track_metadata(md);
     }
@@ -56,6 +57,8 @@ public slots:
     void psl_remove_rows(const QList<int>&, bool = true) {}
     void psl_insert_tracks(const MetaDataList&, int) {}
     void psl_seek(int) {}
+private:
+    QString m_renderer;
 };
 
 #endif /* PLAYLISTOHRCV_H_ */

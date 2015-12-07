@@ -33,41 +33,48 @@ public:
         : QObject(parent), m_srv(ohp)
     {
         m_srv->installReporter(this);
+        connect(this, SIGNAL(_sourceIndexChanged(int)),
+                this, SLOT(onSourceIndexChanged(int)));
     }
     virtual ~OHProductQO() {
         m_srv->installReporter(0);
     }
 
-    // Only interested in sourceIndex changes
     virtual void changed(const char *nm, int value)
     {
-        //qDebug() << "OHPR: Changed: " << nm << " (int): " << value;
+        qDebug() << "OHProductQo: Changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "SourceIndex")) {
-            emit sourceIndexChanged(value);
+            emit _sourceIndexChanged(value);
         } 
     }
-    virtual void changed(const char * /*nm*/, const char * /*value*/) {
-        //qDebug() << "OHPL: Changed: " << nm << " (char*): " << value;
+    virtual void changed(const char *nm, const char *value) {
+        Q_UNUSED(nm);
+        Q_UNUSED(value);
+        //qDebug() << "OHProductQO: Changed: " << nm << " (char*): " << value;
     }
 
     enum SourceType{OHPR_SourceUnknown, OHPR_SourcePlaylist, OHPR_SourceRadio,
                     OHPR_SourceReceiver};
+    SourceType srcStringToType(const std::string& stype) {
+        if (!stype.compare("Playlist")) {
+            return OHPR_SourcePlaylist;
+        } else if (!stype.compare("Radio")) {
+            return OHPR_SourceRadio;
+        } else if (!stype.compare("Receiver")) {
+            return OHPR_SourceReceiver;
+        }
+        return OHPR_SourceUnknown;
+    }
+        
     SourceType getSourceType() {
         int idx;
         std::vector<UPnPClient::OHProduct::Source> srcs;
-        if (sourceIndex(&idx) && getSources(srcs)) {
-            if (idx >= 0 && idx < int(srcs.size())) {
-                std::string stype = srcs[idx].type;
-                if (!stype.compare("Playlist")) {
-                    return OHPR_SourcePlaylist;
-                } else if (!stype.compare("Radio")) {
-                    return OHPR_SourceRadio;
-                } else if (!stype.compare("Receiver")) {
-                    return OHPR_SourceReceiver;
-                }
-            }
+        std::string st;
+        if (sourceIndex(&idx) && getSources(srcs) &&
+            idx >= 0 && idx < int(srcs.size())) {
+            st = srcs[idx].type;
         }
-        return OHPR_SourceUnknown;
+        return srcStringToType(st);
     }
  
 public slots:
@@ -80,10 +87,22 @@ public slots:
     virtual bool setSourceIndex(int index) {
         return m_srv->setSourceIndex(index) == 0;
     }
-
+    
 signals:
-    void sourceIndexChanged(int);
-                                         
+    void sourceTypeChanged(OHProductQO::SourceType);
+
+    // This is used internally. Use sourceTypeChanged instead
+    void _sourceIndexChanged(int);
+
+private slots:
+    void onSourceIndexChanged(int idx) {
+        std::vector<UPnPClient::OHProduct::Source> srcs;
+        std::string st;
+        if (getSources(srcs) && idx >= 0 && idx < int(srcs.size())) {
+            st = srcs[idx].type;
+        }
+        emit sourceTypeChanged(srcStringToType(st));
+    }
 private:
     UPnPClient::OHPRH m_srv;
 };

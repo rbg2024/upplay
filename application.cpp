@@ -143,100 +143,6 @@ bool Application::is_initialized()
     return m_initialized;
 }
 
-bool Application::setupRenderer(const string& uid)
-{
-    deleteZ(m_playlist);
-    deleteZ(m_rdco);
-    deleteZ(m_avto);
-    deleteZ(m_ohtmo);
-    deleteZ(m_ohvlo);
-    deleteZ(m_ohpro);
-    
-    // Create media renderer object. We don't use it directly but it
-    // gives handles to the services. Note that the lib will return
-    // anything implementing either renderingcontrol or ohproduct
-    MRDH rdr = getRenderer(uid, false);
-    if (!rdr) {
-        cerr << "Renderer " << uid << " not found" << endl;
-        return false;
-    }
-
-    if (rdr->rdc()) {
-        LOGDEB("Application::setupRenderer: using Rendering Control\n");
-        m_rdco = new RenderingControlQO(rdr->rdc());
-    } else {
-        if (!rdr->ohvl()) {
-            cerr << "Device implements neither RenderingControl nor OHVolume" <<
-                endl;
-            return false;
-        }
-        LOGDEB("Application::setupRenderer: using OHVolume\n");
-        m_ohvlo =  new OHVolumeQO(rdr->ohvl());
-    }
-
-    bool needavt = true;
-    OHProductQO::SourceType ohprtp = OHProductQO::OHPR_SourceUnknown;
-    OHPLH ohpl = rdr->ohpl();
-    if (ohpl) {
-        LOGDEB("Application::setupRenderer: using OHPlaylist\n");
-        OHTMH ohtm = rdr->ohtm();
-        if (ohtm) {
-            LOGDEB("Application::setupRenderer: OHTm ok, no need for avt\n");
-            m_ohtmo = new OHTimeQO(ohtm);
-            // no need for AVT then
-            needavt = false;
-        }
-        OHPRH ohpr = rdr->ohpr();
-        if (ohpr) {
-            m_ohpro = new OHProductQO(ohpr);
-            ohprtp = m_ohpro->getSourceType();
-        }
-        switch(ohprtp) {
-        case OHProductQO::OHPR_SourceRadio:
-        {
-            OHRDH ohrd = rdr->ohrd();
-            if (!ohrd) {
-                cerr << "Renderer: radio mode, but can't connect" << endl;
-                return false;
-            }
-            OHIFH ohif = rdr->ohif();
-            m_playlist = new PlaylistOHRD(new OHRad(ohrd), ohif ?
-                                          new OHInf(ohif) : 0);
-        }
-        break;
-        case OHProductQO::OHPR_SourceReceiver:
-        {
-            m_playlist = new PlaylistOHRCV(0);
-        }
-        break;
-        case OHProductQO::OHPR_SourcePlaylist:
-        default:
-            m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
-        }
-    }
-
-    if (needavt) {
-        if (!rdr->avt()) {
-            cerr << "Renderer: AVTransport missing but we need it" << endl;
-            return false;
-        }
-        m_avto = new AVTPlayer(rdr->avt());
-    }
-
-    if (!ohpl) {
-        LOGDEB("Application::setupRenderer: using AVT playlist\n");
-        m_playlist = new PlaylistAVT(m_avto, rdr->desc()->UDN);
-    }
-    
-    m_cdb->setPlaylist(m_playlist);
-
-    m_renderer_friendly_name = u8s2qs(rdr->desc()->friendlyName);
-
-    renderer_connections();
-
-    return true;
-}
-
 void Application::chooseRenderer()
 {
     MetaData md;
@@ -292,6 +198,154 @@ void Application::chooseRenderer()
     }
 }
 
+void Application::reconnectOrChoose()
+{
+    string uid = qs2utf8s(m_settings->getPlayerUID());
+    if (uid.empty() || !setupRenderer(uid)) {
+        if (QMessageBox::warning(0, "Upplay",
+                             tr("Connection to current rendererer lost. "
+                                "Choose again ?"),
+                             QMessageBox::Cancel | QMessageBox::Ok, 
+                                 QMessageBox::Ok) == QMessageBox::Ok) {
+            chooseRenderer();
+        }
+    }
+}
+
+bool Application::setupRenderer(const string& uid)
+{
+    deleteZ(m_playlist);
+    deleteZ(m_rdco);
+    deleteZ(m_avto);
+    deleteZ(m_ohtmo);
+    deleteZ(m_ohvlo);
+    deleteZ(m_ohpro);
+    
+    // The media renderer object is not used directly except for
+    // providing handles to the services. Note that the lib will
+    // return anything implementing either renderingcontrol or
+    // ohproduct
+    m_rdr = getRenderer(uid, false);
+    if (!m_rdr) {
+        cerr << "Renderer " << uid << " not found" << endl;
+        return false;
+    }
+    m_renderer_friendly_name = u8s2qs(m_rdr->desc()->friendlyName);
+
+    bool needavt = true;
+    OHPRH ohpr = m_rdr->ohpr();
+    if (ohpr) {
+        // This is an OpenHome media renderer
+        m_ohpro = new OHProductQO(ohpr);
+        connect(m_ohpro, SIGNAL(sourceTypeChanged(OHProductQO::SourceType)),
+                this, SLOT(onSourceTypeChanged(OHProductQO::SourceType)));
+
+        // Create appropriate Playlist object depending on type of source
+        createPlaylistForOpenHomeSource();
+
+        // Try to use the time service
+        OHTMH ohtm = m_rdr->ohtm();
+        if (ohtm) {
+            qDebug() << "Application::setupRenderer: OHTm ok, no need for avt";
+            m_ohtmo = new OHTimeQO(ohtm);
+            // no need for AVT then
+            needavt = false;
+        }
+    }
+
+    if (!m_playlist) {
+        qDebug() <<"Application::setupRenderer: using AVT playlist";
+        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
+    }
+
+    // It would be possible in theory to be connected to an openhome
+    // playlist without a time service?? and use avt for time updates
+    // instead.
+    if (needavt) {
+        if (!m_rdr->avt()) {
+            qDebug() << "Renderer: AVTransport missing but we need it";
+            return false;
+        }
+        m_avto = new AVTPlayer(m_rdr->avt());
+    }
+
+    // Use either renderingControl or ohvolume for volume control.
+    if (m_rdr->rdc()) {
+        qDebug() << "Application::setupRenderer: using Rendering Control";
+        m_rdco = new RenderingControlQO(m_rdr->rdc());
+    } else {
+        if (!m_rdr->ohvl()) {
+            qDebug() << "Device implements neither RenderingControl nor "
+                "OHVolume";
+            return false;
+        }
+        qDebug() << "Application::setupRenderer: using OHVolume";
+        m_ohvlo =  new OHVolumeQO(m_rdr->ohvl());
+    }
+    
+    renderer_connections();
+    playlist_connections();
+
+    return true;
+}
+
+void Application::createPlaylistForOpenHomeSource()
+{
+    deleteZ(m_playlist);
+
+    OHProductQO::SourceType ohprtp = m_ohpro->getSourceType();
+
+    switch(ohprtp) {
+
+    case OHProductQO::OHPR_SourceRadio:
+    {
+        OHRDH ohrd = m_rdr->ohrd();
+        if (!ohrd) {
+            qDebug() << "Application::createPlaylistForOpenHomeSource: "
+                "radio mode, but can't connect";
+            return;
+        }
+        OHIFH ohif = m_rdr->ohif();
+        m_playlist = new PlaylistOHRD(new OHRad(ohrd), ohif ?
+                                      new OHInf(ohif) : 0);
+    }
+    break;
+
+    case OHProductQO::OHPR_SourceReceiver:
+    {
+        m_playlist = new PlaylistOHRCV(u8s2qs(m_rdr->desc()->friendlyName));
+    }
+    break;
+
+    case OHProductQO::OHPR_SourcePlaylist:
+    default:
+    {
+        OHPLH ohpl = m_rdr->ohpl();
+        if (ohpl) {
+            m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
+        }
+    }
+
+    }
+
+    if (!m_playlist) {
+        qDebug() << "Application::createPlaylistForOpenHomeSource: "
+            "could not create playlist object";
+    }
+}
+
+void Application::onSourceTypeChanged(OHProductQO::SourceType tp)
+{
+    qDebug() << "Application::onSourceTypeChanged: " << int(tp);
+    if (!m_ohpro) {
+        // Not possible cause ohpro is the sender of this signal.. anyway
+        qDebug() <<"Application::onSourceTypeChanged: no OHProduct!!";
+        return;
+    }
+    createPlaylistForOpenHomeSource();
+    playlist_connections();
+}
+
 void Application::getIdleMeta(MetaData* mdp)
 {
     QString sourcetype;
@@ -318,48 +372,19 @@ void Application::getIdleMeta(MetaData* mdp)
     }
 }
 
-void Application::reconnectOrChoose()
+// We may switch the playlist when an openhome renderer switches sources. So
+// set the playlist connections in a separate function
+void Application::playlist_connections()
 {
-    string uid = qs2utf8s(m_settings->getPlayerUID());
-    if (uid.empty() || !setupRenderer(uid)) {
-        if (QMessageBox::warning(0, "Upplay",
-                             tr("Connection to current rendererer lost. "
-                                "Choose again ?"),
-                             QMessageBox::Cancel | QMessageBox::Ok, 
-                                 QMessageBox::Ok) == QMessageBox::Ok) {
-            chooseRenderer();
-        }
-    }
-}
+    m_cdb->setPlaylist(m_playlist);
 
-void Application::renderer_connections()
-{
     // Use either ohtime or avt for time updates
     if (m_ohtmo) {
-        CONNECT(m_ohtmo, secsInSongChanged(quint32),
-                m_player, setCurrentPosition(quint32));
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
                 m_playlist, onRemoteSecsInSong(quint32));
     } else if (m_avto) {
         CONNECT(m_avto, secsInSongChanged(quint32),
-                m_player, setCurrentPosition(quint32));
-        CONNECT(m_avto, secsInSongChanged(quint32),
                 m_playlist, onRemoteSecsInSong(quint32));
-    }
-    if (m_ohvlo) {
-        CONNECT(m_player, sig_volume_changed(int), m_ohvlo, setVolume(int));
-        CONNECT(m_player, sig_mute(bool), m_ohvlo, setMute(bool));
-        CONNECT(m_ohvlo, volumeChanged(int), m_player, setVolumeUi(int));
-        CONNECT(m_ohvlo, muteChanged(bool), m_player, setMuteUi(bool));
-        // Set up the initial volume from the renderer value
-        m_player->setVolumeUi(m_ohvlo->volume());
-    } else if (m_rdco) {
-        CONNECT(m_player, sig_volume_changed(int), m_rdco, setVolume(int));
-        CONNECT(m_player, sig_mute(bool), m_rdco, setMute(bool));
-        CONNECT(m_rdco, volumeChanged(int), m_player, setVolumeUi(int));
-        CONNECT(m_rdco, muteChanged(bool), m_player, setMuteUi(bool));
-        // Set up the initial volume from the renderer value
-        m_player->setVolumeUi(m_rdco->volume());
     }
 
     CONNECT(m_player, play(), m_playlist, psl_play());
@@ -368,7 +393,6 @@ void Application::renderer_connections()
     CONNECT(m_player, forward(), m_playlist, psl_forward());
     CONNECT(m_player, backward(), m_playlist, psl_backward());
     CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
-    CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
     CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
     CONNECT(m_player, sig_seek(int), m_playlist, psl_seek(int));
 
@@ -392,14 +416,41 @@ void Application::renderer_connections()
             m_playlist, psl_insert_tracks(const MetaDataList&, int));
     CONNECT(m_ui_playlist, sig_rows_removed(const QList<int>&, bool),
             m_playlist, psl_remove_rows(const QList<int>&, bool));
-    CONNECT(m_ui_playlist, sig_sort_tno(), m_playlist, psl_sort_by_tno());
+    CONNECT(m_ui_playlist, sig_sort_tno(),
+            m_playlist, psl_sort_by_tno());
     CONNECT(m_ui_playlist, row_activated(int),
             m_playlist, psl_change_track(int));
-    CONNECT(m_ui_playlist, clear_playlist(), m_playlist, psl_clear_playlist());
-    CONNECT(m_cdb, sig_next_group_html(QString),
-            m_ui_playlist, psl_next_group_html(QString));
+    CONNECT(m_ui_playlist, clear_playlist(),
+            m_playlist, psl_clear_playlist());
 
     m_playlist->update_state();
+}
+
+void Application::renderer_connections()
+{
+    // Use either ohtime or avt for time updates
+    if (m_ohtmo) {
+        CONNECT(m_ohtmo, secsInSongChanged(quint32),
+                m_player, setCurrentPosition(quint32));
+    } else if (m_avto) {
+        CONNECT(m_avto, secsInSongChanged(quint32),
+                m_player, setCurrentPosition(quint32));
+    }
+    if (m_ohvlo) {
+        CONNECT(m_player, sig_volume_changed(int), m_ohvlo, setVolume(int));
+        CONNECT(m_player, sig_mute(bool), m_ohvlo, setMute(bool));
+        CONNECT(m_ohvlo, volumeChanged(int), m_player, setVolumeUi(int));
+        CONNECT(m_ohvlo, muteChanged(bool), m_player, setMuteUi(bool));
+        // Set up the initial volume from the renderer value
+        m_player->setVolumeUi(m_ohvlo->volume());
+    } else if (m_rdco) {
+        CONNECT(m_player, sig_volume_changed(int), m_rdco, setVolume(int));
+        CONNECT(m_player, sig_mute(bool), m_rdco, setMute(bool));
+        CONNECT(m_rdco, volumeChanged(int), m_player, setVolumeUi(int));
+        CONNECT(m_rdco, muteChanged(bool), m_player, setMuteUi(bool));
+        // Set up the initial volume from the renderer value
+        m_player->setVolumeUi(m_rdco->volume());
+    }
 }
 
 // Connections which make sense without a renderer.
@@ -413,6 +464,9 @@ void Application::init_connections()
     static UPPrefs g_prefs(m_player);
     CONNECT(m_player, sig_preferences(), &g_prefs, onShowPrefs());
     CONNECT(&g_prefs, sig_prefsChanged(), m_cdb, onSortprefs());
+    CONNECT(m_cdb, sig_next_group_html(QString),
+            m_ui_playlist, psl_next_group_html(QString));
+    CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
 }
 
 

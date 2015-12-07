@@ -25,6 +25,9 @@
 
 #include <QObject>
 #include <QApplication>
+#include "libupnpp/control/mediarenderer.hxx"
+
+#include "upqo/ohproduct_qo.h"
 
 class AVTPlayer;
 class CSettingsStorage;
@@ -55,13 +58,14 @@ public:
 public slots:
     void chooseRenderer();
     void reconnectOrChoose();
-
+    void onSourceTypeChanged(OHProductQO::SourceType);
 private:
 
     GUI_Player   *m_player;
     Playlist     *m_playlist;
     DirBrowser   *m_cdb;
 
+    UPnPClient::MRDH    m_rdr;
     RenderingControlQO *m_rdco;
     AVTPlayer    *m_avto;
     OHTimeQO     *m_ohtmo;
@@ -79,8 +83,9 @@ private:
 
     void init_connections();
     void renderer_connections();
+    void playlist_connections();
     bool setupRenderer(const std::string& uid);
-
+    void createPlaylistForOpenHomeSource();
 };
 
 

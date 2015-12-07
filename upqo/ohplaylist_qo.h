@@ -94,6 +94,14 @@ public:
     }
 
 public slots:
+    virtual void sync() {
+        //qDebug() << "OHPL::sync";
+        std::vector<int> ids;
+        int tp;
+        if (idArray(&ids, &tp)) {
+            onIdArrayChanged(ids);
+        }
+    }
 
     /// Read state from the remote. Used when starting up, to avoid
     /// having to wait for events.
