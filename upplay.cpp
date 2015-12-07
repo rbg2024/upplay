@@ -25,6 +25,7 @@ using namespace std;
 #include <QApplication>
 #include <QObject>
 #include <QTimer>
+#include <QStringList>
 
 #include <libupnpp/upnpplib.hxx>
 #include <libupnpp/log.hxx>
