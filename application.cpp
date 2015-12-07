@@ -253,11 +253,6 @@ bool Application::setupRenderer(const string& uid)
         }
     }
 
-    if (!m_playlist) {
-        qDebug() <<"Application::setupRenderer: using AVT playlist";
-        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
-    }
-
     // It would be possible in theory to be connected to an openhome
     // playlist without a time service?? and use avt for time updates
     // instead.
@@ -268,6 +263,13 @@ bool Application::setupRenderer(const string& uid)
         }
         m_avto = new AVTPlayer(m_rdr->avt());
     }
+
+    // Keep this after avt object creation !
+    if (!m_playlist) {
+        qDebug() <<"Application::setupRenderer: using AVT playlist";
+        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
+    }
+
 
     // Use either renderingControl or ohvolume for volume control.
     if (m_rdr->rdc()) {
