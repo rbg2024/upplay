@@ -66,21 +66,17 @@ PlaylistAVT::PlaylistAVT(AVTPlayer *avtp, const string& _udn, QObject *parent)
 
     m_meta.unSerialize(u8s2qs(m_savefile));
 
-    connect(this, SIGNAL(sig_play_now(const MetaData&, int, bool)),
-            m_avto, SLOT(changeTrack(const MetaData&, int, bool)));
-    connect(this, SIGNAL(sig_next_track_to_play(const MetaData&)),
-            m_avto, SLOT(infoNextTrack(const MetaData&)));
     connect(m_avto, SIGNAL(endOfTrackIsNear()),
             this, SLOT(psl_prepare_for_end_of_track()));
     connect(m_avto, SIGNAL(newTrackPlaying(const QString&)),
-            this, SLOT(psl_ext_track_change(const QString&)));
+            this, SLOT(onExtTrackChange(const QString&)));
     connect(m_avto, SIGNAL(sig_currentMetadata(const MetaData&)),
-            this, SLOT(psl_onCurrentMetadata(const MetaData&)));
-    
+            this, SLOT(onCurrentMetadata(const MetaData&)));
     connect(m_avto, SIGNAL(audioStateChanged(int, const char*)),
             this, SLOT(onRemoteTpState(int, const char *)));
     connect(m_avto, SIGNAL(stoppedAtEOT()), this,  SLOT(psl_forward()));
-    connect(m_avto,  SIGNAL(connectionLost()), this, SLOT(reconnectOrChoose()));
+    connect(m_avto,  SIGNAL(connectionLost()), this, SIGNAL(connectionLost()));
+
     connect(this, SIGNAL(sig_stop()),  m_avto, SLOT(stop()));
     connect(this, SIGNAL(sig_resume_play()), m_avto, SLOT(play()));
     connect(this, SIGNAL(sig_pause()), m_avto, SLOT(pause()));
@@ -101,24 +97,24 @@ void PlaylistAVT::set_for_playing(int row)
     m_meta.setCurPlayTrack(row);
     m_meta[row].shuffle_played = true;
 
+    m_avto->changeTrack(m_meta[row], 0, true);
     emit sig_playing_track_changed(row);
-    emit sig_play_now(m_meta[row]);
     emit sig_track_metadata(m_meta[row]);
 }
 
 // Player switched tracks under us. Hopefully the uri matches another
 // track.  We first look ahead, because the normal situation is that
 // the device switched to the nextURI track
-void PlaylistAVT::psl_ext_track_change(const QString& uri)
+void PlaylistAVT::onExtTrackChange(const QString& uri)
 {
-    qDebug() << "PlaylistAVT::psl_ext_track_change " << uri;
+    qDebug() << "PlaylistAVT::onExtTrackChange " << uri;
 
     if (m_play_idx < -1) // ??
         return;
 
     for (unsigned int i = m_play_idx + 1; i < m_meta.size(); i++) {
         if (!uri.compare(m_meta[i].filepath)) {
-            qDebug() << "PlaylistAVT::psl_ext_track_change: index now " << i;
+            qDebug() << "PlaylistAVT::onExtTrackChange: index now " << i;
             m_play_idx = i;
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
@@ -128,7 +124,7 @@ void PlaylistAVT::psl_ext_track_change(const QString& uri)
     }
     for (int i = 0; i <= m_play_idx && i < int(m_meta.size()); i++) {
         if (!uri.compare(m_meta[i].filepath)) {
-            qDebug() << "PlaylistAVT::psl_ext_track_change: index now " << i;
+            qDebug() << "PlaylistAVT::onExtTrackChange: index now " << i;
             m_play_idx = i;
             m_meta.setCurPlayTrack(i);
             emit sig_playing_track_changed(i);
@@ -143,7 +139,7 @@ void PlaylistAVT::psl_seek(int secs)
     m_avto->seek(secs);
 }
 
-void PlaylistAVT::psl_onCurrentMetadata(const MetaData& md)
+void PlaylistAVT::onCurrentMetadata(const MetaData& md)
 {
     MetaData *localmeta = 0;
     if (!m_meta.contains(md, true, &localmeta)) {
@@ -165,7 +161,7 @@ void PlaylistAVT::send_next_playing_signal()
         return;
     // Only if there is a track behind the current one
     if (m_play_idx >= 0 && m_play_idx < int(m_meta.size()) - 1)
-        emit sig_next_track_to_play(m_meta[m_play_idx + 1]);
+        m_avto->infoNextTrack(m_meta[m_play_idx + 1]);
 }
 
 void PlaylistAVT::psl_prepare_for_end_of_track()
