@@ -1,7 +1,7 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-QT += script webkit network
+QT += script webkit network xml
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 
 #QT += script widgets network webenginewidgets
@@ -76,6 +76,8 @@ HEADERS += \
         upqo/ohradio_qo.h \
         upqo/renderingcontrol_qo.h
 
+#       playlist/playlistlocrd.h
+
 SOURCES += \
         GUI/widgets/directslider.cpp \
         GUI/mainw/mainw.cpp \
@@ -116,6 +118,8 @@ SOURCES += \
         upqo/ohpool.cpp \
         upplay.cpp 
 
+#       playlist/playlistlocrd.cpp
+
 FORMS   = \
         GUI/mainw/mainw.ui \
         GUI/mainw/mainhw.ui \
@@ -148,6 +152,7 @@ unix {
   bdata.files = dirbrowser/cdbrowser.css dirbrowser/dark.css \
               dirbrowser/standard.css dirbrowser/containerscript.js
   bdata.path = $$PREFIX/share/upplay/cdbrowser   
+#  gdata.files = GUI/standard.css GUI/dark.css playlist/radiolist.xml
   gdata.files = GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
