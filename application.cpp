@@ -24,6 +24,7 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <QDir>
 
 #include "libupnpp/upnpplib.hxx"
 #include "libupnpp/log.hxx"
@@ -46,6 +47,7 @@
 #include "playlist/playlistohpl.h"
 #include "playlist/playlistohrcv.h"
 #include "playlist/playlistohrd.h"
+#include "playlist/playlistlocrd.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
 #include "upqo/ohtime_qo.h"
@@ -202,11 +204,17 @@ void Application::chooseRenderer()
 
 void Application::chooseSource()
 {
-    if (!m_ohpro) {
-        qDebug() << "Application::chooseSource: called but not an OH renderer?";
-        m_player->enableSourceSelect(false);
+    if (m_ohpro) {
+        chooseSourceOH();
+    } else {
+        // Not ready yet
         return;
+        chooseSourceAVT();
     }
+}
+
+void Application::chooseSourceOH()
+{
     vector<UPnPClient::OHProduct::Source> srcs;
     if (!m_ohpro->getSources(srcs)) {
         return;
@@ -250,6 +258,30 @@ void Application::chooseSource()
     }
 }
 
+
+// Avt radio is not ready yet, this is not used for now.
+void Application::chooseSourceAVT()
+{
+    vector<int> rowtoidx;
+    SourceChooseDLG dlg(m_player);
+    dlg.rndsLW->addItem("Playlist");
+    dlg.rndsLW->addItem("Radio");
+    if (!dlg.exec()) {
+        return;
+    }
+    int row = dlg.rndsLW->currentRow();
+    m_playlist->psl_stop();
+    m_player->stopped();
+    deleteZ(m_playlist);
+    if (row == 1) {
+        QString fn = QDir(Helper::getSharePath()).filePath("radiolist.xml");
+        m_playlist = new PlaylistLOCRD(m_avto, fn.toLocal8Bit());
+    } else {
+        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
+    }
+    playlist_connections();
+}
+
 void Application::reconnectOrChoose()
 {
     string uid = qs2utf8s(m_settings->getPlayerUID());
@@ -291,7 +323,6 @@ bool Application::setupRenderer(const string& uid)
         m_ohpro = new OHProductQO(ohpr);
         connect(m_ohpro, SIGNAL(sourceTypeChanged(OHProductQO::SourceType)),
                 this, SLOT(onSourceTypeChanged(OHProductQO::SourceType)));
-        m_player->enableSourceSelect(true);
 
         // Create appropriate Playlist object depending on type of source
         createPlaylistForOpenHomeSource();
@@ -304,8 +335,8 @@ bool Application::setupRenderer(const string& uid)
             // no need for AVT then
             needavt = false;
         }
-    } else {
-        m_player->enableSourceSelect(false);
+        // Move this out of the if when avt radio is ready
+        m_player->enableSourceSelect(true);
     }
 
     // It would be possible in theory to be connected to an openhome

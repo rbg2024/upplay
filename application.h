@@ -88,6 +88,8 @@ private:
     void playlist_connections();
     bool setupRenderer(const std::string& uid);
     void createPlaylistForOpenHomeSource();
+    void chooseSourceOH();
+    void chooseSourceAVT();
 };
 
 
