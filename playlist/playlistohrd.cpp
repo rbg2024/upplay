@@ -34,17 +34,17 @@ PlaylistOHRD::PlaylistOHRD(OHRad *ohrd, OHInf *ohif, QObject * parent)
             this, SLOT(onRemoteCurrentTrackid(int)));
     connect(m_ohrdo, SIGNAL(audioStateChanged(int, const char *)),
             this, SLOT(onRemoteTpState(int, const char *)));
+    connect(m_ohrdo, SIGNAL(connectionLost()), this, SIGNAL(connectionLost()));
 
-    // Connections from local playlist to openhome
-    connect(this, SIGNAL(sig_row_activated(int)),
-            m_ohrdo, SLOT(setIdx(int)));
-    connect(this, SIGNAL(sig_pause()), m_ohrdo, SLOT(pause()));
-    connect(this, SIGNAL(sig_stop()),  m_ohrdo, SLOT(stop()));
-    connect(this, SIGNAL(sig_resume_play()), m_ohrdo, SLOT(play()));
     if (m_ohifo) {
         connect(m_ohifo, SIGNAL(metatextChanged(const MetaData&)),
                 this, SIGNAL(sig_track_metadata(const MetaData&)));
     }
+
+    // Connections from local playlist to openhome
+    connect(this, SIGNAL(sig_pause()), m_ohrdo, SLOT(pause()));
+    connect(this, SIGNAL(sig_stop()),  m_ohrdo, SLOT(stop()));
+    connect(this, SIGNAL(sig_resume_play()), m_ohrdo, SLOT(play()));
 }
 
 static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
@@ -110,10 +110,14 @@ void PlaylistOHRD::update_state()
     }
 }
 
+void PlaylistOHRD::psl_change_track_impl(int idx) {
+    m_ohrdo->setIdx(idx);
+}
+
 void PlaylistOHRD::psl_play() 
 {
     if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
-        emit sig_row_activated(m_selection_min_row);
+        m_ohrdo->setIdx(m_selection_min_row);
     } else {
         emit sig_resume_play();
     }
