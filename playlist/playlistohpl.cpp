@@ -35,15 +35,14 @@ PlaylistOHPL::PlaylistOHPL(OHPlayer *ohpl, QObject * parent)
             this, SLOT(onRemoteCurrentTrackid(int)));
     connect(m_ohplo, SIGNAL(audioStateChanged(int, const char *)),
             this, SLOT(onRemoteTpState(int, const char *)));
-
+    connect(m_ohplo, SIGNAL(connectionLost()), this, SIGNAL(connectionLost()));
+    
     // Connections from local playlist to openhome
     connect(this, SIGNAL(sig_clear_playlist()), m_ohplo, SLOT(clear()));
     connect(this, SIGNAL(sig_insert_tracks(const MetaDataList&, int)),
             m_ohplo, SLOT(insertTracks(const MetaDataList&, int)));
     connect(this, SIGNAL(sig_tracks_removed(const QList<int>&)),
             m_ohplo, SLOT(removeTracks(const QList<int>&)));
-    connect(this, SIGNAL(sig_row_activated(int)),
-            m_ohplo, SLOT(seekIndex(int)));
     connect(this, SIGNAL(sig_mode_changed(Playlist_Mode)),
             m_ohplo, SLOT(changeMode(Playlist_Mode)));
     connect(this, SIGNAL(sig_sync()), m_ohplo, SLOT(sync()));
@@ -141,10 +140,14 @@ void PlaylistOHPL::psl_clear_playlist_impl()
     emit sig_playlist_done();
 }
 
+void PlaylistOHPL::psl_change_track_impl(int idx) {
+    m_ohplo->seekIndex(idx);
+}
+
 void PlaylistOHPL::psl_play() 
 {
     if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
-        emit sig_row_activated(m_selection_min_row);
+        m_ohplo->seekIndex(m_selection_min_row);
     } else {
         emit sig_resume_play();
     }

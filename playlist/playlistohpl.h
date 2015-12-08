@@ -44,7 +44,6 @@ signals:
     void sig_clear_playlist();
     void sig_insert_tracks(const MetaDataList&, int);
     void sig_tracks_removed(const QList<int>& rows);
-    void sig_row_activated(int);
 
 public slots:
 
@@ -55,10 +54,7 @@ public slots:
     
     // The following are connected to GUI signals, for responding to
     // user actions.
-    void psl_change_track_impl(int idx) {
-        qDebug() << "psl_change_track: " << idx;
-        emit sig_row_activated(idx);
-    }
+    void psl_change_track_impl(int idx);
     void psl_clear_playlist_impl();
     void psl_play();
     void psl_pause();
