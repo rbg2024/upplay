@@ -62,6 +62,7 @@ HEADERS += \
         playlist/playlistohpl.h \
         playlist/playlistohrcv.h \
         playlist/playlistohrd.h \
+        playlist/playlistlocrd.h \
         upadapt/avtadapt.h \
         upadapt/ohifadapt.h \
         upadapt/ohpladapt.h \
@@ -75,8 +76,6 @@ HEADERS += \
         upqo/ohproduct_qo.h \
         upqo/ohradio_qo.h \
         upqo/renderingcontrol_qo.h
-
-#       playlist/playlistlocrd.h
 
 SOURCES += \
         GUI/widgets/directslider.cpp \
@@ -114,11 +113,10 @@ SOURCES += \
         playlist/playlistavt.cpp \
         playlist/playlistohpl.cpp \
         playlist/playlistohrd.cpp \
+        playlist/playlistlocrd.cpp \
         upadapt/upputils.cpp \
         upqo/ohpool.cpp \
         upplay.cpp 
-
-#       playlist/playlistlocrd.cpp
 
 FORMS   = \
         GUI/mainw/mainw.ui \

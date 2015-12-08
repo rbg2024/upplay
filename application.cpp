@@ -337,6 +337,8 @@ bool Application::setupRenderer(const string& uid)
         }
         // Move this out of the if when avt radio is ready
         m_player->enableSourceSelect(true);
+    } else {
+        m_player->enableSourceSelect(false);
     }
 
     // It would be possible in theory to be connected to an openhome
