@@ -73,8 +73,9 @@ signals:
     // Done inserting tracks in the playlist
     void sig_insert_done();
 
-    // Only ever emitted by the openhome variant
     void connectionLost();
+
+    // Only ever emitted by the openhome variant
     void playlistModeChanged(Playlist_Mode);
                                            
 public slots:
