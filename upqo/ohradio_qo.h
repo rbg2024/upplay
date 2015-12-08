@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QThread>
 #include <QDebug>
+#include <QTimer>
 
 #include "libupnpp/control/ohradio.hxx"
 #include "ohpool.h"
@@ -31,7 +32,10 @@ Q_OBJECT
 
 public:
     OHRadioQO(UPnPClient::OHRDH ohp, QObject *parent = 0)
-        : QObject(parent), m_curid(-1), m_srv(ohp) {
+        : QObject(parent), m_curid(-1), m_srv(ohp), m_timer(0), m_errcnt(0) {
+        m_timer = new QTimer(this);
+        connect(m_timer, SIGNAL(timeout()), this, SLOT(testconn()));
+        m_timer->start(2000);
         m_srv->installReporter(this);
     }
 
@@ -64,6 +68,18 @@ public:
     }
 
 public slots:
+
+    // Ping renderer to check it's still there.
+    virtual void testconn() {
+        int val;
+        if (m_srv->id(&val) != 0) {
+            if (m_errcnt++ > 2) {
+                emit connectionLost();
+            }
+            return;
+        }
+        m_errcnt = 0;
+    }
 
     // Read state from the remote. Used when starting up, to avoid
     // having to wait for events.
@@ -133,7 +149,8 @@ signals:
     void currentTrackId(int);
     void trackArrayChanged();
     void tpStateChanged(int);
-
+    void connectionLost();
+    
     // This is an internal signal. Use trackArrayChanged()
     void __idArrayChanged(std::vector<int>);
 
@@ -160,7 +177,10 @@ private:
     virtual bool idArray(std::vector<int> *ids, int *tokp) {
         return m_srv->idArray(ids, tokp) == 0;
     }
+
     UPnPClient::OHRDH m_srv;
+    QTimer *m_timer;
+    int m_errcnt;
 };
 
 #endif // _OHRADIO_QO_INCLUDED
