@@ -161,7 +161,15 @@ public slots:
     }
     virtual bool seekId(int i) {return m_srv->seekId(i) == 0;}
     virtual bool seekIndex(int i) {return m_srv->seekIndex(i) == 0;}
-    virtual bool clear() {return m_srv->deleteAll() == 0;}
+    virtual bool clear() {
+        int ret = m_srv->deleteAll();
+        // Not necessary with upmpdcli, but mediaplayer does not emit a
+        // tpstate change without it here, so this helps
+        m_srv->stop();
+        m_curid = 0;
+        emit tpStateChanged(UPnPClient::OHPlaylist::TPS_Stopped);
+        return ret == 0;
+    }
     virtual bool insert(int afterid, const std::string& uri, 
                         const std::string& didl, int *nid) {
         //qDebug() << "OHPL:: insert after " << afterid;

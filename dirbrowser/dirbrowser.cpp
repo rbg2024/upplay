@@ -491,6 +491,8 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
 
     mode.replace = replace_saved;
     m_pl->psl_change_mode(mode);
+    // not necessary for upmpdcli but helps mediaplayer
+    m_pl->psl_change_track(0);
     m_pl->psl_play();
 
     connect(m_pl, SIGNAL(sig_playlist_done()),

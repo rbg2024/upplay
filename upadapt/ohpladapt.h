@@ -112,6 +112,8 @@ public slots:
             }
         }
         qDebug() << "OHPlayer::insertTracks: sync at end";
+        // Get rid of, e.g. queued "queue empty" events
+        qApp->processEvents();
         sync();
         asyncArrayUpdates(true);
         m_ininsert = false;
