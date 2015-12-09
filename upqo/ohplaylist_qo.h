@@ -115,8 +115,16 @@ public slots:
             emit currentTrackId(tok);
         }
         UPnPClient::OHPlaylist::TPState tpst;
-        if (m_srv->transportState(&tpst) == 0)
+        // Note: it seems that the initial value returned by
+        // MediaPlayer if the current playlist is empty is random
+        // (either error or "Playing").
+        // Only actually call transportState if the playlist is not empty,
+        // else just emit "stopped"
+        if (ids.size() && m_srv->transportState(&tpst) == 0) {
             emit tpStateChanged(tpst);
+        } else {
+            emit tpStateChanged(UPnPClient::OHPlaylist::TPS_Stopped);
+        }            
     }
 
     // Ping renderer to check it's still there.
