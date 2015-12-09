@@ -14,57 +14,47 @@
  *   Free Software Foundation, Inc.,
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-#ifndef PLAYLISTOHRCV_H_
-#define PLAYLISTOHRCV_H_
+#ifndef PLAYLISTNULL_H_
+#define PLAYLISTNULL_H_
 
 #include <QDebug>
 
 #include "HelperStructs/MetaData.h"
 #include "playlist.h"
-#include "upqo/ohreceiver_qo.h"
 
-// Incomplete: we don't process the remote transportstate changes. For now,
-// can only be used for stopping in case of extreme need...
-class PlaylistOHRCV : public Playlist {
+// This is a placeholder playlist object which does nothing, for when the
+// renderer is using a source we can't control.
+
+class PlaylistNULL : public Playlist {
     Q_OBJECT
 
 public:
-    PlaylistOHRCV(UPnPClient::OHRCH ohrc, const QString& fnm,
-                  QObject *parent = 0)
-        : Playlist(parent), m_ohrc(ohrc), m_renderer(fnm) {
+    PlaylistNULL(QObject *parent = 0)
+        : Playlist(parent) {
     }
 
-    virtual ~PlaylistOHRCV() {
-    }
+    virtual ~PlaylistNULL() { }
 
     virtual void update_state() {
-        MetaDataList mdv;
-        MetaData md;
-        md.title = "Songcast receiver mode";
-        md.artist = tr("Renderer: ") + m_renderer;
-        mdv.push_back(md);
-        emit sig_playlist_updated(mdv, 0, 0);
-        emit sig_track_metadata(md);
+        // Send out empty data.
+        emit sig_track_metadata(MetaData());
+        emit sig_playlist_updated(m_meta, -1, 0);
     }
 
 signals:
     void sig_track_metadata(const MetaData&);
 
 public slots:
-
     void psl_change_track_impl(int) {}
     void psl_clear_playlist_impl() {}
-    void psl_play() {m_ohrc->play();}
+    void psl_play() {}
     void psl_pause() {}
-    void psl_stop() {m_ohrc->stop();}
+    void psl_stop() {}
     void psl_forward() {}
     void psl_backward() {}
     void psl_remove_rows(const QList<int>&, bool = true) {}
     void psl_insert_tracks(const MetaDataList&, int) {}
     void psl_seek(int) {}
-private:
-    UPnPClient::OHRCH m_ohrc;
-    QString m_renderer;
 };
 
-#endif /* PLAYLISTOHRCV_H_ */
+#endif /* PLAYLISTNULL_H_ */

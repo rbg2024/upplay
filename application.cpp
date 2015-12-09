@@ -44,16 +44,18 @@
 #include "dirbrowser/dirbrowser.h"
 #include "playlist/playlist.h"
 #include "playlist/playlistavt.h"
+#include "playlist/playlistnull.h"
 #include "playlist/playlistohpl.h"
 #include "playlist/playlistohrcv.h"
 #include "playlist/playlistohrd.h"
 #include "playlist/playlistlocrd.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
-#include "upqo/ohtime_qo.h"
-#include "upqo/ohvolume_qo.h"
 #include "upqo/ohproduct_qo.h"
 #include "upqo/ohradio_qo.h"
+#include "upqo/ohreceiver_qo.h"
+#include "upqo/ohtime_qo.h"
+#include "upqo/ohvolume_qo.h"
 #include "upqo/renderingcontrol_qo.h"
 
 using namespace std;
@@ -236,10 +238,8 @@ void Application::chooseSourceOH()
             dlg.rndsLW->addItem(item);
             rowtoidx.push_back(i);
         } else {
-            if (!stype.compare("Radio") || !stype.compare("Playlist")) {
-                rowtoidx.push_back(i);
-                dlg.rndsLW->addItem(stype);
-            }
+            rowtoidx.push_back(i);
+            dlg.rndsLW->addItem(stype);
         }
     }
     if (!dlg.exec()) {
@@ -385,13 +385,12 @@ void Application::createPlaylistForOpenHomeSource()
 {
     deleteZ(m_playlist);
 
-    OHProductQO::SourceType ohprtp = m_ohpro->getSourceType();
+    m_ohsourcetype = m_ohpro->getSourceType();
 
-    switch(ohprtp) {
+    switch (m_ohsourcetype) {
 
     case OHProductQO::OHPR_SourceRadio:
     {
-        m_ohsourcetype = OHProductQO::OHPR_SourceRadio;
         OHRDH ohrd = m_rdr->ohrd();
         if (!ohrd) {
             qDebug() << "Application::createPlaylistForOpenHomeSource: "
@@ -406,21 +405,31 @@ void Application::createPlaylistForOpenHomeSource()
 
     case OHProductQO::OHPR_SourceReceiver:
     {
-        m_ohsourcetype = OHProductQO::OHPR_SourceReceiver;
-        m_playlist = new PlaylistOHRCV(u8s2qs(m_rdr->desc()->friendlyName));
+        OHRCH ohrc = m_rdr->ohrc();
+        if (!ohrc) {
+            qDebug() << "Application::createPlaylistForOpenHomeSource: "
+                "receiver mode, but can't connect";
+            return;
+        }
+        m_playlist = new PlaylistOHRCV(ohrc,
+                                       u8s2qs(m_rdr->desc()->friendlyName));
     }
     break;
 
     case OHProductQO::OHPR_SourcePlaylist:
-    default:
     {
-        m_ohsourcetype = OHProductQO::OHPR_SourcePlaylist;
         OHPLH ohpl = m_rdr->ohpl();
         if (ohpl) {
             m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
         }
     }
+    break;
 
+    default:
+    {
+        m_playlist = new PlaylistNULL();
+    }
+    break;
     }
 
     if (!m_playlist) {

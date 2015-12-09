@@ -62,6 +62,7 @@ HEADERS += \
         playlist/playlistohpl.h \
         playlist/playlistohrcv.h \
         playlist/playlistohrd.h \
+        playlist/playlistnull.h \
         playlist/playlistlocrd.h \
         upadapt/avtadapt.h \
         upadapt/ohifadapt.h \
@@ -71,6 +72,7 @@ HEADERS += \
         upqo/cdirectory_qo.h \
         upqo/ohinfo_qo.h \
         upqo/ohplaylist_qo.h \
+        upqo/ohreceiver_qo.h \
         upqo/ohtime_qo.h \
         upqo/ohvolume_qo.h \
         upqo/ohproduct_qo.h \
