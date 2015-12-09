@@ -67,8 +67,9 @@ static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
 void PlaylistOHPL::onRemoteMetaArray(const MetaDataList& mdv)
 {
     qDebug() << "PlaylistOHPL::onRemoteMetaArray: " << mdv.size() << " entries";
-    if (!samelist(mdv, m_meta)) {
+    if (mdv.empty() || !samelist(mdv, m_meta)) {
         m_meta = mdv;
+
         emit sig_playlist_updated(m_meta, m_play_idx, 0);
     }
 }
