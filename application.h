@@ -80,7 +80,7 @@ private:
     QApplication     *m_app;
 
     bool             m_initialized;
-
+    OHProductQO::SourceType m_ohsourcetype;
     QString          m_renderer_friendly_name;
 
     void init_connections();

@@ -97,7 +97,8 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 Application::Application(QApplication* qapp, QObject *parent)
     : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
       m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ohpro(0),
-      m_ui_playlist(0), m_settings(0), m_app(qapp), m_initialized(false)
+      m_ui_playlist(0), m_settings(0), m_app(qapp), m_initialized(false),
+      m_ohsourcetype(OHProductQO::OHPR_SourceUnknown)
 {
     m_settings = CSettingsStorage::getInstance();
 
@@ -304,6 +305,7 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(m_ohtmo);
     deleteZ(m_ohvlo);
     deleteZ(m_ohpro);
+    m_ohsourcetype = OHProductQO::OHPR_SourceUnknown;
     
     // The media renderer object is not used directly except for
     // providing handles to the services. Note that the lib will
@@ -389,6 +391,7 @@ void Application::createPlaylistForOpenHomeSource()
 
     case OHProductQO::OHPR_SourceRadio:
     {
+        m_ohsourcetype = OHProductQO::OHPR_SourceRadio;
         OHRDH ohrd = m_rdr->ohrd();
         if (!ohrd) {
             qDebug() << "Application::createPlaylistForOpenHomeSource: "
@@ -403,6 +406,7 @@ void Application::createPlaylistForOpenHomeSource()
 
     case OHProductQO::OHPR_SourceReceiver:
     {
+        m_ohsourcetype = OHProductQO::OHPR_SourceReceiver;
         m_playlist = new PlaylistOHRCV(u8s2qs(m_rdr->desc()->friendlyName));
     }
     break;
@@ -410,6 +414,7 @@ void Application::createPlaylistForOpenHomeSource()
     case OHProductQO::OHPR_SourcePlaylist:
     default:
     {
+        m_ohsourcetype = OHProductQO::OHPR_SourcePlaylist;
         OHPLH ohpl = m_rdr->ohpl();
         if (ohpl) {
             m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
@@ -427,6 +432,11 @@ void Application::createPlaylistForOpenHomeSource()
 void Application::onSourceTypeChanged(OHProductQO::SourceType tp)
 {
     qDebug() << "Application::onSourceTypeChanged: " << int(tp);
+    if (tp == m_ohsourcetype) {
+        qDebug() << "Application::onSourceTypeChanged: same type";
+        return;
+    }
+    
     if (!m_ohpro) {
         // Not possible cause ohpro is the sender of this signal.. anyway
         qDebug() <<"Application::onSourceTypeChanged: no OHProduct!!";
