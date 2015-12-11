@@ -25,8 +25,8 @@
 
 #include <QObject>
 #include <QApplication>
-#include "libupnpp/control/mediarenderer.hxx"
 
+#include "libupnpp/control/mediarenderer.hxx"
 #include "upqo/ohproduct_qo.h"
 
 class AVTPlayer;
@@ -41,6 +41,7 @@ class OHTimeQO;
 class OHVolumeQO;
 class Playlist;
 class RenderingControlQO;
+class SongcastTool;
 
 class Application : public QObject
 {
@@ -58,9 +59,10 @@ public:
 public slots:
     void chooseRenderer();
     void chooseSource();
+    void openSongcast();
     void reconnectOrChoose();
     void onSourceTypeChanged(OHProductQO::SourceType);
-
+    
 private:
 
     GUI_Player   *m_player;
@@ -75,7 +77,8 @@ private:
     OHProductQO  *m_ohpro;
     
     GUI_Playlist *m_ui_playlist;
-
+    SongcastTool *m_sctool;
+    
     CSettingsStorage *m_settings;
     QApplication     *m_app;
 

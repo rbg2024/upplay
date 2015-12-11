@@ -48,6 +48,8 @@ void GUI_Player::setupConnections()
             this, SIGNAL(sig_save_playlist()));
     connect(ui->actionLoad_Playlist, SIGNAL(triggered(bool)),
             this, SIGNAL(sig_load_playlist()));
+    connect(ui->actionOpen_Songcast, SIGNAL(triggered(bool)),
+            this, SIGNAL(sig_open_songcast()));
     connect(ui->action_Close, SIGNAL(triggered(bool)), this,
             SLOT(really_close(bool)));
 

@@ -37,6 +37,7 @@
 #include "GUI/prefs/prefs.h"
 #include "GUI/renderchoose/renderchoose.h"
 #include "GUI/sourcechoose/sourcechoose.h"
+#include "GUI/songcast/songcastdlg.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/Style.h"
@@ -51,6 +52,7 @@
 #include "playlist/playlistlocrd.h"
 #include "upadapt/avtadapt.h"
 #include "upadapt/ohpladapt.h"
+#include "upadapt/songcast.h"
 #include "upqo/ohproduct_qo.h"
 #include "upqo/ohradio_qo.h"
 #include "upqo/ohreceiver_qo.h"
@@ -99,7 +101,8 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 Application::Application(QApplication* qapp, QObject *parent)
     : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
       m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ohpro(0),
-      m_ui_playlist(0), m_settings(0), m_app(qapp), m_initialized(false),
+      m_ui_playlist(0), m_sctool(0), m_settings(0), m_app(qapp),
+      m_initialized(false),
       m_ohsourcetype(OHProductQO::OHPR_SourceUnknown)
 {
     m_settings = CSettingsStorage::getInstance();
@@ -281,6 +284,22 @@ void Application::chooseSourceAVT()
         m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
     }
     playlist_connections();
+}
+
+void Application::openSongcast()
+{
+    SongcastDLG *scdlg;
+    if (!m_sctool) {
+        scdlg = new SongcastDLG(m_player);
+        m_sctool = new SongcastTool(scdlg, this);
+    } else {
+        scdlg = m_sctool->dlg();
+        m_sctool->initControls();
+    }
+    if (scdlg) {
+        scdlg->hide();
+        scdlg->show();
+    }
 }
 
 void Application::reconnectOrChoose()
@@ -568,6 +587,7 @@ void Application::init_connections()
     CONNECT(m_player, show_small_playlist_items(bool),
             m_ui_playlist, psl_show_small_playlist_items(bool));
     CONNECT(m_player, sig_choose_renderer(), this, chooseRenderer());
+    CONNECT(m_player, sig_open_songcast(), this, openSongcast());
     CONNECT(m_player, sig_choose_source(), this, chooseSource());
     CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
     CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));

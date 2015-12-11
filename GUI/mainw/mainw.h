@@ -89,6 +89,7 @@ signals:
     void sig_choose_source();
     void sig_save_playlist();
     void sig_load_playlist();
+    void sig_open_songcast();
 
     /* Preferences / View */
     void show_playlists();

@@ -20,20 +20,14 @@ CONFIG  += qt warn_on thread $$buildtype
 
 
 HEADERS += \
-        GUI/widgets/directslider.h  \
         GUI/mainw/mainw.h \
         GUI/mainw/trayicon.h \
-        GUI/playerwidget/playerhwidget.h \
-        GUI/playerwidget/playervwidget.h \
         GUI/mdatawidget/mdatawidget.h \
         GUI/mdatawidget/mdatawidgetif.h \
-        GUI/volumewidget/volumewidget.h \
-        GUI/volumewidget/volumewidgetif.h \
-        GUI/volumewidget/soundslider.h  \
         GUI/playctlwidget/playctlwidget.h \
         GUI/playctlwidget/playctlwidgetif.h \
-        GUI/progresswidget/progresswidget.h \
-        GUI/progresswidget/progresswidgetif.h \
+        GUI/playerwidget/playerhwidget.h \
+        GUI/playerwidget/playervwidget.h \
         GUI/playlist/GUI_Playlist.h \
         GUI/playlist/delegate/PlaylistItemDelegate.h \
         GUI/playlist/delegate/PlaylistItemDelegateInterface.h \
@@ -46,53 +40,57 @@ HEADERS += \
         GUI/prefs/confgui.h \
         GUI/prefs/prefs.h \
         GUI/prefs/sortprefs.h \
+        GUI/progresswidget/progresswidget.h \
+        GUI/progresswidget/progresswidgetif.h \
         GUI/renderchoose/renderchoose.h \
+        GUI/songcast/songcastdlg.h \
         GUI/sourcechoose/sourcechoose.h \
+        GUI/volumewidget/soundslider.h  \
+        GUI/volumewidget/volumewidget.h \
+        GUI/volumewidget/volumewidgetif.h \
+        GUI/widgets/directslider.h  \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
         HelperStructs/Style.h \
         application.h \
-        dirbrowser/dirbrowser.h \
         dirbrowser/cdbrowser.h \
-        dirbrowser/rreaper.h \
+        dirbrowser/dirbrowser.h \
         dirbrowser/randplayer.h \
+        dirbrowser/rreaper.h \
         playlist/playlist.h \
         playlist/playlistavt.h \
+        playlist/playlistlocrd.h \
+        playlist/playlistnull.h \
         playlist/playlistohpl.h \
         playlist/playlistohrcv.h \
         playlist/playlistohrd.h \
-        playlist/playlistnull.h \
-        playlist/playlistlocrd.h \
         upadapt/avtadapt.h \
         upadapt/ohifadapt.h \
         upadapt/ohpladapt.h \
         upadapt/ohrdadapt.h \
+        upadapt/songcast.h \
         upqo/avtransport_qo.h \
         upqo/cdirectory_qo.h \
         upqo/ohinfo_qo.h \
         upqo/ohplaylist_qo.h \
+        upqo/ohproduct_qo.h \
+        upqo/ohradio_qo.h \
         upqo/ohreceiver_qo.h \
         upqo/ohtime_qo.h \
         upqo/ohvolume_qo.h \
-        upqo/ohproduct_qo.h \
-        upqo/ohradio_qo.h \
         upqo/renderingcontrol_qo.h
 
 SOURCES += \
-        GUI/widgets/directslider.cpp \
         GUI/mainw/mainw.cpp \
         GUI/mainw/mw_connections.cpp  \
         GUI/mainw/mw_controls.cpp  \
         GUI/mainw/mw_cover.cpp  \
         GUI/mainw/mw_menubar.cpp  \
         GUI/mainw/trayicon.cpp \
-        GUI/playerwidget/playerwidget.cpp \
         GUI/mdatawidget/mdatawidget.cpp \
-        GUI/volumewidget/volumewidget.cpp \
-        GUI/volumewidget/soundslider.cpp  \
         GUI/playctlwidget/playctlwidget.cpp \
-        GUI/progresswidget/progresswidget.cpp \
+        GUI/playerwidget/playerwidget.cpp \
         GUI/playlist/GUI_Playlist.cpp \
         GUI/playlist/delegate/PlaylistItemDelegate.cpp \
         GUI/playlist/entry/GUI_PlaylistEntryBig.cpp \
@@ -103,37 +101,44 @@ SOURCES += \
         GUI/prefs/confgui.cpp \
         GUI/prefs/prefs.cpp \
         GUI/prefs/sortprefs.cpp \
+        GUI/progresswidget/progresswidget.cpp \
+        GUI/songcast/songcastdlg.cpp \
+        GUI/volumewidget/soundslider.cpp  \
+        GUI/volumewidget/volumewidget.cpp \
+        GUI/widgets/directslider.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
         application.cpp \
-        dirbrowser/dirbrowser.cpp \
         dirbrowser/cdbrowser.cpp \
-        dirbrowser/rreaper.cpp \
+        dirbrowser/dirbrowser.cpp \
         dirbrowser/randplayer.cpp \
+        dirbrowser/rreaper.cpp \
         playlist/playlist.cpp \
         playlist/playlistavt.cpp \
+        playlist/playlistlocrd.cpp \
         playlist/playlistohpl.cpp \
         playlist/playlistohrd.cpp \
-        playlist/playlistlocrd.cpp \
+        upadapt/songcast.cpp \
         upadapt/upputils.cpp \
-        upqo/ohpool.cpp \
-        upplay.cpp 
+        upplay.cpp \
+        upqo/ohpool.cpp
 
 FORMS   = \
-        GUI/mainw/mainw.ui \
         GUI/mainw/mainhw.ui \
+        GUI/mainw/mainw.ui \
+        GUI/playctlwidget/playctlwidget.ui \
         GUI/playerwidget/playerhwidget.ui \
         GUI/playerwidget/playervwidget.ui \
-        GUI/playctlwidget/playctlwidget.ui \
-        GUI/progresswidget/progresswidget.ui \
-        dirbrowser/dirbrowser.ui \
         GUI/playlist/GUI_Playlist.ui \
         GUI/playlist/entry/GUI_PlaylistEntryBig.ui \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.ui \
         GUI/prefs/sortprefs.ui \
+        GUI/progresswidget/progresswidget.ui \
         GUI/renderchoose/renderchoose.ui \
-        GUI/sourcechoose/sourcechoose.ui
+        GUI/songcast/songcastdlg.ui \
+        GUI/sourcechoose/sourcechoose.ui \
+        dirbrowser/dirbrowser.ui
 
 unix {
   UI_DIR = .ui

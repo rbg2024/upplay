@@ -130,6 +130,8 @@
     <addaction name="actionSave_Playlist"/>
     <addaction name="actionLoad_Playlist"/>
     <addaction name="separator"/>
+    <addaction name="actionOpen_Songcast"/>
+    <addaction name="separator"/>
     <addaction name="action_Close"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -226,6 +228,11 @@
   <action name="actionSelect_Media_Renderer">
    <property name="text">
     <string>Select Media Renderer</string>
+   </property>
+  </action>
+  <action name="actionOpen_Songcast">
+   <property name="text">
+    <string>Open Songcast tool</string>
    </property>
   </action>
   <action name="actionSelect_OH_Source">
