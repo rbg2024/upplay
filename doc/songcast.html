@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.9" />
-<title>Upplay manual</title>
+<title>The Upplay Songcast dialog</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -733,237 +733,40 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>Upplay manual</h1>
+<h1>The Upplay Songcast dialog</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="imageblock">
 <div class="content">
-<img src="legend-upplay-main.png" alt="legend-upplay-main.png" />
+<img src="upplay-songcast.png" alt="upplay-songcast.png" />
 </div>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_player_section">Player section</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Play, Pause, Stop, Next, Previous, Seek, and Adjust volume. I would guess that
-these don&#8217;t need explanations.</p></div>
-<div class="paragraph"><p>Most elements displaying information about the current track have tooltips
-which can display a bigger and more readable version.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_playlist_section">Playlist section</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Playlist entries:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Double-click entry to play
-</p>
-</li>
-<li>
-<p>
-Click entry, then click the play button to play
-</p>
-</li>
-<li>
-<p>
-Select and drag-drop to reorder
-</p>
-</li>
-<li>
-<p>
-Right click and select <em>Remove</em> to delete current selection
-</p>
-</li>
-<li>
-<p>
-Right click and select <em>Sort by track number</em> to reorder tracks (useful
-  when tracks from an album directory were sent in wrong order by the Media
-  Server).
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Playlist buttons:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-Playlist modes select how the tracks are sequenced: normal, repeat,
-  shuffle.
-</p>
-</li>
-<li>
-<p>
-Playlist add modes determine how "Send to playlist" from the directory
-  browser will affect the playlist. By default, this inserts after the
-  current track. You can also choose to Append or Replace, and opt to
-  immediately start play for the first of the new tracks.
-</p>
-</li>
-<li>
-<p>
-The sequential number toggle will show numbers in front of the
-  entries. Not too sure what this is good for&#8230;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>You can clear the current playlist by clicking the broom icon above it on
-the right.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_directory_browser_section">Directory browser section</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>The list at the top is a hybrid path/search history section:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-When you browse a directory tree by clicking on containers, it shows
-   your location in the tree.
-</p>
-</li>
-<li>
-<p>
-If you perform searches, your search history will be stacked at the end
-   of the path. Searches are not nested, and always relative to the closest
-   directory earlier in the path. If you click a directory inside the
-   search results, it will get stacked, and any further searches will be
-   relative to this directory, not the earlier one.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Left-Clicking a track title will send it to the playlist, according to the
-current playlist add mode.</p></div>
-<div class="paragraph"><p>Left-Clicking a directory title will get you there.</p></div>
-<div class="paragraph"><p>Right-clicking a track title will propose the following actions:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<code>Back</code>
-</p>
-</li>
-<li>
-<p>
-<code>Send to playlist</code>: same as left-clicking.
-</p>
-</li>
-<li>
-<p>
-<code>Send all to playlist</code>: send all tracks from this directory.
-</p>
-</li>
-<li>
-<p>
-<code>Send all from here to playlist</code>: this track and the following ones go to
-   the playlist.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Right-clicking a directory (in the list or in the path) will propose the
-following actions:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<code>Back</code>
-</p>
-</li>
-<li>
-<p>
-<code>Send to playlist</code>: this is a recursive walk, it will send all tracks from
-  the subtree to the playlist. Don&#8217;t do this at the root of a big tree&#8230;
-</p>
-</li>
-<li>
-<p>
-`Open in new tab.
-</p>
-</li>
-<li>
-<p>
-<code>Random play by tracks</code>: this is analogous to <code>Send to playlist</code>, but the
-  list is shuffled, and sent to the Renderer by slices, so you can use a very
-  big list without swamping it.
-</p>
-</li>
-<li>
-<p>
-<code>Random play by groups</code>: this will play groups of tracks, corresponding to
-  the lowest level of directories in the subtree, typically albums, but
-  these may also be MinimServer Groups for example.
-</p>
-</li>
-<li>
-<p>
-<code>Stop random play</code>: if currently playing.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>While in "Random play by group" mode, the playlist broom tooltip displays
-the next group. Clicking the button will skip to it.</p></div>
-<div class="paragraph"><p>Right-clicking empty space will propose to go back (or up).</p></div>
-<div class="paragraph"><p>Mid-Clicking a directory from the entries list, or a search or directory in
-the path at the top will open the element in a new tab. This can be
-particularly useful if you want to go back to a previous search without
-losing the current display.</p></div>
-<div class="paragraph"><p><code>^f</code> or <code>/</code> will open the search panel, <code>Esc</code> will close it (or the x-cross
-button at the right).</p></div>
-<div class="paragraph"><p><a href="searching.html">more detail on search</a>.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_tab_bar_section">Tab bar section</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Clicking the big plus sign will open a new tab. Clicking a tab&#8217;s cross
-sign will close it&#8230;</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_menus">Menus</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>File:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<code>Change Media Renderer</code> will let you do just this. You will see a dialog
-  with the list of renderers currently seen on the network. After choosing
-  one, you may decide that the current <strong>upplay</strong> playlist will replace the
-  one or the new renderer, or be appended to it by checking the appropriate
-  places. Double-clicking a renderer will get you there too.
-</p>
-</li>
-<li>
-<p>
-<code>Select Source</code> is only activated if the current Renderer supports
-  OpenHome, and will let you select the Source among the available ones
-  (<code>Playlist</code>, <code>Radio</code> etc.).
-</p>
-</li>
-<li>
-<p>
-<code>Save / Load playlist</code> will let you save the current playlist to a local
-  file, or load one which you previously saved.
-</p>
-</li>
-<li>
-<p>
-<code>Open Songcast Tool</code> will open a dialog for managing the connections
-  between Linn Songcast Senders or Receivers. <a href="songcast.html">more
-  details here</a>.
-</p>
-</li>
-<li>
-<p>
-<code>View</code>  lets you elect to hide the right panel (directory listing), change
-   the color scheme for a dark one and other interesting experiences. Also
-   a number of Preferences can be adjusted from the appropriately named
-   submenu.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>And <code>Help</code>, there is no help&#8230;</p></div>
+<div class="paragraph"><p>The Songcast dialog lets you establish and terminate connections between
+the existing Songcast Senders or Receivers on your network.</p></div>
+<div class="paragraph"><p>Songcast Sender modules currently
+<a href="http://www.linn.co.uk/software#songcast">exist for Windows and Mac OS
+X</a>.</p></div>
+<div class="paragraph"><p>Songcast Receiver modules come with Linn hardware, or with software
+Renderers like
+<a href="http://www.lesbonscomptes.com/upmpdcli/sc2mpd.html">upmpdcli</a> or
+<a href="https://github.com/PeteManchester/MediaPlayer">MediaPlayer</a>.
+As far as I can see (disclosure: I am the author of <code>upmpdcli</code>) the
+Songcast Receiver in Upmpdcli works much better at the moment (12-2015).</p></div>
+<div class="paragraph"><p>You will see Senders listed in the top part of the dialog if there are any
+currently active on the local network.</p></div>
+<div class="paragraph"><p>The bottom part of the dialog list the Receivers, with their connected
+state.</p></div>
+<div class="paragraph"><p>If a Sender is selected in the top part, you can check the <code>Link to
+selected Sender</code> boxes, and click <code>Apply</code> to establish the connection(s).</p></div>
+<div class="paragraph"><p>Checking <code>Unlink</code> and clicking <code>Apply</code> will disconnect the selected
+Receivers.</p></div>
+<div class="paragraph"><p>You will need to close and re-open the dialog to update the lists when
+Senders appear, or Receivers appear or disappear from the network,</p></div>
+<div class="paragraph"><p>The Senders are currently not too good at advertising their demise, so you
+may be better off restarting upplay after one goes away, to avoid timeouts
+when using the dialog.</p></div>
 </div>
 </div>
 </div>
@@ -971,7 +774,7 @@ sign will close it&#8230;</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2015-12-12 16:32:31 CET
+ 2015-12-12 16:50:14 CET
 </div>
 </div>
 </body>

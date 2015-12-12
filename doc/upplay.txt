@@ -101,20 +101,25 @@ sign will close it...
 
 File:
 
-- Change Media Renderer will let you do just this. You will see a dialog
+- `Change Media Renderer` will let you do just this. You will see a dialog
   with the list of renderers currently seen on the network. After choosing
   one, you may decide that the current *upplay* playlist will replace the
   one or the new renderer, or be appended to it by checking the appropriate
   places. Double-clicking a renderer will get you there too.
-- Save / Load playlist will let you save the current playlist to a local
+- `Select Source` is only activated if the current Renderer supports
+  OpenHome, and will let you select the Source among the available ones
+  (`Playlist`, `Radio` etc.).
+- `Save / Load playlist` will let you save the current playlist to a local
   file, or load one which you previously saved.
+- `Open Songcast Tool` will open a dialog for managing the connections
+  between Linn Songcast Senders or Receivers. link:songcast.html[more
+  details here].
+- `View`  lets you elect to hide the right panel (directory listing), change
+   the color scheme for a dark one and other interesting experiences. Also
+   a number of Preferences can be adjusted from the appropriately named
+   submenu. 
 
-View:  you can elect to hide the right panel (directory listing), change
-the color scheme for a dark one and other interesting experiences.
-
-Preferences should be reasonably self-explaining.
-
-And help, there is no help...
+And `Help`, there is no help...
 
 
   
