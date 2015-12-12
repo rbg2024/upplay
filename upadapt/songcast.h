@@ -21,6 +21,7 @@
 #include <string>
 
 #include <QObject>
+#include <QString>
 
 class SongcastDLG;
 
@@ -44,7 +45,8 @@ private:
     std::string senderNameFromUri(const std::string& uri);
     int selectedSenderIdx();
     void songcastPopulate();
-
+    QString receiverLabel(int, bool);
+    
     class Internal;
     Internal *m;
 };

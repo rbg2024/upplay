@@ -56,6 +56,15 @@ SongcastTool::SongcastTool(SongcastDLG *dlg, QObject *parent)
     initControls();
 }
 
+static void btnSzPolicy(QWidget *w)
+{
+    QSizePolicy szPol(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    szPol.setHorizontalStretch(0);
+    szPol.setVerticalStretch(0);
+    szPol.setHeightForWidth(w->sizePolicy().hasHeightForWidth());
+    w->setSizePolicy(szPol);
+}
+
 void SongcastTool::initControls()
 {
     QLayoutItem *child;
@@ -81,6 +90,7 @@ void SongcastTool::initControls()
             
         for (unsigned int i = 0; i < m->senders.size(); i++) {
             btn = new QRadioButton(m->dlg->sndGroupBox);
+            btnSzPolicy(btn);
             connect(btn, SIGNAL(toggled(bool)), this, SLOT(enableOnButtons()));
             lbl = new QLabel(m->dlg->sndGroupBox);
             lbl->setText(u8s2qs(m->senders[i].nm));
@@ -99,17 +109,16 @@ void SongcastTool::initControls()
         for (unsigned int i = 0; i < m->receivers.size(); i++) {
             on = new UncheckCheckBox(tr("Link to selected Sender"),
                                m->dlg->rcvGroupBox);
+            btnSzPolicy(on);
             off = new UncheckCheckBox(tr("Unlink"), m->dlg->rcvGroupBox);
+            btnSzPolicy(off);
             lbl = new QLabel(m->dlg->rcvGroupBox);
-            QString rcvdesc(u8s2qs(m->receivers[i].nm));
+
             ReceiverState::SCState st(m->receivers[i].state);
             bool isconnected = st == ReceiverState::SCRS_STOPPED ||
                 st ==  ReceiverState::SCRS_PLAYING;
-            if (isconnected) {
-                string snm = senderNameFromUri(m->receivers[i].uri);
-                rcvdesc += tr(" (connected to: ") + u8s2qs(snm) + ")";
-            }
-            lbl->setText(rcvdesc);
+            lbl->setText(receiverLabel(i, isconnected));
+
             m->dlg->rcvGridLayout->addWidget(off, i, 0, 1, 1);
             on->setEnabled(false);
             off->setEnabled(isconnected);
@@ -196,6 +205,17 @@ void SongcastTool::enableOnButtons()
     }
 }
 
+QString SongcastTool::receiverLabel(int i, bool isconnected)
+{
+    QString rcvdesc("<b>");
+    rcvdesc += u8s2qs(m->receivers[i].nm + "</b>");
+    if (isconnected) {
+        string snm = senderNameFromUri(m->receivers[i].uri);
+        rcvdesc += tr(" (connected to: ") + u8s2qs(snm) + ")";
+    }
+    return rcvdesc;
+}
+
 // Synchronize ui state with actual receiver state. This will not list
 // new devices or delete old ones.
 void SongcastTool::syncReceivers()
@@ -218,18 +238,15 @@ void SongcastTool::syncReceivers()
         string udn = m->receivers[i].UDN;
         getReceiverState(udn, m->receivers[i], false);
 
-        QString rcvdesc(u8s2qs(m->receivers[i].nm));
         ReceiverState::SCState st(m->receivers[i].state);
         bool isconnected = st == ReceiverState::SCRS_STOPPED ||
             st ==  ReceiverState::SCRS_PLAYING;
         if (isconnected) {
-            string snm = senderNameFromUri(m->receivers[i].uri);
-            rcvdesc += tr(" (connected to: ") + u8s2qs(snm) + ")";
             on->setEnabled(false);
         } else {
             on->setEnabled(senderidx >= 0);
         }
-        lbl->setText(rcvdesc);
+        lbl->setText(receiverLabel(i, isconnected));
         off->setEnabled(isconnected);
     }
 }

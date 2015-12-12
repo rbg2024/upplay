@@ -151,6 +151,10 @@ GUI/progresswidget/pw.pro
 GUI/renderchoose/
 GUI/renderchoose/renderchoose.h
 GUI/renderchoose/renderchoose.ui
+GUI/songcast/
+GUI/songcast/songcastdlg.cpp
+GUI/songcast/songcastdlg.h
+GUI/songcast/songcastdlg.ui
 GUI/sourcechoose/
 GUI/sourcechoose/sourcechoose.h
 GUI/sourcechoose/sourcechoose.ui
@@ -237,6 +241,8 @@ upadapt/md5.hxx
 upadapt/ohifadapt.h
 upadapt/ohpladapt.h
 upadapt/ohrdadapt.h
+upadapt/songcast.cpp
+upadapt/songcast.h
 upadapt/upputils.cpp
 upadapt/upputils.h
 upplay.cpp

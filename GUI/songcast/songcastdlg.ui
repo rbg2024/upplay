@@ -30,6 +30,12 @@
        <layout class="QGridLayout" name="sndGridLayout">
         <item row="0" column="0">
          <widget class="QRadioButton" name="initsbutton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>RadioButton</string>
           </property>
@@ -70,6 +76,12 @@
         </item>
         <item row="0" column="0">
          <widget class="QCheckBox" name="initrbutton1">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Turn off</string>
           </property>
@@ -77,6 +89,12 @@
         </item>
         <item row="0" column="1">
          <widget class="QCheckBox" name="initrbutton2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Associate</string>
           </property>
