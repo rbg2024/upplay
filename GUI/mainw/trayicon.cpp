@@ -42,9 +42,9 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     m_playing = false;
     m_mute = false;
 
-    QIcon play_icon = QIcon(Helper::getIconPath("/play.png"));
-    QIcon pause_icon = QIcon(Helper::getIconPath("/pause.png"));
-    QIcon sayo_icon = QIcon(Helper::getIconPath("/logo.png"));
+    QIcon play_icon = QIcon(Helper::getIconPath("play.png"));
+    QIcon pause_icon = QIcon(Helper::getIconPath("pause.png"));
+    QIcon sayo_icon = QIcon(Helper::getIconPath("logo.png"));
     QPixmap play_pixmap = play_icon.pixmap(24, 24);
     QPixmap pause_pixmap = pause_icon.pixmap(24, 24);
     QPixmap sayo_pixmap = sayo_icon.pixmap(24, 24);
