@@ -19,9 +19,6 @@
 #include <iostream>
 #include <vector>
 
-#include <QLabel>
-#include <QCheckBox>
-#include <QRadioButton>
 #include <QTimer>
 #include <QDebug>
 
@@ -33,9 +30,6 @@
 using namespace std;
 using namespace UPnPClient;
 using namespace Songcast;
-
-static const int RCVWPERLINE = 3;
-static const int SNDWPERLINE = 2;
 
 class SongcastTool::Internal {
 public:
@@ -51,85 +45,20 @@ SongcastTool::SongcastTool(SongcastDLG *dlg, QObject *parent)
     m->dlg = dlg;
     connect(m->dlg, SIGNAL(sig_apply(SongcastDLG*)),
             this, SLOT(onSongcastApply()));
-    connect(m->dlg, SIGNAL(accepted()),
-            this, SLOT(onSongcastApply()));
+    connect(m->dlg, SIGNAL(accepted()), this, SLOT(onSongcastApply()));
     initControls();
-}
-
-static void btnSzPolicy(QWidget *w)
-{
-    QSizePolicy szPol(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    szPol.setHorizontalStretch(0);
-    szPol.setVerticalStretch(0);
-    szPol.setHeightForWidth(w->sizePolicy().hasHeightForWidth());
-    w->setSizePolicy(szPol);
 }
 
 void SongcastTool::initControls()
 {
-    QLayoutItem *child;
-    while ((child = m->dlg->sndGridLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
-    }
-    while ((child = m->dlg->rcvGridLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
-    }
-    m->dlg->sndGridLayout->update();
-    m->dlg->rcvGridLayout->update();
     listSenders(m->senders);
     listReceivers(m->receivers);
-
-    if (m->senders.size() == 0) {
-        QLabel *lbl = new QLabel(tr("No Songcast Senders found"), m->dlg);
-        m->dlg->sndGridLayout->addWidget(lbl, 0, 0, 1, 1);
-    } else {
-        QLabel *lbl;
-        QRadioButton *btn;
-            
-        for (unsigned int i = 0; i < m->senders.size(); i++) {
-            btn = new QRadioButton(m->dlg->sndGroupBox);
-            btnSzPolicy(btn);
-            connect(btn, SIGNAL(toggled(bool)), this, SLOT(enableOnButtons()));
-            lbl = new QLabel(m->dlg->sndGroupBox);
-            lbl->setText(u8s2qs(m->senders[i].nm));
-            m->dlg->sndGridLayout->addWidget(btn, i, 0, 1, 1);
-            m->dlg->sndGridLayout->addWidget(lbl, i, 1, 1, 1);
-        }
+    m->dlg->createControls(m->senders.size(), m->receivers.size());
+    for (unsigned int i = 0; i < m->senders.size(); i++) {
+        connect(m->dlg->senderButton(i), SIGNAL(toggled(bool)),
+                this, SLOT(enableOnButtons()));
     }
-
-    if (m->receivers.size() == 0) {
-        QLabel *lbl = new QLabel(tr("No Songcast Receivers found"), m->dlg);
-        m->dlg->rcvGridLayout->addWidget(lbl, 0, 0, 1, 1);
-    } else {
-        QLabel *lbl;
-        UncheckCheckBox *on, *off;
-            
-        for (unsigned int i = 0; i < m->receivers.size(); i++) {
-            on = new UncheckCheckBox(tr("Link to selected Sender"),
-                               m->dlg->rcvGroupBox);
-            btnSzPolicy(on);
-            off = new UncheckCheckBox(tr("Unlink"), m->dlg->rcvGroupBox);
-            btnSzPolicy(off);
-            lbl = new QLabel(m->dlg->rcvGroupBox);
-
-            ReceiverState::SCState st(m->receivers[i].state);
-            bool isconnected = st == ReceiverState::SCRS_STOPPED ||
-                st ==  ReceiverState::SCRS_PLAYING;
-            lbl->setText(receiverLabel(i, isconnected));
-
-            m->dlg->rcvGridLayout->addWidget(off, i, 0, 1, 1);
-            on->setEnabled(false);
-            off->setEnabled(isconnected);
-            m->dlg->rcvGridLayout->addWidget(on,  i, 1, 1, 1);
-            m->dlg->rcvGridLayout->addWidget(lbl, i, 2, 1, 1);
-            connect(on, SIGNAL(toggled(bool)),
-                    off, SLOT(setUnChecked(bool)));
-            connect(off, SIGNAL(toggled(bool)),
-                    on, SLOT(setUnChecked(bool)));
-        }
-    }
+    syncReceivers();
 }
 
 SongcastDLG *SongcastTool::dlg()
@@ -146,38 +75,14 @@ string SongcastTool::senderNameFromUri(const string& uri)
     return string();
 }
 
-int SongcastTool::selectedSenderIdx()
-{
-    int senderidx = -1;
-    // Note: quite unbelievably, gridLayout::rowCount() is not the number
-    // of actual rows, but the size of the internal allocation. So can't use it
-    // after deleting rows...
-    for (int i = 0; i < m->dlg->sndGridLayout->count() / SNDWPERLINE; i++) {
-        QRadioButton *btn = (QRadioButton*)
-            m->dlg->sndGridLayout->itemAtPosition(i, 0)->widget();
-        if (btn->isChecked()) {
-            senderidx = i;
-            break;
-        }
-    }
-    return senderidx;
-}
-
 void SongcastTool::onSongcastApply()
 {
-    int senderidx = selectedSenderIdx();
-    // Note: quite unbelievably, gridLayout::rowCount() is not the number
-    // of actual rows, but the size of the internal allocation. So can't use it
-    // after deleting rows...
-    for (int i = 0; i < m->dlg->rcvGridLayout->count() / RCVWPERLINE; i++) {
-        UncheckCheckBox *off = (UncheckCheckBox*)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 0)->widget();
-        UncheckCheckBox *on = (UncheckCheckBox*)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 1)->widget();
+    int senderidx = m->dlg->selectedSenderIdx();
 
-        if (off->isChecked()) {
+    for (unsigned int i = 0; i < m->receivers.size(); i++) {
+        if (m->dlg->receiverOffRequested(i)) {
             stopReceiver(m->receivers[i]);
-        } else  if (senderidx != -1  && on->isChecked()) {
+        } else  if (senderidx != -1 && m->dlg->receiverOnRequested(i)) {
             setReceiverPlaying(m->receivers[i],
                                m->senders[senderidx].uri,
                                m->senders[senderidx].meta);
@@ -186,26 +91,20 @@ void SongcastTool::onSongcastApply()
     QTimer::singleShot(500, this, SLOT(syncReceivers()));
 }
 
-// This is called when a sender is selected.
+// This is called when a sender is selected, to enable appropriate on buttons
 void SongcastTool::enableOnButtons()
 {
-    int senderidx = selectedSenderIdx();
-    // Note: quite unbelievably, gridLayout::rowCount() is not the
-    // number of actual rows, but the size of the internal
-    // allocation. So can't use it after deleting rows...
-    qDebug() << "SongcastTool::enableOnButtons() rows: " <<
-        m->dlg->rcvGridLayout->count() / RCVWPERLINE;
-    for (int i = 0; i < m->dlg->rcvGridLayout->count() / RCVWPERLINE; i++) {
+    int senderidx = m->dlg->selectedSenderIdx();
+
+    for (unsigned int i = 0; i < m->receivers.size(); i++) {
         ReceiverState::SCState st(m->receivers[i].state);
         bool isconnected = st == ReceiverState::SCRS_STOPPED ||
             st ==  ReceiverState::SCRS_PLAYING;
-        UncheckCheckBox *on = (UncheckCheckBox *)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 1)->widget();
-        on->setEnabled(!isconnected && senderidx >= 0);
+        m->dlg->receiverOnButton(i)->setEnabled(!isconnected && senderidx >= 0);
     }
 }
 
-QString SongcastTool::receiverLabel(int i, bool isconnected)
+QString SongcastTool::receiverText(int i, bool isconnected)
 {
     QString rcvdesc("<b>");
     rcvdesc += u8s2qs(m->receivers[i].nm + "</b>");
@@ -217,36 +116,25 @@ QString SongcastTool::receiverLabel(int i, bool isconnected)
 }
 
 // Synchronize ui state with actual receiver state. This will not list
-// new devices or delete old ones.
+// new devices or delete old ones. Also set the senders names (this is
+// used right after creating the grids)
 void SongcastTool::syncReceivers()
 {
-    cerr << "SongcastTool::syncReceivers()\n";
-    int senderidx = selectedSenderIdx();
-    QLabel *lbl;
-    UncheckCheckBox *on, *off;
+    int senderidx = m->dlg->selectedSenderIdx();
+
+    for (unsigned int i = 0; i < m->senders.size(); i++) {
+        m->dlg->senderLabel(i)->setText(u8s2qs(m->senders[i].nm));
+    }
             
     for (unsigned int i = 0; i < m->receivers.size(); i++) {
-        off = (UncheckCheckBox *)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 0)->widget();
-        on = (UncheckCheckBox *)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 1)->widget();
-        lbl = (QLabel*)
-            m->dlg->rcvGridLayout->itemAtPosition(i, 2)->widget();
-        on->setChecked(false);
-        off->setChecked(false);
-        
         string udn = m->receivers[i].UDN;
         getReceiverState(udn, m->receivers[i], false);
-
         ReceiverState::SCState st(m->receivers[i].state);
         bool isconnected = st == ReceiverState::SCRS_STOPPED ||
             st ==  ReceiverState::SCRS_PLAYING;
-        if (isconnected) {
-            on->setEnabled(false);
-        } else {
-            on->setEnabled(senderidx >= 0);
-        }
-        lbl->setText(receiverLabel(i, isconnected));
-        off->setEnabled(isconnected);
+
+        m->dlg->receiverOffButton(i)->setEnabled(isconnected);
+        m->dlg->receiverOnButton(i)->setEnabled(!isconnected && senderidx >= 0);
+        m->dlg->receiverLabel(i)->setText(receiverText(i, isconnected));
     }
 }

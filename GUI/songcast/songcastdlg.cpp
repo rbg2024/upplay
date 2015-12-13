@@ -20,6 +20,9 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 
+const int SongcastDLG::SNDWPERLINE = 2;
+const int SongcastDLG::RCVWPERLINE = 3;
+
 
 void SongcastDLG::init()
 {
@@ -33,7 +36,124 @@ void SongcastDLG::init()
     delete initrlabel;
 }
 
+static void btnSzPolicy(QWidget *w)
+{
+    QSizePolicy szPol(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    szPol.setHorizontalStretch(0);
+    szPol.setVerticalStretch(0);
+    szPol.setHeightForWidth(w->sizePolicy().hasHeightForWidth());
+    w->setSizePolicy(szPol);
+}
+
+void SongcastDLG::createControls(unsigned int numsenders,
+                                 unsigned int numreceivers)
+{
+    QLayoutItem *child;
+    while ((child = sndGridLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+    while ((child = rcvGridLayout->takeAt(0)) != 0) {
+        delete child->widget();
+        delete child;
+    }
+
+    if (numsenders == 0) {
+        QLabel *lbl = new QLabel(tr("No Songcast Senders found"), this);
+        sndGridLayout->addWidget(lbl, 0, 0, 1, 1);
+    } else {
+        QLabel *lbl;
+        QRadioButton *btn;
+            
+        for (unsigned int i = 0; i < numsenders; i++) {
+            btn = new QRadioButton(sndGroupBox);
+            btnSzPolicy(btn);
+            lbl = new QLabel(sndGroupBox);
+            sndGridLayout->addWidget(btn, i, 0, 1, 1);
+            sndGridLayout->addWidget(lbl, i, 1, 1, 1);
+        }
+    }
+
+    if (numreceivers == 0) {
+        QLabel *lbl = new QLabel(tr("No Songcast Receivers found"), this);
+        rcvGridLayout->addWidget(lbl, 0, 0, 1, 1);
+    } else {
+        QLabel *lbl;
+        UncheckCheckBox *on, *off;
+            
+        for (unsigned int i = 0; i < numreceivers; i++) {
+            on = new UncheckCheckBox(tr("Link to selected Sender"),rcvGroupBox);
+            btnSzPolicy(on);
+            off = new UncheckCheckBox(tr("Unlink"), rcvGroupBox);
+            btnSzPolicy(off);
+            lbl = new QLabel(rcvGroupBox);
+
+            rcvGridLayout->addWidget(off, i, 0, 1, 1);
+            rcvGridLayout->addWidget(on,  i, 1, 1, 1);
+            rcvGridLayout->addWidget(lbl, i, 2, 1, 1);
+            connect(on, SIGNAL(toggled(bool)), off, SLOT(setUnChecked(bool)));
+            connect(off, SIGNAL(toggled(bool)), on, SLOT(setUnChecked(bool)));
+        }
+    }
+}
+
+int SongcastDLG::numReceiverRows()
+{
+    return rcvGridLayout->count() / SongcastDLG::RCVWPERLINE;
+}
+int SongcastDLG::numSenderRows()
+{
+    return sndGridLayout->count() / SongcastDLG::SNDWPERLINE;
+}
+
 void SongcastDLG::apply()
 {
     emit sig_apply(this);
+}
+
+int SongcastDLG::selectedSenderIdx()
+{
+    int senderidx = -1;
+    // Note: quite unbelievably, gridLayout::rowCount() is not the number
+    // of actual rows, but the size of the internal allocation. So can't use it
+    // after deleting rows...
+    for (int i = 0; i < numSenderRows(); i++) {
+        QRadioButton *btn = (QRadioButton*)
+            sndGridLayout->itemAtPosition(i, 0)->widget();
+        if (btn->isChecked()) {
+            senderidx = i;
+            break;
+        }
+    }
+    return senderidx;
+}
+
+bool SongcastDLG::receiverOnRequested(unsigned int i)
+{
+    return receiverOnButton(i)->isChecked();
+}
+bool SongcastDLG::receiverOffRequested(unsigned int i)
+{
+    return receiverOffButton(i)->isChecked();
+}
+
+UncheckCheckBox* SongcastDLG::receiverOffButton(int row)
+{
+    return (UncheckCheckBox*)rcvGridLayout->itemAtPosition(row, 0)->widget();
+}
+UncheckCheckBox* SongcastDLG::receiverOnButton(int row)
+{
+    return (UncheckCheckBox*)rcvGridLayout->itemAtPosition(row, 1)->widget();
+}
+QLabel* SongcastDLG::receiverLabel(int row)
+{
+    return (QLabel *)rcvGridLayout->itemAtPosition(row, 2)->widget();
+}
+QCheckBox* SongcastDLG::senderButton(int row)
+{
+    return (QCheckBox *)sndGridLayout->itemAtPosition(row, 0)->widget();
+}
+QLabel* SongcastDLG::senderLabel(int row)
+{
+    return (QLabel *)sndGridLayout->itemAtPosition(row, 1)->widget();
 }

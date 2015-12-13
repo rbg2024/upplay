@@ -21,6 +21,8 @@
 
 #include <QCheckBox>
 
+class UncheckCheckBox;
+
 class SongcastDLG : public QDialog, public Ui::SongcastDLG {
     Q_OBJECT;
 
@@ -31,6 +33,27 @@ public:
 	setupUi(this);
         init();
     }
+
+    void createControls(unsigned int numsenders, unsigned int numreceivers);
+    
+    // Return index of checked sender, or -1 (at most one can be checked)
+    int selectedSenderIdx();
+
+    bool receiverOnRequested(unsigned int i);
+    bool receiverOffRequested(unsigned int i);
+    QCheckBox* senderButton(int row);
+    QLabel* senderLabel(int row);
+    UncheckCheckBox* receiverOffButton(int row);
+    UncheckCheckBox* receiverOnButton(int row);
+    QLabel* receiverLabel(int row);
+    
+    // These are needed, because gridLayout::numRows is unreliable...
+    static const int SNDWPERLINE;
+    static const int RCVWPERLINE;
+
+    int numSenderRows();
+    int numReceiverRows();
+                         
 public slots:
     void apply();
 signals:
