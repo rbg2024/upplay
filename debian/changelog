@@ -1,3 +1,11 @@
+upplay (1.2.0-1) unstable; urgency=low
+
+  * OpenHome renderer Source selection
+  * Songcast Sender/Receiver connection management tool
+  * (Internal) code cleanup.
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 13 Dec 2015 19:01:00 +0100
+
 upplay (1.1.0-1) unstable; urgency=low
 
   * More preferences (directory: display artists with albums lists,

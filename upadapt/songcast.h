@@ -43,7 +43,6 @@ private slots:
 
 private:
     std::string senderNameFromUri(const std::string& uri);
-    int selectedSenderIdx();
     void songcastPopulate();
     QString receiverText(int, bool);
     

@@ -211,9 +211,12 @@ doc/legend-upplay-main.png
 doc/legend-upplay-main.xcf
 doc/searching.html
 doc/searching.txt
+doc/songcast.html
+doc/songcast.txt
 doc/upplay-mingw.html
 doc/upplay-mingw.txt
 doc/upplay-releases.txt
+doc/upplay-songcast.png
 doc/upplay.html
 doc/upplay.txt
 excludefile
