@@ -1,5 +1,13 @@
 = Upplay release history
 
+== Version 1.2
+
+- Support for the OpenHome Radio service (e.g. when controlling
+  MediaPlayer).
+- Support for switching to an arbitrary Source on an OpenHome Renderer.
+- New tool for setting up and terminating multiple Linn Songcast
+  Sender-Receiver connections.
+  
 == Version 1.1
 
 - Tooltips to help read the information in the "currently playing" area.
