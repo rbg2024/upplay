@@ -232,7 +232,7 @@ void Application::chooseSourceOH()
     vector<int> rowtoidx;
     SourceChooseDLG dlg(m_player);
     for (unsigned int i = 0; i < srcs.size(); i++) {
-        QString stype = u8s2qs(srcs[i].type);
+        QString stype = u8s2qs(srcs[i].type + "\t(" + srcs[i].name + ")");
         if (int(i) == cur) {
             QListWidgetItem *item = new QListWidgetItem(stype);
             QFont font = dlg.rndsLW->font();
