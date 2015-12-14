@@ -232,6 +232,8 @@ void Application::chooseSourceOH()
     vector<int> rowtoidx;
     SourceChooseDLG dlg(m_player);
     for (unsigned int i = 0; i < srcs.size(); i++) {
+        if (!srcs[i].visible)
+            continue;
         QString stype = u8s2qs(srcs[i].type + "\t(" + srcs[i].name + ")");
         if (int(i) == cur) {
             QListWidgetItem *item = new QListWidgetItem(stype);
@@ -239,11 +241,10 @@ void Application::chooseSourceOH()
             font.setBold(true);
             item->setFont(font);
             dlg.rndsLW->addItem(item);
-            rowtoidx.push_back(i);
         } else {
-            rowtoidx.push_back(i);
             dlg.rndsLW->addItem(stype);
         }
+        rowtoidx.push_back(i);
     }
     if (!dlg.exec()) {
         return;
