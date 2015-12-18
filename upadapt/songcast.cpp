@@ -133,6 +133,8 @@ void SongcastTool::syncReceivers()
         bool isconnected = st == ReceiverState::SCRS_STOPPED ||
             st ==  ReceiverState::SCRS_PLAYING;
 
+        m->dlg->receiverOffButton(i)->setChecked(false);
+        m->dlg->receiverOnButton(i)->setChecked(false);
         m->dlg->receiverOffButton(i)->setEnabled(isconnected);
         m->dlg->receiverOnButton(i)->setEnabled(!isconnected && senderidx >= 0);
         m->dlg->receiverLabel(i)->setText(receiverText(i, isconnected));
