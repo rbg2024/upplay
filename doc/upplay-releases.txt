@@ -7,7 +7,9 @@
 - Support for switching to an arbitrary Source on an OpenHome Renderer.
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
-  
+
+1.2.1: Small fixes for Songcast tool: buttons checked state was not reset.
+
 == Version 1.1
 
 - Tooltips to help read the information in the "currently playing" area.

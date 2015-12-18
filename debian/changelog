@@ -1,3 +1,9 @@
+upplay (1.2.1-1) unstable; urgency=low
+
+  * Fixed Songcast tool issue (checked state of buttons not reset)
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 18 Dec 2015 16:13:00 +0100
+
 upplay (1.2.0-1) unstable; urgency=low
 
   * OpenHome renderer Source selection
