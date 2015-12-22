@@ -257,8 +257,6 @@ void Application::chooseSourceOH()
     }
     int idx = rowtoidx[row];
     if (idx != cur) {
-        m_playlist->psl_stop();
-        m_player->stopped();
         m_ohpro->setSourceIndex(idx);
     }
 }
