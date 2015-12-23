@@ -27,8 +27,15 @@
 
 void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
 {
-    // qDebug() << "GUI_Player::sl_cover_fetch_done";
+    //qDebug() << "GUI_Player::sl_cover_fetch_done";
+
+    if (reply != (QNetworkReply*)m_currentCoverReply) {
+        // Ignore answers to older requests
+        reply->deleteLater();
+        return;
+    }
     if (reply->error() != QNetworkReply::NoError) {
+        reply->deleteLater();
         sl_no_cover_available();
         return;
     }
@@ -53,6 +60,7 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     } else {
         qDebug() << "GUI_Player::sl_cover_fetch_done: unsupported mime type: "<<
             smime;
+        reply->deleteLater();
         sl_no_cover_available();
         return;
     }
@@ -76,6 +84,7 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     QImage image;
     if (!image.loadFromData(imdata, imtype)) {
         qDebug() << "GUI_Player::sl_cover_fetch_done: image read failed ";
+        reply->deleteLater();
         sl_no_cover_available();
         return;
     }
@@ -90,7 +99,6 @@ void GUI_Player::sl_cover_fetch_done(QNetworkReply* reply)
     htmlfrag += "\">";
     ui->player_w->albumCover->setToolTip(htmlfrag);
 
-    ui->player_w->albumCover->repaint();
     reply->deleteLater();
 }
 
@@ -99,4 +107,5 @@ void GUI_Player::sl_no_cover_available()
 {
     QString coverpath = Helper::getIconPath("logo.png");
     ui->player_w->albumCover->setIcon(QIcon(coverpath));
+    ui->player_w->albumCover->setToolTip("");
 }

@@ -71,7 +71,8 @@ void GUI_Player::idleDisplay()
     this->setWindowTitle("Upplay");
     ui->player_w->progress()->setUi(0);
 
-    ui->player_w->albumCover->setIcon(QIcon(Helper::getIconPath("logo.png")));
+    m_currentCoverReply = 0;
+    sl_no_cover_available();
 }
 
 void GUI_Player::onBackwardActivated()

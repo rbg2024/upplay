@@ -61,7 +61,8 @@ void signal_handler(int sig)
 #endif
 
 GUI_Player::GUI_Player(Application *upapp, QWidget *parent) :
-    QMainWindow(parent), m_upapp(upapp), ui(new Ui::Upplay), m_covertempfile(0)
+    QMainWindow(parent), m_upapp(upapp), ui(new Ui::Upplay), m_covertempfile(0),
+    m_currentCoverReply(0)
 {
     ui->setupUi(this);
 
@@ -174,8 +175,8 @@ void GUI_Player::update_track(const MetaData& md)
     if (!md.albumArtURI.isEmpty()) {
         fetch_cover(md.albumArtURI);
     } else {
-        ui->player_w->albumCover->setIcon(
-            QIcon(Helper::getIconPath("logo.png")));
+        m_currentCoverReply = 0;
+        sl_no_cover_available();
     }
 
     ui->player_w->progress()->setEnabled(true);
@@ -192,9 +193,10 @@ void GUI_Player::update_track(const MetaData& md)
 void GUI_Player::fetch_cover(const QString& URI)
 {
     if (!m_netmanager) {
+        m_currentCoverReply = 0;
         return;
     }
-    m_netmanager->get(QNetworkRequest(QUrl(URI)));
+    m_currentCoverReply = m_netmanager->get(QNetworkRequest(QUrl(URI)));
 }
 
 void GUI_Player::setStyle(int style)

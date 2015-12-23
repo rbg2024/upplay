@@ -176,6 +176,8 @@ private:
     int                 m_library_stretch_factor;
     CSettingsStorage*   m_settings;
     QTemporaryFile*     m_covertempfile;
+    // Last request for cover data: ignore others
+    void                *m_currentCoverReply; 
 
     void setupTrayActions ();
     void idleDisplay();
