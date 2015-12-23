@@ -7,7 +7,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 #QT += script widgets network webenginewidgets
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 1.2.1
+VERSION = 1.2.2
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
