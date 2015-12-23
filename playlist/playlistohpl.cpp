@@ -58,7 +58,8 @@ static bool samelist(const MetaDataList& mdv1, const MetaDataList& mdv2)
     if (mdv1.size() != mdv2.size())
         return false;
     for (unsigned int i = 0; i < mdv1.size(); i++) {
-        if (mdv1[i].filepath.compare(mdv2[i].filepath))
+        if (mdv1[i].filepath.compare(mdv2[i].filepath) ||
+            mdv1[i].id != mdv2[i].id)
             return false;
     }
     return true;

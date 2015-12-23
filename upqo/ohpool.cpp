@@ -91,6 +91,14 @@ bool ohupdmetapool(const vector<int>& nids, int curid,
         }
         i += j;
     }
+
+#if 0
+    qDebug() << "Metadata Pool now: ";
+    for (STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::const_iterator it
+             =  metapool.begin(); it != metapool.end(); it++) {
+        qDebug() << it->first << it->second.m_title.c_str();
+    }
+#endif
     return true;
 }
 
