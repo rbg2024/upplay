@@ -458,9 +458,9 @@ void Application::createPlaylistForOpenHomeSource()
 
 void Application::onSourceTypeChanged(OHProductQO::SourceType tp)
 {
-    qDebug() << "Application::onSourceTypeChanged: " << int(tp);
+    //qDebug() << "Application::onSourceTypeChanged: " << int(tp);
     if (tp == m_ohsourcetype) {
-        qDebug() << "Application::onSourceTypeChanged: same type";
+        //qDebug() << "Application::onSourceTypeChanged: same type";
         return;
     }
     

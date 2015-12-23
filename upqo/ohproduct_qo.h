@@ -42,7 +42,7 @@ public:
 
     virtual void changed(const char *nm, int value)
     {
-        qDebug() << "OHProductQo: Changed: " << nm << " (int): " << value;
+        //qDebug() << "OHProductQo: Changed: " << nm << " (int): " << value;
         if (!strcmp(nm, "SourceIndex")) {
             emit _sourceIndexChanged(value);
         } 
@@ -56,6 +56,7 @@ public:
     enum SourceType{OHPR_SourceUnknown, OHPR_SourcePlaylist, OHPR_SourceRadio,
                     OHPR_SourceReceiver};
     SourceType srcStringToType(const std::string& stype) {
+        qDebug() << "OHProductQO::getSourceType: " << stype.c_str();
         if (!stype.compare("Playlist")) {
             return OHPR_SourcePlaylist;
         } else if (!stype.compare("Radio")) {
