@@ -1,3 +1,10 @@
+upplay (1.2.2-1) unstable; urgency=low
+
+  * Improve updates of playlist and cover image when the renderer source
+    changes 
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Wed, 23 Dec 2015 17:41:00 +0100
+
 upplay (1.2.1-1) unstable; urgency=low
 
   * Fixed Songcast tool issue (checked state of buttons not reset)
