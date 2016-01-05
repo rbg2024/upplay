@@ -57,6 +57,12 @@ void UPPrefs::onShowPrefs()
         m_w = new ConfTabsW(m_parent, "UPPlay Preferences", &lnkfact);
         int idx = m_w->addPanel("Application");
 
+        // Specify network interface ?
+        m_w->addParam(idx, ConfTabsW::CFPT_STR, "netifname",
+                      "Network interface name (needs restart)",
+                      "Specify network interface to use, or leave blank to "
+                      "use the first or only appropriate interface");
+        
         // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
