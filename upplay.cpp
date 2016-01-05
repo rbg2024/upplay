@@ -30,6 +30,7 @@ using namespace std;
 #include <QMessageBox>
 
 #include <libupnpp/upnpplib.hxx>
+#include <libupnpp/upnpputils.hxx>
 #include <libupnpp/log.hxx>
 
 #include "application.h"
@@ -128,6 +129,11 @@ int main(int argc, char **argv)
                 return 1;
             }
         }
+    }
+    vector<string> adapters;
+    UPnPP::getAdapterNames(adapters);
+    for (unsigned int i = 0; i < adapters.size(); i++) {
+        cerr << "ADAPTER: " << adapters[i] << endl;
     }
 
     if ((cp = getenv("UPPLAY_UPNPLOGFILENAME"))) {
