@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Upplay"
-#define MyAppVersion "1.2.1-w1"
+#define MyAppVersion "1.3.0-w1"
 #define MyAppPublisher "J.F. Dockes"
 #define MyAppURL "http://www.lesbonscomptes.com/upplay"
 #define MyAppExeName "upplay.exe"
