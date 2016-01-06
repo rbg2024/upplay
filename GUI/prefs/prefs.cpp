@@ -4,6 +4,9 @@
 #include <QSettings>
 #include <QDebug>
 
+#include <libupnpp/upnpputils.hxx>
+
+#include "upadapt/upputils.h"
 #include "prefs.h"
 #include "confgui.h"
 #include "sortprefs.h"
@@ -57,11 +60,19 @@ void UPPrefs::onShowPrefs()
         m_w = new ConfTabsW(m_parent, "UPPlay Preferences", &lnkfact);
         int idx = m_w->addPanel("Application");
 
+        vector<string> adapters;
+        UPnPP::getAdapterNames(adapters);
+        QStringList qadapters;
+        qadapters.push_back("");
+        for (unsigned int i = 0; i < adapters.size(); i++) {
+            qadapters.push_back(u8s2qs(adapters[i]));
+        }
         // Specify network interface ?
-        m_w->addParam(idx, ConfTabsW::CFPT_STR, "netifname",
+        m_w->addParam(idx, ConfTabsW::CFPT_CSTR, "netifname",
                       "Network interface name (needs restart)",
                       "Specify network interface to use, or leave blank to "
-                      "use the first or only appropriate interface");
+                      "use the first or only appropriate interface",
+                      0, 0, &qadapters);
         
         // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",

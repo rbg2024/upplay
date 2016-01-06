@@ -130,11 +130,6 @@ int main(int argc, char **argv)
             }
         }
     }
-    vector<string> adapters;
-    UPnPP::getAdapterNames(adapters);
-    for (unsigned int i = 0; i < adapters.size(); i++) {
-        cerr << "ADAPTER: " << adapters[i] << endl;
-    }
 
     if ((cp = getenv("UPPLAY_UPNPLOGFILENAME"))) {
         char *cp1 = getenv("UPPLAY_UPNPLOGLEVEL");
