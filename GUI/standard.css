@@ -29,6 +29,9 @@ QPushButton[flat=true]:pressed{
                                       stop:1 rgba(255, 255, 255, 0));
 }
 
+/* Note that having a minimal resource file and setting the button here
+   was the only way I found to style the tab close button which is otherwise
+   an ugly red thing */
 QTabBar::close-button {
      image: url(:/icons/cross.png)
- }
+}

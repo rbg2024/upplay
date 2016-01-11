@@ -18,6 +18,9 @@ CONFIG  += qt warn_on thread $$buildtype
 
 # DEFINES += UPPLAY_HORIZONTAL_LAYOUT
 
+# This is only used for the dir browser tab close button, which is set in
+# the style sheet, did not find any other reasonably simple way to do it.
+RESOURCES += GUI/upplay.qrc
 
 HEADERS += \
         GUI/mainw/mainw.h \

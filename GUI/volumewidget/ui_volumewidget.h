@@ -68,7 +68,7 @@ public:
         btn_mute->setMaximumSize(QSize(28, 30));
         btn_mute->setFocusPolicy(Qt::NoFocus);
         QIcon icon;
-        icon.addFile(QStringLiteral(":/icons/vol_mute.png"), QSize(),
+        icon.addFile(Helper::getIconPath("vol_mute.png"), QSize(),
                      QIcon::Normal, QIcon::Off);
         btn_mute->setIcon(icon);
         btn_mute->setIconSize(QSize(24, 24));

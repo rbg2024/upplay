@@ -44,7 +44,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>:/icons/vol_mute.png</normaloff>:/icons/vol_mute.png</iconset>
+         <normaloff>../icons/vol_mute.png</normaloff>../icons/vol_mute.png</iconset>
        </property>
        <property name="iconSize">
         <size>
