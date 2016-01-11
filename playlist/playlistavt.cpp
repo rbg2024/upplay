@@ -112,6 +112,7 @@ void PlaylistAVT::onExtTrackChange(const QString& uri)
     if (m_play_idx < -1) // ??
         return;
 
+    // Look for the uri in tracks following this one
     for (unsigned int i = m_play_idx + 1; i < m_meta.size(); i++) {
         if (!uri.compare(m_meta[i].filepath)) {
             qDebug() << "PlaylistAVT::onExtTrackChange: index now " << i;
@@ -122,6 +123,7 @@ void PlaylistAVT::onExtTrackChange(const QString& uri)
             return;
         }
     }
+    // Look for the uri in tracks preceding
     for (int i = 0; i <= m_play_idx && i < int(m_meta.size()); i++) {
         if (!uri.compare(m_meta[i].filepath)) {
             qDebug() << "PlaylistAVT::onExtTrackChange: index now " << i;
