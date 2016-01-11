@@ -52,7 +52,6 @@ public:
     virtual ~Application();
 
     bool is_initialized();
-    QString getVersion();
                         
     void getIdleMeta(MetaData* mdp);
                         

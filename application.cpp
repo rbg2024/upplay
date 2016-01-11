@@ -107,7 +107,7 @@ Application::Application(QApplication* qapp, QObject *parent)
 {
     m_settings = CSettingsStorage::getInstance();
 
-    QString version = getVersion();
+    QString version = UPPLAY_VERSION;
     m_settings->setVersion(version);
 
     m_player = new GUI_Player(this);
@@ -488,7 +488,7 @@ void Application::getIdleMeta(MetaData* mdp)
         }
     }
 
-    mdp->title = QString::fromUtf8("Upplay ") + m_settings->getVersion();
+    mdp->title = QString::fromUtf8("Upplay ") + UPPLAY_VERSION;
     if (m_renderer_friendly_name.isEmpty()) {
         mdp->artist = "No renderer connected";
     } else {
@@ -596,10 +596,4 @@ void Application::init_connections()
     CONNECT(m_cdb, sig_next_group_html(QString),
             m_ui_playlist, psl_next_group_html(QString));
     CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
-}
-
-
-QString Application::getVersion()
-{
-    return UPPLAY_VERSION;
 }
