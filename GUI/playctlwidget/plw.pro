@@ -14,7 +14,7 @@ SOURCES += plw.cpp playctlwidget.cpp \
         
 FORMS   = playctlwidget.ui
 
-RESOURCES = ../upplay.qrc
+#RESOURCES = ../upplay.qrc
 
 unix {
   UI_DIR = .ui
