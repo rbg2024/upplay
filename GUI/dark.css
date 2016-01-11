@@ -316,6 +316,13 @@ QTabWidget::tab-bar {
 /* move to the right by 5px */
 }
 
+/* Note that having a minimal resource file and setting the button here
+   was the only way I found to style the tab close button which is otherwise
+   an ugly red thing */
+QTabBar::close-button {
+     image: url(:/icons/cross.png)
+}
+
 QTabBar::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #525252, stop: 0.4 #383838, stop: 0.5 #383838, stop: 1.0 #424242);
     border: 1px solid #242424;
