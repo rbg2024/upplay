@@ -19,7 +19,7 @@ SOURCES += vw.cpp volumewidget.cpp \
         
 # FORMS   = volumewidget.ui
 
-RESOURCES = ../upplay.qrc
+#RESOURCES = ../upplay.qrc
 
 unix {
   UI_DIR = .ui

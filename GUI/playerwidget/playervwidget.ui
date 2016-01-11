@@ -48,8 +48,8 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../upplay.qrc">
-           <normaloff>:/icons/logo.png</normaloff>:/icons/logo.png</iconset>
+          <iconset>
+           <normaloff>../icons/logo.png</normaloff>../icons/logo.png</iconset>
          </property>
          <property name="iconSize">
           <size>
