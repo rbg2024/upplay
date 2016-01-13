@@ -43,15 +43,25 @@ static const char *thisprog;
 static int    op_flags;
 #define OPT_h     0x4 
 #define OPT_c     0x20
+#define OPT_v     0x40
 
 static const char usage [] =
-    "\n"
+    "upplay [-h] [-v] : options: get help and version\n"
     ;
+
+static void
+versionInfo(FILE *fp)
+{
+    fprintf(fp, "Upplay %s %s\n",
+           UPPLAY_VERSION, LibUPnP::versionString().c_str());
+}
+
 static void
 Usage(void)
 {
     FILE *fp = (op_flags & OPT_h) ? stdout : stderr;
     fprintf(fp, "%s: Usage: %s", thisprog, usage);
+    versionInfo(fp);
     exit((op_flags & OPT_h)==0);
 }
 
@@ -62,8 +72,6 @@ int main(int argc, char **argv)
 
     QCoreApplication::setOrganizationName("Upmpd.org");
     QCoreApplication::setApplicationName("upplay");
-
-    string a_config;
 
     QStringList params;
     for(int i = 1; i < argc; i++){
@@ -80,12 +88,11 @@ int main(int argc, char **argv)
             Usage();
         while (**argv)
             switch (*(*argv)++) {
-            case 'c':   op_flags |= OPT_c; if (argc < 2)  Usage();
-                a_config = *(++argv);
-                argc--; goto b1;
+            case 'h':   op_flags |= OPT_h; Usage(); break;
+            case 'v':   op_flags |= OPT_v; versionInfo(stdout); exit(0); break;
             default: Usage();
             }
-    b1: argc--; argv++;
+        argc--; argv++;
     }
 
     if (argc > 0)

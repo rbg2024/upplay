@@ -22,6 +22,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <libupnpp/upnpplib.hxx>
+
 
 /** VIEW **/
 
@@ -136,6 +138,7 @@ void GUI_Player::about(bool b)
                     version + "</font></b>");
     infobox.setInformativeText(
         QString("") +
+        UPnPP::LibUPnP::versionString().c_str() + "<br/>" +
         tr("Based on Sayonara, written by Lucio Carreras") + "<br />" +
         tr("License") + ": GPL<br />" +
         "Copyright 2011-2013<br /><br />" + link + "<br /><br />"
