@@ -112,12 +112,14 @@ void PlaylistOHRD::update_state()
 
 void PlaylistOHRD::psl_change_track_impl(int idx) {
     m_ohrdo->setIdx(idx);
+    m_ohrdo->play();
 }
 
 void PlaylistOHRD::psl_play() 
 {
     if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
         m_ohrdo->setIdx(m_selection_min_row);
+        m_ohrdo->play();
     } else {
         emit sig_resume_play();
     }
