@@ -99,10 +99,10 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 
 
 Application::Application(QApplication* qapp, QObject *parent)
-    : QObject(parent), m_player(0), m_playlist(0), m_cdb(0), m_rdco(0),
+    : QObject(parent), m_player(0), m_cdb(0), m_rdco(0),
       m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ohpro(0),
       m_ui_playlist(0), m_sctool(0), m_settings(0), m_app(qapp),
-      m_initialized(false),
+      m_initialized(false), m_playlistIsPlaylist(false),
       m_ohsourcetype(OHProductQO::OHPR_SourceUnknown)
 {
     m_settings = CSettingsStorage::getInstance();
@@ -273,14 +273,19 @@ void Application::chooseSourceAVT()
         return;
     }
     int row = dlg.rndsLW->currentRow();
-    m_playlist->psl_stop();
+    if (m_playlist) {
+        m_playlist->psl_stop();
+    }
     m_player->stopped();
-    deleteZ(m_playlist);
     if (row == 1) {
         QString fn = QDir(Helper::getSharePath()).filePath("radiolist.xml");
-        m_playlist = new PlaylistLOCRD(m_avto, fn.toLocal8Bit());
+        m_playlist = shared_ptr<Playlist>(new PlaylistLOCRD(m_avto,
+                                                            fn.toLocal8Bit()));
+        m_playlistIsPlaylist = false;
     } else {
-        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
+        m_playlist = shared_ptr<Playlist>(new PlaylistAVT(m_avto,
+                                                          m_rdr->desc()->UDN));
+        m_playlistIsPlaylist = true;
     }
     playlist_connections();
 }
@@ -317,7 +322,6 @@ void Application::reconnectOrChoose()
 
 bool Application::setupRenderer(const string& uid)
 {
-    deleteZ(m_playlist);
     deleteZ(m_rdco);
     deleteZ(m_avto);
     deleteZ(m_ohtmo);
@@ -375,7 +379,9 @@ bool Application::setupRenderer(const string& uid)
     // Keep this after avt object creation !
     if (!m_playlist) {
         qDebug() <<"Application::setupRenderer: using AVT playlist";
-        m_playlist = new PlaylistAVT(m_avto, m_rdr->desc()->UDN);
+        m_playlist = shared_ptr<Playlist>(new PlaylistAVT(m_avto,
+                                                         m_rdr->desc()->UDN));
+        m_playlistIsPlaylist = true;
     }
 
 
@@ -401,8 +407,6 @@ bool Application::setupRenderer(const string& uid)
 
 void Application::createPlaylistForOpenHomeSource()
 {
-    deleteZ(m_playlist);
-
     m_ohsourcetype = m_ohpro->getSourceType();
 
     switch (m_ohsourcetype) {
@@ -416,8 +420,9 @@ void Application::createPlaylistForOpenHomeSource()
             return;
         }
         OHIFH ohif = m_rdr->ohif();
-        m_playlist = new PlaylistOHRD(new OHRad(ohrd), ohif ?
-                                      new OHInf(ohif) : 0);
+        m_playlist = shared_ptr<Playlist>(
+            new PlaylistOHRD(new OHRad(ohrd), ohif ? new OHInf(ohif) : 0));
+        m_playlistIsPlaylist = false;
     }
     break;
 
@@ -429,8 +434,9 @@ void Application::createPlaylistForOpenHomeSource()
                 "receiver mode, but can't connect";
             return;
         }
-        m_playlist = new PlaylistOHRCV(ohrc,
-                                       u8s2qs(m_rdr->desc()->friendlyName));
+        m_playlist = shared_ptr<Playlist>(
+            new PlaylistOHRCV(ohrc, u8s2qs(m_rdr->desc()->friendlyName)));
+        m_playlistIsPlaylist = false;
     }
     break;
 
@@ -438,14 +444,17 @@ void Application::createPlaylistForOpenHomeSource()
     {
         OHPLH ohpl = m_rdr->ohpl();
         if (ohpl) {
-            m_playlist = new PlaylistOHPL(new OHPlayer(ohpl));
+            m_playlist = shared_ptr<Playlist>(
+                new PlaylistOHPL(new OHPlayer(ohpl)));
+            m_playlistIsPlaylist = true;
         }
     }
     break;
 
     default:
     {
-        m_playlist = new PlaylistNULL();
+        m_playlist = shared_ptr<Playlist>(new PlaylistNULL());
+        m_playlistIsPlaylist = false;
     }
     break;
     }
@@ -503,52 +512,55 @@ void Application::getIdleMeta(MetaData* mdp)
 // set the playlist connections in a separate function
 void Application::playlist_connections()
 {
-    m_cdb->setPlaylist(m_playlist);
+    if (m_playlistIsPlaylist)
+        m_cdb->setPlaylist(m_playlist);
+    else
+        m_cdb->setPlaylist(shared_ptr<Playlist>());
 
     // Use either ohtime or avt for time updates
     if (m_ohtmo) {
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
-                m_playlist, onRemoteSecsInSong(quint32));
+                m_playlist.get(), onRemoteSecsInSong(quint32));
     } else if (m_avto) {
         CONNECT(m_avto, secsInSongChanged(quint32),
-                m_playlist, onRemoteSecsInSong(quint32));
+                m_playlist.get(), onRemoteSecsInSong(quint32));
     }
 
-    CONNECT(m_player, play(), m_playlist, psl_play());
-    CONNECT(m_player, pause(), m_playlist, psl_pause());
-    CONNECT(m_player, stop(), m_playlist, psl_stop());
-    CONNECT(m_player, forward(), m_playlist, psl_forward());
-    CONNECT(m_player, backward(), m_playlist, psl_backward());
-    CONNECT(m_player, sig_load_playlist(), m_playlist, psl_load_playlist());
-    CONNECT(m_player, sig_save_playlist(), m_playlist, psl_save_playlist());
-    CONNECT(m_player, sig_seek(int), m_playlist, psl_seek(int));
+    CONNECT(m_player, play(), m_playlist.get(), psl_play());
+    CONNECT(m_player, pause(), m_playlist.get(), psl_pause());
+    CONNECT(m_player, stop(), m_playlist.get(), psl_stop());
+    CONNECT(m_player, forward(), m_playlist.get(), psl_forward());
+    CONNECT(m_player, backward(), m_playlist.get(), psl_backward());
+    CONNECT(m_player, sig_load_playlist(), m_playlist.get(), psl_load_playlist());
+    CONNECT(m_player, sig_save_playlist(), m_playlist.get(), psl_save_playlist());
+    CONNECT(m_player, sig_seek(int), m_playlist.get(), psl_seek(int));
 
-    CONNECT(m_playlist, connectionLost(), this, reconnectOrChoose());
-    CONNECT(m_playlist, playlistModeChanged(Playlist_Mode),
+    CONNECT(m_playlist.get(), connectionLost(), this, reconnectOrChoose());
+    CONNECT(m_playlist.get(), playlistModeChanged(Playlist_Mode),
             m_ui_playlist, setPlayerMode(Playlist_Mode));
-    CONNECT(m_playlist, sig_track_metadata(const MetaData&),
+    CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
             m_player, update_track(const MetaData&));
-    CONNECT(m_playlist, sig_stopped(),  m_player, stopped());
-    CONNECT(m_playlist, sig_paused(),  m_player, paused());
-    CONNECT(m_playlist, sig_playing(),  m_player, playing());
-    CONNECT(m_playlist, sig_playing_track_changed(int),
+    CONNECT(m_playlist.get(), sig_stopped(),  m_player, stopped());
+    CONNECT(m_playlist.get(), sig_paused(),  m_player, paused());
+    CONNECT(m_playlist.get(), sig_playing(),  m_player, playing());
+    CONNECT(m_playlist.get(), sig_playing_track_changed(int),
             m_ui_playlist, track_changed(int));
-    CONNECT(m_playlist, sig_playlist_updated(MetaDataList&, int, int),
+    CONNECT(m_playlist.get(), sig_playlist_updated(MetaDataList&, int, int),
             m_ui_playlist, fillPlaylist(MetaDataList&, int, int));
     CONNECT(m_ui_playlist, selection_min_row(int),
-            m_playlist, psl_selection_min_row(int));
+            m_playlist.get(), psl_selection_min_row(int));
     CONNECT(m_ui_playlist, playlist_mode_changed(const Playlist_Mode&),
-            m_playlist, psl_change_mode(const Playlist_Mode&));
+            m_playlist.get(), psl_change_mode(const Playlist_Mode&));
     CONNECT(m_ui_playlist, dropped_tracks(const MetaDataList&, int),
-            m_playlist, psl_insert_tracks(const MetaDataList&, int));
+            m_playlist.get(), psl_insert_tracks(const MetaDataList&, int));
     CONNECT(m_ui_playlist, sig_rows_removed(const QList<int>&, bool),
-            m_playlist, psl_remove_rows(const QList<int>&, bool));
+            m_playlist.get(), psl_remove_rows(const QList<int>&, bool));
     CONNECT(m_ui_playlist, sig_sort_tno(),
-            m_playlist, psl_sort_by_tno());
+            m_playlist.get(), psl_sort_by_tno());
     CONNECT(m_ui_playlist, row_activated(int),
-            m_playlist, psl_change_track(int));
+            m_playlist.get(), psl_change_track(int));
     CONNECT(m_ui_playlist, clear_playlist(),
-            m_playlist, psl_clear_playlist());
+            m_playlist.get(), psl_clear_playlist());
 
     m_playlist->update_state();
 }

@@ -22,6 +22,7 @@
 #define APPLICATION_H
 
 #include <string>
+#include <memory>
 
 #include <QObject>
 #include <QApplication>
@@ -65,7 +66,7 @@ public slots:
 private:
 
     GUI_Player   *m_player;
-    Playlist     *m_playlist;
+    std::shared_ptr<Playlist> m_playlist;
     DirBrowser   *m_cdb;
 
     UPnPClient::MRDH    m_rdr;
@@ -82,6 +83,8 @@ private:
     QApplication     *m_app;
 
     bool             m_initialized;
+    // Can we send titles into the playlist (e.g. not OHradio).
+    bool             m_playlistIsPlaylist;
     OHProductQO::SourceType m_ohsourcetype;
     QString          m_renderer_friendly_name;
 

@@ -18,6 +18,8 @@
 #define _DIRBROWSER_H_INCLUDED_
 #include "ui_dirbrowser.h"
 
+#include <memory>
+
 #include "HelperStructs/MetaData.h"
 #include "playlist/playlist.h"
 #include "cdbrowser.h"
@@ -29,14 +31,15 @@ class DirBrowser : public QWidget {
     Q_OBJECT;
 
 public:
-    DirBrowser(QWidget *parent, Playlist *pl);
+    DirBrowser(QWidget *parent, std::shared_ptr<Playlist> pl);
     bool insertActive();
     CDBrowser *currentBrowser();
     void doSearch(const QString&, bool);
     bool randPlayActive() {return m_randplayer != 0;}
+    bool have_playlist() {return bool(m_pl);}
 
 public slots:
-    void setPlaylist(Playlist *pl);
+    void setPlaylist(std::shared_ptr<Playlist> pl);
     void setStyleSheet(bool);
     void addTab();
     void closeTab(int);
@@ -74,7 +77,7 @@ private:
     void setupTabConnections(CDBrowser* w);
 
     Ui::DirBrowser *ui;
-    Playlist *m_pl;
+    std::shared_ptr<Playlist> m_pl;
     bool m_insertactive;
     RandPlayer *m_randplayer;
 };

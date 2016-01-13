@@ -862,8 +862,8 @@ void CDBrowser::createPopupMenu(const QPoint& pos)
         popup->addAction(act);
     }
 
-    // Click in blank area: the only entry is Back
-    if (el.isNull()) {
+    // Click in blank area, or no playlist the only entry is Back
+    if (el.isNull() || (m_browsers && !m_browsers->have_playlist())) {
         popup->connect(popup, SIGNAL(triggered(QAction *)), this, 
                        SLOT(back(QAction *)));
         popup->popup(mapToGlobal(pos));

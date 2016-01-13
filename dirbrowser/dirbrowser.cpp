@@ -28,7 +28,7 @@
 #include "GUI/prefs/sortprefs.h"
 #include "HelperStructs/CSettingsStorage.h"
 
-DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
+DirBrowser::DirBrowser(QWidget *parent, std::shared_ptr<Playlist> pl)
     : QWidget(parent), ui(new Ui::DirBrowser), m_pl(pl), m_insertactive(false),
       m_randplayer(0)
 {
@@ -97,7 +97,7 @@ DirBrowser::DirBrowser(QWidget *parent, Playlist *pl)
     setPlaylist(pl);
 }
 
-void DirBrowser::setPlaylist(Playlist *pl)
+void DirBrowser::setPlaylist(std::shared_ptr<Playlist> pl)
 {
     m_pl = pl;
 
@@ -105,7 +105,8 @@ void DirBrowser::setPlaylist(Playlist *pl)
         setupTabConnections(i);
     }
     if (m_pl)
-        connect(m_pl, SIGNAL(sig_insert_done()), this, SLOT(onInsertDone()));
+        connect(m_pl.get(), SIGNAL(sig_insert_done()),
+                this, SLOT(onInsertDone()));
 }
 
 void DirBrowser::setStyleSheet(bool dark)
@@ -373,6 +374,8 @@ void DirBrowser::doSearch(const QString& text, bool reverse)
 void DirBrowser::setInsertActive(bool onoff)
 {
     m_insertactive = onoff;
+    if (!m_pl)
+        m_insertactive = false;
 }
 
 bool DirBrowser::insertActive()
@@ -416,7 +419,7 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
     disconnect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)), 0, 0);
     if (m_pl)
         connect(cdb, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
-                m_pl, SLOT(psl_add_tracks(const MetaDataList&)));
+                m_pl.get(), SLOT(psl_add_tracks(const MetaDataList&)));
 
     disconnect(cdb, SIGNAL(sig_searchcaps_changed()), 0, 0);
     connect(cdb, SIGNAL(sig_searchcaps_changed()), 
@@ -449,6 +452,8 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
 void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const
                                  std::vector<UPnPClient::UPnPDirObject>& ents)
 {
+    if (!m_pl)
+        return;
     qDebug() << "DirBrowser::onEnterRandPlay: " << ents.size() << " tracks";
     if (m_randplayer) {
         delete m_randplayer;
@@ -460,7 +465,7 @@ void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const
     }
     connect(m_randplayer, SIGNAL(sig_tracks_to_playlist(const MetaDataList&)),
             this, SLOT(onRandTracksToPlaylist(const MetaDataList&)));
-    connect(m_pl, SIGNAL(sig_playlist_done()),
+    connect(m_pl.get(), SIGNAL(sig_playlist_done()),
             m_randplayer, SLOT(playNextSlice()));
     connect(m_randplayer, SIGNAL(sig_randplay_done()),
             this, SLOT(onRandDone()));
@@ -479,7 +484,7 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
     // playlist clear from the ui (which we want to trigger a new
     // slice) from this one, but temporarily disconnecting is just
     // simpler.
-    disconnect(m_pl, SIGNAL(sig_playlist_done()),
+    disconnect(m_pl.get(), SIGNAL(sig_playlist_done()),
                m_randplayer, SLOT(playNextSlice()));
     
     Playlist_Mode mode = m_pl->mode();
@@ -495,7 +500,7 @@ void DirBrowser::onRandTracksToPlaylist(const MetaDataList& mdl)
     m_pl->psl_change_track(0);
     m_pl->psl_play();
 
-    connect(m_pl, SIGNAL(sig_playlist_done()),
+    connect(m_pl.get(), SIGNAL(sig_playlist_done()),
             m_randplayer, SLOT(playNextSlice()));
 }
 
