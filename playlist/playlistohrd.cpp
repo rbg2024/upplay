@@ -119,10 +119,8 @@ void PlaylistOHRD::psl_play()
 {
     if (m_tpstate ==  AUDIO_STOPPED && valid_row(m_selection_min_row)) {
         m_ohrdo->setIdx(m_selection_min_row);
-        m_ohrdo->play();
-    } else {
-        emit sig_resume_play();
     }
+    emit sig_resume_play();
 }
 
 void PlaylistOHRD::psl_pause() 
