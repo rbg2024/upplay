@@ -98,19 +98,23 @@ void SongcastTool::enableOnButtons()
 
     for (unsigned int i = 0; i < m->receivers.size(); i++) {
         ReceiverState::SCState st(m->receivers[i].state);
-        bool isconnected = st == ReceiverState::SCRS_STOPPED ||
-            st ==  ReceiverState::SCRS_PLAYING;
-        m->dlg->receiverOnButton(i)->setEnabled(!isconnected && senderidx >= 0);
+        bool isplaying =  st ==  ReceiverState::SCRS_PLAYING;
+        m->dlg->receiverOnButton(i)->setEnabled(!isplaying && senderidx >= 0);
     }
 }
 
-QString SongcastTool::receiverText(int i, bool isconnected)
+QString SongcastTool::receiverText(int i, bool isplaying)
 {
     QString rcvdesc("<b>");
     rcvdesc += u8s2qs(m->receivers[i].nm + "</b>");
-    if (isconnected) {
-        string snm = senderNameFromUri(m->receivers[i].uri);
-        rcvdesc += tr(" (connected to: ") + u8s2qs(snm) + ")";
+    string snm = senderNameFromUri(m->receivers[i].uri);
+    if (!snm.empty()) {
+        if (isplaying) {
+            rcvdesc += tr(" (playing from: ");
+        } else {
+            rcvdesc += tr(" (connected to: ");
+        }
+        rcvdesc += u8s2qs(snm) + ")";
     }
     return rcvdesc;
 }
@@ -130,13 +134,12 @@ void SongcastTool::syncReceivers()
         string udn = m->receivers[i].UDN;
         getReceiverState(udn, m->receivers[i], false);
         ReceiverState::SCState st(m->receivers[i].state);
-        bool isconnected = st == ReceiverState::SCRS_STOPPED ||
-            st ==  ReceiverState::SCRS_PLAYING;
+        bool isplaying = st ==  ReceiverState::SCRS_PLAYING;
 
         m->dlg->receiverOffButton(i)->setChecked(false);
         m->dlg->receiverOnButton(i)->setChecked(false);
-        m->dlg->receiverOffButton(i)->setEnabled(isconnected);
-        m->dlg->receiverOnButton(i)->setEnabled(!isconnected && senderidx >= 0);
-        m->dlg->receiverLabel(i)->setText(receiverText(i, isconnected));
+        m->dlg->receiverOffButton(i)->setEnabled(isplaying);
+        m->dlg->receiverOnButton(i)->setEnabled(!isplaying && senderidx >= 0);
+        m->dlg->receiverLabel(i)->setText(receiverText(i, isplaying));
     }
 }

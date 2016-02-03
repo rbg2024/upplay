@@ -82,9 +82,9 @@ void SongcastDLG::createControls(unsigned int numsenders,
         UncheckCheckBox *on, *off;
             
         for (unsigned int i = 0; i < numreceivers; i++) {
-            on = new UncheckCheckBox(tr("Link to selected Sender"),rcvGroupBox);
+            on = new UncheckCheckBox(tr("Link and start"), rcvGroupBox);
             btnSzPolicy(on);
-            off = new UncheckCheckBox(tr("Unlink"), rcvGroupBox);
+            off = new UncheckCheckBox(tr("Stop"), rcvGroupBox);
             btnSzPolicy(off);
             lbl = new QLabel(rcvGroupBox);
 
