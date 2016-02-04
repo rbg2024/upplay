@@ -159,6 +159,7 @@ GUI/sourcechoose/
 GUI/sourcechoose/sourcechoose.h
 GUI/sourcechoose/sourcechoose.ui
 GUI/standard.css
+GUI/upplay.qrc
 GUI/volumewidget/
 GUI/volumewidget/Makefile
 GUI/volumewidget/soundslider.cpp
