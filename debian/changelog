@@ -1,3 +1,12 @@
+upplay (1.2.3-1) unstable; urgency=low
+
+  * Changed Songcast connection tool to match changes in upmpdcli et al
+  * Deactivate send to playlist from dir browser when Radio is active
+  * Network interface selection
+  * Other Small fixes (tab close buttons, issues in radio interface)
+  
+ -- Jean-Francois Dockes <jf@dockes.org>  Thu, 04 Feb 2016 18:52:00 +0100
+
 upplay (1.2.2-1) unstable; urgency=low
 
   * Improve updates of playlist and cover image when the renderer source
@@ -14,6 +23,7 @@ upplay (1.2.1-1) unstable; urgency=low
 upplay (1.2.0-1) unstable; urgency=low
 
   * OpenHome renderer Source selection
+  * OpenHome Radio support
   * Songcast Sender/Receiver connection management tool
   * (Internal) code cleanup.
 
