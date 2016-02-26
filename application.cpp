@@ -327,6 +327,8 @@ bool Application::setupRenderer(const string& uid)
     deleteZ(m_ohtmo);
     deleteZ(m_ohvlo);
     deleteZ(m_ohpro);
+    bool needs_playlist = true;
+
     m_ohsourcetype = OHProductQO::OHPR_SourceUnknown;
     
     // The media renderer object is not used directly except for
@@ -350,6 +352,7 @@ bool Application::setupRenderer(const string& uid)
 
         // Create appropriate Playlist object depending on type of source
         createPlaylistForOpenHomeSource();
+        needs_playlist = false;
 
         // Try to use the time service
         OHTMH ohtm = m_rdr->ohtm();
@@ -377,7 +380,7 @@ bool Application::setupRenderer(const string& uid)
     }
 
     // Keep this after avt object creation !
-    if (!m_playlist) {
+    if (needs_playlist) {
         qDebug() <<"Application::setupRenderer: using AVT playlist";
         m_playlist = shared_ptr<Playlist>(new PlaylistAVT(m_avto,
                                                          m_rdr->desc()->UDN));

@@ -80,7 +80,8 @@ PlaylistAVT::PlaylistAVT(AVTPlayer *avtp, const string& _udn, QObject *parent)
     connect(this, SIGNAL(sig_stop()),  m_avto, SLOT(stop()));
     connect(this, SIGNAL(sig_resume_play()), m_avto, SLOT(play()));
     connect(this, SIGNAL(sig_pause()), m_avto, SLOT(pause()));
-    
+
+    QTimer::singleShot(0, m_avto, SLOT(fetchState()));
     QTimer::singleShot(0, this, SLOT(playlist_updated()));
 }
 

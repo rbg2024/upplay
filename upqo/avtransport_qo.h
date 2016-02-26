@@ -168,8 +168,12 @@ public slots:
         m_srv->seek(UPnPClient::AVTransport::SEEK_REL_TIME, secs);
     }
 
+    virtual void fetchState() {
+        update(true);
+    }
+
     // Called by timer every sec
-    virtual void update() {
+    virtual void update(bool force = false) {
         UPnPClient::AVTransport::PositionInfo info;
         int error;
         if ((error = m_srv->getPositionInfo(info)) != 0) {
@@ -209,13 +213,13 @@ public slots:
             qDebug() << "getTransportInfo failed with error " << error;
             return;
         }
-        if (tinfo.tpstate != m_tpstate) {
+        if (force || tinfo.tpstate != m_tpstate) {
             emit tpStateChanged(tinfo.tpstate);
             m_tpstate = tinfo.tpstate;
         }
-        if (m_cururi.compare(info.trackuri) &&
+        if (force || (m_cururi.compare(info.trackuri) &&
             (m_tpstate == UPnPClient::AVTransport::Playing ||
-             m_tpstate == UPnPClient::AVTransport::PausedPlayback) ) {
+             m_tpstate == UPnPClient::AVTransport::PausedPlayback)) ) {
             qDebug() << "AVT: update: ext track change: cur [" << 
                 m_cururi.c_str() << "] new [" <<                     
                 info.trackuri.c_str() << "]";
