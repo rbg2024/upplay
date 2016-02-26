@@ -9,6 +9,10 @@ Songcast Sender modules currently
 link:http://www.linn.co.uk/software#songcast[exist for Windows and Mac OS
 X].
 
+upmpdcli also has a Songcast Sender additional package. Unlike the Mac and
+Windows tools, this does not capture arbitrary audio on the Linux host, but
+it is useful for synchronized multiroom audio.
+
 Songcast Receiver modules come with Linn hardware, or with software
 Renderers like
 link:http://www.lesbonscomptes.com/upmpdcli/sc2mpd.html[upmpdcli] or
