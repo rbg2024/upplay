@@ -8,7 +8,23 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
-1.2.1: Small fixes for Songcast tool: buttons checked state was not reset.
+1.2.4:
+
+- Fixes to the AVTransport interface, which had support of a bit of
+  neglect. Especially, attaching to a playing renderer did not update the
+  status, even when the information was available. Switching from an
+  OpenHome renderer to an AVTransport one did not replace the playlist
+  object (stayed attached to the OpenHome renderer).
+
+1.2.2/3:
+
+- Improvements to how source switches are handled. Netw
+- Choice of network interface in preferences
+
+1.2.1:
+
+- Small fixes for Songcast tool: buttons checked state was not reset.
+
 
 == Version 1.1
 
