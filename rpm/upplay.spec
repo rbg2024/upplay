@@ -1,6 +1,6 @@
 Summary:        Linux UPnP audio control point
 Name:           upplay
-Version:        1.2.2
+Version:        1.2.3
 Release:        1%{?dist}
 Group:          Applications/Multimedia
 License:        GPLv2+
@@ -41,6 +41,8 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
+* Fri Feb 05 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.3
+- Small fixes. Needed update for upmpdcli 1.1.0
 * Wed Dec 23 2015 Jean-Francois Dockes <jf@dockes.org> - 1.2.2
 - Better reactions to openhome renderer source changes
 * Fri Dec 18 2015 Jean-Francois Dockes <jf@dockes.org> - 1.2.1
