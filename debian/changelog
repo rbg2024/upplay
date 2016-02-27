@@ -1,3 +1,8 @@
+upplay (1.2.4-1) unstable; urgency=low
+
+  * Some fixes to the AVTransport interface
+ -- Jean-Francois Dockes <jf@dockes.org>  Fri, 26 Feb 2016 14:36:00 +0100
+
 upplay (1.2.3-1) unstable; urgency=low
 
   * Changed Songcast connection tool to match changes in upmpdcli et al
