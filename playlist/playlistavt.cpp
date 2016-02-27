@@ -135,9 +135,11 @@ void PlaylistAVT::psl_seek(int secs)
 
 void PlaylistAVT::onCurrentMetadata(const MetaData& md)
 {
+    qDebug() << "PlaylistAVT::onCurrentMetadata";
     MetaData *localmeta = 0;
     if (!m_meta.contains(md, true, &localmeta)) {
         m_meta.push_back(md);
+        m_play_idx = m_meta.size() -1;
         playlist_updated();
     }
     bool preferlocal = true;
