@@ -18,7 +18,7 @@
 
 1.2.2/3:
 
-- Improvements to how source switches are handled. Netw
+- Improvements to how source switches are handled.
 - Choice of network interface in preferences
 
 1.2.1:
