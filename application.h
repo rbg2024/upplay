@@ -88,6 +88,7 @@ private:
     OHProductQO::SourceType m_ohsourcetype;
     QString          m_renderer_friendly_name;
 
+    void clear_renderer();
     void init_connections();
     void renderer_connections();
     void playlist_connections();

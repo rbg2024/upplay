@@ -306,14 +306,29 @@ void Application::openSongcast()
     }
 }
 
+void Application::clear_renderer()
+{
+    m_rdr = UPnPClient::MRDH();
+    deleteZ(m_rdco);
+    deleteZ(m_avto);
+    deleteZ(m_ohtmo);
+    deleteZ(m_ohvlo);
+    deleteZ(m_ohpro);
+    m_ohsourcetype = OHProductQO::OHPR_SourceUnknown;
+}
+
 void Application::reconnectOrChoose()
 {
     string uid = qs2utf8s(m_settings->getPlayerUID());
     if (uid.empty() || !setupRenderer(uid)) {
+        clear_renderer();
+        m_playlist = shared_ptr<Playlist>(new PlaylistNULL());
+        m_playlistIsPlaylist = false;
+        playlist_connections();
         if (QMessageBox::warning(0, "Upplay",
-                             tr("Connection to current rendererer lost. "
-                                "Choose again ?"),
-                             QMessageBox::Cancel | QMessageBox::Ok, 
+                                 tr("Connection to current rendererer lost. "
+                                    "Choose again ?"),
+                                 QMessageBox::Cancel | QMessageBox::Ok, 
                                  QMessageBox::Ok) == QMessageBox::Ok) {
             chooseRenderer();
         }
@@ -322,14 +337,9 @@ void Application::reconnectOrChoose()
 
 bool Application::setupRenderer(const string& uid)
 {
-    deleteZ(m_rdco);
-    deleteZ(m_avto);
-    deleteZ(m_ohtmo);
-    deleteZ(m_ohvlo);
-    deleteZ(m_ohpro);
-    bool needs_playlist = true;
+    clear_renderer();
 
-    m_ohsourcetype = OHProductQO::OHPR_SourceUnknown;
+    bool needs_playlist = true;
     
     // The media renderer object is not used directly except for
     // providing handles to the services. Note that the lib will
