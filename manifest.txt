@@ -2,6 +2,7 @@
 AUTHORS
 COPYING
 GUI/
+GUI/common.css
 GUI/dark.css
 GUI/icons/
 GUI/icons/addtab.png
@@ -116,7 +117,6 @@ GUI/playlist/GUI_Playlist.ui
 GUI/playlist/delegate/
 GUI/playlist/delegate/PlaylistItemDelegate.cpp
 GUI/playlist/delegate/PlaylistItemDelegate.h
-GUI/playlist/delegate/PlaylistItemDelegateInterface.h
 GUI/playlist/entry/
 GUI/playlist/entry/GUI_PlaylistEntry.h
 GUI/playlist/entry/GUI_PlaylistEntryBig.cpp
