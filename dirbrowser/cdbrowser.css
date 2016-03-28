@@ -1,3 +1,13 @@
+
+
+/* General font selection. This is where you would increase the font size for
+ a highdpi display */
+html, body, form, fieldset, table, tr, td, img {
+    font-family:Arial,helvetica,sans-serif;
+/*    font-size: 30px;*/
+}
+
+
 /* Servers page. Each is a p */
 p.cdserver {
     margin: 7px 0px 0px 0px;

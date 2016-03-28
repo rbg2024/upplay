@@ -1,6 +1,6 @@
 /* deflt 10pt */
 QWidget {
-    font-size: 20pt;
+    font-size: 10pt;
 }
 
 QLabel#lab_totalTime {
@@ -9,24 +9,24 @@ QLabel#lab_totalTime {
 
 /* Playlist. Deflt 8 */
 QLabel#pl_lab_title {
-    font-size: 16pt;
+    font-size: 8pt;
     font-weight: bold;
 }
 
 /* Playlist. Deflt 7 */
 QLabel#pl_lab_artist, QLabel#pl_lab_album, QLabel#pl_lab_time {
-    font-size: 14pt;
+    font-size: 7pt;
 }
 
 /* Player area title. Deflt 10 */
 QLabel#lab_title {
-    font-size: 20pt;
+    font-size: 10pt;
     font-weight: bold;
 }
 
 /* Player area artist and album. Deflt 6 */
 QLabel#lab_artist, QLabel#lab_album {
-    font-size: 12pt;
+    font-size: 6pt;
 }
 
 /* Note that having a minimal resource file and setting the button here

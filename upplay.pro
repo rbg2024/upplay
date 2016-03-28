@@ -33,7 +33,6 @@ HEADERS += \
         GUI/playerwidget/playervwidget.h \
         GUI/playlist/GUI_Playlist.h \
         GUI/playlist/delegate/PlaylistItemDelegate.h \
-        GUI/playlist/delegate/PlaylistItemDelegateInterface.h \
         GUI/playlist/entry/GUI_PlaylistEntry.h \
         GUI/playlist/entry/GUI_PlaylistEntryBig.h \
         GUI/playlist/entry/GUI_PlaylistEntrySmall.h \
@@ -160,8 +159,7 @@ unix {
   bdata.files = dirbrowser/cdbrowser.css dirbrowser/dark.css \
               dirbrowser/standard.css dirbrowser/containerscript.js
   bdata.path = $$PREFIX/share/upplay/cdbrowser   
-#  gdata.files = GUI/standard.css GUI/dark.css playlist/radiolist.xml
-  gdata.files = GUI/standard.css GUI/dark.css
+  gdata.files = GUI/common.css GUI/standard.css GUI/dark.css
   gdata.path = $$PREFIX/share/upplay/
   desktop.files += upplay.desktop
   desktop.path = $$PREFIX/share/applications/

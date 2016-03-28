@@ -1,12 +1,12 @@
-QMainWindow, QDialog {
+QWidget {
     border: none;
-    background-color: #3c3c3c;
     color: #D8D8D8;
     selection-background-color: #424e72;
 }
 
-QWidget {
+QMainWindow, QDialog {
     border: none;
+    background-color: #3c3c3c;
     color: #D8D8D8;
     selection-background-color: #424e72;
 }
@@ -16,7 +16,7 @@ QFrame {
     background: transparent;
 }
 
-QLabel, QScrollArea{
+QLabel, QScrollArea {
     border: none;
     background: transparent;
 }

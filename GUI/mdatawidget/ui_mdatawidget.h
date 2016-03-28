@@ -62,12 +62,6 @@ public:
         lab_title->setObjectName(QString::fromUtf8("lab_title"));
         lab_title->setMinimumSize(QSize(0, titlehmin));
         lab_title->setMaximumSize(QSize(16777215, titlehmax));
-        QFont font;
-        font.setPointSize(10);
-        font.setBold(true);
-        font.setWeight(75);
-        lab_title->setFont(font);
-        lab_title->setStyleSheet(QString::fromUtf8(""));
         lab_title->setFrameShape(QFrame::NoFrame);
         lab_title->setFrameShadow(QFrame::Plain);
         lab_title->setInputMethodHints(Qt::ImhNone);
@@ -84,11 +78,6 @@ public:
         lab_artist->setObjectName(QString::fromUtf8("lab_artist"));
         lab_artist->setMinimumSize(QSize(0, otherhmin));
         lab_artist->setMaximumSize(QSize(16777215, otherhmax));
-        QFont font1;
-        font1.setPointSize(6);
-        font1.setStyleStrategy(QFont::PreferAntialias);
-        lab_artist->setFont(font1);
-        lab_artist->setStyleSheet(QString::fromUtf8(""));
         lab_artist->setFrameShape(QFrame::NoFrame);
         lab_artist->setFrameShadow(QFrame::Plain);
         lab_artist->setText(QString::fromUtf8(""));
@@ -103,8 +92,6 @@ public:
         lab_album->setObjectName(QString::fromUtf8("lab_album"));
         lab_album->setMinimumSize(QSize(0, otherhmin));
         lab_album->setMaximumSize(QSize(16777215, otherhmax));
-        lab_album->setFont(font1);
-        lab_album->setStyleSheet(QString::fromUtf8(""));
         lab_album->setText(QString::fromUtf8(""));
         lab_album->setAlignment(Qt::AlignCenter);
         lab_album->setWordWrap(true);

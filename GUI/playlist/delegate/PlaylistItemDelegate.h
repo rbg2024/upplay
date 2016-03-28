@@ -38,12 +38,11 @@ public:
                    const QModelIndex& index) const;
 
     void setMaxWidth(int w);
-    int rowHeight();
+    int rowHeight() const;
 
 private:
-    int     _rendered_items;
-    int     _row_height;
     int     _max_width;
+    bool    _compact;
     QListView*  _parent;
     GUI_PlaylistEntry* _pl_entry;
 };

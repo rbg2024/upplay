@@ -34,26 +34,22 @@ static QString get_fg_color(int val_bg)
 }
 
 PlaylistItemDelegate::PlaylistItemDelegate(QListView* parent, bool compact)
+    : _max_width(100), _compact(compact), _parent(parent)
 {
     // There is no way to apply the style sheet and compute the row
     // height here, the actual font metrics are only known during the
     // paint event (apparently...)
     if (compact) {
-        _row_height = 20;
         _pl_entry = new GUI_PlaylistEntrySmall();
     } else {
-        _row_height = 31;
         _pl_entry = new GUI_PlaylistEntryBig();
     }
 
-    _parent = parent;
-    _rendered_items = 0;
 }
 
 PlaylistItemDelegate::~PlaylistItemDelegate()
 {
     delete _pl_entry;
-    _row_height = 0;
 }
 
 void PlaylistItemDelegate::paint(QPainter *painter,
@@ -64,19 +60,17 @@ void PlaylistItemDelegate::paint(QPainter *painter,
         return;
     }
 
-    QRect rect(option.rect);
-    _pl_entry->setMaximumSize(_max_width, _row_height);
-    _pl_entry->setMinimumSize(_max_width, _row_height);
-    _pl_entry->resize(_max_width, _row_height);
-
     QVariant mdVariant = index.model()->data(index, Qt::WhatsThisRole);
     MetaData md;
     if (!MetaData::fromVariant(mdVariant, md)) {
         return;
     }
-
     _pl_entry->setContent(md, index.row() + 1);
 
+    // This keeps the time always visible
+    _pl_entry->setMaximumWidth(_max_width);
+    _pl_entry->setMinimumWidth(_max_width);
+    _pl_entry->resize(_max_width, rowHeight());
     QString style;
     QPalette palette = _parent->palette();
 
@@ -89,30 +83,31 @@ void PlaylistItemDelegate::paint(QPainter *painter,
     int playing_val = col_highlight_lighter.lightness();
     int background_val = col_background.lightness();
 
-    style = "* {";
     if (md.pl_playing) {
         style += QString("background-color: ") +
-                col_highlight_lighter.name() + "; " +
-                get_fg_color(playing_val);
+                 col_highlight_lighter.name() + "; " +
+                 get_fg_color(playing_val);
         _pl_entry->setProperty("play_state", "playing");
     } else if (md.is_disabled) {
         style += QString("color: #A0A0A0; background-color: transparent;");
         _pl_entry->setProperty("play_state", "disabled");
     } else if (!md.pl_selected) {
         style += QString("background-color: transparent; ") +
-                get_fg_color(background_val);
+                 get_fg_color(background_val);
         _pl_entry->setProperty("play_state", "selected");
     } else {
         // standard selected
         style += QString("background-color: ") +
-                col_highlight.name() + ";" +
-                get_fg_color(highlight_val);
+                 col_highlight.name() + ";" +
+                 get_fg_color(highlight_val);
         _pl_entry->setProperty("play_state", "default");
     }
-    style += "}";
-    int y = rect.topLeft().y() +  _pl_entry->height() - 1;
-    _pl_entry->setStyleSheet(_parent->styleSheet().append(style));
-//    _pl_entry->setStyleSheet(style);
+
+    QRect rect(option.rect);
+    int y = rect.topLeft().y() +  rowHeight() - 1;
+
+    _pl_entry->setStyleSheet(style);
+
     if (md.is_disabled) {
         _pl_entry->setDisabled(true);
     }
@@ -135,7 +130,7 @@ QSize PlaylistItemDelegate::sizeHint(const QStyleOptionViewItem& option,
     Q_UNUSED(option);
     Q_UNUSED(index);
 
-    return QSize(_max_width, _row_height);
+    return QSize(_max_width, rowHeight());
 }
 
 void PlaylistItemDelegate::setMaxWidth(int w)
@@ -143,7 +138,14 @@ void PlaylistItemDelegate::setMaxWidth(int w)
     _max_width = w;
 }
 
-int PlaylistItemDelegate::rowHeight()
+int PlaylistItemDelegate::rowHeight() const
 {
-    return _row_height;
+    int h  = _pl_entry->fontheight();
+    if (_compact) {
+        h = h  + 3;
+    } else {
+        h = 2 * h  + 3;
+    }
+    //qDebug() << "PlaylistItemDelegate::rowHeight(): "<< h;
+    return h;
 }
