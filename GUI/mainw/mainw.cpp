@@ -210,8 +210,7 @@ void GUI_Player::setStyle(int style)
 void GUI_Player::changeSkin(bool dark)
 {
     QString stylesheet = Style::get_style(dark);
-
-    this->setStyleSheet(stylesheet);
+    qApp->setStyleSheet(stylesheet);
 
     if (dark) {
         Helper::setStyleSubDir("dark");
@@ -220,7 +219,7 @@ void GUI_Player::changeSkin(bool dark)
     }
 
     m_settings->setPlayerStyle(dark ? 1 : 0);
-    this->m_trayIcon->change_skin(stylesheet);
+    m_trayIcon->change_skin(stylesheet);
 
     ui->player_w->volume()->updateSkin();
     emit sig_skin_changed(dark);
