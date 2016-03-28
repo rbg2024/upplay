@@ -1,6 +1,6 @@
 /* deflt 10pt */
 QWidget {
-    font-size: 10pt;
+/*    font-size: 10pt;*/
 }
 
 QLabel#lab_totalTime {
