@@ -51,7 +51,7 @@ public:
     void dragMoveEvent(QDragMoveEvent* event);
 
 signals:
-    // Bad name, emitted on dbl-click, should be row_activated()
+    // Emitted on dbl-click
     void row_activated(int);
 
     // Inform about first row in selection (might want to start there
