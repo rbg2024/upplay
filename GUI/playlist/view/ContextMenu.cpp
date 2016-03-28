@@ -1,5 +1,3 @@
-/* ContextMenu.cpp */
-
 /* Copyright (C) 2013  Lucio Carreras
  *
  * This file is part of sayonara player
@@ -17,9 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
-
 #include "ContextMenu.h"
 #include "HelperStructs/Helper.h"
 
@@ -39,7 +34,7 @@ ContextMenu::ContextMenu(QWidget* parent) :
                                  tr("Remove"), this);
     _delete_action = new QAction(QIcon(Helper::getIconPath("delete.png")),
                                  tr("Delete"), this);
-    _play_next_action = 
+    _play_next_action =
         new QAction(QIcon(Helper::getIconPath("fwd_orange.png")),
                     tr("Play next"), this);
     _append_action = new QAction(QIcon(Helper::getIconPath("append.png")),
@@ -56,17 +51,17 @@ void ContextMenu::clear_actions()
         this->removeAction(a);
     }
 
-    disconnect(_info_action, SIGNAL(triggered()), 
+    disconnect(_info_action, SIGNAL(triggered()),
                this, SIGNAL(sig_info_clicked()));
-    disconnect(_edit_action, SIGNAL(triggered()), 
+    disconnect(_edit_action, SIGNAL(triggered()),
                this, SIGNAL(sig_edit_clicked()));
-    disconnect(_remove_action, SIGNAL(triggered()), this, 
+    disconnect(_remove_action, SIGNAL(triggered()), this,
                SIGNAL(sig_remove_clicked()));
-    disconnect(_delete_action, SIGNAL(triggered()), this, 
+    disconnect(_delete_action, SIGNAL(triggered()), this,
                SIGNAL(sig_delete_clicked()));
-    disconnect(_play_next_action, SIGNAL(triggered()), this, 
+    disconnect(_play_next_action, SIGNAL(triggered()), this,
                SIGNAL(sig_play_next_clicked()));
-    disconnect(_sort_tno_action, SIGNAL(triggered()), this, 
+    disconnect(_sort_tno_action, SIGNAL(triggered()), this,
                SIGNAL(sig_sort_tno_clicked()));
 }
 
@@ -76,37 +71,37 @@ void ContextMenu::setup_entries(int entries)
 
     if (entries & ENTRY_INFO) {
         this->addAction(_info_action);
-        connect(_info_action, SIGNAL(triggered()), 
+        connect(_info_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_info_clicked()));
     }
     if (entries & ENTRY_EDIT) {
         this->addAction(_edit_action);
-        connect(_edit_action, SIGNAL(triggered()), 
+        connect(_edit_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_edit_clicked()));
     }
     if (entries & ENTRY_REMOVE) {
         this->addAction(_remove_action);
-        connect(_remove_action, SIGNAL(triggered()), 
+        connect(_remove_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_remove_clicked()));
     }
     if (entries & ENTRY_DELETE) {
         this->addAction(_delete_action);
-        connect(_delete_action, SIGNAL(triggered()), 
+        connect(_delete_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_delete_clicked()));
     }
     if (entries & ENTRY_PLAY_NEXT) {
         this->addAction(_play_next_action);
-        connect(_play_next_action, SIGNAL(triggered()), 
+        connect(_play_next_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_play_next_clicked()));
     }
     if (entries & ENTRY_APPEND) {
         this->addAction(_append_action);
-        connect(_append_action, SIGNAL(triggered()), 
+        connect(_append_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_append_clicked()));
     }
     if (entries & ENTRY_SORT_TNO) {
         this->addAction(_sort_tno_action);
-        connect(_sort_tno_action, SIGNAL(triggered()), 
+        connect(_sort_tno_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_sort_tno_clicked()));
     }
 }

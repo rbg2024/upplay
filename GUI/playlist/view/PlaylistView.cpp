@@ -34,9 +34,9 @@ PlaylistView::PlaylistView(QWidget* parent)
 {
     m_usertimer->setSingleShot(true);
     m_usertimer->setInterval(user_activity_timeout_ms);
-    
+
     setMouseTracking(true);
-    
+
     _drag_allowed = true;
     _inner_drag_drop = false;
     _parent = parent;
@@ -67,7 +67,6 @@ PlaylistView::PlaylistView(QWidget* parent)
 
 PlaylistView::~PlaylistView()
 {
-
     delete _rc_menu;
     delete _model;
 }
@@ -106,8 +105,9 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
         pos.setY(pos.y());
         pos.setX(pos.x() + 10);
 
-        if (_rc_menu)
+        if (_rc_menu) {
             _rc_menu->exec(pos);
+        }
 
         break;
 
@@ -292,13 +292,13 @@ void PlaylistView::resizeEvent(QResizeEvent *e)
 
 void PlaylistView::init_rc_menu()
 {
-
     _rc_menu = new ContextMenu(this);
 
     connect(_rc_menu, SIGNAL(sig_info_clicked()), this, SLOT(info_clicked()));
     connect(_rc_menu, SIGNAL(sig_edit_clicked()), this, SLOT(edit_clicked()));
-    connect(_rc_menu, SIGNAL(sig_remove_clicked()), this, SLOT(remove_clicked()));
-    connect(_rc_menu, SIGNAL(sig_sort_tno_clicked()), 
+    connect(_rc_menu, SIGNAL(sig_remove_clicked()), this,
+            SLOT(remove_clicked()));
+    connect(_rc_menu, SIGNAL(sig_sort_tno_clicked()),
             this, SIGNAL(sig_sort_tno()));
 }
 
@@ -336,7 +336,8 @@ void PlaylistView::set_mimedata(MetaDataList& v_md, QString text)
     _qDrag = new QDrag(this);
     _qDrag->setMimeData(mimedata);
 
-    connect(_qDrag, SIGNAL(destroyed()), this, SLOT(forbid_mimedata_destroyable()));
+    connect(_qDrag, SIGNAL(destroyed()),
+            this, SLOT(forbid_mimedata_destroyable()));
 
     _drag = true;
 }
@@ -378,8 +379,9 @@ void PlaylistView::set_current_track(int row)
     QModelIndex new_idx = _model->index(row);
 
     // Don't move the playlist around if the user is doing something
-    if (CAN_AUTOSCROLL)
+    if (CAN_AUTOSCROLL) {
         scrollTo(new_idx,  QListView::EnsureVisible);
+    }
 }
 
 
@@ -441,8 +443,9 @@ void PlaylistView::fill(MetaDataList& v_metadata, int cur_play_idx)
     this->select_rows(_cur_selected_rows);
 
     // Don't move the playlist around if the user is doing something
-    if (CAN_AUTOSCROLL)
+    if (CAN_AUTOSCROLL) {
         this->scrollTo(idx_cur_playing, QListView::EnsureVisible);
+    }
 }
 
 void PlaylistView::row_pressed(const QModelIndex&)
@@ -534,10 +537,11 @@ QList<int> PlaylistView::calc_selections()
 
     _cur_selected_rows = selections;
 
-    if (selections.empty())
+    if (selections.empty()) {
         emit sig_selection_min_row(-1);
-    else
+    } else {
         emit sig_selection_min_row(get_min_selected());
+    }
     return selections;
 }
 
@@ -725,8 +729,9 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
     for (uint i = 0; i < v_metadata.size(); i++) {
         affected_rows << i + row + 1;
     }
-    if (!affected_rows.empty())
+    if (!affected_rows.empty()) {
         emit sig_metadata_dropped(v_metadata, row);
+    }
 }
 
 
@@ -775,10 +780,10 @@ void PlaylistView::show_big_items(bool big)
 
 void PlaylistView::set_delegate_max_width(int n_items)
 {
+    bool scrollbar_visible = ((n_items * _delegate->rowHeight()) >=
+                              this->height());
 
-    bool scrollbar_visible = ((n_items * _delegate->rowHeight()) >= this->height());
-
-    int max_width = this->width();
+    int max_width = width();
     if (scrollbar_visible) {
         max_width -= verticalScrollBar()->width();
     }

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #ifndef PLAYLISTVIEW_H_
 #define PLAYLISTVIEW_H_
 
@@ -118,8 +117,8 @@ private:
     QWidget*        _parent;
     // Timer active if the user did something recently: avoid moving the
     // playlist around
-    QTimer*         m_usertimer; 
-    
+    QTimer*         m_usertimer;
+
     bool            _drag;
     bool            _drag_allowed;
     bool            _inner_drag_drop;
