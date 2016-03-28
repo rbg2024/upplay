@@ -1,0 +1,37 @@
+/* deflt 10pt */
+QWidget {
+    font-size: 20pt;
+}
+
+QLabel#lab_totalTime {
+    font-weight: bold;
+}
+
+/* Playlist. Deflt 8 */
+QLabel#pl_lab_title {
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+/* Playlist. Deflt 7 */
+QLabel#pl_lab_artist, QLabel#pl_lab_album, QLabel#pl_lab_time {
+    font-size: 14pt;
+}
+
+/* Player area title. Deflt 10 */
+QLabel#lab_title {
+    font-size: 20pt;
+    font-weight: bold;
+}
+
+/* Player area artist and album. Deflt 6 */
+QLabel#lab_artist, QLabel#lab_album {
+    font-size: 12pt;
+}
+
+/* Note that having a minimal resource file and setting the button here
+   was the only way I found to style the tab close button which is otherwise
+   an ugly red thing */
+QTabBar::close-button {
+     image: url(:/icons/cross.png)
+}
