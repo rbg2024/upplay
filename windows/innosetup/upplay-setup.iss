@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Upplay"
-#define MyAppVersion "1.2.3-w1"
+#define MyAppVersion "1.2.5pre1-w1"
 #define MyAppPublisher "J.F. Dockes"
 #define MyAppURL "http://www.lesbonscomptes.com/upplay"
 #define MyAppExeName "upplay.exe"
@@ -27,6 +27,7 @@ OutputBaseFilename=upplaysetup-{#MyAppVersion}
 SetupIconFile=C:\install\upplay\upplay.ico
 Compression=lzma
 SolidCompression=yes
+PrivilegesRequired=lowest
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
