@@ -121,5 +121,25 @@ File:
 
 And `Help`, there is no help...
 
+[[hiresadjust]]
+== Adjusting the font sizes on high resolution displays
 
-  
+Most people will find that the font sizes are too small on high DPI
+displays.
+
+As of version 1.2.5, the GUI can be partially adjusted by editing two style
+sheet files. To adjust the font sizes:
+
+- Edit `/usr/share/upplay/cdbrowser/cdbrowser.css`, and uncomment the
+  "font-size" directive at the top. Adjust the 30px to taste.
+- Edit `/usr/share/upplay/common.css` and adjust the 6 font-size
+  directives. An adequate approach will usually be to multiply the sizes by
+  some constant factor (e.g.: 2 ...).
+
+
+The adjustment is not perfect for now: the player section does not update
+its size, which means that some titles will be truncated (in the top left
+area), and the icon sizes are unchanged.
+
+There are other, system-based, approaches described on the following Qt page:
+http://doc.qt.io/qt-5/highdpi.html

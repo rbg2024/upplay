@@ -966,12 +966,41 @@ sign will close it&#8230;</p></div>
 <div class="paragraph"><p>And <code>Help</code>, there is no help&#8230;</p></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="hiresadjust">Adjusting the font sizes on high resolution displays</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Most people will find that the font sizes are too small on high DPI
+displays.</p></div>
+<div class="paragraph"><p>As of version 1.2.5, the GUI can be partially adjusted by editing two style
+sheet files. To adjust the font sizes:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Edit <code>/usr/share/upplay/cdbrowser/cdbrowser.css</code>, and uncomment the
+  "font-size" directive at the top. Adjust the 30px to taste.
+</p>
+</li>
+<li>
+<p>
+Edit <code>/usr/share/upplay/common.css</code> and adjust the 6 font-size
+  directives. An adequate approach will usually be to multiply the sizes by
+  some constant factor (e.g.: 2 &#8230;).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The adjustment is not perfect for now: the player section does not update
+its size, which means that some titles will be truncated (in the top left
+area), and the icon sizes are unchanged.</p></div>
+<div class="paragraph"><p>There are other, system-based, approaches described on the following Qt page:
+<a href="http://doc.qt.io/qt-5/highdpi.html">http://doc.qt.io/qt-5/highdpi.html</a></p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2015-12-12 16:32:31 CET
+ 2016-03-28 18:36:59 CEST
 </div>
 </div>
 </body>
