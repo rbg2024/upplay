@@ -78,7 +78,7 @@ void UPPrefs::onShowPrefs()
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
-
+#ifndef _WIN32
         // Show notifications ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "shownotifications",
                       "Show notifications",
@@ -94,7 +94,8 @@ void UPPrefs::onShowPrefs()
                       "Notification command",
                       "Command to execute to notify. The message argument "
                       " will be appended");
-
+#endif
+        
         // Truncate artist information in directory listings?
         ConfParamW *b1 =
             m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "truncateartistindir", 
