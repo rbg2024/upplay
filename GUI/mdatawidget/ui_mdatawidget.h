@@ -1,10 +1,7 @@
-/********************************************************************************
-** Form generated from reading UI file 'mdatawidget.ui'
-**
-** Created by: Qt User Interface Compiler version 4.8.6
-**
-** WARNING! All changes made in this file will be lost when recompiling UI file!
-********************************************************************************/
+/*************************************************************************
+** Form Initially created with designer, then hand-modified. The ui file may
+** still be useful to help produce changes.
+****************************************************************************/
 
 #ifndef UI_MDATAWIDGET_H
 #define UI_MDATAWIDGET_H
