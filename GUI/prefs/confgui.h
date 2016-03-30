@@ -42,6 +42,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include <QString>
 #include <QWidget>
@@ -334,6 +335,10 @@ protected:
     const QStringList m_sl;
 };
 
+// Expose some utilities in namespace confgui
+    template <class T> bool stringToStrings(const std::string &s, T &tokens, 
+                                            const std::string& addseps = "");
+    template <class T> void stringsToString(const T &tokens, std::string &s);
 }
 
 #endif /* _confgui_h_included_ */

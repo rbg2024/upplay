@@ -38,6 +38,7 @@
 #include "GUI/renderchoose/renderchoose.h"
 #include "GUI/sourcechoose/sourcechoose.h"
 #include "GUI/songcast/songcastdlg.h"
+#include "HelperStructs/notifications.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/Style.h"
@@ -101,7 +102,7 @@ static MRDH getRenderer(const string& name, bool isfriendlyname)
 Application::Application(QApplication* qapp, QObject *parent)
     : QObject(parent), m_player(0), m_cdb(0), m_rdco(0),
       m_avto(0), m_ohtmo(0), m_ohvlo(0), m_ohpro(0),
-      m_ui_playlist(0), m_sctool(0), m_settings(0), m_app(qapp),
+      m_ui_playlist(0), m_sctool(0), m_notifs(0), m_settings(0), m_app(qapp),
       m_initialized(false), m_playlistIsPlaylist(false),
       m_ohsourcetype(OHProductQO::OHPR_SourceUnknown)
 {
@@ -553,6 +554,13 @@ void Application::playlist_connections()
             m_ui_playlist, setPlayerMode(Playlist_Mode));
     CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
             m_player, update_track(const MetaData&));
+    if (m_notifs == 0) {
+        m_notifs = new UpplayNotifications(this);
+    }
+    if (m_notifs) {
+        CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
+                m_notifs, notify(const MetaData&));
+    }
     CONNECT(m_playlist.get(), sig_stopped(),  m_player, stopped());
     CONNECT(m_playlist.get(), sig_paused(),  m_player, paused());
     CONNECT(m_playlist.get(), sig_playing(),  m_player, playing());
@@ -578,6 +586,8 @@ void Application::playlist_connections()
     m_playlist->update_state();
 }
 
+// Direct renderer-Player connections (not going through the Playlist):
+// volume and time mostly.
 void Application::renderer_connections()
 {
     // Use either ohtime or avt for time updates

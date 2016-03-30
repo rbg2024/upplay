@@ -79,13 +79,29 @@ void UPPrefs::onShowPrefs()
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
 
+        // Show notifications ?
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "shownotifications",
+                      "Show notifications",
+                      "Show pop-up message in notification area when a track "
+                      "starts playing");
+
+        QSettings settings;
+        if (!settings.contains("notificationcmd")) {
+            settings.setValue("notificationcmd",
+                              "notify-send --expire-time=500 --icon=upplay");
+        }
+        m_w->addParam(idx, ConfTabsW::CFPT_STR, "notificationcmd",
+                      "Notification command",
+                      "Command to execute to notify. The message argument "
+                      " will be appended");
+
         // Truncate artist information in directory listings?
         ConfParamW *b1 =
             m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "truncateartistindir", 
                           "Truncate artist information in track lists",
                           "Truncate very long artist info so that the table "
                           "does not become weird");
-        QSettings settings;
+
         QString pname("truncateartistlen");
         if (!settings.contains(pname)) {
             settings.setValue(pname, 30);

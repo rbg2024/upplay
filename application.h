@@ -43,6 +43,7 @@ class OHVolumeQO;
 class Playlist;
 class RenderingControlQO;
 class SongcastTool;
+class UpplayNotifications;
 
 class Application : public QObject
 {
@@ -78,6 +79,7 @@ private:
     
     GUI_Playlist *m_ui_playlist;
     SongcastTool *m_sctool;
+    UpplayNotifications *m_notifs;
     
     CSettingsStorage *m_settings;
     QApplication     *m_app;

@@ -51,6 +51,7 @@ HEADERS += \
         GUI/volumewidget/volumewidget.h \
         GUI/volumewidget/volumewidgetif.h \
         GUI/widgets/directslider.h  \
+        HelperStructs/notifications.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
@@ -108,6 +109,7 @@ SOURCES += \
         GUI/volumewidget/soundslider.cpp  \
         GUI/volumewidget/volumewidget.cpp \
         GUI/widgets/directslider.cpp \
+        HelperStructs/notifications.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
