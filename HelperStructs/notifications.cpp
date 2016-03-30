@@ -30,10 +30,10 @@ void UpplayNotifications::notify(const MetaData& meta)
 {
     //qDebug() << "UpplayNotifications::notify: title [" << meta.title <<
     //"] artist [" << meta.artist;
-
     if (meta.title == "") {
         return;
     }
+#ifndef _WIN32
     if (meta.title == m_prevmeta.title && 
         meta.artist == m_prevmeta.artist) {
         return;
@@ -71,4 +71,5 @@ void UpplayNotifications::notify(const MetaData& meta)
     qlist.push_back(msg);
     //qDebug() << "UpplayNotifications::notify: starting command " << command;
     QProcess::startDetached(command, qlist, "/tmp");
+#endif
 }
