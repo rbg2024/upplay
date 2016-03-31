@@ -23,8 +23,21 @@
 #include "upadapt/upputils.h"
 #include "GUI/prefs/confgui.h"
 #include "notifications.h"
+#include "audioscrobbler.h"
 
 using namespace std;
+
+UpplayNotifications::UpplayNotifications(QObject *parent)
+    : QObject(parent), m_scrobbler(0)
+{
+}
+
+void UpplayNotifications::songProgress(quint32 secs)
+{
+    if (m_scrobbler) {
+        m_scrobbler->maybeScrobble(secs, m_prevmeta);
+    }
+}
 
 void UpplayNotifications::notify(const MetaData& meta)
 {
@@ -33,18 +46,28 @@ void UpplayNotifications::notify(const MetaData& meta)
     if (meta.title == "") {
         return;
     }
-#ifndef _WIN32
     if (meta.title == m_prevmeta.title && 
         meta.artist == m_prevmeta.artist) {
         return;
     }
+    m_prevmeta = meta;
+
     QSettings settings;
+    if (settings.value("lastfmscrobble").toBool()) {
+        if (m_scrobbler == 0) {
+            m_scrobbler = new AudioScrobbler(this);
+        }
+    } else {
+        if (m_scrobbler) {
+            delete m_scrobbler;
+            m_scrobbler = 0;
+        }
+    }
+    
+#ifndef _WIN32
     if (!settings.value("shownotifications").toBool()) {
         return;
     }
-
-    m_prevmeta.title = meta.title;
-    m_prevmeta.artist = meta.artist;
     
     // Retrieve notification command as string list
     QString cmdstring = settings.value("notificationcmd").toString();

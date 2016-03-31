@@ -51,7 +51,6 @@ HEADERS += \
         GUI/volumewidget/volumewidget.h \
         GUI/volumewidget/volumewidgetif.h \
         GUI/widgets/directslider.h  \
-        HelperStructs/notifications.h \
         HelperStructs/CSettingsStorage.h \
         HelperStructs/Helper.h \
         HelperStructs/PlaylistMode.h \
@@ -61,6 +60,8 @@ HEADERS += \
         dirbrowser/dirbrowser.h \
         dirbrowser/randplayer.h \
         dirbrowser/rreaper.h \
+        notifications/audioscrobbler.h \
+        notifications/notifications.h \
         playlist/playlist.h \
         playlist/playlistavt.h \
         playlist/playlistlocrd.h \
@@ -109,7 +110,6 @@ SOURCES += \
         GUI/volumewidget/soundslider.cpp  \
         GUI/volumewidget/volumewidget.cpp \
         GUI/widgets/directslider.cpp \
-        HelperStructs/notifications.cpp \
         HelperStructs/CSettingsStorage.cpp \
         HelperStructs/Helper.cpp \
         HelperStructs/Style.cpp \
@@ -118,6 +118,8 @@ SOURCES += \
         dirbrowser/dirbrowser.cpp \
         dirbrowser/randplayer.cpp \
         dirbrowser/rreaper.cpp \
+        notifications/audioscrobbler.cpp \
+        notifications/notifications.cpp \
         playlist/playlist.cpp \
         playlist/playlistavt.cpp \
         playlist/playlistlocrd.cpp \

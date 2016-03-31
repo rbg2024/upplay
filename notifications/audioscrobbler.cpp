@@ -59,7 +59,7 @@ void AudioScrobbler::maybeScrobble(time_t reltime, const MetaData& meta)
         m_curpos = reltime;
         m_starttime = time(0);
         m_sent = false;
-        qDebug() << "AudioScrobbler::maybeScrobble: registered new song";
+        //qDebug() << "AudioScrobbler::maybeScrobble: registered new song";
     }
 
     if(m_curpos != reltime) {
@@ -73,9 +73,9 @@ void AudioScrobbler::maybeScrobble(time_t reltime, const MetaData& meta)
 
 void AudioScrobbler::maybeQueue()
 {
-    qDebug() << "AudioScrobbler::maybeQueue: m_sent" << m_sent <<
-        " artist " << m_curmeta.artist << " " <<
-        " title " << m_curmeta.title << " mS " << m_curmeta.length_ms;
+    //qDebug() << "AudioScrobbler::maybeQueue: m_sent" << m_sent <<
+    //" artist " << m_curmeta.artist << " " <<
+    //" title " << m_curmeta.title << " mS " << m_curmeta.length_ms;
     if(m_sent || m_curmeta.artist.isEmpty() ||
        m_curmeta.title.isEmpty() || m_curmeta.length_ms / 1000 < 5) {
         return;
@@ -83,7 +83,7 @@ void AudioScrobbler::maybeQueue()
 
     if(m_curpos >= 240 ||
        m_curpos >= m_curmeta.length_ms / 2000) {
-        qDebug() << "AudioScrobbler::maybeQueue: queueing" << m_curmeta.title;
+        //qDebug() << "AudioScrobbler::maybeQueue: queueing" << m_curmeta.title;
 
         MetaData meta = m_curmeta;
         // Store starttime in meta filesize which is not sent to last.fm
@@ -98,6 +98,8 @@ void AudioScrobbler::maybeQueue()
 void AudioScrobbler::processQueue()
 {
     if (m_queue.isEmpty() || (time(0) - m_lastqfail < 300)) {
+        //qDebug() << "AudioScrobbler::processQueue: qs " << m_queue.size() <<
+        //" fail time " << time(0) - m_lastqfail;
         return;
     }
         
@@ -108,11 +110,22 @@ void AudioScrobbler::processQueue()
     }
 }
 
-
-void AudioScrobbler::openURL(const QString& url, const QByteArray *data)
+void AudioScrobbler::scrobbleFailure()
 {
-    if (m_netman == 0 || m_netactive)
+    m_lastqfail = time(0);
+    m_failcount += 1;
+    if(m_failcount >= 3) {
+        m_failcount = 0;
+        handshake();
+    }
+}
+
+void AudioScrobbler::openURL(const QString& url, const char *data)
+{
+    if (m_netman == 0 || m_netactive) {
+        qDebug() << "AudioScrobbler::openURL: no netman or already active";
         return;
+    }
     
     QNetworkRequest request;
     request.setUrl(url);
@@ -120,7 +133,7 @@ void AudioScrobbler::openURL(const QString& url, const QByteArray *data)
     if (data) {
         request.setHeader(QNetworkRequest::ContentTypeHeader,
                           "application/x-www-form-urlencoded");
-        m_netman->post(request, *data);
+        m_netman->post(request, QByteArray(data));
     } else {
         m_netman->get(request);
     }
@@ -128,31 +141,99 @@ void AudioScrobbler::openURL(const QString& url, const QByteArray *data)
 
 void AudioScrobbler::replyFinished(QNetworkReply *reply)
 {
-
     QNetworkReply::NetworkError error = reply->error();
+    QByteArray qdata;
     if (error == QNetworkReply::NoError) {
-        qDebug() << "Success" << reply->readAll();
+        qdata = reply->readAll();
+        // qDebug() << "Success: " << qdata;
     } else {
         qDebug() << "Failure" << reply->errorString();
     }
     reply->deleteLater();
-
-#if 0
-    if(_response.find("<lfm status=\"ok\">") != std::string::npos) {
-        size_t start, end;
-        start = _response.find("<key>") + 5;
-        end = _response.find("</key>");
-        _sessionid = _response.substr(start, end-start);
-        iprintf("%s%s", "Last.fm handshake successful. SessionID: ", _sessionid.c_str());
-        _authed = true;
-    } else if(_response.find("<lfm status=\"failed\">") != std::string::npos) {
-        CheckFailure(_response);
-        exit(EXIT_FAILURE);
+    m_netactive = false;
+    
+    string data((const char *)qdata);
+    
+    if(data.find("<lfm status=\"ok\">") == std::string::npos) {
+        checkFailure(data);
+        return;
     }
-#endif
+
+    if (data.find("<session>") != string::npos &&
+        data.find("<key>") != string::npos) {
+        // Login Response:
+        // <?xml version="1.0" encoding="utf-8"?>
+        // <lfm status="ok">
+        //   <session>
+        //     <name>medoc92</name>
+        //     <key>8b654a6cbf3a40a882d90430d398ab92</key>
+        //     <subscriber>0</subscriber>
+        //   </session>
+        // </lfm>
+        size_t start, end;
+        start = data.find("<key>") + 5;
+        end = data.find("</key>");
+        m_sessionid = data.substr(start, end-start);
+        //qDebug() << "AudioScrobbler: Last.fm handshake ok. SessionID: " <<
+        // m_sessionid.c_str();
+        m_authed = true;
+        m_lastqfail = 0;
+    } else if (data.find("<scrobbles") != string::npos &&
+        data.find("<scrobble>") != string::npos) {
+        // <lfm status="ok">
+        //   <scrobbles ignored="0" accepted="1">
+        //     <scrobble>
+        //       <track corrected="0">De Camino a La Vereda</track>
+        //       <artist corrected="0">Buena Vista Social Club</artist>
+        //       <album corrected="0">Buena Vista Social Club</album>
+        //       <albumArtist corrected="0"></albumArtist>
+        //       <timestamp>1459441085</timestamp>
+        //       <ignoredMessage code="0"></ignoredMessage>
+        //     </scrobble>
+        //    </scrobbles>
+        // </lfm>
+        qDebug() << "Scrobbled successfully.";
+    } else {
+        qDebug() << "AudioScrobbler: unrecognized response";
+    }
 }
 
-QString AudioScrobbler::createScrobbleMessage(const MetaData& meta)
+bool AudioScrobbler::checkFailure(string respdata)
+{
+    size_t start, end;
+    start = respdata.find("<error code=\"") + 13;
+    end = respdata.find(">", start) - 1;
+    string errorcode = respdata.substr(start, end - start);
+    int code = strtol(errorcode.c_str(), 0, 10);
+
+    qDebug() << "AudioScrobbler: error code: " <<  code;
+
+    switch(code) {
+    case 3:
+        qDebug() << "AudioScrobbler: Invalid Method. This should not happen.";
+        return true;
+    case 4:
+        qDebug() << "AudioScrobbler: Authentication failed. "
+            "Please check your login data.";
+        return false;
+    case 9:
+        qDebug() << "AudioScrobbler: Invalid session key. Re-authenticating.";
+        m_failcount = 3;
+        return true;
+    case 10:
+        qDebug() << "AudioScrobbler: Invalid API-Key !!";
+        return false;
+    case 16:
+        qDebug() << "AudioScrobbler: service is temporarily unavailable";
+        return true;
+    case 26:
+        qDebug() << "AudioScrobbler: Suspended API key !!";
+        return false;
+    }
+    return false;
+}
+
+string AudioScrobbler::createScrobbleMessage(const MetaData& meta)
 {
     stringstream msg, sigmsg ;
     string artist, title, album, array = "=";
@@ -168,7 +249,7 @@ QString AudioScrobbler::createScrobbleMessage(const MetaData& meta)
         "&method=track.Scrobble" << 
         "&timestamp" << array << meta.filesize << 
         "&track" << array << escapeHtml(title) << 
-        "&sk=" << qs2utf8s(m_sessionid);
+        "&sk=" << m_sessionid;
 
     array = "";
 
@@ -178,7 +259,7 @@ QString AudioScrobbler::createScrobbleMessage(const MetaData& meta)
     sigmsg << "artist" << array << artist;
     sigmsg << "duration" << array << meta.length_ms / 1000;
     sigmsg << "methodtrack.Scrobble";
-    sigmsg << "sk" << qs2utf8s(m_sessionid);
+    sigmsg << "sk" << m_sessionid;
     sigmsg << "timestamp" << array << meta.filesize;
     sigmsg << "track" << array << title;
     sigmsg << apiSecret;
@@ -189,85 +270,22 @@ QString AudioScrobbler::createScrobbleMessage(const MetaData& meta)
 
     msg << "&api_sig=" << sighash;
 
-    return u8s2qs(msg.str());
+    return msg.str();
 }
 
-void AudioScrobbler::scrobbleFailure()
+bool AudioScrobbler::scrobble(const MetaData& meta)
 {
-    m_lastqfail = time(0);
-    m_failcount += 1;
-    if(m_failcount >= 3) {
-        m_failcount = 0;
-        handshake();
-    }
-}
-
-#if 0
-bool CAudioScrobbler::CheckFailure(std::string response)
-{
-    bool retval = false;
-
-    size_t start, end;
-    start = _response.find("<error code=\"")+13;
-    end = _response.find(">", start)-1;
-    std::string errorcode = _response.substr(start, end-start);
-    int code = strtol(errorcode.c_str(), 0, 10);
-
-    eprintf("%s%i", "Code: ", code);
-
-    switch(code) {
-    case 3:
-        eprintf("Invalid Method. This should not happen.");
-        retval = true;
-        break;
-    case 4:
-        eprintf("Authentication failed. Please check your login data.");
-        exit(EXIT_FAILURE);
-    case 9:
-        eprintf("Invalid session key. Re-authenticating.");
-        retval = true;
-        _failcount = 3;
-        break;
-    case 10:
-        eprintf("Invalid API-Key. Let's bugger off.");
-        exit(EXIT_FAILURE);
-    case 16:
-        eprintf("The service is temporarily unavailable, we will try again later..");
-        retval = true;
-        break;
-    case 26:
-        eprintf("Uh oh. Suspended API key - Access for your account has been suspended, please contact Last.fm");
-        exit(EXIT_FAILURE);
-    }
-
-    return retval;
-}
-#endif
-
-bool AudioScrobbler::scrobble(const MetaData&)
-{
-    bool retval = false;
     if(!m_authed) {
-        qDebug() << "AudioScrobbler::scrobble: handshake hasn't been done yet.";
+        //qDebug() << "AudioScrobbler::scrobble: handshake not done yet.";
         handshake();
-        return retval;
+        return false;
     }
 
-#if 0
-    iprintf("Scrobbling: %s - %s", entry.getSong().getArtist().c_str(), entry.getSong().getTitle().c_str());
+    qDebug() << "AudioScrobbler:scrobble: " << meta.title << " " << meta.artist;
 
-    OpenURL(ROOTURL, CreateScrobbleMessage(0, entry).c_str());
-    if(_response.find("<lfm status=\"ok\">") != std::string::npos) {
-        iprintf("%s", "Scrobbled successfully.");
-        retval = true;
-    } else if (_response.find("<lfm status=\"failed\">") != std::string::npos) {
-        eprintf("%s%s", "Last.fm returned an error while scrobbling:\n", _response.c_str());
-        if(CheckFailure(_response))
-            Failure();
-    }
-#endif
+    openURL(rootUrl, createScrobbleMessage(meta).c_str());
 
-    return retval;
+    return true;
 }
 
 void AudioScrobbler::handshake()
@@ -297,6 +315,5 @@ void AudioScrobbler::handshake()
 
     query += "&api_sig=" + sighash;
 
-    m_qdata = query.c_str();
-    openURL(rootUrl, &m_qdata);
+    openURL(rootUrl, query.c_str());
 }

@@ -129,6 +129,14 @@ void UPPrefs::onShowPrefs()
                            "", 0, 100);
         m_w->enableLink(b1, w1);
         
+        idx = m_w->addPanel("Last.FM");
+
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "lastfmscrobble",
+                      "Send track information to Last.FM", "");
+        m_w->addParam(idx, ConfTabsW::CFPT_STR, "lastfmusername",
+                      "Last.FM user name", "");
+        m_w->addParam(idx, ConfTabsW::CFPT_STR, "lastfmpassword",
+                      "Last.FM password (md5)", "");
 
         idx = m_w->addForeignPanel(new SortprefsW(m_w), "Directory Sorting");
 

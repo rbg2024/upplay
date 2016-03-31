@@ -19,19 +19,23 @@
 
 #include <QObject>
 
-#include "MetaData.h"
+#include "HelperStructs/MetaData.h"
+
+class AudioScrobbler;
 
 class UpplayNotifications : public QObject {
     Q_OBJECT;
 public:
-    UpplayNotifications(QObject *parent = 0) : QObject(parent) {}
+    UpplayNotifications(QObject *parent = 0);
     virtual ~UpplayNotifications() {}
 
 public slots:
     void notify(const MetaData&);
-
+    void songProgress(quint32 secs);
+    
 private:
     MetaData m_prevmeta;
+    AudioScrobbler *m_scrobbler;
 };
 
 

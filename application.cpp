@@ -38,7 +38,7 @@
 #include "GUI/renderchoose/renderchoose.h"
 #include "GUI/sourcechoose/sourcechoose.h"
 #include "GUI/songcast/songcastdlg.h"
-#include "HelperStructs/notifications.h"
+#include "notifications/notifications.h"
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/Style.h"
@@ -119,6 +119,8 @@ Application::Application(QApplication* qapp, QObject *parent)
 
     m_cdb = new DirBrowser(m_player->getParentOfLibrary(), 0);
     m_player->setLibraryWidget(m_cdb);
+
+    m_notifs = new UpplayNotifications(this);
 
     init_connections();
     string uid = qs2utf8s(m_settings->getPlayerUID());
@@ -535,9 +537,13 @@ void Application::playlist_connections()
     if (m_ohtmo) {
         CONNECT(m_ohtmo, secsInSongChanged(quint32),
                 m_playlist.get(), onRemoteSecsInSong(quint32));
+        CONNECT(m_ohtmo, secsInSongChanged(quint32),
+                m_notifs, songProgress(quint32));
     } else if (m_avto) {
         CONNECT(m_avto, secsInSongChanged(quint32),
                 m_playlist.get(), onRemoteSecsInSong(quint32));
+        CONNECT(m_avto, secsInSongChanged(quint32),
+                m_notifs, songProgress(quint32));
     }
 
     CONNECT(m_player, play(), m_playlist.get(), psl_play());
@@ -554,13 +560,8 @@ void Application::playlist_connections()
             m_ui_playlist, setPlayerMode(Playlist_Mode));
     CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
             m_player, update_track(const MetaData&));
-    if (m_notifs == 0) {
-        m_notifs = new UpplayNotifications(this);
-    }
-    if (m_notifs) {
-        CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
-                m_notifs, notify(const MetaData&));
-    }
+    CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
+            m_notifs, notify(const MetaData&));
     CONNECT(m_playlist.get(), sig_stopped(),  m_player, stopped());
     CONNECT(m_playlist.get(), sig_paused(),  m_player, paused());
     CONNECT(m_playlist.get(), sig_playing(),  m_player, playing());

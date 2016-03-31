@@ -21,6 +21,8 @@
 #include <QString>
 #include <QHash>
 
+#include <string>
+
 #include "HelperStructs/MetaData.h"
 
 class QNetworkAccessManager;
@@ -55,8 +57,9 @@ private:
     void scrobbleFailure();
     bool scrobble(const MetaData&);
     void handshake();
-    void openURL(const QString& url, const QByteArray *data = 0);
-    QString createScrobbleMessage(const MetaData& meta);
+    void openURL(const QString& url, const char *data = 0);
+    std::string createScrobbleMessage(const MetaData& meta);
+    bool checkFailure(std::string response);
     
     // Current song playing. maybeScrobble uses this to decide when to
     // queue data for scrobbling
@@ -76,11 +79,9 @@ private:
     int m_failcount;
     // Logged in ?
     bool m_authed;
-    QString m_sessionid;
+    std::string m_sessionid;
     QNetworkAccessManager *m_netman;
     bool m_netactive;
-    QByteArray m_qdata;
 };
-
 
 #endif /* _AUDIOSCROBBLER_H_INCLUDED_ */
