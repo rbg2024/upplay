@@ -1,4 +1,7 @@
 = Upplay manual
+:toc:
+
+== Overview
 
 image::legend-upplay-main.png[]
 
@@ -89,7 +92,52 @@ losing the current display.
 `^f` or `/` will open the search panel, `Esc` will close it (or the x-cross
 button at the right).
 
-link:searching.html[more detail on search].
+== Searching 
+
+Upplay supports two search modes:
+ 
+- Inside the current directory page: this is handy to quickly skip inside
+  a long list.
+- Server search.
+
+The search panel is located at the bottom of the library window (the one on
+the right), and normally hidden. You can open it by the following actions:
+ 
+- Typing `/` inside the library window.
+- Typing `Ctrl+f` inside the library window.
+- Using the View menu
+
+Not all servers support search (e.g, MediaTomb does not, Minidlna does,
+etc.).
+
+You can close the panel by the following actions:
+
+- Typing `Esc` (the Escape key).
+- Clicking the x-cross icon on the right of the panel
+- Using the `View` menu.
+
+When the search panel opens for the first time, the panel is in local
+search mode. Typing inside the search entry area will try to find matches
+in the page. You can use the two arrow buttons or type `F3` or `Shift+F3`
+to find the next or previous match.
+
+In server mode, the search panel will let you enter a search string and the
+kind of field inside which you want to search (the combobox on the right,
+Artist/Album/Title). Type `Enter` or click the search button to start the
+search. 
+
+The results are displayed just like a directory listing and can be
+used in the same way (including opening tabs for directory listings, etc.).
+
+Server searches are always relative to the first directory earlier in the
+path, never to another search.
+If your search yields nothing, one of the things to check is that you are
+high enough in the tree (not searching a single directory).
+
+Also *_space characters are significant in the search entry_*. This has a
+capacity for trouble but it can also be a great help when trying to match
+words (there are no standard UPnP ways to specify word matches, or anchor a
+search at the beginning or end of a field).
 
 == Tab bar section
 
@@ -124,8 +172,8 @@ And `Help`, there is no help...
 [[hiresadjust]]
 == Adjusting the font sizes on high resolution displays
 
-Most people will find that the font sizes are too small on high DPI
-displays.
+Most people will find that the font sizes (and buttons/icons) are too small
+on high DPI displays.
 
 As of version 1.2.5, the GUI can be partially adjusted by editing two style
 sheet files. To adjust the font sizes:
@@ -136,10 +184,16 @@ sheet files. To adjust the font sizes:
   directives. An adequate approach will usually be to multiply the sizes by
   some constant factor (e.g.: 2 ...).
 
+On Windows, use 'notepad' or an equivalent pure text editor to edit the
+files, which are located in the 'share' and 'share\cdbrowser'
+subdirectories of the top installation directory (e.g: 'C:\Program Files
+(x86)\Upplay\'). You need to specify "all files" when opening the files,
+because notepad does not list '.css' files by default (only '.txt').
 
 The adjustment is not perfect for now: the player section does not update
 its size, which means that some titles will be truncated (in the top left
-area), and the icon sizes are unchanged.
+area), and the icon sizes are unchanged. Arbitrary text truncation may
+happen in places. This will hopefully be improved in a future release.
 
 There are other, system-based, approaches described on the following Qt page:
 http://doc.qt.io/qt-5/highdpi.html
