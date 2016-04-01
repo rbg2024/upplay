@@ -59,6 +59,7 @@ void AudioScrobbler::maybeScrobble(time_t reltime, const MetaData& meta)
         m_curpos = reltime;
         m_starttime = time(0);
         m_sent = false;
+        nowPlaying(m_curmeta);
         //qDebug() << "AudioScrobbler::maybeScrobble: registered new song";
     }
 
@@ -145,9 +146,12 @@ void AudioScrobbler::replyFinished(QNetworkReply *reply)
     QByteArray qdata;
     if (error == QNetworkReply::NoError) {
         qdata = reply->readAll();
-        // qDebug() << "Success: " << qdata;
+        qDebug() << "Success: " << qdata;
     } else {
-        qDebug() << "Failure" << reply->errorString();
+        qDebug() << "Failure: error: " << reply->errorString();
+        reply->deleteLater();
+        m_netactive = false;
+        return;
     }
     reply->deleteLater();
     m_netactive = false;
@@ -192,9 +196,11 @@ void AudioScrobbler::replyFinished(QNetworkReply *reply)
         //     </scrobble>
         //    </scrobbles>
         // </lfm>
-        qDebug() << "Scrobbled successfully.";
+        qDebug() << "AudioScrobbler: scrobbled successfully.";
+    } else if (data.find("<nowplaying>") != string::npos) {
+        qDebug() << "AudioScrobbler: now playing successful.";
     } else {
-        qDebug() << "AudioScrobbler: unrecognized response";
+        qDebug() << "AudioScrobbler: unrecognized response (no big deal)";
     }
 }
 
@@ -233,44 +239,54 @@ bool AudioScrobbler::checkFailure(string respdata)
     return false;
 }
 
-string AudioScrobbler::createScrobbleMessage(const MetaData& meta)
+// Yes inefficient. whatever...
+static string i2s(int val)
 {
-    stringstream msg, sigmsg ;
-    string artist, title, album, array = "=";
+    char cbuf[30];
+    sprintf(cbuf, "%d", val);
+    return string(cbuf);
+}
 
-    artist = qs2utf8s(meta.artist);
-    title = qs2utf8s(meta.title);
-    album = qs2utf8s(meta.album);
+static string LFMMessage(const map<string, string>& vars)
+{
+    string out;
+    string sigdata;
+    static const string amp("&");
+    static const string eq("=");
 
-    msg << "&album" << array << escapeHtml(album) <<
-        "&api_key=" << apiKey << 
-        "&artist" << array << escapeHtml(artist) << 
-        "&duration" << array << meta.length_ms / 1000 << 
-        "&method=track.Scrobble" << 
-        "&timestamp" << array << meta.filesize << 
-        "&track" << array << escapeHtml(title) << 
-        "&sk=" << m_sessionid;
-
-    array = "";
-
-    // Signature: parameters are ordered alphabetically
-    sigmsg << "album" << array << album;
-    sigmsg << "api_key" << apiKey;
-    sigmsg << "artist" << array << artist;
-    sigmsg << "duration" << array << meta.length_ms / 1000;
-    sigmsg << "methodtrack.Scrobble";
-    sigmsg << "sk" << m_sessionid;
-    sigmsg << "timestamp" << array << meta.filesize;
-    sigmsg << "track" << array << title;
-    sigmsg << apiSecret;
+    for (map<string, string>::const_iterator it = vars.begin();
+         it != vars.end(); it++) {
+        if (it != vars.begin())
+            out += amp;
+        out +=  it->first + eq + it->second;
+        sigdata += it->first + it->second;
+    }
+    sigdata += apiSecret;
 
     string digest, sighash;
-    MD5String(sigmsg.str(), digest);
+    MD5String(sigdata, digest);
     MD5HexPrint(digest, sighash);
 
-    msg << "&api_sig=" << sighash;
+    out += "&api_sig=" + sighash;
 
-    return msg.str();
+    //qDebug() << "Message: [" << out.c_str() << "]\n";
+    return out;
+}
+
+string AudioScrobbler::createScrobbleMessage(const MetaData& meta)
+{
+    map<string, string> vars;
+
+    vars["album"] = escapeHtml(qs2utf8s(meta.album));
+    vars["api_key"] = apiKey;
+    vars["artist"] = escapeHtml(qs2utf8s(meta.artist));
+    vars["duration"] = i2s(meta.length_ms / 1000);
+    vars["method"] = "track.Scrobble";
+    vars["timestamp"] = i2s(meta.filesize); // We store starttime in filesize
+    vars["track"] = escapeHtml(qs2utf8s(meta.title));
+    vars["sk"] = m_sessionid;
+
+    return LFMMessage(vars);
 }
 
 bool AudioScrobbler::scrobble(const MetaData& meta)
@@ -288,32 +304,51 @@ bool AudioScrobbler::scrobble(const MetaData& meta)
     return true;
 }
 
+bool AudioScrobbler::nowPlaying(const MetaData& meta)
+{
+    map<string, string> vars;
+    vars["method"] = "track.updateNowPlaying";
+    vars["track"] = escapeHtml(qs2utf8s(meta.title));
+    vars["artist"] =  escapeHtml(qs2utf8s(meta.artist));
+    vars["album"] = escapeHtml(qs2utf8s(meta.album));
+    vars["duration"] = i2s(meta.length_ms / 1000);
+    vars["api_key"] = apiKey;
+    vars["sk"] = m_sessionid;
+
+    openURL(rootUrl, LFMMessage(vars).c_str());
+    return true;
+}
+
+bool AudioScrobbler::loveTrack(const MetaData& meta)
+{
+    map<string, string> vars;
+    
+    vars["method"] = "track.love";
+    vars["track"] = escapeHtml(qs2utf8s(meta.title));
+    vars["artist"] =  escapeHtml(qs2utf8s(meta.artist));
+    vars["api_key"] = apiKey;
+    vars["sk"] = m_sessionid;
+
+    openURL(rootUrl, LFMMessage(vars).c_str());
+    return true;
+}
+
 void AudioScrobbler::handshake()
 {
     QSettings settings;
-    QString username = settings.value("lastfmusername").toString().toLower();
-    QString password = settings.value("lastfmpassword").toString();
+    string username = qs2utf8s(settings.value("lastfmusername").
+                               toString().toLower());
+    string password = qs2utf8s(settings.value("lastfmpassword").toString());
 
     string digest, authtoken;
-    MD5String(qs2utf8s(username+password), digest);
+    MD5String(username + password, digest);
     MD5HexPrint(digest, authtoken);
 
-    string query, sig;
-    query = string("method=auth.getMobileSession&username=") +
-        qs2utf8s(username) +
-        "&authToken=" + authtoken +
-        "&api_key=" + apiKey;
+    map<string, string> vars;
+    vars["method"] = "auth.getMobileSession";
+    vars["username"] = username;
+    vars["authToken"] = authtoken;
+    vars["api_key"] = apiKey;
 
-    sig = string("api_key") + apiKey +
-        "authToken" + authtoken +
-        "methodauth.getMobileSessionusername" + qs2utf8s(username) +
-        apiSecret;
-
-    string sighash;
-    MD5String(sig, digest);
-    MD5HexPrint(digest, sighash);
-
-    query += "&api_sig=" + sighash;
-
-    openURL(rootUrl, query.c_str());
+    openURL(rootUrl, LFMMessage(vars).c_str());
 }

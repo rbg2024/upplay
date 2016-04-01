@@ -56,6 +56,8 @@ private:
     void processQueue();
     void scrobbleFailure();
     bool scrobble(const MetaData&);
+    bool nowPlaying(const MetaData&);
+    bool loveTrack(const MetaData& meta);
     void handshake();
     void openURL(const QString& url, const char *data = 0);
     std::string createScrobbleMessage(const MetaData& meta);
