@@ -42,17 +42,16 @@ void GUI_Player::showLibrary(bool b, bool resize)
 
         p.setHorizontalStretch(0);
         this->ui->library_widget->setSizePolicy(p);
-
         m_library_width = lib_width;
         new_width = old_width - lib_width;
-        this->setMinimumSize(300, 400);
+        //this->setMinimumSize(300, 400);
     } else {
         // visible
         QSizePolicy p = this->ui->library_widget->sizePolicy();
         p.setHorizontalStretch(m_library_stretch_factor);
         this->ui->library_widget->setSizePolicy(p);
         new_width = old_width + m_library_width;
-        this->setMinimumSize(650, 400);
+        //this->setMinimumSize(650, 400);
     }
 
     if (resize) {
@@ -76,28 +75,11 @@ void GUI_Player::show_fullscreen_toggled(bool b)
     m_settings->setPlayerFullscreen(b);
 }
 
-/** VIEW END **/
-
-
-
-/** PREFERENCES **/
-
-// prvt slot
-void GUI_Player::load_pl_on_startup_toggled(bool b)
-{
-
-    m_settings->setLoadPlaylist(b);
-}
-
 // prvt slot
 void GUI_Player::show_notification_toggled(bool active)
 {
 
     m_settings->setShowNotifications(active);
-}
-
-void GUI_Player::only_one_instance_toggled(bool)
-{
 }
 
 // prvt slot

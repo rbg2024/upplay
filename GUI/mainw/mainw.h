@@ -113,21 +113,11 @@ private slots:
     void onVolumeStepActivated(int val);
     void onVolumeHigherActivated();
     void onVolumeLowerActivated();
-
-    /* File */
-
-    /* View */
     void showLibrary(bool, bool resize=true);
     void changeSkin(bool);
     void small_playlist_items_toggled(bool);
     void show_notification_toggled(bool);
     void show_fullscreen_toggled(bool);
-
-    /* Preferences */
-
-    void load_pl_on_startup_toggled(bool);
-    void only_one_instance_toggled(bool);
-
     void about(bool b=false);
     void help(bool b=false);
 
@@ -136,8 +126,8 @@ private slots:
 
 public:
     void setPlaylist(GUI_Playlist* playlist);
-    QWidget* getParentOfPlaylist();
-    QWidget* getParentOfLibrary();
+    QWidget *getParentOfPlaylist();
+    QWidget *getParentOfLibrary();
     void setLibraryWidget(QWidget* );
     void setPlaylistWidget(QWidget* );
 
