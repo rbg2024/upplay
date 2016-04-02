@@ -319,7 +319,6 @@ void GUI_Player::setPlaylistWidget(QWidget* w)
     delete ui->playlist_widget;
     ui->playlist_widget = w;
     ui->verticalLayout->addWidget(ui->playlist_widget);
-
 #ifdef UPPLAY_HORIZONTAL_LAYOUT
     QLayoutItem *cover = ui->player_w->takeCoverWidget();
     QWidget *cw = cover->widget();
@@ -347,6 +346,8 @@ void GUI_Player::setLibraryWidget(QWidget* w)
     ui->library_widget = w;
     ui->splitter->addWidget(w);
     ui->splitter->restoreState(m_settings->getSplitterState());
+    bool show_library = !m_settings->getNoShowLibrary();
+    this->showLibrary(show_library);
 }
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
