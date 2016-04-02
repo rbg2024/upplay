@@ -241,9 +241,6 @@ static bool stringToBool(const string &s)
     return false;
 }
 
-template <class T> bool stringToStrings(const string& s, T &tokens, 
-                                        const string& addseps = "");
-
 template <class T> bool stringToStrings(const string &s, T &tokens, 
                                         const string& addseps)
 {
