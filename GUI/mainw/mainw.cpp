@@ -347,7 +347,7 @@ void GUI_Player::setLibraryWidget(QWidget* w)
     ui->splitter->addWidget(w);
     ui->splitter->restoreState(m_settings->getSplitterState());
     bool show_library = !m_settings->getNoShowLibrary();
-    this->showLibrary(show_library);
+    this->showLibrary(show_library, false);
 }
 
 void GUI_Player::setPlaylist(GUI_Playlist* playlist)
