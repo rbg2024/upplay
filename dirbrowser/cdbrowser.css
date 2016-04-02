@@ -1,10 +1,11 @@
 
 
-/* General font selection. This is where you would increase the font size for
- a highdpi display */
+/* General font selection. This is the place to adjust the font size for the
+ * directory browser area. The distributed file uses the system
+ * default (the size spec is commented out. */
 html, body, form, fieldset, table, tr, td, img {
     font-family:Arial,helvetica,sans-serif;
-/*    font-size: 30px;*/
+/*    font-size: 10pt;*/
 }
 
 
