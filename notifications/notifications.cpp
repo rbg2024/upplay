@@ -28,10 +28,21 @@
 using namespace std;
 
 UpplayNotifications::UpplayNotifications(QObject *parent)
-    : QObject(parent), m_scrobbler(0)
+    : QObject(parent), m_scrobbler(0), m_playing(false)
 {
 }
-
+void UpplayNotifications::onStopped()
+{
+    m_playing = false;
+}
+void UpplayNotifications::onPaused()
+{
+    m_playing = false;
+}
+void UpplayNotifications::onPlaying()
+{
+    m_playing = true;
+}
 void UpplayNotifications::songProgress(quint32 secs)
 {
     if (m_scrobbler) {
@@ -41,15 +52,19 @@ void UpplayNotifications::songProgress(quint32 secs)
 
 void UpplayNotifications::notify(const MetaData& meta)
 {
-    //qDebug() << "UpplayNotifications::notify: title [" << meta.title <<
-    //"] artist [" << meta.artist;
+//    qDebug() << "UpplayNotifications::notify: playing " << m_playing <<
+//        "title" << meta.title << "artist" << meta.artist <<
+//        "prevtit" << m_prevmeta.title << "prevart" << m_prevmeta.artist;
     if (meta.title == "") {
         return;
     }
     if (meta.title == m_prevmeta.title && 
         meta.artist == m_prevmeta.artist) {
+        //qDebug() << "same difference";
         return;
     }
+
+    bool prevempty = m_prevmeta.title == "" && m_prevmeta.artist == "";
     m_prevmeta = meta;
 
     QSettings settings;
@@ -64,35 +79,48 @@ void UpplayNotifications::notify(const MetaData& meta)
         }
     }
     
-#ifndef _WIN32
     if (!settings.value("shownotifications").toBool()) {
         return;
     }
-    
-    // Retrieve notification command as string list
-    QString cmdstring = settings.value("notificationcmd").toString();
-    if (cmdstring.isEmpty()) {
-        qDebug() << "UpplayNotifications::notify: no cmd";
-        return;
-    }
-    vector<string> cmdlist;
-    confgui::stringToStrings(qs2utf8s(cmdstring), cmdlist);
-    if (cmdlist.empty()) {
-        qDebug() << "UpplayNotifications::notify: cmd list empty??";
+    if (prevempty || !m_playing) {
+        // Only notify on an actual track change, not when we just
+        // start up and a song is playing.
         return;
     }
 
-    QString command = u8s2qs(cmdlist[0]);
-    QStringList qlist;
-    if (cmdlist.size() > 1) {
-        for (unsigned int i = 1; i < cmdlist.size(); i++) {
-            qlist.push_back(u8s2qs(cmdlist[i]));
+#ifndef _WIN32
+    bool usenotificationcmd = settings.value("usenotificationcmd").toBool();
+    if (usenotificationcmd) {
+        // Retrieve notification command as string list
+        QString cmdstring = settings.value("notificationcmd").toString();
+        if (cmdstring.isEmpty()) {
+            qDebug() << "UpplayNotifications::notify: no cmd";
+            return;
         }
-    }
+        vector<string> cmdlist;
+        confgui::stringToStrings(qs2utf8s(cmdstring), cmdlist);
+        if (cmdlist.empty()) {
+            qDebug() << "UpplayNotifications::notify: cmd list empty??";
+            return;
+        }
 
-    QString msg = meta.title + " / " + meta.artist;
-    qlist.push_back(msg);
-    //qDebug() << "UpplayNotifications::notify: starting command " << command;
-    QProcess::startDetached(command, qlist, "/tmp");
+        QString command = u8s2qs(cmdlist[0]);
+        QStringList qlist;
+        if (cmdlist.size() > 1) {
+            for (unsigned int i = 1; i < cmdlist.size(); i++) {
+                qlist.push_back(u8s2qs(cmdlist[i]));
+            }
+        }
+
+        QString msg = meta.title + " / " + meta.artist;
+        qlist.push_back(msg);
+        //qDebug() << "UpplayNotifications::notify: starting cmd " << command;
+        QProcess::startDetached(command, qlist, "/tmp");
+        return;
+    }
 #endif
+
+    // Else, or always on windows, tell the gui to do its thing
+    emit notifyNeeded(meta);
+    return;
 }

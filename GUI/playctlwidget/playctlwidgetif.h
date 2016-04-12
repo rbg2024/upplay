@@ -27,7 +27,8 @@ public:
         : QWidget(parent) {
     }
     virtual ~PlayCtlWidgetIF() {}
-
+    virtual bool playing() = 0;
+                          
 public slots:
     // These are used to set the ui state in sync with externally
     // caused player state changes. No signals are emitted.

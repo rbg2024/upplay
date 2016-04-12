@@ -560,8 +560,15 @@ void Application::playlist_connections()
             m_ui_playlist, setPlayerMode(Playlist_Mode));
     CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
             m_player, update_track(const MetaData&));
+
     CONNECT(m_playlist.get(), sig_track_metadata(const MetaData&),
             m_notifs, notify(const MetaData&));
+    CONNECT(m_playlist.get(), sig_stopped(),  m_notifs, onStopped());
+    CONNECT(m_playlist.get(), sig_paused(),  m_notifs, onPaused());
+    CONNECT(m_playlist.get(), sig_playing(),  m_notifs, onPlaying());
+    CONNECT(m_notifs, notifyNeeded(const MetaData&),
+            m_player, onNotify(const MetaData&));
+            
     CONNECT(m_playlist.get(), sig_stopped(),  m_player, stopped());
     CONNECT(m_playlist.get(), sig_paused(),  m_player, paused());
     CONNECT(m_playlist.get(), sig_playing(),  m_player, playing());

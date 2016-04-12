@@ -32,6 +32,11 @@ PlayCtlWidget::PlayCtlWidget(QWidget *parent)
     connect(btn_stop, SIGNAL(clicked()), this, SLOT(onStopClicked()));
 }
 
+bool PlayCtlWidget::playing()
+{
+    return m_playing;
+}
+
 QLayoutItem *PlayCtlWidget::takeStopWidget()
 {
     return horizontalLayout->takeAt(1);

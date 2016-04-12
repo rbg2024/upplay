@@ -78,22 +78,31 @@ void UPPrefs::onShowPrefs()
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
-#ifndef _WIN32
-        // Show notifications ?
-        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "shownotifications",
-                      "Show notifications",
-                      "Show pop-up message in notification area when a track "
-                      "starts playing");
 
+        // Show notifications ?
+        ConfParamW *wsn =
+            m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "shownotifications",
+                          "Show notifications",
+                          "Show pop-up message in notification area when a "
+                          "track starts playing");
+#ifndef _WIN32
+        ConfParamW *wuncmd =
+            m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "usenotificationcmd",
+                          "Use notification command (else use Qt)",
+                          "Choose whether to use the Qt notification mechanism "
+                          "or to execute a desktop command");
         QSettings settings;
         if (!settings.contains("notificationcmd")) {
             settings.setValue("notificationcmd",
-                              "notify-send --expire-time=500 --icon=upplay");
+                              "notify-send --expire-time=1000 --icon=upplay");
         }
-        m_w->addParam(idx, ConfTabsW::CFPT_STR, "notificationcmd",
-                      "Notification command",
-                      "Command to execute to notify. The message argument "
-                      " will be appended");
+        ConfParamW *wncmd =
+            m_w->addParam(idx, ConfTabsW::CFPT_STR, "notificationcmd",
+                          "Notification command",
+                          "Command to execute to notify. The message argument "
+                          " will be appended");
+        m_w->enableLink(wsn, wuncmd);
+        m_w->enableLink(wuncmd, wncmd);
 #endif
         
         // Truncate artist information in directory listings?

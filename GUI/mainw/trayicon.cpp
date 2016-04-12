@@ -28,7 +28,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QPixmap>
-#include <QTimer>
+#include <QSettings>
 
 #include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/Helper.h"
@@ -55,13 +55,8 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
 
     m_vol_step = 5;
 
-//    m_plugin_loader = NotificationPluginLoader::getInstance();
-    m_notification_active = m_settings->getShowNotifications();
+    QSettings settings;
     m_timeout = m_settings->getNotificationTimeout();
-
-    _timer = new QTimer(this);
-    _timer->setInterval(300);
-    _md_set = false;
 
     m_playAction = new QAction(tr("Play"), this);
     m_playAction->setIcon(QIcon(Helper::getIconPath("play.png")));
@@ -97,11 +92,6 @@ GUI_TrayIcon::GUI_TrayIcon(QObject *parent)
     connect(m_showAction, SIGNAL(triggered()), this, SLOT(show_clicked()));
     connect(m_closeAction, SIGNAL(triggered()), this, SLOT(close_clicked()));
     connect(m_muteAction, SIGNAL(triggered()), this, SLOT(mute_clicked()));
-    connect(_timer, SIGNAL(timeout()), this, SLOT(timer_timed_out()));
-}
-
-GUI_TrayIcon::~GUI_TrayIcon()
-{
 }
 
 void GUI_TrayIcon::change_skin(QString stylesheet)
@@ -120,50 +110,17 @@ bool GUI_TrayIcon::event(QEvent * e)
     return true;
 }
 
-void GUI_TrayIcon::timer_timed_out()
-{
-    qDebug() << "Timed out";
-    _timer->stop();
-    if (_md_set) {
-        trackChanged(_md);
-    }
-}
-
 void GUI_TrayIcon::songChangedMessage(const MetaData& md)
 {
-    _md = md;
-    _md_set = true;
-#if 0
-    if (m_notification_active) {
-        Notification* n = m_plugin_loader->get_cur_plugin();
-
-        if (n) {
-
-            n->notification_show(md);
-        }
-
-        else if (this -> isSystemTrayAvailable()) {
-
-            this -> showMessage("Upplay", md.title + tr(" by ") + md.artist,
-                                QSystemTrayIcon::Information, m_timeout);
-        }
+    if (isSystemTrayAvailable()) {
+        showMessage("Upplay", md.title + tr(" by ") + md.artist,
+                    QSystemTrayIcon::Information, 1000/*m_timeout*/);
     }
-#endif
-}
-
-void GUI_TrayIcon::trackChanged(const MetaData& md)
-{
-    songChangedMessage(md);
 }
 
 void  GUI_TrayIcon::set_timeout(int timeout_ms)
 {
     m_timeout = timeout_ms;
-}
-
-void  GUI_TrayIcon::set_notification_active(bool active)
-{
-    m_notification_active = active;
 }
 
 void GUI_TrayIcon::set_enable_play(bool b)
@@ -212,7 +169,6 @@ void GUI_TrayIcon::stop_clicked()
 
 void GUI_TrayIcon::stop()
 {
-    _md_set = false;
 }
 
 void GUI_TrayIcon::fwd_clicked()

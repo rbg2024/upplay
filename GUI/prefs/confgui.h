@@ -108,9 +108,9 @@ public:
 
     /** Add parameter setter to specified tab */
     ConfParamW *addParam(int tabindex, ParamType tp, 
-                      const QString& varname, const QString& label,
-                      const QString& tooltip, int isdirorminval = 0, 
-                      int maxval = 0, const QStringList* sl = 0);
+                         const QString& varname, const QString& label,
+                         const QString& tooltip, int isdirorminval = 0, 
+                         int maxval = 0, const QStringList* sl = 0);
     bool enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert = false);
                                                 
 public slots:

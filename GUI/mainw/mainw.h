@@ -64,6 +64,8 @@ public slots:
     
     // Reflect externally triggered audio changes in ui
     void update_track(const MetaData& in);
+    // Systray notification. 
+    void onNotify(const MetaData& md);
     void setCurrentPosition(quint32 pos_sec);
     void stopped();
     void playing();
@@ -116,7 +118,6 @@ private slots:
     void showLibrary(bool, bool resize=true);
     void changeSkin(bool);
     void small_playlist_items_toggled(bool);
-    void show_notification_toggled(bool);
     void show_fullscreen_toggled(bool);
     void about(bool b=false);
     void help(bool b=false);

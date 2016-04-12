@@ -167,8 +167,6 @@ void GUI_Player::update_track(const MetaData& md)
     total_time_changed(md.length_ms);
 
     ui->player_w->mdata()->setData(md);
-    
-    m_trayIcon->songChangedMessage(md);
 
     this->setWindowTitle(QString("Upplay - ") + md.title);
 
@@ -188,6 +186,10 @@ void GUI_Player::update_track(const MetaData& md)
     ui->player_w->progress()->setEnabled(true);
 
     m_metadata_available = true;
+}
+void GUI_Player::onNotify(const MetaData& md)
+{
+    m_trayIcon->songChangedMessage(md);
 }
 
 void GUI_Player::fetch_cover(const QString& URI)
@@ -235,7 +237,8 @@ void GUI_Player::setupTrayActions()
 {
     m_trayIcon = new GUI_TrayIcon(this);
 
-    connect(m_trayIcon, SIGNAL(sig_stop_clicked()), this, SLOT(onStopActivated()));
+    connect(m_trayIcon, SIGNAL(sig_stop_clicked()),
+            this, SLOT(onStopActivated()));
     connect(m_trayIcon, SIGNAL(sig_bwd_clicked()),
             this, SLOT(onBackwardActivated()));
     connect(m_trayIcon, SIGNAL(sig_fwd_clicked()),
@@ -246,13 +249,11 @@ void GUI_Player::setupTrayActions()
             this, SLOT(onPauseActivated()));
     connect(m_trayIcon, SIGNAL(sig_mute_clicked()),
             ui->player_w->volume(), SLOT(toggleMute()));
-
-    connect(m_trayIcon, SIGNAL(sig_close_clicked()), this, SLOT(really_close()));
+    connect(m_trayIcon, SIGNAL(sig_close_clicked()),
+            this, SLOT(really_close()));
     connect(m_trayIcon, SIGNAL(sig_show_clicked()), this, SLOT(showNormal()));
-
     connect(m_trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(trayItemActivated(QSystemTrayIcon::ActivationReason)));
-
     connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)),
             this, SLOT(onVolumeStepActivated(int)));
 

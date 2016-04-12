@@ -29,6 +29,8 @@ public:
     PlayCtlWidget(QWidget *parent = 0);
     virtual ~PlayCtlWidget() {}
 
+    bool playing();
+                  
 public slots:
     // These are used to set the ui state in sync with externally
     // caused player state changes
@@ -49,6 +51,5 @@ public slots:
 private:
     bool m_playing;
 };
-
 
 #endif /* _PLAYCTLWIDGET_H_INCLUDED_ */

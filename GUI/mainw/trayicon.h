@@ -1,5 +1,3 @@
-/* GUI_TrayIcon.h */
-
 /* Copyright (C) 2012  gleugner
  *
  * This file is part of sayonara player
@@ -17,36 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-
 #ifndef GUI_TRAYICON_H
 #define GUI_TRAYICON_H
 
-#include "HelperStructs/CSettingsStorage.h"
 #include "HelperStructs/MetaData.h"
 
-//#include "Notification/Notification.h"
-//#include "Notification/NotificationPluginLoader.h"
-
-class NotificationPluginLoader;
-
 #include <QSystemTrayIcon>
-#include <QAction>
-#include <QTimer>
+
+class QAction;
+class QMenu;
+class CSettingsStorage;
 
 /**
  * Small class to be used as tray icon
  */
 class GUI_TrayIcon : public QSystemTrayIcon {
-    Q_OBJECT
+    Q_OBJECT;
+
 public:
 
     GUI_TrayIcon(QObject *parent = 0);
-    virtual ~GUI_TrayIcon();
 
     virtual bool event(QEvent * e);
     void set_timeout(int timeout_ms);
-    void set_notification_active(bool active);
 
     void set_enable_play(bool);
     void set_enable_stop(bool);
@@ -58,7 +49,6 @@ public:
     int get_vol_step();
 
 public slots:
-    void trackChanged(const MetaData& md);
     void songChangedMessage(const MetaData& md);
     void setPlaying(bool);
     void setMute(bool mute);
@@ -69,8 +59,8 @@ signals:
     /**
      * this event is fired, if we have a mouse wheel event
      * @param delta bigger then 0 when mouse wheel has moved forward
-     smaller when moved backwards
-    */
+     * smaller when moved backwards
+     */
     void sig_volume_changed_by_wheel(int delta);
     void sig_play_clicked();
     void sig_pause_clicked();
@@ -90,7 +80,6 @@ private slots:
     void show_clicked();
     void close_clicked();
     void mute_clicked();
-    void timer_timed_out();
 
 private:
     QAction*    m_closeAction;
@@ -100,23 +89,17 @@ private:
     QAction*    m_fwdAction;
     QAction*    m_bwdAction;
     QAction*    m_showAction;
-    QMenu*                      m_trayContextMenu;
+    QMenu*      m_trayContextMenu;
 
     QIcon                   m_playIcon;
     QIcon                   m_pauseIcon;
     int                     m_timeout;
     int                     m_vol_step;
 
-    NotificationPluginLoader* m_plugin_loader;
-
-    bool                    m_notification_active;
     bool                    m_playing;
     bool                    m_mute;
     CSettingsStorage*       m_settings;
 
-    bool            _md_set;
-    MetaData            _md;
-    QTimer*         _timer;
     bool            _mute;
 };
 

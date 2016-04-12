@@ -32,10 +32,17 @@ public:
 public slots:
     void notify(const MetaData&);
     void songProgress(quint32 secs);
+    void onStopped();
+    void onPaused();
+    void onPlaying();
+
+signals:
+    void notifyNeeded(const MetaData&);
     
 private:
     MetaData m_prevmeta;
     AudioScrobbler *m_scrobbler;
+    bool m_playing;
 };
 
 

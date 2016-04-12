@@ -24,6 +24,7 @@
 
 #include <libupnpp/upnpplib.hxx>
 
+#include "HelperStructs/CSettingsStorage.h"
 
 /** VIEW **/
 
@@ -73,13 +74,6 @@ void GUI_Player::show_fullscreen_toggled(bool b)
     }
 
     m_settings->setPlayerFullscreen(b);
-}
-
-// prvt slot
-void GUI_Player::show_notification_toggled(bool active)
-{
-
-    m_settings->setShowNotifications(active);
 }
 
 // prvt slot
