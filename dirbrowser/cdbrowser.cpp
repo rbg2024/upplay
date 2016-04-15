@@ -35,6 +35,7 @@
 #include <QScriptEngine>
 #endif
 
+#include <QMessageBox>
 #include <QMenu>
 #include <QApplication>
 #include <QByteArray>
@@ -74,7 +75,7 @@ void CDWebPage::javaScriptConsoleMessage(
 
 CDBrowser::CDBrowser(QWidget* parent)
     : QWebView(parent), m_reader(0), m_reaper(0), m_progressD(0),
-      m_browsers(0), m_lastbutton(Qt::LeftButton)
+      m_browsers(0), m_lastbutton(Qt::LeftButton), m_sysUpdId(0)
 {
     setPage(new CDWebPage(this));
 #ifndef USING_WEBENGINE
@@ -211,6 +212,73 @@ void CDBrowser::appendHtml(const QString& elt_id, const QString& html)
 #endif
 }
 
+bool CDBrowser::newCds(int cdsidx)
+{
+    if (cdsidx > int(m_msdescs.size())) {
+        LOGERR("CDBrowser::onLinkClicked: bad link index: " << cdsidx 
+               << " cd count: " << m_msdescs.size() << endl);
+        return false;
+    }
+    MSRH ms = MSRH(new MediaServer(m_msdescs[cdsidx]));
+    if (!ms) {
+        qDebug() << "MediaServer connect failed";
+        return false;
+    }
+    CDSH cds = ms->cds();
+    if (!cds) {
+        LOGERR("CDBrowser::onLinkClicked: null cds" << endl);
+        return false;
+    }
+    m_cds = STD_SHARED_PTR<ContentDirectoryQO>(new ContentDirectoryQO(cds));
+    m_sysUpdId = 0;
+    connect(m_cds.get(), SIGNAL(systemUpdateIDChanged(int)),
+            this, SLOT(onSysUpdIdChanged(int)));
+    return true;
+}
+
+void CDBrowser::onSysUpdIdChanged(int id)
+{
+    qDebug() << "CDBrowser::onSysUpdIdChanged: mine " << m_sysUpdId <<
+        "server" << id;
+
+    // 1st time is free
+    if (!m_sysUpdId) {
+        m_sysUpdId = id;
+        return;
+    }
+
+    // We should try to use the containerUpdateIDs to make sure of
+    // what needs to be done, instead of dumping the problem on the
+    // user.
+    if (m_sysUpdId != id) {
+
+        m_sysUpdId = id;
+
+        // CDSKIND_BUBBLE, CDSKIND_MEDIATOMB,
+        // CDSKIND_MINIDLNA, CDSKIND_MINIM, CDSKIND_TWONKY
+        ContentDirectory::ServiceKind kind = m_cds->srv()->getKind();
+        switch (kind) {
+            // Not too sure which actually invalidate their
+            // tree. Pretty sure that Minim does not (we might just
+            // want to reload the current dir).
+        case ContentDirectory::CDSKIND_MINIM: return;
+        default: break;
+        }
+
+        QMessageBox::Button rep = 
+            QMessageBox::question(0, "Upplay",
+                                  tr("Content Directory Server state changed, "
+                                     "some references may be invalid. (some "
+                                     "playlist elements may be invalid too). "
+                                     "<br>Reset browse state ?"),
+                                  QMessageBox::Ok | QMessageBox::Cancel);
+        if (rep == QMessageBox::Ok) {
+            curpathClicked(1);
+            m_sysUpdId = 0;
+        }
+    }
+}
+
 void CDBrowser::onLinkClicked(const QUrl &url)
 {
     m_timer.stop();
@@ -226,23 +294,14 @@ void CDBrowser::onLinkClicked(const QUrl &url)
     {
         // Servers page server link click: browse clicked server root
 	unsigned int cdsidx = atoi(scurl.c_str()+1);
-        if (cdsidx > m_msdescs.size()) {
-	    LOGERR("CDBrowser::onLinkClicked: bad link index: " << cdsidx 
-                   << " cd count: " << m_msdescs.size() << endl);
-	    return;
-	}
         m_curpath.clear();
         m_curpath.push_back(CtPathElt("0", "(servers)"));
-        m_ms = MSRH(new MediaServer(m_msdescs[cdsidx]));
-        if (!m_ms) {
-            qDebug() << "MediaServer connect failed";
+        if (!newCds(cdsidx)) {
             return;
         }
-        CDSH cds = m_ms->cds();
-        if (cds) {
-            cds->getSearchCapabilities(m_searchcaps);
-            emit sig_searchcaps_changed();
-        }
+        m_cds->srv()->getSearchCapabilities(m_searchcaps);
+        emit sig_searchcaps_changed();
+
 	browseContainer("0", m_msdescs[cdsidx].friendlyName);
     }
     break;
@@ -281,7 +340,8 @@ void CDBrowser::onLinkClicked(const QUrl &url)
             // Open in new tab
             vector<CtPathElt> npath(m_curpath);
             npath.push_back(CtPathElt(m_entries[i].m_id, m_entries[i].m_title));
-            emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
+            emit sig_browse_in_new_tab(u8s2qs(m_cds->srv()->getDeviceId()),
+                                       npath);
         } else {
             browseContainer(m_entries[i].m_id, m_entries[i].m_title);
         }
@@ -317,7 +377,7 @@ void CDBrowser::curpathClicked(unsigned int i)
     if (i == 0) {
         m_curpath.clear();
         m_msdescs.clear();
-        m_ms = MSRH();
+        m_cds.reset();
         initialPage();
     } else {
         string objid = m_curpath[i].objid;
@@ -328,7 +388,8 @@ void CDBrowser::curpathClicked(unsigned int i)
         if (m_lastbutton == Qt::MidButton) {
             vector<CtPathElt> npath(m_curpath);
             npath.push_back(CtPathElt(objid, title, ss));
-            emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
+            emit sig_browse_in_new_tab(u8s2qs(m_cds->srv()->getDeviceId()),
+                                       npath);
         } else {
             if (ss.empty()) {
                 browseContainer(objid, title, scrollpos);
@@ -360,7 +421,7 @@ void CDBrowser::browseIn(QString UDN, vector<CtPathElt> path)
     string sudn = qs2utf8s(UDN);
     for (unsigned int i = 0; i < m_msdescs.size(); i++) {
         if (m_msdescs[i].UDN == sudn) {
-            m_ms = MSRH(new MediaServer(m_msdescs[i]));
+            newCds(i);
             curpathClicked(path.size() - 1);
             return;
         }
@@ -438,13 +499,8 @@ void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
     emit sig_now_in(this, QString::fromUtf8(cttitle.c_str()));
 
     m_savedscrollpos = scrollpos;
-    if (!m_ms) {
+    if (!m_cds) {
         LOGERR("CDBrowser::browseContainer: server not set" << endl);
-        return;
-    }
-    CDSH cds = m_ms->cds();
-    if (!cds) {
-        LOGERR("Cant reach content directory service" << endl);
         return;
     }
     m_entries.clear();
@@ -453,7 +509,7 @@ void CDBrowser::browseContainer(string ctid, string cttitle, QPoint scrollpos)
 
     initContainerHtml();
     
-    m_reader = new ContentDirectoryQO(cds, ctid, string(), this);
+    m_reader = new CDBrowseQO(m_cds->srv(), ctid, string(), this);
 
     connect(m_reader, SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(UPnPClient::UPnPDirContent *)));
@@ -471,13 +527,8 @@ void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
     deleteReaders();
     if (iss.empty())
         return;
-    if (!m_ms) {
+    if (!m_cds) {
         LOGERR("CDBrowser::search: server not set" << endl);
-        return;
-    }
-    CDSH cds = m_ms->cds();
-    if (!cds) {
-        LOGERR("Cant reach content directory service" << endl);
         return;
     }
     m_savedscrollpos = scrollpos;
@@ -485,7 +536,7 @@ void CDBrowser::search(const string& objid, const string& iss, QPoint scrollpos)
     m_curpath.push_back(CtPathElt(objid, "(search)", iss));
     initContainerHtml(iss);
 
-    m_reader = new ContentDirectoryQO(cds, m_curpath.back().objid, iss, this);
+    m_reader = new CDBrowseQO(m_cds->srv(), m_curpath.back().objid, iss, this);
 
     connect(m_reader, SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent*)),
             this, SLOT(onSliceAvailable(UPnPClient::UPnPDirContent *)));
@@ -1014,26 +1065,21 @@ void CDBrowser::recursiveAdd(QAction *act)
         return;
     }
 
-    if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
-        vector<CtPathElt> npath(m_curpath);
-        npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
-        emit sig_browse_in_new_tab(u8s2qs(m_ms->desc()->UDN), npath);
-        return;
-    }
-
-    if (!m_ms) {
+    if (!m_cds) {
         qDebug() << "CDBrowser::recursiveAdd: server not set" ;
         return;
     }
-    CDSH cds = m_ms->cds();
-    if (!cds) {
-        qDebug() << "Cant reach content directory service";
+
+    if (m_popupmode == PUP_OPEN_IN_NEW_TAB) {
+        vector<CtPathElt> npath(m_curpath);
+        npath.push_back(CtPathElt(m_popupobjid, m_popupobjtitle));
+        emit sig_browse_in_new_tab(u8s2qs(m_cds->srv()->getDeviceId()), npath);
         return;
     }
 
     if (m_browsers)
         m_browsers->setInsertActive(true);
-    ContentDirectory::ServiceKind kind = cds->getKind();
+    ContentDirectory::ServiceKind kind = m_cds->srv()->getKind();
     if (kind == ContentDirectory::CDSKIND_MINIM &&
         m_popupmode != PUP_RAND_PLAY_GROUPS) {
         // Use search() rather than a tree walk for Minim, it is much
@@ -1041,7 +1087,7 @@ void CDBrowser::recursiveAdd(QAction *act)
         // to preserve the paths (for discrimination)
         UPnPDirContent dirbuf;
         string ss("upnp:class = \"object.item.audioItem.musicTrack\"");
-        int err = cds->search(m_popupobjid, ss, dirbuf);
+        int err = m_cds->srv()->search(m_popupobjid, ss, dirbuf);
         if (err != 0) {
             LOGERR("CDBrowser::recursiveAdd: search failed, code " << err);
             return;
@@ -1074,7 +1120,7 @@ void CDBrowser::recursiveAdd(QAction *act)
         
         m_recwalkentries.clear();
         m_recwalkdedup.clear();
-        m_reaper = new RecursiveReaper(cds, m_popupobjid, this);
+        m_reaper = new RecursiveReaper(m_cds->srv(), m_popupobjid, this);
         connect(m_reaper, 
                 SIGNAL(sliceAvailable(UPnPClient::UPnPDirContent *)),
                 this, 

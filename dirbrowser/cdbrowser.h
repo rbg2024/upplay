@@ -49,10 +49,11 @@
 
 #include "randplayer.h"
 
-class ContentDirectoryQO;
+class CDBrowseQO;
 class RecursiveReaper;
 class DirBrowser;
 class QProgressDialog;
+class ContentDirectoryQO;
 
 class CDBrowser : public QWebView
 {
@@ -77,6 +78,8 @@ class CDBrowser : public QWebView
         QPoint scrollpos;
     };
 
+    // This is called when a new tab is created to browse a
+    // container. We have no server link yet.
     void browseIn(QString UDN, vector<CtPathElt> path);
 
  public slots:
@@ -86,7 +89,8 @@ class CDBrowser : public QWebView
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
     void setStyleSheet(bool);
     void refresh();
-
+    void onSysUpdIdChanged(int id);
+    
  signals:
     void sig_tracks_to_playlist(const MetaDataList&);
     void sig_tracks_to_randplay(RandPlayer::PlayMode,
@@ -127,7 +131,7 @@ class CDBrowser : public QWebView
     std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
 
     // Handle for the currently active media server
-    UPnPClient::MSRH m_ms;
+    STD_SHARED_PTR<ContentDirectoryQO>  m_cds;
 
     // Search caps of current server
     std::set<std::string> m_searchcaps;
@@ -135,9 +139,10 @@ class CDBrowser : public QWebView
     std::vector<CtPathElt> m_curpath;
 
     // Threaded objects to perform directory reads and recursive walks
-    ContentDirectoryQO *m_reader;
+    CDBrowseQO *m_reader;
     RecursiveReaper    *m_reaper;
     void deleteReaders();
+    bool newCds(int cdsidx);
 
     // Busy dialog for lengthy ops
     QProgressDialog *m_progressD;
@@ -168,6 +173,9 @@ class CDBrowser : public QWebView
 
     // State for init browsing in subdir instead of servers page (middle-click)
     QString m_initUDN;
+
+    // SystemUpdateID for the connected content directory server
+    int m_sysUpdId;
 };
 
 // A QObject to hold a QString. Maybe there would be a simpler way to
