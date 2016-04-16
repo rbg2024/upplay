@@ -17,14 +17,17 @@
 
 #ifndef _CDBROWSER_H_INCLUDED_
 #define _CDBROWSER_H_INCLUDED_
+#include "libupnpp/config.h"
 
 /** CDBrowser displays Content Directory data inside a DirBrowser Tab */
 #include <time.h>
 
 #include <vector>
 #include <iostream>
-#include "libupnpp/config.h"
-#include <set>
+#ifndef UNORDERED_SET_INCLUDE
+#define UNORDERED_SET_INCLUDE <unordered_set>
+#endif
+#include UNORDERED_SET_INCLUDE
 
 #ifdef USING_WEBENGINE
 #include <QWebEngineView>

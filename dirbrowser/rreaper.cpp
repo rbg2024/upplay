@@ -15,13 +15,18 @@
  *       59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#include "rreaper.h"
+
 #include <list>
 #include <queue>
 #include <iostream>
+#ifndef UNORDERED_SET_INCLUDE
+#define UNORDERED_SET_INCLUDE <unordered_set>
+#endif
+#include UNORDERED_SET_INCLUDE
 
 #include <QDebug>
 
-#include "rreaper.h"
 
 using namespace std;
 
