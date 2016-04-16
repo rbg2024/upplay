@@ -18,6 +18,10 @@
 #define _OHPOOL_H_INCLUDED_
 
 #include "libupnpp/config.h"
+#ifndef UNORDERED_MAP_INCLUDE
+#define UNORDERED_MAP_INCLUDE <unordered_map>
+#endif
+#include UNORDERED_MAP_INCLUDE
 
 #include <vector>
 

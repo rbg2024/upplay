@@ -67,11 +67,6 @@ template <typename T> QList<T> randomize_list(const QList<T>& list)
     return list_copy;
 }
 
-inline bool checkTrack(const MetaData&)
-{
-    return true;
-}
-
 bool read_file_into_str(QString filename, QString* content);
 
 };

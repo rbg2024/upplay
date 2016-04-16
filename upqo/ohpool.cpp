@@ -17,6 +17,11 @@
 
 #include "ohpool.h"
 
+#ifndef UNORDERED_SET_INCLUDE
+#define UNORDERED_SET_INCLUDE <unordered_set>
+#endif
+
+#include UNORDERED_SET_INCLUDE
 #include <string>
 #include <vector>
 
