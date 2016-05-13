@@ -385,11 +385,12 @@ bool Application::setupRenderer(const string& uid)
     // playlist without a time service?? and use avt for time updates
     // instead.
     if (needavt) {
-        if (!m_rdr->avt()) {
+        AVTH avt = m_rdr->avt();
+        if (!avt) {
             qDebug() << "Renderer: AVTransport missing but we need it";
             return false;
         }
-        m_avto = new AVTPlayer(m_rdr->avt());
+        m_avto = new AVTPlayer(avt);
     }
 
     // Keep this after avt object creation !
@@ -402,17 +403,19 @@ bool Application::setupRenderer(const string& uid)
 
 
     // Use either renderingControl or ohvolume for volume control.
-    if (m_rdr->rdc()) {
+    RDCH rdc = m_rdr->rdc();
+    if (rdc) {
         qDebug() << "Application::setupRenderer: using Rendering Control";
-        m_rdco = new RenderingControlQO(m_rdr->rdc());
+        m_rdco = new RenderingControlQO(rdc);
     } else {
-        if (!m_rdr->ohvl()) {
+        OHVLH ohvl = m_rdr->ohvl();
+        if (!ohvl) {
             qDebug() << "Device implements neither RenderingControl nor "
                 "OHVolume";
             return false;
         }
         qDebug() << "Application::setupRenderer: using OHVolume";
-        m_ohvlo =  new OHVolumeQO(m_rdr->ohvl());
+        m_ohvlo =  new OHVolumeQO(ohvl);
     }
     
     renderer_connections();
