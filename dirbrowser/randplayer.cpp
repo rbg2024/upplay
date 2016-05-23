@@ -18,6 +18,7 @@
 
 #include <QDebug>
 
+#include <math.h>
 #include <time.h>
 
 #include "randplayer.h"
