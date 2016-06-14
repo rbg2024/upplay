@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <QApplication>
 #include <QDebug>
 #include <QUrl>
 #include <QScrollBar>
@@ -467,7 +468,9 @@ void PlaylistView::row_pressed(const QModelIndex&)
         v_md.push_back(md);
     }
 
-    set_mimedata(v_md, "tracks");
+    if (QApplication::mouseButtons() == Qt::LeftButton) {
+        set_mimedata(v_md, "tracks");
+    }
     emit sig_selection_changed(v_md);
 }
 
