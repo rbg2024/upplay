@@ -90,9 +90,7 @@ void PlaylistView::mousePressEvent(QMouseEvent* event)
 
         if ((this->model()->rowCount()) * 33 > event->pos().y()) {
             _drag_pos = event->pos();
-        }
-
-        else {
+        } else {
             _drag_pos.setY(-10);
             _drag = false;
         }
@@ -712,22 +710,16 @@ void PlaylistView::handle_drop(QDropEvent* event, bool from_outside)
         if (v_metadata.size() == 0) {
             return;
         }
-    }
-
-    else if (d->hasHtml()) {}
-    else if (d->hasImage()) {}
-
-    else if (d->hasText() && d->hasMetaData()) {
-
+    } else if (d->hasHtml()) {
+    } else if (d->hasImage()) {
+    } else if (d->hasText() && d->hasMetaData()) {
         uint sz = d->getMetaData(v_metadata);
         if (sz == 0) {
             return;
         }
-
+    } else if (d->hasText()) {
+    } else {
     }
-
-    else if (d->hasText()) {}
-    else {}
 
     for (uint i = 0; i < v_metadata.size(); i++) {
         affected_rows << i + row + 1;
