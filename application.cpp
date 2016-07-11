@@ -166,9 +166,26 @@ void Application::chooseRenderer()
                              tr("No Media Renderers found."));
         return;
     }
+
+    QSettings settings;
+    bool ohonly = settings.value("ohonly").toBool();
+
     RenderChooseDLG dlg(m_player);
+    if (ohonly) {
+        dlg.setWindowTitle(tr("Select Renderer (OpenHome Only)"));
+    }
     for (vector<UPnPDeviceDesc>::iterator it = devices.begin(); 
          it != devices.end(); it++) {
+        if (ohonly) {
+            UPnPClient::MRDH  rdr = getRenderer(it->UDN, false);
+            if (!rdr || !rdr->hasOpenHome()) {
+                cerr << "Renderer " << it->friendlyName << "(" << it->UDN
+                     << ") not found or no openhome services (the option to"
+                    " only use openhome renderers is set\n"<< endl;
+                continue;
+            }
+        }
+        
         QString fname = u8s2qs(it->friendlyName);
         if (!m_renderer_friendly_name.compare(fname)) {
             QListWidgetItem *item = new QListWidgetItem(fname);

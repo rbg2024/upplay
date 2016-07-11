@@ -74,10 +74,16 @@ void UPPrefs::onShowPrefs()
                       "use the first or only appropriate interface",
                       0, 0, &qadapters);
         
+        // Filter out non-openhome renderers?
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "ohonly", "OpenHome only",
+                      "Only show OpenHome-capable renderers in "
+                      "selection dialog.");
+
         // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
+
 
         // Show notifications ?
         ConfParamW *wsn =
