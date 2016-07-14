@@ -24,10 +24,7 @@
 
 #include <vector>
 #include <iostream>
-#ifndef UNORDERED_SET_INCLUDE
-#define UNORDERED_SET_INCLUDE <unordered_set>
-#endif
-#include UNORDERED_SET_INCLUDE
+#include <unordered_set>
 
 #ifdef USING_WEBENGINE
 #include <QWebEngineView>
@@ -134,7 +131,7 @@ class CDBrowser : public QWebView
     std::vector<UPnPClient::UPnPDeviceDesc> m_msdescs;
 
     // Handle for the currently active media server
-    STD_SHARED_PTR<ContentDirectoryQO>  m_cds;
+    std::shared_ptr<ContentDirectoryQO>  m_cds;
 
     // Search caps of current server
     std::set<std::string> m_searchcaps;
@@ -160,7 +157,7 @@ class CDBrowser : public QWebView
     // Recursive explore contents, for possible sorting before sending to pl
     std::vector<UPnPClient::UPnPDirObject> m_recwalkentries;
     // URL hashes for deduplication while walking the tree
-    STD_UNORDERED_SET<std::string> m_recwalkdedup;
+    std::unordered_set<std::string> m_recwalkdedup;
 
     // Pointer to parent tabbed object for access to shared state (insertActive)
     DirBrowser *m_browsers;

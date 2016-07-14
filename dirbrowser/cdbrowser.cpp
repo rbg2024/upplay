@@ -229,7 +229,7 @@ bool CDBrowser::newCds(int cdsidx)
         LOGERR("CDBrowser::onLinkClicked: null cds" << endl);
         return false;
     }
-    m_cds = STD_SHARED_PTR<ContentDirectoryQO>(new ContentDirectoryQO(cds));
+    m_cds = std::shared_ptr<ContentDirectoryQO>(new ContentDirectoryQO(cds));
     m_sysUpdId = 0;
     connect(m_cds.get(), SIGNAL(systemUpdateIDChanged(int)),
             this, SLOT(onSysUpdIdChanged(int)));
@@ -1148,7 +1148,7 @@ void CDBrowser::onReaperSliceAvailable(UPnPClient::UPnPDirContent *dc)
         //       dc->m_items[i].m_resources[0].m_uri << endl);
         string md5;
         MD5String(dc->m_items[i].m_resources[0].m_uri, md5);
-        pair<STD_UNORDERED_SET<std::string>::iterator, bool> res = 
+        pair<std::unordered_set<std::string>::iterator, bool> res = 
             m_recwalkdedup.insert(md5);
         if (res.second) {
             m_recwalkentries.push_back(dc->m_items[i]);

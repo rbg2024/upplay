@@ -250,7 +250,7 @@ private slots:
 
 protected:
     std::vector<int> m_idsv;
-    STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject> m_metapool;
+    std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
     int m_curid;
     bool m_forceUpdate;
     bool m_discardArrayEvents;

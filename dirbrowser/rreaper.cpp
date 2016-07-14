@@ -20,10 +20,7 @@
 #include <list>
 #include <queue>
 #include <iostream>
-#ifndef UNORDERED_SET_INCLUDE
-#define UNORDERED_SET_INCLUDE <unordered_set>
-#endif
-#include UNORDERED_SET_INCLUDE
+#include <unordered_set>
 
 #include <QDebug>
 
@@ -45,7 +42,7 @@ public:
     }
     UPnPClient::CDSH serv;
     queue<CtDesc> ctobjids;
-    STD_UNORDERED_SET<string> allctobjids;
+    std::unordered_set<string> allctobjids;
     int status;
     bool cancel;
 };

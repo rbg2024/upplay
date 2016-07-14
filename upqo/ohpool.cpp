@@ -17,11 +17,7 @@
 
 #include "ohpool.h"
 
-#ifndef UNORDERED_SET_INCLUDE
-#define UNORDERED_SET_INCLUDE <unordered_set>
-#endif
-
-#include UNORDERED_SET_INCLUDE
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -34,7 +30,7 @@ using namespace std;
 
 template <class T>
 bool ohupdmetapool(const vector<int>& nids, int curid,
-                   STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>& metapool,
+                   std::unordered_map<int, UPnPClient::UPnPDirObject>& metapool,
                    T srv)
 {
     // Clean up metapool entries not in ids. We build a set with
@@ -43,8 +39,8 @@ bool ohupdmetapool(const vector<int>& nids, int curid,
     // linear search the repeated search to make this
     // quadratic. We're sort of O(n * log(n)) instead.
     if (!metapool.empty() && !nids.empty()){
-        STD_UNORDERED_SET<int> tmpset(nids.begin(), nids.end());
-        for (STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator it
+        std::unordered_set<int> tmpset(nids.begin(), nids.end());
+        for (std::unordered_map<int, UPnPClient::UPnPDirObject>::iterator it
                  = metapool.begin(); it != metapool.end(); ) {
             if (tmpset.find(it->first) == tmpset.end()) {
                 it = metapool.erase(it);
@@ -99,7 +95,7 @@ bool ohupdmetapool(const vector<int>& nids, int curid,
 
 #if 0
     qDebug() << "Metadata Pool now: ";
-    for (STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::const_iterator it
+    for (std::unordered_map<int, UPnPClient::UPnPDirObject>::const_iterator it
              =  metapool.begin(); it != metapool.end(); it++) {
         qDebug() << "Id " << it->first << "->\n" << it->second.dump().c_str();
     }
@@ -110,10 +106,10 @@ bool ohupdmetapool(const vector<int>& nids, int curid,
 template bool
 ohupdmetapool<UPnPClient::OHPLH>
 (const vector<int>&, int, 
- STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>& ,
+ std::unordered_map<int, UPnPClient::UPnPDirObject>& ,
  UPnPClient::OHPLH);
 template bool
 ohupdmetapool<UPnPClient::OHRDH>
 (const vector<int>&, int, 
- STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>& ,
+ std::unordered_map<int, UPnPClient::UPnPDirObject>& ,
  UPnPClient::OHRDH);

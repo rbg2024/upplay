@@ -58,7 +58,7 @@ public slots:
     // Seek to time in seconds
     void seek(int secs) {
         if (m_songsecs == -1) {
-            STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator
+            std::unordered_map<int, UPnPClient::UPnPDirObject>::iterator
                 poolit = m_metapool.find(m_curid);
             if (poolit != m_metapool.end()) {
                 UPnPClient::UPnPDirObject& ude = poolit->second;
@@ -198,7 +198,7 @@ private slots:
         MetaDataList mdv;
         for (std::vector<int>::iterator idit = m_idsv.begin(); 
              idit != m_idsv.end(); idit++) {
-            STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator poolit 
+            std::unordered_map<int, UPnPClient::UPnPDirObject>::iterator poolit 
                 = m_metapool.find(*idit);
             if (poolit == m_metapool.end()) {
                 qDebug() << "OHPlayer::translateMetaData: "

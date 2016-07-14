@@ -130,7 +130,7 @@ public slots:
         int id = m_idsv[idx];
         //qDebug() << "OHRadioQO::setIdx: id: " << id;
         
-        STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>::iterator it;
+        std::unordered_map<int, UPnPClient::UPnPDirObject>::iterator it;
         if ((it = m_metapool.find(id)) == m_metapool.end()) {
             qDebug() << "OHRadioQO::setId: id not found";
             return false;
@@ -170,7 +170,7 @@ private slots:
     
 protected:
     std::vector<int> m_idsv;
-    STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject> m_metapool;
+    std::unordered_map<int, UPnPClient::UPnPDirObject> m_metapool;
     int m_curid;
 
 private:

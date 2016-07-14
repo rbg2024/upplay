@@ -18,10 +18,7 @@
 #define _OHPOOL_H_INCLUDED_
 
 #include "libupnpp/config.h"
-#ifndef UNORDERED_MAP_INCLUDE
-#define UNORDERED_MAP_INCLUDE <unordered_map>
-#endif
-#include UNORDERED_MAP_INCLUDE
+#include <unordered_map>
 
 #include <vector>
 
@@ -31,7 +28,7 @@
 // metadata when the id array changes.
 template <class T>
 bool ohupdmetapool(const std::vector<int>& nids, int curid, 
-                   STD_UNORDERED_MAP<int, UPnPClient::UPnPDirObject>& metapool,
+                   std::unordered_map<int, UPnPClient::UPnPDirObject>& metapool,
                    T srv);
 
 #endif /* _OHPOOL_H_INCLUDED_ */
