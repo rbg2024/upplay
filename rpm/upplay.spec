@@ -6,6 +6,7 @@ Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.lesbonscomptes.com/upplay
 Source0:        http://www.lesbonscomptes.com/upplay/upplay-%{version}.tar.gz
+Patch0:         upplay-randplayer-mathinc.patch
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
 BuildRequires:  libupnpp
@@ -18,6 +19,7 @@ standard UPnP or OpenHome Playlist services.
 
 %prep
 %setup -q 
+%patch0 -p0
 
 %build
 qmake-qt4
