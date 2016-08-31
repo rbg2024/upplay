@@ -680,6 +680,18 @@ void CDBrowser::onSliceAvailable(UPnPDirContent *dc)
     }
     appendHtml("entrylist", html);
     delete dc;
+    // On very big lists (thousands), this can be quite late against
+    // the dir reading threads, with a long queue of slice events
+    // accumulated. The UI is frozen while we get called for each
+    // event in the queue. We'd like to give a chance to user
+    // interaction (e.g. scrolling)here, but it seems that there is no
+    // way to process only the user events, so processEvents does not help.
+    // Probably the only workable approach would be to do the
+    // appending from another thread?
+    // (by the way, processEvent if it worked must be called at the
+    // bottom of the func else we risk onBrowseDone getting called and
+    // deleting the reader before we can use it).
+    //qApp->processEvents();
 }
 
 class DirObjCmp {
