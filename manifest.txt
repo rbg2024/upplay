@@ -210,8 +210,6 @@ doc/install.html
 doc/install.txt
 doc/legend-upplay-main.png
 doc/legend-upplay-main.xcf
-doc/searching.html
-doc/searching.txt
 doc/songcast.html
 doc/songcast.txt
 doc/upplay-mingw.html
@@ -222,6 +220,11 @@ doc/upplay.html
 doc/upplay.txt
 excludefile
 makesrcdist.sh
+notifications/
+notifications/audioscrobbler.cpp
+notifications/audioscrobbler.h
+notifications/notifications.cpp
+notifications/notifications.h
 playlist/
 playlist/playlist.cpp
 playlist/playlist.h
@@ -237,6 +240,7 @@ playlist/playlistohrd.cpp
 playlist/playlistohrd.h
 playlist/radiolist.xml
 rpm/
+rpm/upplay-randplayer-mathinc.patch
 rpm/upplay.spec
 upadapt/
 upadapt/avtadapt.h
