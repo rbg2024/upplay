@@ -8,7 +8,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
 #QMAKE_CXXFLAGS += -DUSING_WEBENGINE
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 1.2.5pre1
+VERSION = 1.2.5
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
