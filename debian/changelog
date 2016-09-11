@@ -1,6 +1,21 @@
+upplay (1.2.5-1) unstable; urgency=low
+
+  * Add scrolling to the songcast connections dialog. 
+  * Option to only show OpenHome renderers in the Renderer choice dialog
+    (avoids bubble upnp servers doublons).
+  * Fix drag&drop being wrongly initiated in some cases.
+  * Last.FM scrobbler.
+  * Font size improvements.
+  * Changed libupnpp dependancy to libupnpp3. Upplay would work fine with
+    libupnpp2, done to keep in sync with upmpdcli and avoids needing both
+    libs.   
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Sun, 11 Sep 2016 09:50:00 +0100
+
 upplay (1.2.4-1) unstable; urgency=low
 
   * Some fixes to the AVTransport interface
+
  -- Jean-Francois Dockes <jf@dockes.org>  Fri, 26 Feb 2016 14:36:00 +0100
 
 upplay (1.2.3-1) unstable; urgency=low

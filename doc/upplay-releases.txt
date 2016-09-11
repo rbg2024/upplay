@@ -8,6 +8,19 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
+1.2.5:
+
+Actually, this should have been 1.3.0, there are some small functional
+changes in addition to bug fixes.
+
+- Add scrolling to the songcast connections dialog. It was difficult to use
+  with many devices present.
+- Option to only show OpenHome renderers in the Renderer choice dialog
+  (avoids bubble upnp servers doublons).
+- Fix drag&drop being wrongly initiated in some cases.
+- Last.FM scrobbler.
+- Font size improvements.
+
 1.2.4:
 
 - Fixes to the AVTransport interface, which had support of a bit of

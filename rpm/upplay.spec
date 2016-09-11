@@ -1,15 +1,14 @@
 Summary:        Linux UPnP audio control point
 Name:           upplay
-Version:        1.2.4
+Version:        1.2.5
 Release:        1%{?dist}
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.lesbonscomptes.com/upplay
 Source0:        http://www.lesbonscomptes.com/upplay/upplay-%{version}.tar.gz
-Patch0:         upplay-randplayer-mathinc.patch
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
-BuildRequires:  libupnpp
+BuildRequires:  libupnpp-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
@@ -19,7 +18,6 @@ standard UPnP or OpenHome Playlist services.
 
 %prep
 %setup -q 
-%patch0 -p0
 
 %build
 qmake-qt4
@@ -43,6 +41,16 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
+* Sun Sep 11 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.5
+- Add scrolling to the songcast connections dialog. 
+- Option to only show OpenHome renderers in the Renderer choice dialog
+  (avoids bubble upnp servers doublons).
+- Fix drag&drop being wrongly initiated in some cases.
+- Last.FM scrobbler.
+- Font size improvements.
+- Changed libupnpp dependancy to libupnpp3. Upplay would work fine with
+  libupnpp2, done to keep in sync with upmpdcli and avoids needing both
+  libs.   
 * Fri Feb 26 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.4
 - Fixes to the AVTransport interface
 * Fri Feb 05 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.3
