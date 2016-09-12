@@ -277,13 +277,13 @@ string AudioScrobbler::createScrobbleMessage(const MetaData& meta)
 {
     map<string, string> vars;
 
-    vars["album"] = escapeHtml(qs2utf8s(meta.album));
+    vars["album"] = Helper::escapeHtml(qs2utf8s(meta.album));
     vars["api_key"] = apiKey;
-    vars["artist"] = escapeHtml(qs2utf8s(meta.artist));
+    vars["artist"] = Helper::escapeHtml(qs2utf8s(meta.artist));
     vars["duration"] = i2s(meta.length_ms / 1000);
     vars["method"] = "track.Scrobble";
     vars["timestamp"] = i2s(meta.filesize); // We store starttime in filesize
-    vars["track"] = escapeHtml(qs2utf8s(meta.title));
+    vars["track"] = Helper::escapeHtml(qs2utf8s(meta.title));
     vars["sk"] = m_sessionid;
 
     return LFMMessage(vars);
@@ -308,9 +308,9 @@ bool AudioScrobbler::nowPlaying(const MetaData& meta)
 {
     map<string, string> vars;
     vars["method"] = "track.updateNowPlaying";
-    vars["track"] = escapeHtml(qs2utf8s(meta.title));
-    vars["artist"] =  escapeHtml(qs2utf8s(meta.artist));
-    vars["album"] = escapeHtml(qs2utf8s(meta.album));
+    vars["track"] = Helper::escapeHtml(qs2utf8s(meta.title));
+    vars["artist"] =  Helper::escapeHtml(qs2utf8s(meta.artist));
+    vars["album"] = Helper::escapeHtml(qs2utf8s(meta.album));
     vars["duration"] = i2s(meta.length_ms / 1000);
     vars["api_key"] = apiKey;
     vars["sk"] = m_sessionid;
@@ -324,8 +324,8 @@ bool AudioScrobbler::loveTrack(const MetaData& meta)
     map<string, string> vars;
     
     vars["method"] = "track.love";
-    vars["track"] = escapeHtml(qs2utf8s(meta.title));
-    vars["artist"] =  escapeHtml(qs2utf8s(meta.artist));
+    vars["track"] = Helper::escapeHtml(qs2utf8s(meta.title));
+    vars["artist"] =  Helper::escapeHtml(qs2utf8s(meta.artist));
     vars["api_key"] = apiKey;
     vars["sk"] = m_sessionid;
 

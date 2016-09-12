@@ -68,12 +68,12 @@ template <typename T> QList<T> randomize_list(const QList<T>& list)
 }
 
 bool read_file_into_str(QString filename, QString* content);
-
-};
-
 // Escape things that would look like HTML markup
 std::string escapeHtml(const string &in);
 QString escapeHtml(const QString& in);
+
+};
+
 
 template <class T> void stringsToString(const T &tokens, std::string &s);
 template <class T> std::string stringsToString(const T &tokens);

@@ -91,13 +91,13 @@ void UPPrefs::onShowPrefs()
                           "Show notifications",
                           "Show pop-up message in notification area when a "
                           "track starts playing");
+        QSettings settings;
 #ifndef _WIN32
         ConfParamW *wuncmd =
             m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "usenotificationcmd",
                           "Use notification command (else use Qt)",
                           "Choose whether to use the Qt notification mechanism "
                           "or to execute a desktop command");
-        QSettings settings;
         if (!settings.contains("notificationcmd")) {
             settings.setValue("notificationcmd",
                               "notify-send --expire-time=1000 --icon=upplay");

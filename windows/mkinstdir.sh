@@ -60,9 +60,10 @@ copyupplay()
     chkcp $UPP/dirbrowser/cdbrowser.css $DESTDIR//share/cdbrowser
     chkcp $UPP/dirbrowser/standard.css $DESTDIR/share/cdbrowser
     chkcp $UPP/dirbrowser/dark.css $DESTDIR/share/cdbrowser
-    chkcp $UPP/GUI/standard.css $DESTDIR/share
     cp -rp $UPP/GUI/icons $DESTDIR/share
+    chkcp $UPP/GUI/standard.css $DESTDIR/share
     chkcp $UPP/GUI/dark.css $DESTDIR/share
+    chkcp $UPP/GUI/common.css $DESTDIR/share
     chkcp $UPP/GUI/icons/upplay.ico $DESTDIR
     chkcp -rp $UPP/GUI/icons $DESTDIR
     chkcp $GUIBIN $DESTDIR

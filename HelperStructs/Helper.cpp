@@ -315,7 +315,7 @@ bool Helper::read_file_into_str(QString filename, QString* content)
 }
 
 // Escape things that would look like HTML markup
-string escapeHtml(const string &in)
+string Helper::escapeHtml(const string &in)
 {
     string out;
     for (string::size_type pos = 0; pos < in.length(); pos++) {
@@ -330,7 +330,7 @@ string escapeHtml(const string &in)
     return out;
 }
 
-QString escapeHtml(const QString& in)
+QString Helper::escapeHtml(const QString& in)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     return in.toHtmlEscaped();

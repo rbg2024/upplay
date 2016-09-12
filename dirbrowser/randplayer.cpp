@@ -119,9 +119,9 @@ QString RandPlayer::groupHtml(std::vector<UPnPClient::UPnPDirObject>& ents)
     string html = "<i></i>";
     for (vector<UPnPClient::UPnPDirObject>::iterator it = ents.begin();
          it != ents.end(); it++) {
-        html += string("<b>") + escapeHtml(it->m_title) + "</b><br />";
-        html += escapeHtml(it->f2s("upnp:album", false)) + "<br />";
-        html += escapeHtml(it->f2s("upnp:artist", false)) + "<br />";
+        html += string("<b>") + Helper::escapeHtml(it->m_title) + "</b><br />";
+        html += Helper::escapeHtml(it->f2s("upnp:album", false)) + "<br />";
+        html += Helper::escapeHtml(it->f2s("upnp:artist", false)) + "<br />";
     }
     return QString::fromUtf8(html.c_str());
 }

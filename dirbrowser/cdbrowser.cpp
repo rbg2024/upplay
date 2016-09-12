@@ -551,7 +551,7 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
     out += QString("<tr class=\"container\" objid=\"%1\" objidx=\"%2\">"
                    "<td></td><td>").arg(e.m_id.c_str());
     out += QString("<a class=\"ct_title\" href=\"C%1\">").arg(idx);
-    out += QString::fromUtf8(escapeHtml(e.m_title).c_str());
+    out += QString::fromUtf8(Helper::escapeHtml(e.m_title).c_str());
     out += "</a></td>";
     string val;
     e.getprop("upnp:artist", val);
@@ -563,7 +563,7 @@ static QString CTToHtml(unsigned int idx, const UPnPDirObject& e)
             val = val.substr(0,len) + "...";
         }
         out += "<td class=\"ct_artist\">";
-        out += QString::fromUtf8(escapeHtml(val).c_str());
+        out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
         out += "</td>";
     }
     out += "</tr>";
@@ -584,11 +584,11 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e,
 
     e.getprop("upnp:originalTrackNumber", val);
     out += QString("<td class=\"tk_tracknum\">") + 
-        escapeHtml(val).c_str() + "</td>";
+        Helper::escapeHtml(val).c_str() + "</td>";
 
     out += "<td class=\"tk_title\">";
     out += QString("<a href=\"I%1\">").arg(idx);
-    out += QString::fromUtf8(escapeHtml(e.m_title).c_str());
+    out += QString::fromUtf8(Helper::escapeHtml(e.m_title).c_str());
     out += "</a>";
     out += "</td>";
 
@@ -599,13 +599,13 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e,
         int len = maxartlen-3 >= 0 ? maxartlen-3 : 0;
         val = val.substr(0,len) + "...";
     }
-    out += QString::fromUtf8(escapeHtml(val).c_str());
+    out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
     out += "</td>";
     
     val.clear();
     e.getprop("upnp:album", val);
     out += "<td class=\"tk_album\">";
-    out += QString::fromUtf8(escapeHtml(val).c_str());
+    out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
     out += "</td>";
     
     val.clear();
