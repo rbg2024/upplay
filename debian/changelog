@@ -1,3 +1,9 @@
+upplay (1.2.6-1) unstable; urgency=low
+
+  * Fix bug in renderer selection when filtering non-openhome renderers.
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Mon, 12 Sep 2016 14:39:00 +0100
+
 upplay (1.2.5-1) unstable; urgency=low
 
   * Add scrolling to the songcast connections dialog. 

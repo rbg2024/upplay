@@ -1,6 +1,6 @@
 Summary:        Linux UPnP audio control point
 Name:           upplay
-Version:        1.2.5
+Version:        1.2.6
 Release:        1%{?dist}
 Group:          Applications/Multimedia
 License:        GPLv2+
@@ -41,6 +41,8 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
+* Mon Sep 12 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.6
+- Fix bug in renderer selection
 * Sun Sep 11 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.5
 - Add scrolling to the songcast connections dialog. 
 - Option to only show OpenHome renderers in the Renderer choice dialog
