@@ -174,6 +174,7 @@ void Application::chooseRenderer()
     if (ohonly) {
         dlg.setWindowTitle(tr("Select Renderer (OpenHome Only)"));
     }
+    vector<UPnPDeviceDesc*> filtered_devices;
     for (vector<UPnPDeviceDesc>::iterator it = devices.begin(); 
          it != devices.end(); it++) {
         if (ohonly) {
@@ -185,7 +186,7 @@ void Application::chooseRenderer()
                 continue;
             }
         }
-        
+        filtered_devices.push_back(&(*it));
         QString fname = u8s2qs(it->friendlyName);
         if (!m_renderer_friendly_name.compare(fname)) {
             QListWidgetItem *item = new QListWidgetItem(fname);
@@ -202,23 +203,25 @@ void Application::chooseRenderer()
     }
 
     int row = dlg.rndsLW->currentRow();
-    if (row < 0 || row >= int(devices.size())) {
+    if (row < 0 || row >= int(filtered_devices.size())) {
         cerr << "Internal error: bad row after renderer choose dlg" << endl;
         return;
     }
+
+    UPnPDeviceDesc& chosen(*filtered_devices[row]);
     MetaDataList curmeta;
     if (m_playlist) {
         m_playlist->get_metadata(curmeta);
     }
 
-    m_renderer_friendly_name = u8s2qs(devices[row].friendlyName);
-    if (!setupRenderer(devices[row].UDN)) {
+    m_renderer_friendly_name = u8s2qs(chosen.friendlyName);
+    if (!setupRenderer(chosen.UDN)) {
         QMessageBox::warning(0, "Upplay", tr("Can't connect to ") +
                              m_renderer_friendly_name);
         m_renderer_friendly_name = "";
         return;
     }
-    m_settings->setPlayerUID(u8s2qs(devices[row].UDN));
+    m_settings->setPlayerUID(u8s2qs(chosen.UDN));
 
     if (m_playlist && !dlg.keepRB->isChecked()) {
         if (dlg.replRB->isChecked()) {
