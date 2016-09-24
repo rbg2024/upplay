@@ -71,11 +71,7 @@ void GUI_Player::setupConnections()
 
     // about
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
-
     connect(ui->action_help, SIGNAL(triggered(bool)), this, SLOT(help(bool)));
-    connect(m_trayIcon, SIGNAL(sig_volume_changed_by_wheel(int)), 
-            this, SLOT(onVolumeStepActivated(int)));
-
 
     QList<QKeySequence> lst;
     lst << QKeySequence(Qt::Key_MediaTogglePlayPause) <<

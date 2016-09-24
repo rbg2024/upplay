@@ -104,7 +104,7 @@ bool GUI_TrayIcon::event(QEvent * e)
 {
     if (e->type() == QEvent::Wheel) {
         QWheelEvent * wheelEvent = dynamic_cast <QWheelEvent *>(e);
-        emit sig_volume_changed_by_wheel(wheelEvent->delta());
+        emit sig_volume_changed_by_wheel(wheelEvent->delta() > 0 ? 1 : -1);
     }
 
     return true;
