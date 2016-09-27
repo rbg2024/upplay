@@ -76,47 +76,56 @@ void GUI_Player::setupConnections()
 
     // Keyboard shortcuts
     QList<QKeySequence> lst;
+
     lst << QKeySequence(Qt::Key_MediaTogglePlayPause) <<
         QKeySequence(Qt::Key_MediaPlay) << QKeySequence(Qt::Key_MediaPause) <<
         QKeySequence(Qt::Key_Space);
     QAction* play_pause_action = createAction(lst);
+    lst.clear();
     connect(play_pause_action, SIGNAL(triggered()),
             ui->player_w->playctl(), SLOT(onPlayClicked()));
-
-    QList<QKeySequence> lst_fwd;
-    lst_fwd << QKeySequence(Qt::Key_MediaNext) <<
+    
+    lst << QKeySequence(Qt::Key_MediaNext) <<
         QKeySequence(Qt::ControlModifier | Qt::Key_Right);
-    QAction* fwd_action = createAction(lst_fwd);
+    QAction* fwd_action = createAction(lst);
+    lst.clear();
     connect(fwd_action, SIGNAL(triggered()),
             ui->player_w->playctl(), SLOT(onForwardClicked()));
-
-    QList<QKeySequence> lst_bwd;
-    lst_bwd << QKeySequence(Qt::Key_MediaPrevious) <<
+        
+    lst << QKeySequence(Qt::Key_MediaPrevious) <<
         QKeySequence(Qt::ControlModifier | Qt::Key_Left);
-    QAction* bwd_action = createAction(lst_bwd);
+    QAction* bwd_action = createAction(lst);
+    lst.clear();
     connect(bwd_action, SIGNAL(triggered()),
             ui->player_w->playctl(), SLOT(onBackwardClicked()));
-
-    QAction* stop_action = createAction(QKeySequence(Qt::ControlModifier |
-                                                     Qt::Key_Space));
+    
+    QAction* stop_action = createAction(
+        QKeySequence(Qt::ControlModifier | Qt::Key_Space));
     connect(stop_action, SIGNAL(triggered()),
             ui->player_w->playctl(), SLOT(onStopClicked()));
 
-
-    QAction* louder_action = createAction(QKeySequence(Qt::Key_Up));
+    lst << QKeySequence(Qt::Key_MediaPrevious) <<
+        QKeySequence(Qt::ControlModifier | Qt::Key_Up) <<
+        QKeySequence(Qt::Key_Plus);
+    QAction* louder_action = createAction(lst);
+    lst.clear();
     connect(louder_action, SIGNAL(triggered()),
             this, SLOT(onVolumeHigherActivated()));
 
-    QAction* leiser_action = createAction(QKeySequence(Qt::Key_Down));
+    lst << QKeySequence(Qt::ControlModifier | Qt::Key_Down) <<
+        QKeySequence(Qt::Key_Minus);
+    QAction* leiser_action = createAction(lst);
+    lst.clear();
     connect(leiser_action, SIGNAL(triggered()),
             this, SLOT(onVolumeLowerActivated()));
-
-
-    QAction* two_perc_plus_action = createAction(QKeySequence(Qt::Key_Right));
+    
+    QAction* two_perc_plus_action = createAction(
+        QKeySequence(Qt::Key_Right));
     connect(two_perc_plus_action, SIGNAL(triggered()),
             this, SLOT(onJumpForwardActivated()));
 
-    QAction* two_perc_minus_action = createAction(QKeySequence(Qt::Key_Left));
+    QAction* two_perc_minus_action = createAction(
+        QKeySequence(Qt::Key_Left));
     connect(two_perc_minus_action, SIGNAL(triggered()),
             this, SLOT(onJumpBackwardActivated()));
 

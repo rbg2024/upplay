@@ -18,8 +18,6 @@
 
 #include "HelperStructs/Helper.h"
 
-#include <QDebug>
-
 ProgressWidget::ProgressWidget(QWidget *parent)
     : ProgressWidgetIF(parent), m_totalsecs(0), m_step_pc(2), m_step_secs(-1)
 {
@@ -108,6 +106,5 @@ void ProgressWidget::onProgressSliderChanged(int pc)
     }
     int secs = (pc * m_totalsecs) / 100;
     showTimes(secs);
-    qDebug() << "ProgressWidget: emitting seekRequested(" << secs << ")";
     emit seekRequested(secs);
 }
