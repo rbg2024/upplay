@@ -104,8 +104,7 @@ void GUI_Player::setupConnections()
     connect(stop_action, SIGNAL(triggered()),
             ui->player_w->playctl(), SLOT(onStopClicked()));
 
-    lst << QKeySequence(Qt::Key_MediaPrevious) <<
-        QKeySequence(Qt::ControlModifier | Qt::Key_Up) <<
+    lst << QKeySequence(Qt::ControlModifier | Qt::Key_Up) <<
         QKeySequence(Qt::Key_Plus);
     QAction* louder_action = createAction(lst);
     lst.clear();
