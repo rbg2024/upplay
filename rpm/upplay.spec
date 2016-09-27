@@ -8,7 +8,7 @@ URL:            http://www.lesbonscomptes.com/upplay
 Source0:        http://www.lesbonscomptes.com/upplay/upplay-%{version}.tar.gz
 BuildRequires:  qt-devel
 BuildRequires:  qtwebkit-devel
-BuildRequires:  libupnpp-devel
+BuildRequires:  libupnpp
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %description
