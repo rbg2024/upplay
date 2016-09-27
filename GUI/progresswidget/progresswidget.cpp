@@ -46,15 +46,15 @@ void ProgressWidget::seek(int secs)
     }
     setUi(secs);
     emit seekRequested(secs);
-        
 }
 
 void ProgressWidget::step(int steps)
 {
     int secs = m_step_pc > 0 ? (m_step_pc * steps * m_totalsecs) / 100 :
         m_step_secs * steps;
-    setUi(secs);
-    emit seekRequested(secs);
+    int current = (songProgress->value() * m_totalsecs) / 100;
+    current += secs;
+    seek(current);
 }
 
 void ProgressWidget::setStepValuePc(int percent)
@@ -67,10 +67,8 @@ void ProgressWidget::setStepValuePc(int percent)
 
 void ProgressWidget::setStepValueSecs(int secs)
 {
-    m_step_secs = secs;
-    if (secs < 0) {
-        m_step_pc = 2;
-    } else {
+    if (secs > 0) {
+        m_step_secs = secs;
         m_step_pc = -1;
     }
 }

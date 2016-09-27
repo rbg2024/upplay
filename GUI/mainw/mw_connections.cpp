@@ -73,6 +73,8 @@ void GUI_Player::setupConnections()
     connect(ui->action_about, SIGNAL(triggered(bool)), this, SLOT(about(bool)));
     connect(ui->action_help, SIGNAL(triggered(bool)), this, SLOT(help(bool)));
 
+
+    // Keyboard shortcuts
     QList<QKeySequence> lst;
     lst << QKeySequence(Qt::Key_MediaTogglePlayPause) <<
         QKeySequence(Qt::Key_MediaPlay) << QKeySequence(Qt::Key_MediaPause) <<
@@ -101,23 +103,20 @@ void GUI_Player::setupConnections()
             ui->player_w->playctl(), SLOT(onStopClicked()));
 
 
+    QAction* louder_action = createAction(QKeySequence(Qt::Key_Up));
+    connect(louder_action, SIGNAL(triggered()),
+            this, SLOT(onVolumeHigherActivated()));
 
-    QAction* louder_action = createAction(QKeySequence(Qt::AltModifier |
-                                                       Qt::Key_Up));
-    connect(louder_action, SIGNAL(triggered()), this, SLOT(onVolumeHigherActivated()));
-
-    QAction* leiser_action = createAction(QKeySequence(Qt::AltModifier |
-                                                       Qt::Key_Down));
-    connect(leiser_action, SIGNAL(triggered()), this, SLOT(onVolumeLowerActivated()));
+    QAction* leiser_action = createAction(QKeySequence(Qt::Key_Down));
+    connect(leiser_action, SIGNAL(triggered()),
+            this, SLOT(onVolumeLowerActivated()));
 
 
-    QAction* two_perc_plus_action = createAction(QKeySequence(Qt::AltModifier |
-                                                              Qt::Key_Right));
+    QAction* two_perc_plus_action = createAction(QKeySequence(Qt::Key_Right));
     connect(two_perc_plus_action, SIGNAL(triggered()),
             this, SLOT(onJumpForwardActivated()));
 
-    QAction* two_perc_minus_action = createAction(QKeySequence(Qt::AltModifier |
-                                                               Qt::Key_Left));
+    QAction* two_perc_minus_action = createAction(QKeySequence(Qt::Key_Left));
     connect(two_perc_minus_action, SIGNAL(triggered()),
             this, SLOT(onJumpBackwardActivated()));
 
