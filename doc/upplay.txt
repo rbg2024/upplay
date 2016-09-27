@@ -144,7 +144,7 @@ search at the beginning or end of a field).
 Clicking the big plus sign will open a new tab. Clicking a tab's cross
 sign will close it...
 
-
+[[menus]]
 == Menus
 
 File:
@@ -168,6 +168,18 @@ File:
    submenu. 
 
 And `Help`, there is no help...
+
+[[keyboard]]
+== Keyboard shortcuts
+
+- Space/MediaTogglePlayPause/MediaPlay/MediaPause : toggle play/pause.
+- Ctl+Right / MediaNext : next track.
+- Ctl+Left / MediaPrevious : previous track.
+- Ctl+Space : stop.    
+- Ctl+Up / Plus : volume increase.
+- Ctl+Down/ Minus : volume decrease.
+- Right : seek forward a few secs.
+- Left : seek backward a few secs.
 
 [[hiresadjust]]
 == Adjusting the font sizes on high resolution displays

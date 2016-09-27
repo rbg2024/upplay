@@ -8,6 +8,10 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
+1.2.6:
+
+- Fix stupid bug in renderer selection when openhome filtering was set.
+
 1.2.5:
 
 Actually, this should have been 1.3.0, there are some small functional
