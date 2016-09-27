@@ -208,10 +208,10 @@ void GUI_TrayIcon::setMute(bool mute)
     }
 
     if (!mute) {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_mute.png")));
+        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_3.png")));
         m_muteAction->setText(tr("Mute"));
     }  else {
-        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_3.png")));
+        m_muteAction->setIcon(QIcon(Helper::getIconPath("vol_mute.png")));
         m_muteAction->setText(tr("Unmute"));
     }
 }

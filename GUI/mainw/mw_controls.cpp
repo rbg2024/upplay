@@ -141,6 +141,7 @@ void GUI_Player::setVolumeUi(int pc)
 void GUI_Player::setMuteUi(bool ismute)
 {
     ui->player_w->volume()->setMuteUi(ismute);
+    m_trayIcon->setMute(ismute);
 }
 
 void GUI_Player::onVolumeStepActivated(int val)
