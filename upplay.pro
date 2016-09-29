@@ -14,7 +14,7 @@ contains(WEBPLATFORM, webengine) {
 }
 
 # VERSION is ^egrepped and must stay in the first column
-VERSION = 1.2.6
+VERSION = 1.2.7
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -std=c++0x

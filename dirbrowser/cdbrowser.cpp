@@ -267,6 +267,10 @@ void CDBrowser::onSysUpdIdChanged(int id)
     qDebug() << "CDBrowser::onSysUpdIdChanged: mine " << m_sysUpdId <<
         "server" << id;
 
+    if (!QSettings().value("monitorupdateid").toBool()) {
+        return;
+
+    }
     // 1st time is free
     if (!m_sysUpdId) {
         m_sysUpdId = id;
@@ -287,8 +291,13 @@ void CDBrowser::onSysUpdIdChanged(int id)
             // Not too sure which actually invalidate their
             // tree. Pretty sure that Minim does not (we might just
             // want to reload the current dir).
-        case ContentDirectory::CDSKIND_MINIM: return;
-        default: break;
+        case ContentDirectory::CDSKIND_MINIDLNA: break;
+        case ContentDirectory::CDSKIND_MEDIATOMB: break;
+            // By default, don't do anything by default because some
+            // cds keep changing their global updateid. We'd need to
+            // check the containerUpdateID.
+        case ContentDirectory::CDSKIND_MINIM:
+        default: return;
         }
 
         QMessageBox::Button rep = 

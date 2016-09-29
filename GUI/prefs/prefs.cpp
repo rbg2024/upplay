@@ -75,9 +75,15 @@ void UPPrefs::onShowPrefs()
                       0, 0, &qadapters);
         
         // Filter out non-openhome renderers?
-        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "ohonly", "OpenHome only",
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "ohonly",
+                      "Only show OpenHome renderers",
                       "Only show OpenHome-capable renderers in "
-                      "selection dialog.");
+                      "the selection dialog. Avoids Bubble UPnP server dups.");
+
+        // Notify content directory updateid changes
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "monitorupdateid",
+                      "Notify on Content Directory update",
+                      "Show dialog when content directory state changes.");
 
         // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
