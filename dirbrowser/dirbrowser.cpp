@@ -361,7 +361,11 @@ void DirBrowser::doSearch(const QString& text, bool reverse)
 	return;
     }
 #ifdef USING_WEBENGINE
-#warning tobedone
+    QWebEnginePage::FindFlags options = 0;
+    if (reverse) {
+        options |= QWebEnginePage::FindBackward;
+    }
+    cdb->findText(text, options, [] (bool) {});
 #else
     QWebPage::FindFlags options = QWebPage::FindWrapsAroundDocument;
     if (reverse)

@@ -28,11 +28,14 @@
 
 #ifdef USING_WEBENGINE
 #include <QWebEngineView>
-#define QWebView QWebEngineView
-#define QWebPage QWebEnginePage
-#define QWebSettings QWebEngineSettings
+#define QWEBVIEW QWebEngineView
+#define QWEBPAGE QWebEnginePage
+#define QWEBSETTINGS QWebEngineSettings
 #else
 #include <QWebView>
+#define QWEBVIEW QWebView
+#define QWEBPAGE QWebPage
+#define QWEBSETTINGS QWebSettings
 #endif
 
 #include <QVariant>
@@ -55,7 +58,7 @@ class DirBrowser;
 class QProgressDialog;
 class ContentDirectoryQO;
 
-class CDBrowser : public QWebView
+class CDBrowser : public QWEBVIEW
 {
     Q_OBJECT;
 
@@ -100,7 +103,7 @@ class CDBrowser : public QWebView
     void sig_browse_in_new_tab(QString UDN,
                                std::vector<CDBrowser::CtPathElt>);
     void sig_rand_stop();
-                        
+
  public slots:
     virtual void appendHtml(const QString&, const QString& html);
     virtual void onLinkClicked(const QUrl &);
@@ -112,7 +115,9 @@ class CDBrowser : public QWebView
     virtual void onContentsSizeChanged(const QSize&);
     virtual void mouseReleaseEvent(QMouseEvent *event);
 
-
+    virtual void onPopupJsDone(const QVariant&);
+    virtual void onLoadFinished(bool);
+    
  private:
     void initContainerHtml(const std::string& ss=string());
     void browseContainer(std::string, std::string, QPoint scrollpos = QPoint());
@@ -120,7 +125,9 @@ class CDBrowser : public QWebView
                 QPoint());
     void curpathClicked(unsigned int i);
     void waitForPage();
-
+    void mySetHtml(const QString&);
+    void doCreatePopupMenu();
+    
     // When displaying the servers list, we periodically check the
     // server pool state. The last seen Media Server descriptions are
     // stored in m_msdescs for diffing with the new ones and deciding
@@ -165,7 +172,9 @@ class CDBrowser : public QWebView
     // Objid and index in entries for the last popup menu click
     std::string m_popupobjid;
     std::string m_popupobjtitle;
+    std::string m_popupotype;
     int m_popupidx;
+    QPoint m_popupos;
     int m_popupmode; // now, next, at end
 
     // Remember last click kind for detecting midclick
@@ -218,7 +227,6 @@ protected:
     virtual bool acceptNavigationRequest(const QUrl& url, 
                                          NavigationType, 
                                          bool) {
-        qDebug() << "acceptNavigationRequest: url: " << url.toString();
         m_browser->onLinkClicked(url);
         return false;
     }
@@ -230,10 +238,6 @@ protected:
 private:
     CDBrowser *m_browser;
 };
-
-#define QWebView QWebEngineView
-#define QWebPage QWebEnginePage
-#define QWebSettings QWebEngineSettings
 
 #else // Using Qt Webkit
 

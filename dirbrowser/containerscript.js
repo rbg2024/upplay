@@ -8,19 +8,37 @@ var locDetails = '';
 function saveLoc(ev) 
 {
     el = ev.target;
-    //console.log('el: ' + el);
     locDetails = '';
-    while (el && !el.getAttribute('objid')) {
-        //console.log('el: ' + el);
+    while (el && el.attributes && !el.attributes.getNamedItem("objid")) {
+        // console.log('el: ' + el);
         el = el.parentNode;
     }
-    if (el) {
-        locdetails = '{\n' + 
-            '"objid" : ' + JSON.stringify(el.getAttribute("objid")) + ',\n' +
-            '"title" : ' + JSON.stringify(el.textContent || el.innerText || "") + ',\n' +
-            '"objidx" : ' + JSON.stringify(el.getAttribute("objidx")) + ',\n' +
-            '"otype" : ' + JSON.stringify(el.getAttribute("class")) + '\n' +
-            '}\n';
+    
+    objid = el.attributes.getNamedItem("objid");
+    if (objid) {
+        objidvalue = objid.value;
+    } else {
+        objidvalue = "";
     }
-    //console.log(locdetails);
+    objidvalue = el.attributes.getNamedItem("objid").value;
+    objidx = el.attributes.getNamedItem("objidx");
+    if (objidx) {
+        objidxvalue = objidx.value;
+    } else {
+        objidxvalue = "";
+    }
+    otype = el.attributes.getNamedItem("class");
+    if (otype) {
+        otypevalue = otype.value
+    } else {
+        otypevalue = "";
+    }
+    if (el && el.attributes) {
+        locDetails = 
+            'objid = ' + objidvalue + '\n' +
+            'title = ' + (el.textContent || el.innerText || "") + '\n' +
+            'objidx = ' + objidxvalue + '\n' +
+            'otype = ' + otypevalue + '\n';
+    }
+    //console.log(locDetails);
 }

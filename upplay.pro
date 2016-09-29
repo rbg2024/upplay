@@ -1,11 +1,17 @@
 TEMPLATE        = app
 LANGUAGE        = C++
 
-QT += script webkit network xml
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
+QT += script xml network
 
-#QT += script widgets network webenginewidgets
-#QMAKE_CXXFLAGS += -DUSING_WEBENGINE
+# WEBPLATFORM = webengine
+contains(WEBPLATFORM, webengine) {
+    QT += widgets webenginewidgets
+    QMAKE_CXXFLAGS += -DUSING_WEBENGINE
+} else {
+    # Webkit (qt4 or 5)
+    QT += webkit
+    greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
+}
 
 # VERSION is ^egrepped and must stay in the first column
 VERSION = 1.2.6
