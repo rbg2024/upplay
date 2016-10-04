@@ -60,36 +60,10 @@ void UPPrefs::onShowPrefs()
         m_w = new ConfTabsW(m_parent, "UPPlay Preferences", &lnkfact);
         int idx = m_w->addPanel("Application");
 
-        vector<string> adapters;
-        UPnPP::getAdapterNames(adapters);
-        QStringList qadapters;
-        qadapters.push_back("");
-        for (unsigned int i = 0; i < adapters.size(); i++) {
-            qadapters.push_back(u8s2qs(adapters[i]));
-        }
-        // Specify network interface ?
-        m_w->addParam(idx, ConfTabsW::CFPT_CSTR, "netifname",
-                      "Network interface name (needs restart)",
-                      "Specify network interface to use, or leave blank to "
-                      "use the first or only appropriate interface",
-                      0, 0, &qadapters);
-        
-        // Filter out non-openhome renderers?
-        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "ohonly",
-                      "Only show OpenHome renderers",
-                      "Only show OpenHome-capable renderers in "
-                      "the selection dialog. Avoids Bubble UPnP server dups.");
-
-        // Notify content directory updateid changes
-        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "monitorupdateid",
-                      "Notify on Content Directory update",
-                      "Show dialog when content directory state changes.");
-
         // Close to tray ?
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "min2tray", "Close to tray",
                    "Minimize to tray instead of exiting when the main window "
                    "is closed");
-
 
         // Show notifications ?
         ConfParamW *wsn =
@@ -150,6 +124,41 @@ void UPPrefs::onShowPrefs()
                            "", 0, 100);
         m_w->enableLink(b1, w1);
         
+        m_w->endOfList(idx);
+        idx = m_w->addPanel("UPnP");
+        vector<string> adapters;
+        UPnPP::getAdapterNames(adapters);
+        QStringList qadapters;
+        qadapters.push_back("");
+        for (unsigned int i = 0; i < adapters.size(); i++) {
+            qadapters.push_back(u8s2qs(adapters[i]));
+        }
+        // Specify network interface ?
+        m_w->addParam(idx, ConfTabsW::CFPT_CSTR, "netifname",
+                      "Network interface name (needs restart)",
+                      "Specify network interface to use, or leave blank to "
+                      "use the first or only appropriate interface",
+                      0, 0, &qadapters);
+        
+        // Filter out non-openhome renderers?
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "ohonly",
+                      "Only show OpenHome renderers",
+                      "Only show OpenHome-capable renderers in "
+                      "the selection dialog. Avoids Bubble UPnP server dups.");
+
+        // Notify content directory updateid changes
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "monitorupdateid",
+                      "Notify on Content Directory update",
+                      "Show dialog when content directory state changes.");
+
+        // 
+        m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "noavtsetnext",
+                      "Do not use AVTransport gapless functionality",
+                      "Disables use of setNextAVTransportUri/Metadata.<br>"
+                      "Useful with some buggy AVT renderers. Irrelevant "
+                      "with OpenHome.");
+
+        
         idx = m_w->addPanel("Last.FM");
 
         m_w->addParam(idx, ConfTabsW::CFPT_BOOL, "lastfmscrobble",
@@ -159,7 +168,10 @@ void UPPrefs::onShowPrefs()
         m_w->addParam(idx, ConfTabsW::CFPT_STR, "lastfmpassword",
                       "Last.FM password (md5)", "");
 
+
+        m_w->endOfList(idx);
         idx = m_w->addForeignPanel(new SortprefsW(m_w), "Directory Sorting");
+        m_w->endOfList(idx);
 
         connect(m_w, SIGNAL(sig_prefsChanged()), 
                 this, SIGNAL(sig_prefsChanged()));

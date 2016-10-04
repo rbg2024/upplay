@@ -112,6 +112,7 @@ public:
                          const QString& tooltip, int isdirorminval = 0, 
                          int maxval = 0, const QStringList* sl = 0);
     bool enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert = false);
+    void endOfList(int tabindex);
                                                 
 public slots:
     void acceptChanges();
@@ -143,6 +144,7 @@ public:
     void addWidget (QWidget *w);
     void storeValues();
     void loadValues();
+    void endOfList();
 private:
     QVBoxLayout *m_vboxlayout;
     std::vector<QWidget *> m_widgets;

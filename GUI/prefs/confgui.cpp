@@ -51,8 +51,9 @@ using namespace std;
 
 namespace confgui {
 
-static const int spacing = 3;
-static const int margin = 3;
+static const int spacing = 0;
+// left,top,right, bottom
+static QMargins margin(4,3,4,3);
 
 ConfTabsW::ConfTabsW(QWidget *parent, const QString& title, 
                      ConfLinkFact *fact)
@@ -65,6 +66,8 @@ ConfTabsW::ConfTabsW(QWidget *parent, const QString& title,
 				     | QDialogButtonBox::Cancel);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->setSpacing(spacing);
+    mainLayout->setContentsMargins(margin);
     mainLayout->addWidget(tabWidget);
     mainLayout->addWidget(buttonBox);
     setLayout(mainLayout);
@@ -172,6 +175,14 @@ ConfParamW *ConfTabsW::addParam(int tabindex,
     return cp;
 }
 
+void ConfTabsW::endOfList(int tabindex)
+{
+    ConfPanelW *panel = (ConfPanelW*)tabWidget->widget(tabindex);
+    if (panel == 0) 
+        return;
+    panel->endOfList();
+}
+
 bool ConfTabsW::enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert)
 {
     if (std::find(m_params.begin(), m_params.end(), boolw) == m_params.end() ||
@@ -200,14 +211,19 @@ ConfPanelW::ConfPanelW(QWidget *parent)
 {
     m_vboxlayout = new QVBoxLayout(this);
     m_vboxlayout->setSpacing(spacing);
-    m_vboxlayout->setMargin(margin);
-    m_vboxlayout->insertStretch(-1);
+    m_vboxlayout->setAlignment(Qt::AlignTop);
+    m_vboxlayout->setContentsMargins(margin);
 }
 
-void ConfPanelW::addWidget (QWidget *w) 
+void ConfPanelW::addWidget(QWidget *w) 
 {
     m_vboxlayout->addWidget(w);
     m_widgets.push_back(w);
+}
+
+void ConfPanelW::endOfList()
+{
+    m_vboxlayout->addStretch(2);
 }
 
 void ConfPanelW::storeValues()
@@ -456,6 +472,7 @@ bool ConfParamW::createCommon(const QString& lbltxt, const QString& tltptxt)
 {
     m_hl = new QHBoxLayout(this);
     m_hl->setSpacing(spacing);
+    m_hl->setContentsMargins(margin);
 
     QLabel *tl = new QLabel(this);
     setSzPol(tl, QSizePolicy::Preferred, QSizePolicy::Fixed, 0, 0);
@@ -587,6 +604,7 @@ ConfParamBoolW::ConfParamBoolW(QWidget *parent, ConfLink cflink,
     // No createCommon because the checkbox has a label
     m_hl = new QHBoxLayout(this);
     m_hl->setSpacing(spacing);
+    m_hl->setContentsMargins(margin);
 
     m_cb = new QCheckBox(lbltxt, this);
     setSzPol(m_cb, QSizePolicy::Fixed, QSizePolicy::Fixed, 0, 0);
@@ -677,9 +695,14 @@ ConfParamSLW::ConfParamSLW(QWidget *parent, ConfLink cflink,
     // Can't use createCommon here cause we want the buttons below the label
     m_hl = new QHBoxLayout(this);
     m_hl->setSpacing(spacing);
+    m_hl->setContentsMargins(margin);
 
     QVBoxLayout *vl1 = new QVBoxLayout();
+    vl1->setSpacing(spacing);
+    vl1->setContentsMargins(margin);
     QHBoxLayout *hl1 = new QHBoxLayout();
+    hl1->setSpacing(spacing);
+    hl1->setContentsMargins(margin);
 
     QLabel *tl = new QLabel(this);
     setSzPol(tl, QSizePolicy::Preferred, QSizePolicy::Fixed, 0, 0);

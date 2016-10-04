@@ -155,6 +155,13 @@ void PlaylistAVT::send_next_playing_signal()
     // Do not do this in shuffle mode: makes no sense
     if (CSettingsStorage::getInstance()->getPlaylistMode().shuffle) 
         return;
+    // Can be disabled in prefs
+    QSettings settings;
+    if (settings.value("noavtsetnext").toBool()) {
+        qDebug() << "Not using AVT gapless because it is disabled in prefs";
+        return;
+    }
+
     // Only if there is a track behind the current one
     if (m_play_idx >= 0 && m_play_idx < int(m_meta.size()) - 1)
         m_avto->infoNextTrack(m_meta[m_play_idx + 1]);
