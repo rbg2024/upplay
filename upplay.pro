@@ -45,7 +45,6 @@ HEADERS += \
         GUI/playlist/model/PlaylistItemModel.h \
         GUI/playlist/view/ContextMenu.h \
         GUI/playlist/view/PlaylistView.h \
-        GUI/prefs/confgui.h \
         GUI/prefs/prefs.h \
         GUI/prefs/sortprefs.h \
         GUI/progresswidget/progresswidget.h \
@@ -89,7 +88,10 @@ HEADERS += \
         upqo/ohreceiver_qo.h \
         upqo/ohtime_qo.h \
         upqo/ohvolume_qo.h \
-        upqo/renderingcontrol_qo.h
+        upqo/renderingcontrol_qo.h \
+        utils/confgui.h \
+        utils/smallut.h
+                        
 
 SOURCES += \
         GUI/mainw/mainw.cpp \
@@ -108,7 +110,6 @@ SOURCES += \
         GUI/playlist/model/PlaylistItemModel.cpp \
         GUI/playlist/view/ContextMenu.cpp \
         GUI/playlist/view/PlaylistView.cpp \
-        GUI/prefs/confgui.cpp \
         GUI/prefs/prefs.cpp \
         GUI/prefs/sortprefs.cpp \
         GUI/progresswidget/progresswidget.cpp \
@@ -134,7 +135,9 @@ SOURCES += \
         upadapt/songcast.cpp \
         upadapt/upputils.cpp \
         upplay.cpp \
-        upqo/ohpool.cpp
+        upqo/ohpool.cpp \
+        utils/confgui.cpp \
+        utils/smallut.cpp
 
 FORMS   = \
         GUI/mainw/mainhw.ui \

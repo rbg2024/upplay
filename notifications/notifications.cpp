@@ -21,7 +21,7 @@
 #include <QDebug>
 
 #include "upadapt/upputils.h"
-#include "GUI/prefs/confgui.h"
+#include "utils/smallut.h"
 #include "notifications.h"
 #include "audioscrobbler.h"
 
@@ -98,7 +98,7 @@ void UpplayNotifications::notify(const MetaData& meta)
             return;
         }
         vector<string> cmdlist;
-        confgui::stringToStrings(qs2utf8s(cmdstring), cmdlist);
+        stringToStrings(qs2utf8s(cmdstring), cmdlist);
         if (cmdlist.empty()) {
             qDebug() << "UpplayNotifications::notify: cmd list empty??";
             return;

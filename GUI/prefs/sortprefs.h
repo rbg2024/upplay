@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "confgui.h"
+#include "utils/confgui.h"
 
 #include "ui_sortprefs.h"
 

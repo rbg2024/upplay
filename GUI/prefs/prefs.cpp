@@ -8,7 +8,7 @@
 
 #include "upadapt/upputils.h"
 #include "prefs.h"
-#include "confgui.h"
+#include "utils/confgui.h"
 #include "sortprefs.h"
 
 using namespace std;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2007 J.F.Dockes
+/* Copyright (C) 2007-2016 J.F.Dockes
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
  *   the Free Software Foundation; either version 2 of the License, or
@@ -17,23 +17,23 @@
 #ifndef _confgui_h_included_
 #define _confgui_h_included_
 /**
- * This file defines a number of simple classes (virtual base: ConfParamW) 
- * which let the user input configuration parameters. 
+ * This file defines a number of simple classes (virtual base: ConfParamW)
+ * which let the user input configuration parameters.
  *
- * Subclasses are defined for entering different kind of data, ie a string, 
+ * Subclasses are defined for entering different kind of data, ie a string,
  * a file name, an integer, etc.
  *
  * Each configuration gui object is linked to the configuration data through
  * a "link" object which knows the details of interacting with the actual
- * configuration data, like the parameter name, the actual config object, 
+ * configuration data, like the parameter name, the actual config object,
  * the method to call etc.
- * 
- * The link object is set when the input widget is created and cannot be 
+ *
+ * The link object is set when the input widget is created and cannot be
  * changed.
  *
  * The widgets are typically linked to a temporary configuration object, which
  * is then copied to the actual configuration if the data is accepted, or
- * destroyed and recreated as a copy if Cancel is pressed (you have to 
+ * destroyed and recreated as a copy if Cancel is pressed (you have to
  * delete/recreate the widgets in this case as the links are no longer valid).
  */
 
@@ -86,7 +86,7 @@ public:
 };
 
 /** The top level widget has tabs, each tab/panel has multiple widgets
- * for setting parameter values 
+ * for setting parameter values
  */
 class ConfPanelW;
 class ConfParamW;
@@ -97,7 +97,8 @@ public:
     ConfTabsW(QWidget *parent, const QString& title, ConfLinkFact *linkfact);
 
     enum ParamType {CFPT_BOOL, CFPT_INT, CFPT_STR, CFPT_CSTR, CFPT_FN,
-                    CFPT_STRL, CFPT_DNL, CFPT_CSTRL};
+                    CFPT_STRL, CFPT_DNL, CFPT_CSTRL
+                   };
 
     /** Add tab and return its identifier / index */
     int addPanel(const QString& title);
@@ -107,19 +108,20 @@ public:
     int addForeignPanel(ConfPanelWIF* w, const QString& title);
 
     /** Add parameter setter to specified tab */
-    ConfParamW *addParam(int tabindex, ParamType tp, 
+    ConfParamW *addParam(int tabindex, ParamType tp,
                          const QString& varname, const QString& label,
-                         const QString& tooltip, int isdirorminval = 0, 
+                         const QString& tooltip, int isdirorminval = 0,
                          int maxval = 0, const QStringList* sl = 0);
     bool enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert = false);
     void endOfList(int tabindex);
-                                                
+    ConfParamW *findParamW(const QString& varname);
+                                                 
 public slots:
     void acceptChanges();
     void rejectChanges();
     void reloadPanels();
 
-signals: 
+signals:
     void sig_prefsChanged();
 
 private:
@@ -141,7 +143,7 @@ class ConfPanelW : public QWidget {
     Q_OBJECT
 public:
     ConfPanelW(QWidget *parent);
-    void addWidget (QWidget *w);
+    void addWidget(QWidget *w);
     void storeValues();
     void loadValues();
     void endOfList();
@@ -155,21 +157,24 @@ private:
  */
 class ConfParamW : public QWidget {
     Q_OBJECT
-
 public:
-    ConfParamW(QWidget *parent, ConfLink cflink)
-        : QWidget(parent), m_cflink(cflink), m_fsencoding(false) {
+    ConfParamW(const QString& varnm, QWidget *parent, ConfLink cflink)
+        : QWidget(parent), m_varname(varnm),
+          m_cflink(cflink), m_fsencoding(false) {
     }
     virtual void loadValue() = 0;
     virtual void setFsEncoding(bool onoff) {
         m_fsencoding = onoff;
     }
-
+    const QString& getVarName() {
+        return m_varname;
+    }
 public slots:
     virtual void setEnabled(bool) = 0;
     virtual void storeValue() = 0;
 
 protected:
+    QString      m_varname;
     ConfLink     m_cflink;
     QHBoxLayout *m_hl;
     // File names are encoded as local8bit in the config files. Other
@@ -186,84 +191,96 @@ protected:
 /**  Boolean */
 class ConfParamBoolW : public ConfParamW {
     Q_OBJECT
-    public:
-    ConfParamBoolW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamBoolW(const QString& varnm, QWidget *parent, ConfLink cflink,
                    const QString& lbltxt,
-                   const QString& tltptxt);
+                   const QString& tltptxt, bool deflt = false);
     virtual void loadValue();
     virtual void storeValue();
 public slots:
     virtual void setEnabled(bool i) {
-        if(m_cb) 
+        if (m_cb) {
             ((QWidget*)m_cb)->setEnabled(i);
+        }
     }
 public:
     QCheckBox *m_cb;
+    bool m_dflt;
+    bool m_origvalue;
 };
 
 // Int
 class ConfParamIntW : public ConfParamW {
     Q_OBJECT
-    public:
+public:
     // The default value is only used if none exists in the sample
     // configuration file. Defaults are normally set in there.
-    ConfParamIntW(QWidget *parent, ConfLink cflink, 
+    ConfParamIntW(const QString& varnm, QWidget *parent, ConfLink cflink,
                   const QString& lbltxt,
                   const QString& tltptxt,
-                  int minvalue = INT_MIN, 
+                  int minvalue = INT_MIN,
                   int maxvalue = INT_MAX,
                   int defaultvalue = 0);
     virtual void loadValue();
     virtual void storeValue();
 public slots:
     virtual void setEnabled(bool i) {
-        if(m_sb) 
+        if (m_sb) {
             ((QWidget*)m_sb)->setEnabled(i);
+        }
     }
 protected:
     QSpinBox *m_sb;
     int       m_defaultvalue;
+    int       m_origvalue;
 };
 
 // Arbitrary string
 class ConfParamStrW : public ConfParamW {
     Q_OBJECT
-    public:
-    ConfParamStrW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamStrW(const QString& varnm, QWidget *parent, ConfLink cflink,
                   const QString& lbltxt,
                   const QString& tltptxt);
     virtual void loadValue();
     virtual void storeValue();
 public slots:
     virtual void setEnabled(bool i) {
-        if (m_le) ((QWidget*)m_le)->setEnabled(i);
+        if (m_le) {
+            ((QWidget*)m_le)->setEnabled(i);
+        }
     }
 protected:
     QLineEdit *m_le;
+    QString m_origvalue;
 };
 
 // Constrained string: choose from list
 class ConfParamCStrW : public ConfParamW {
     Q_OBJECT
-    public:
-    ConfParamCStrW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamCStrW(const QString& varnm, QWidget *parent, ConfLink cflink,
                    const QString& lbltxt,
                    const QString& tltptxt, const QStringList& sl);
     virtual void loadValue();
     virtual void storeValue();
+    virtual void setList(const QStringList& sl);
 public slots:
     virtual void setEnabled(bool i) {
-        if (m_cmb) ((QWidget*)m_cmb)->setEnabled(i);
+        if (m_cmb) {
+            ((QWidget*)m_cmb)->setEnabled(i);
+        }
     }
 protected:
     QComboBox *m_cmb;
+    QString m_origvalue;
 };
 
 // File name
 class ConfParamFNW : public ConfParamW {
     Q_OBJECT
-    public:
-    ConfParamFNW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamFNW(const QString& varnm, QWidget *parent, ConfLink cflink,
                  const QString& lbltxt,
                  const QString& tltptxt, bool isdir = false);
     virtual void loadValue();
@@ -272,30 +289,38 @@ protected slots:
     void showBrowserDialog();
 public slots:
     virtual void setEnabled(bool i) {
-        if(m_le) ((QWidget*)m_le)->setEnabled(i);
-        if(m_pb) ((QWidget*)m_pb)->setEnabled(i);
+        if (m_le) {
+            ((QWidget*)m_le)->setEnabled(i);
+        }
+        if (m_pb) {
+            ((QWidget*)m_pb)->setEnabled(i);
+        }
     }
 protected:
     QLineEdit *m_le;
     QPushButton *m_pb;
     bool       m_isdir;
+    QString m_origvalue;
 };
 
 // String list
 class ConfParamSLW : public ConfParamW {
     Q_OBJECT
-    public:
-    ConfParamSLW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamSLW(const QString& varnm, QWidget *parent, ConfLink cflink,
                  const QString& lbltxt,
                  const QString& tltptxt);
     virtual void loadValue();
     virtual void storeValue();
-    QListWidget *getListBox() {return m_lb;}
-	
+    QListWidget *getListBox() {
+        return m_lb;
+    }
+
 public slots:
     virtual void setEnabled(bool i) {
-        if (m_lb) 
+        if (m_lb) {
             ((QWidget*)m_lb)->setEnabled(i);
+        }
     }
 protected slots:
     virtual void showInputDialog();
@@ -305,16 +330,17 @@ signals:
 protected:
     QListWidget *m_lb;
     void listToConf();
+    std::string m_origvalue;
 };
 
 // Dir name list
 class ConfParamDNLW : public ConfParamSLW {
     Q_OBJECT
-    public:
-    ConfParamDNLW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamDNLW(const QString& varnm, QWidget *parent, ConfLink cflink,
                   const QString& lbltxt,
                   const QString& tltptxt)
-        : ConfParamSLW(parent, cflink, lbltxt, tltptxt) {
+        : ConfParamSLW(varnm, parent, cflink, lbltxt, tltptxt) {
         m_fsencoding = true;
     }
 protected slots:
@@ -324,12 +350,12 @@ protected slots:
 // Constrained string list (chose from predefined)
 class ConfParamCSLW : public ConfParamSLW {
     Q_OBJECT
-    public:
-    ConfParamCSLW(QWidget *parent, ConfLink cflink, 
+public:
+    ConfParamCSLW(const QString& varnm, QWidget *parent, ConfLink cflink,
                   const QString& lbltxt,
                   const QString& tltptxt,
                   const QStringList& sl)
-        : ConfParamSLW(parent, cflink, lbltxt, tltptxt), m_sl(sl) {
+        : ConfParamSLW(varnm, parent, cflink, lbltxt, tltptxt), m_sl(sl) {
     }
 protected slots:
     virtual void showInputDialog();
@@ -337,10 +363,51 @@ protected:
     const QStringList m_sl;
 };
 
-// Expose some utilities in namespace confgui
-    template <class T> bool stringToStrings(const std::string &s, T &tokens, 
-                                            const std::string& addseps = "");
-    template <class T> void stringsToString(const T &tokens, std::string &s);
+#ifdef ENABLE_XMLCONF
+/**
+ * Interpret an XML string and create a configuration interface. XML sample:
+ *
+ * <confcomments>
+ *   <filetitle>Configuration file parameters for upmpdcli</filetitle>
+ *   <grouptitle>MPD parameters</grouptitle>
+ *   <var name="mpdhost" type="string">
+ *     <brief>Host MPD runs on.</brief>
+ *     <descr>Defaults to localhost. This can also be specified as -h</descr>
+ *   </var>
+ *   <var name="mpdport" type="int" values="0 65635 6600">
+ *     <brief>IP port used by MPD</brief>. 
+ *     <descr>Can also be specified as -p port. Defaults to the...</descr>
+ *   </var>
+ *   <var name="ownqueue" type="bool" values="1">
+ *     <brief>Set if we own the MPD queue.</brief>
+ *     <descr>If this is set (on by default), we own the MPD...</descr>
+ *   </var>
+ * </confcomments>
+ *
+ * <grouptitle> creates a panel in which the following <var> are set.
+ * The <var> attributes should be self-explanatory. "values"
+ * is used for different things depending on the var type
+ * (min/max, default, str list). Check the code about this. 
+ * type values: "bool" "int" "string" "cstr" "cstrl" "fn" "dfn" "strl" "dnl"
+ *
+ * The XML would typically exist as comments inside a reference configuration
+ * file (ConfSimple can extract such comments).
+ *
+ * This means that the reference configuration file can generate both
+ * the documentation and the GUI interface.
+ * 
+ * @param xml the input xml
+ * @param toptxt on output: the top level text. This will be evaluated
+ *   as a config for default values.
+ * @lnkf factory to create the objects which link the GUI to the
+ *   storage mechanism.
+ */
+extern ConfTabsW *xmlToConfGUI(const std::string& xml,
+                               std::string& toptxt,
+                               ConfLinkFact* lnkf,
+                               QWidget *parent);
+#endif
+
 }
 
 #endif /* _confgui_h_included_ */
