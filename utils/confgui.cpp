@@ -49,6 +49,10 @@
 
 #include "smallut.h"
 
+#ifdef ENABLE_XMLCONF
+#include "picoxml.h"
+#endif
+
 using namespace std;
 
 namespace confgui {
@@ -756,10 +760,7 @@ void ConfParamCSLW::showInputDialog()
 
 
 
-
 #ifdef ENABLE_XMLCONF
-
-#include "picoxml.h"
 
 static QString u8s2qs(const std::string us)
 {

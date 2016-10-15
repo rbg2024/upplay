@@ -191,7 +191,12 @@ As of version 1.2.5, the GUI can be partially adjusted by editing two style
 sheet files. To adjust the font sizes:
 
 - Edit `/usr/share/upplay/cdbrowser/cdbrowser.css`, and uncomment the
-  "font-size" directive at the top. Adjust the 30px to taste.
+  "font-size" directive at the top. Adjust the size to taste, meaning that
+  the line should look like the following (with your preferred value in
+  place of 30):
+
+    font-size: 30pt;
+    
 - Edit `/usr/share/upplay/common.css` and adjust the 6 font-size
   directives. An adequate approach will usually be to multiply the sizes by
   some constant factor (e.g.: 2 ...).

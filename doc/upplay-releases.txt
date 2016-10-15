@@ -8,6 +8,13 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
+1.2.7:
+
+- Add option to avoid monitoring Content Directory update state as it is
+  ennoying with some servers.
+- Fix tray icon wheel volume adjustment, mute state.
+- Changed seek and volume keyboard accels to not use Alt.
+
 1.2.6:
 
 - Fix stupid bug in renderer selection when openhome filtering was set.
