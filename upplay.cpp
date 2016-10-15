@@ -73,12 +73,6 @@ int main(int argc, char **argv)
     QCoreApplication::setOrganizationName("Upmpd.org");
     QCoreApplication::setApplicationName("upplay");
 
-    QStringList params;
-    for(int i = 1; i < argc; i++){
-        QString param(argv[i]);
-        params.push_back(param);
-    }
-
     thisprog = argv[0];
     argc--; argv++;
 
