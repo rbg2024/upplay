@@ -1,11 +1,3 @@
-upplay (1.2.8-1) unstable; urgency=low
-
-  * Rework prefs window layout
-  * Add option to avoid using SetNextAVTransportUri/Metadata (for
-    buggy AVT renderers).
-
- -- Jean-Francois Dockes <jf@dockes.org>  Thu, 04 Oct 2016 09:58:00 +0100
-
 upplay (1.2.7-1) unstable; urgency=low
 
   * Turn off CDS update id monitoring by default
