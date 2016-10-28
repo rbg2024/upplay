@@ -88,27 +88,33 @@ void CDWebPage::javaScriptConsoleMessage(
     LOGDEB("JAVASCRIPT: "<< qs2utf8s(msg) << " at line " << lineNum << endl);
 }
 
-static const QByteArray html_top_orig(
+static const QString html_top_orig = QString::fromUtf8(
     "<html><head>"
     "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">"
     );
-static QByteArray html_top;
+
+// The const part + the js we need for webengine
+static QString html_top_js;
+// The const part + the js + changeable style, computed as needed.
+static QString html_top;
 
 CDBrowser::CDBrowser(QWidget* parent)
     : QWEBVIEW(parent), m_reader(0), m_reaper(0), m_progressD(0),
       m_browsers(0), m_lastbutton(Qt::LeftButton), m_sysUpdId(0)
 {
     setPage(new CDWebPage(this));
-    html_top = html_top_orig;
     
 #ifdef USING_WEBENGINE
-    QLoggingCategory("js").setEnabled(QtDebugMsg, true);
-    QString jsfn = Helper::getSharePath() + "/cdbrowser/containerscript.js";
-    QString js = "<script type=\"text/javascript\">\n";
-    js += QString::fromUtf8(Helper::readFileToByteArray(jsfn));
-    js += "</script>\n";
-    html_top += js;
+    if (html_top_js.isEmpty()) {
+        QLoggingCategory("js").setEnabled(QtDebugMsg, true);
+        QString jsfn = Helper::getSharePath() + "/cdbrowser/containerscript.js";
+        QString js = "<script type=\"text/javascript\">\n";
+        js += QString::fromUtf8(Helper::readFileToByteArray(jsfn));
+        js += "</script>\n";
+        html_top_js = html_top + js;
+    }
 #else
+    html_top_js = html_top;
     connect(this, SIGNAL(linkClicked(const QUrl &)), 
             this, SLOT(onLinkClicked(const QUrl &)));
     // Not available and not sure that this is needed with webengine ?
@@ -117,7 +123,8 @@ CDBrowser::CDBrowser(QWidget* parent)
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 #endif
 
-    setStyleSheet(CSettingsStorage::getInstance()->getPlayerStyle());
+    // This sets html_top
+    setStyleSheet(CSettingsStorage::getInstance()->getPlayerStyle(), false);
     
     settings()->setAttribute(QWEBSETTINGS::JavascriptEnabled, true);
     if (parent) {
@@ -129,10 +136,6 @@ CDBrowser::CDBrowser(QWidget* parent)
     setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 	    this, SLOT(createPopupMenu(const QPoint&)));
-
-    QByteArray html = html_top +
-        "</head><body><p>Looking for servers...</p></body></html>";
-    mySetHtml(html);
     m_timer.setSingleShot(1);
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(initialPage()));
     m_timer.start(0);
@@ -164,10 +167,12 @@ void CDBrowser::mouseReleaseEvent(QMouseEvent *event)
     QWEBVIEW::mouseReleaseEvent(event);
 }
 
-void CDBrowser::setStyleSheet(bool dark)
+// Insert style from on-disk config data to our static constant
+// top-of-page. 
+void CDBrowser::setStyleSheet(bool dark, bool redisplay)
 {
     QString cssfn = Helper::getSharePath() + "/cdbrowser/cdbrowser.css";
-    QByteArray cssdata = Helper::readFileToByteArray(cssfn);
+    QString cssdata = QString::fromUtf8(Helper::readFileToByteArray(cssfn));
 
     if (dark) {
         cssfn = Helper::getSharePath() + "/cdbrowser/dark.css";
@@ -177,9 +182,17 @@ void CDBrowser::setStyleSheet(bool dark)
     }
     cssdata +=  Helper::readFileToByteArray(cssfn);
 
+    html_top = html_top_js;
     html_top += "<style>\n";
     html_top += cssdata;
     html_top += "</style>\n";
+    if (redisplay) {
+        if (m_curpath.size()) {
+            curpathClicked(m_curpath.size() - 1);
+        } else {
+            initialPage(true);
+        }
+    }
 }
 
 void CDBrowser::onContentsSizeChanged(const QSize&)
@@ -471,21 +484,21 @@ void CDBrowser::browseIn(QString UDN, vector<CtPathElt> path)
     qDebug() << "CDBrowser::browsein: " << UDN << " not found";
 }
 
-static const QByteArray init_container_pagemid(
+static const QString init_container_pagemid = QString::fromUtf8(
 #ifdef USING_WEBENGINE
     "</head><body onload=\"addEventListener('contextmenu', saveLoc)\">\n"
 #else
     "</head><body>\n"
 #endif
     );
-static const QByteArray init_container_pagebot(
+static const QString init_container_pagebot = QString::fromUtf8(
     "<table id=\"entrylist\"></table>"
     "</body></html>"
     );
 
 void CDBrowser::initContainerHtml(const string& ss)
 {
-    LOGDEB("CDBrowser::initContainerHtml\n");
+    LOGDEB1("CDBrowser::initContainerHtml\n");
     QString htmlpath("<div id=\"browsepath\"><ul>");
     bool current_is_search = false;
     for (unsigned i = 0; i < m_curpath.size(); i++) {
@@ -511,12 +524,11 @@ void CDBrowser::initContainerHtml(const string& ss)
         htmlpath += QString("Search results for: ") + 
             QString::fromUtf8(ss.c_str()) + "<br/>";
     }
-
-    QByteArray html = html_top + init_container_pagemid +
-        htmlpath.toUtf8() + init_container_pagebot;
+    QString html = html_top + init_container_pagemid +
+        htmlpath + init_container_pagebot;
     LOGDEB1("initContainerHtml: initial content: " << qs2utf8s(html) << endl);
     mySetHtml(html);
-    LOGDEB("CDBrowser::initContainerHtml done\n");
+    LOGDEB1("CDBrowser::initContainerHtml done\n");
 }
 
 // Re-browse (because sort criteria changed probably)
@@ -833,7 +845,7 @@ void CDBrowser::onBrowseDone(int)
 }
 
 
-static const QByteArray init_server_page_bot(
+static const QString init_server_page_bot = QString::fromUtf8(
     "</head><body>"
     "<h2 id=\"cdstitle\">Content Directory Services</h2>"
     "</body></html>"
@@ -849,7 +861,7 @@ static QString DSToHtml(unsigned int idx, const UPnPDeviceDesc& dev)
     return out;
 }
 
-void CDBrowser::initialPage()
+void CDBrowser::initialPage(bool redisplay)
 {
     deleteReaders();
     emit sig_now_in(this, tr("Servers"));
@@ -857,6 +869,9 @@ void CDBrowser::initialPage()
     vector<UPnPDeviceDesc> msdescs;
     int secs = UPnPDeviceDirectory::getTheDir()->getRemainingDelay();
     if (secs > 1) {
+        mySetHtml(html_top + init_server_page_bot);
+        appendHtml("", QString::fromUtf8("</head><body><p>Looking for "
+                                         "servers...</p></body></html>"));
         qDebug() << "CDBrowser::initialPage: waiting " << secs;
         m_timer.start(secs * 1000);
         return;
@@ -878,7 +893,7 @@ void CDBrowser::initialPage()
             }
         }
     }
-    if (same) {
+    if (same && !redisplay) {
         //LOGDEB("CDBrowser::initialPage: no change" << endl);
         m_timer.start(5000);
         return;
@@ -893,7 +908,7 @@ void CDBrowser::initialPage()
         browseIn(s, m_curpath);
     } else {
         // Show servers list
-        QByteArray html = html_top + init_server_page_bot;
+        QString html = html_top + init_server_page_bot;
         mySetHtml(html);
         for (unsigned i = 0; i < msdescs.size(); i++) {
             appendHtml("", DSToHtml(i, msdescs[i]));

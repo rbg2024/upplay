@@ -86,11 +86,11 @@ class CDBrowser : public QWEBVIEW
     void browseIn(QString UDN, vector<CtPathElt> path);
 
  public slots:
-    virtual void initialPage();
+    virtual void initialPage(bool redisplay = false);
     void onBrowseDone(int);
     void onSliceAvailable(UPnPClient::UPnPDirContent *);
     void onReaperSliceAvailable(UPnPClient::UPnPDirContent *);
-    void setStyleSheet(bool);
+    void setStyleSheet(bool dark, bool redisplay=true);
     void refresh();
     void onSysUpdIdChanged(int id);
     
