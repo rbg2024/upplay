@@ -34,6 +34,7 @@
 #define ENTRY_PLAY_NEXT (1 << 4)
 #define ENTRY_APPEND (1 << 5)
 #define ENTRY_SORT_TNO (1 << 6)
+#define ENTRY_INVERT_SELECTION (1<<7)
 
 class ContextMenu : public QMenu {
     Q_OBJECT
@@ -50,6 +51,7 @@ signals:
     void sig_play_next_clicked();
     void sig_append_clicked();
     void sig_sort_tno_clicked();
+    void sig_invert_selection_clicked();
 
 private:
     QAction*            _info_action;
@@ -59,6 +61,7 @@ private:
     QAction*            _play_next_action;
     QAction*            _append_action;
     QAction*            _sort_tno_action;
+    QAction*            _invert_selection_action;
 
     void clear_actions();
 };

@@ -191,7 +191,7 @@ void GUI_Playlist::fillPlaylist(MetaDataList& v_metadata, int cur_play_idx, int)
     ui->listView->fill(v_metadata, cur_play_idx);
     _total_msecs = 0;
 
-    int actions = ENTRY_REMOVE | ENTRY_SORT_TNO;
+    int actions = ENTRY_REMOVE | ENTRY_SORT_TNO | ENTRY_INVERT_SELECTION;
 
     ui->listView->set_context_menu_actions(actions);
     ui->listView->set_drag_enabled(true);

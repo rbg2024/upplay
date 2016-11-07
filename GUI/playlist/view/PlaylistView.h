@@ -52,6 +52,9 @@ signals:
     void sig_double_clicked(int);
     void sig_no_focus();
 
+public slots:
+    void invert_selection();
+
 private slots:
     void forbid_mimedata_destroyable();
     void edit_clicked();
@@ -77,8 +80,6 @@ public:
     void set_current_track(int row);
     int get_num_rows();
     void show_big_items(bool);
-
-
 
 protected:
     // overloaded stuff

@@ -40,6 +40,7 @@ ContextMenu::ContextMenu(QWidget* parent) :
     _append_action = new QAction(QIcon(Helper::getIconPath("append.png")),
                                  tr("Append"), this);
     _sort_tno_action = new QAction(tr("Sort by track number"), this);
+    _invert_selection_action = new QAction(tr("Invert Selection"), this);
 }
 
 
@@ -63,6 +64,8 @@ void ContextMenu::clear_actions()
                SIGNAL(sig_play_next_clicked()));
     disconnect(_sort_tno_action, SIGNAL(triggered()), this,
                SIGNAL(sig_sort_tno_clicked()));
+    disconnect(_invert_selection_action, SIGNAL(triggered()), this,
+               SIGNAL(sig_invert_selection_clicked()));
 }
 
 void ContextMenu::setup_entries(int entries)
@@ -103,5 +106,10 @@ void ContextMenu::setup_entries(int entries)
         this->addAction(_sort_tno_action);
         connect(_sort_tno_action, SIGNAL(triggered()),
                 this, SIGNAL(sig_sort_tno_clicked()));
+    }
+    if (entries & ENTRY_INVERT_SELECTION) {
+        this->addAction(_invert_selection_action);
+        connect(_invert_selection_action, SIGNAL(triggered()),
+                this, SIGNAL(sig_invert_selection_clicked()));
     }
 }

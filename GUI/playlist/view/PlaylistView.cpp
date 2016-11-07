@@ -299,6 +299,8 @@ void PlaylistView::init_rc_menu()
             SLOT(remove_clicked()));
     connect(_rc_menu, SIGNAL(sig_sort_tno_clicked()),
             this, SIGNAL(sig_sort_tno()));
+    connect(_rc_menu, SIGNAL(sig_invert_selection_clicked()),
+            this, SLOT(invert_selection()));
 }
 
 void PlaylistView::set_context_menu_actions(int actions)
@@ -489,20 +491,15 @@ void PlaylistView::row_double_clicked(const QModelIndex& idx)
 
 void PlaylistView::clear_selection()
 {
-
-    MetaDataList v_md;
     this->selectionModel()->clearSelection();
     this->clearSelection();
     calc_selections();
-
 }
 
 void PlaylistView::select_rows(QList<int> lst)
 {
-
     QItemSelectionModel* sm = this->selectionModel();
     QItemSelection sel;
-
 
     foreach(int row, lst) {
         QModelIndex idx = _model->index(row);
@@ -515,6 +512,15 @@ void PlaylistView::select_rows(QList<int> lst)
     sm->select(sel, QItemSelectionModel::Select);
 
     _cur_selected_rows = calc_selections();
+}
+
+void PlaylistView::invert_selection()
+{
+    for (int row = 0; row < model()->rowCount(); row++) {
+        this->selectionModel()->select(_model->index(row),
+                                       QItemSelectionModel::Toggle);
+    }
+    calc_selections();
 }
 
 void PlaylistView::select_all()
