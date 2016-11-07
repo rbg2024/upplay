@@ -48,6 +48,9 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
         <property name="spacing">
@@ -111,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>519</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="defaultUp">
@@ -264,11 +267,6 @@
    <class>PlayerVWidget</class>
    <extends>QWidget</extends>
    <header>GUI/playerwidget/playervwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>PlayerHWidget</class>
-   <extends>QWidget</extends>
-   <header>GUI/playerwidget/playerhwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
