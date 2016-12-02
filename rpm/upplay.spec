@@ -1,7 +1,7 @@
 Summary:        Linux UPnP audio control point
 Name:           upplay
-Version:        1.2.6
-Release:        1%{?dist}
+Version:        1.2.7
+Release:        2%{?dist}
 Group:          Applications/Multimedia
 License:        GPLv2+
 URL:            http://www.lesbonscomptes.com/upplay
@@ -20,7 +20,7 @@ standard UPnP or OpenHome Playlist services.
 %setup -q 
 
 %build
-qmake-qt4
+qmake-qt5
 make %{?_smp_mflags}
 
 %install
@@ -41,6 +41,8 @@ desktop-file-install --delete-original \
 %{_datadir}/icons/hicolor/48x48/apps/upplay.png
 
 %changelog
+* Sat Nov 26 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.7
+- Small fixes
 * Mon Sep 12 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.6
 - Fix bug in renderer selection
 * Sun Sep 11 2016 Jean-Francois Dockes <jf@dockes.org> - 1.2.5
