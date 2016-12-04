@@ -24,12 +24,14 @@
 #include "playlist.h"
 #include "upadapt/ohpladapt.h"
 
+class OHTimeQO;
+
 class PlaylistOHPL : public Playlist {
     Q_OBJECT
 
 public:
-    // We take ownership of the OHPlayer object
-    PlaylistOHPL(OHPlayer *ohpl, QObject * parent = 0);
+    // We take ownership of the OHPlayer object. We only borrow ohtmo.
+    PlaylistOHPL(OHPlayer *ohpl, OHTimeQO *ohtm, QObject * parent = 0);
 
     virtual ~PlaylistOHPL() {
         delete m_ohplo;
@@ -73,6 +75,8 @@ public slots:
 private:
     // My link to the OpenHome Renderer
     OHPlayer *m_ohplo;
+    // We use this to retrieve the duration if not set in the didl frag
+    OHTimeQO *m_ohtmo;
     // Position in current song, 0 if unknown
     quint32 m_cursongsecs;
     // Current song is last in playlist
@@ -84,6 +88,7 @@ private:
         m_cursongsecs = 0;
         m_lastsong = m_closetoend = false;
     }
+    void maybeSetDuration(bool);
 };
 
 #endif /* PLAYLISTOHPL_H_ */

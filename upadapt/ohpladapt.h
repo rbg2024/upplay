@@ -75,6 +75,13 @@ public slots:
         seekSecondAbsolute(secs);
     }
 
+    // The duration is sometimes not set in the didl metadata and the
+    // playlist app object may be able to retrieve it from ohtime. We
+    // then get the info through this method.
+    void setSongSecs(int secs) {
+        m_songsecs = secs;
+    }
+    
     // Insert after idx
     void insertTracks(const MetaDataList& meta, int idx) {
         while (m_ininsert) {

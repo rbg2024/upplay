@@ -383,10 +383,6 @@ bool Application::setupRenderer(const string& uid)
         connect(m_ohpro, SIGNAL(sourceTypeChanged(OHProductQO::SourceType)),
                 this, SLOT(onSourceTypeChanged(OHProductQO::SourceType)));
 
-        // Create appropriate Playlist object depending on type of source
-        createPlaylistForOpenHomeSource();
-        needs_playlist = false;
-
         // Try to use the time service
         OHTMH ohtm = m_rdr->ohtm();
         if (ohtm) {
@@ -395,6 +391,13 @@ bool Application::setupRenderer(const string& uid)
             // no need for AVT then
             needavt = false;
         }
+
+        // Create appropriate Playlist object depending on type of
+        // source. Some may need m_ohtmo, so keep this behind its
+        // creation
+        createPlaylistForOpenHomeSource();
+        needs_playlist = false;
+
         // Move this out of the if when avt radio is ready
         m_player->enableSourceSelect(true);
     } else {
@@ -484,7 +487,7 @@ void Application::createPlaylistForOpenHomeSource()
         OHPLH ohpl = m_rdr->ohpl();
         if (ohpl) {
             m_playlist = shared_ptr<Playlist>(
-                new PlaylistOHPL(new OHPlayer(ohpl)));
+                new PlaylistOHPL(new OHPlayer(ohpl), m_ohtmo));
             m_playlistIsPlaylist = true;
         }
     }

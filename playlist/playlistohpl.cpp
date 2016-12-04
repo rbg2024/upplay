@@ -18,15 +18,15 @@
 #include <QDebug>
 
 #include "playlistohpl.h"
-
+#include "upqo/ohtime_qo.h"
 #include "libupnpp/log.hxx"
 
 using namespace UPnPP;
 
     // We take ownership of the OHPlayer object
-PlaylistOHPL::PlaylistOHPL(OHPlayer *ohpl, QObject * parent)
-    : Playlist(parent), m_ohplo(ohpl), m_cursongsecs(0), m_lastsong(false),
-      m_closetoend(false)
+PlaylistOHPL::PlaylistOHPL(OHPlayer *ohpl, OHTimeQO *ohtm, QObject * parent)
+    : Playlist(parent), m_ohplo(ohpl), m_ohtmo(ohtm),
+      m_cursongsecs(0), m_lastsong(false), m_closetoend(false)
 {
     // Connections from OpenHome renderer to local playlist
     connect(m_ohplo, SIGNAL(metadataArrayChanged(const MetaDataList&)),
@@ -80,6 +80,28 @@ void PlaylistOHPL::psl_seek(int secs)
     m_ohplo->seek(secs);
 }
 
+void PlaylistOHPL::maybeSetDuration(bool needsig)
+{
+    if (m_play_idx< 0 || m_play_idx >= int(m_meta.size()) || !m_ohtmo) {
+        return;
+    }
+    MetaData& meta(m_meta[m_play_idx]);
+    if (meta.length_ms <= 0) {
+        UPnPClient::OHTime::Time tm;
+        if (m_ohtmo->time(tm)) {
+            meta.length_ms = tm.duration * 1000;
+            if (needsig) {
+                emit sig_track_metadata(meta);
+            }
+        }
+    }
+    // Set the songsec every time, it's cheap and it makes
+    // things work when the duration is not in the didl (else
+    // there are order of events issues which result in unset
+    // songsecs in ohpladapt
+    m_ohplo->setSongSecs(meta.length_ms / 1000);
+}
+
 void PlaylistOHPL::onRemoteCurrentTrackid(int id)
 {
     qDebug() << "PlaylistOHPL::onRemoteCurrentTrackid: " << id;
@@ -98,6 +120,8 @@ void PlaylistOHPL::onRemoteCurrentTrackid(int id)
                 }
                 //qDebug() << " new track index " << m_play_idx;
             }
+            maybeSetDuration(false);
+
             // Emit the current index in any case to let the playlist
             // UI scroll to show the currently playing track (some
             // time after a user interaction scrolled it off)
@@ -112,7 +136,7 @@ void PlaylistOHPL::onRemoteCurrentTrackid(int id)
         }
     }
     resetPosState();
-    LOGINF("PlaylistOHPL::onRemoteCurrentTrackid: track not found in array" << endl);
+    LOGINF("PlaylistOHPL::onRemoteCurrentTrackid: track not found in array\n");
 }
 
 void PlaylistOHPL::onRemoteSecsInSong_impl(quint32 secs)
@@ -121,11 +145,11 @@ void PlaylistOHPL::onRemoteSecsInSong_impl(quint32 secs)
         //qDebug() << "PlaylistOHPL::onRemoteSecsInSong_impl: close to end";
         m_closetoend = true;
     }
+    maybeSetDuration(true);
 }
 
-void PlaylistOHPL::onRemoteTpState_impl(int, const char *sst)
+void PlaylistOHPL::onRemoteTpState_impl(int, const char *)
 {
-    Q_UNUSED(sst);
     //qDebug() << "PlaylistOHPL::onRemoteTpState_impl: " << sst;
     if (m_tpstate == AUDIO_STOPPED && m_closetoend == true) {
         resetPosState();
