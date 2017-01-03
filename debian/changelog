@@ -1,3 +1,9 @@
+upplay (1.2.8-1) unstable; urgency=low
+
+  * 
+
+ -- Jean-Francois Dockes <jf@dockes.org>  Thu, 03 Jan 2017 09:48:00 +0100
+
 upplay (1.2.7-1) unstable; urgency=low
 
   * Turn off CDS update id monitoring by default
