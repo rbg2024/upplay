@@ -937,12 +937,12 @@ void CDBrowser::onPopupJsDone(const QVariant &jr)
 {
     QString qs(jr.toString());
     LOGDEB("onPopupJsDone: parameter: " << qs2utf8s(qs) << endl);
-    QStringList lst1 = qs.split("\n", QString::SkipEmptyParts);
-    for (int i = 0 ; i < lst1.size(); i++) {
-        int eq = lst1[i].indexOf("=");
+    QStringList qsl = qs.split("\n", QString::SkipEmptyParts);
+    for (int i = 0 ; i < qsl.size(); i++) {
+        int eq = qsl[i].indexOf("=");
         if (eq > 0) {
-            QString nm = lst1[i].left(eq).trimmed();
-            QString value = lst1[i].right(lst1[i].size() - (eq+1)).trimmed();
+            QString nm = qsl[i].left(eq).trimmed();
+            QString value = qsl[i].right(qsl[i].size() - (eq+1)).trimmed();
             if (!nm.compare("objid")) {
                 m_popupobjid = qs2utf8s(value);
             } else if (!nm.compare("title")) {
