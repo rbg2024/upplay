@@ -134,8 +134,6 @@ GUI/playlist/view/ContextMenu.h
 GUI/playlist/view/PlaylistView.cpp
 GUI/playlist/view/PlaylistView.h
 GUI/prefs/
-GUI/prefs/confgui.cpp
-GUI/prefs/confgui.h
 GUI/prefs/prefs.cpp
 GUI/prefs/prefs.h
 GUI/prefs/sortprefs.cpp
@@ -270,6 +268,11 @@ upqo/ohreceiver_qo.h
 upqo/ohtime_qo.h
 upqo/ohvolume_qo.h
 upqo/renderingcontrol_qo.h
+utils/
+utils/confgui.cpp
+utils/confgui.h
+utils/smallut.cpp
+utils/smallut.h
 windows/
 windows/innosetup/
 windows/innosetup/upplay-setup.iss
