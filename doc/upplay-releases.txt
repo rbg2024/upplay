@@ -8,6 +8,13 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
+1.2.8:
+
+- Fix issue with accented characters in catalog pane.
+- Better use space for displaying artist and album info in playlist.
+- Option to avoid trying to effect gapless playing (for renderers which
+  have trouble with it).
+  
 1.2.7:
 
 - Add option to avoid monitoring Content Directory update state as it is
