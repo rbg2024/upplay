@@ -1290,6 +1290,17 @@ void CDBrowser::rreaperDone(int status)
                << mode << endl);
         emit sig_tracks_to_randplay(mode, m_recwalkentries);
     } else {
+        int sortkind = CSettingsStorage::getInstance()->getSortKind();
+        if (sortkind == CSettingsStorage::SK_CUSTOM) {
+            QStringList qcrits =
+                CSettingsStorage::getInstance()->getSortCrits();
+            vector<string> sortcrits;
+            for (int i = 0; i < qcrits.size(); i++) {
+                sortcrits.push_back(qs2utf8s(qcrits[i]));
+            }
+            DirObjCmp cmpo(sortcrits);
+            sort(m_recwalkentries.begin(), m_recwalkentries.end(), cmpo);
+        }
         MetaDataList mdl;
         mdl.resize(m_recwalkentries.size());
         for (unsigned int i = 0; i <  m_recwalkentries.size(); i++) {
