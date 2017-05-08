@@ -631,13 +631,22 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e,
         arg(e.m_id.c_str()).arg(idx);
 
     e.getprop("upnp:originalTrackNumber", val);
-    out += QString("<td class=\"tk_tracknum\">") + 
-        Helper::escapeHtml(val).c_str() + "</td>";
+    out += QString("<td class=\"tk_tracknum\">");
+    if (val.size() == 0) {
+        out += "&nbsp;";
+    } else {
+        out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
+    }
+    out += "</td>";
 
     out += "<td class=\"tk_title\">";
-    out += QString("<a href=\"http://h/I%1\">").arg(idx);
-    out += QString::fromUtf8(Helper::escapeHtml(e.m_title).c_str());
-    out += "</a>";
+    if (e.m_title.size() == 0) {
+        out += "&nbsp;";
+    } else {
+        out += QString("<a href=\"http://h/I%1\">").arg(idx);
+        out += QString::fromUtf8(Helper::escapeHtml(e.m_title).c_str());
+        out += "</a>";
+    }
     out += "</td>";
 
     val.clear();
@@ -647,7 +656,11 @@ static QString ItemToHtml(unsigned int idx, const UPnPDirObject& e,
         int len = maxartlen-3 >= 0 ? maxartlen-3 : 0;
         val = val.substr(0,len) + "...";
     }
-    out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
+    if (val.size() == 0) {
+        out += "&nbsp;";
+    } else {
+        out += QString::fromUtf8(Helper::escapeHtml(val).c_str());
+    }
     out += "</td>";
     
     val.clear();
