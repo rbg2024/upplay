@@ -451,6 +451,8 @@ void DirBrowser::setupTabConnections(CDBrowser *cdb)
 
     disconnect(cdb, SIGNAL(sig_rand_stop()), 0, 0);
     connect(cdb, SIGNAL(sig_rand_stop()), this, SLOT(onRandStop()));
+    disconnect(cdb, SIGNAL(sig_sort_order()), 0, 0);
+    connect(cdb, SIGNAL(sig_sort_order()), this, SIGNAL(sig_sort_order()));
 }
 
 void DirBrowser::onEnterRandPlay(RandPlayer::PlayMode mode, const

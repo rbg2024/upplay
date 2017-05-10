@@ -71,6 +71,8 @@ using namespace UPnPClient;
 #define CONNECT(a,b,c,d) m_app->connect(a, SIGNAL(b), c, SLOT(d), \
                                         Qt::UniqueConnection)
 
+static UPPrefs g_prefs;
+
 UPnPDeviceDirectory *superdir;
 
 static MRDH getRenderer(const string& name, bool isfriendlyname)
@@ -112,6 +114,7 @@ Application::Application(QApplication* qapp, QObject *parent)
     m_settings->setVersion(version);
 
     m_player = new GUI_Player(this);
+    g_prefs.setParent(m_player);
     m_player->enableSourceSelect(false);
     
     m_ui_playlist = new GUI_Playlist(m_player->getParentOfPlaylist(), 0);
@@ -507,6 +510,11 @@ void Application::createPlaylistForOpenHomeSource()
     }
 }
 
+void Application::onDirSortOrder()
+{
+    g_prefs.onShowPrefs(UPPrefs::PTAB_DIRSORT);
+}
+
 void Application::onSourceTypeChanged(OHProductQO::SourceType tp)
 {
     //qDebug() << "Application::onSourceTypeChanged: " << int(tp);
@@ -659,10 +667,10 @@ void Application::init_connections()
     CONNECT(m_player, sig_choose_source(), this, chooseSource());
     CONNECT(m_player, sig_skin_changed(bool), m_cdb, setStyleSheet(bool));
     CONNECT(m_player, showSearchPanel(bool), m_cdb, showSearchPanel(bool));
-    static UPPrefs g_prefs(m_player);
     CONNECT(m_player, sig_preferences(), &g_prefs, onShowPrefs());
     CONNECT(&g_prefs, sig_prefsChanged(), m_cdb, onSortprefs());
     CONNECT(m_cdb, sig_next_group_html(QString),
             m_ui_playlist, psl_next_group_html(QString));
+    CONNECT(m_cdb, sig_sort_order(), this, onDirSortOrder());
     CONNECT(m_player, sig_sortprefs(), m_cdb, onSortprefs());
 }

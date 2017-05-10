@@ -181,3 +181,11 @@ void UPPrefs::onShowPrefs()
     m_w->reloadPanels();
     m_w->show();
 }
+
+void UPPrefs::onShowPrefs(Tab tb)
+{
+    onShowPrefs();
+    // The enum values and the tab order are currently identical, no
+    // need for complication
+    m_w->setCurrentIndex(tb);
+}

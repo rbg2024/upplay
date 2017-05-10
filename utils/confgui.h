@@ -115,12 +115,13 @@ public:
     bool enableLink(ConfParamW* boolw, ConfParamW* otherw, bool revert = false);
     void endOfList(int tabindex);
     ConfParamW *findParamW(const QString& varname);
-                                                 
+
 public slots:
     void acceptChanges();
     void rejectChanges();
     void reloadPanels();
-
+    void setCurrentIndex(int);
+    
 signals:
     void sig_prefsChanged();
 

@@ -103,6 +103,7 @@ class CDBrowser : public QWEBVIEW
     void sig_browse_in_new_tab(QString UDN,
                                std::vector<CDBrowser::CtPathElt>);
     void sig_rand_stop();
+    void sig_sort_order();
 
  public slots:
     virtual void appendHtml(const QString&, const QString& html);
@@ -119,6 +120,7 @@ class CDBrowser : public QWEBVIEW
     virtual void onLoadFinished(bool);
     
  private:
+    bool popupOther(QAction *act);
     void initContainerHtml(const std::string& ss=string());
     void browseContainer(std::string, std::string, QPoint scrollpos = QPoint());
     void search(const string& objid, const string& iss, QPoint scrollpos = 

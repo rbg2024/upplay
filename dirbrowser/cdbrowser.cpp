@@ -939,6 +939,7 @@ enum PopupMode {
     PUP_RAND_PLAY_TRACKS,
     PUP_RAND_PLAY_GROUPS,
     PUP_RAND_STOP,
+    PUP_SORT_ORDER,
 };
 
 void CDBrowser::onLoadFinished(bool)
@@ -1098,7 +1099,12 @@ void CDBrowser::doCreatePopupMenu()
     act->setData(v);
     popup->addAction(act);
     act->setEnabled(m_browsers->randPlayActive());
-    
+
+    act = new QAction(tr("Sort order"), this);
+    v = QVariant(int(PUP_SORT_ORDER));
+    act->setData(v);
+    popup->addAction(act);
+
     popup->popup(mapToGlobal(m_popupos));
 }
 
@@ -1108,21 +1114,34 @@ void CDBrowser::back(QAction *)
         curpathClicked(m_curpath.size() - 2);
 }
 
+bool CDBrowser::popupOther(QAction *act)
+{
+    m_popupmode = act->data().toInt();
+    switch (m_popupmode) {
+    case PUP_BACK:
+        back(0);
+        break;
+    case PUP_RAND_STOP:
+        emit sig_rand_stop();
+        break;
+    case PUP_SORT_ORDER:
+        emit sig_sort_order();
+        break;
+    default:
+        return false;
+    }
+    return true;
+}
+
 // Add a single track or a section of the current container. This
 // maybe triggered by a link click or a popup on an item entry
 void CDBrowser::simpleAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::simpleAdd";
-    m_popupmode = act->data().toInt();
-    if (m_popupmode == PUP_BACK) {
-        back(0);
+    if (popupOther(act)) {
+        // Not for us
         return;
     }
-    if (m_popupmode == PUP_RAND_STOP) {
-        emit sig_rand_stop();
-        return;
-    }
-
     if (m_popupidx < 0 || m_popupidx > int(m_entries.size())) {
         LOGERR("CDBrowser::simpleAdd: bad obj index: " << m_popupidx
                << " id count: " << m_entries.size() << endl);
@@ -1156,16 +1175,11 @@ void CDBrowser::simpleAdd(QAction *act)
 void CDBrowser::recursiveAdd(QAction *act)
 {
     //qDebug() << "CDBrowser::recursiveAdd";
-    m_popupmode = act->data().toInt();
 
     deleteReaders();
 
-    if (m_popupmode == PUP_BACK) {
-        back(0);
-        return;
-    }
-    if (m_popupmode == PUP_RAND_STOP) {
-        emit sig_rand_stop();
+    if (popupOther(act)) {
+        // Not for us
         return;
     }
 

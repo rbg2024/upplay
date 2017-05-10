@@ -71,7 +71,8 @@ public slots:
 
 signals:
     void sig_next_group_html(QString);
-
+    void sig_sort_order();
+    
 private:
     void setupTabConnections(int i);
     void setupTabConnections(CDBrowser* w);

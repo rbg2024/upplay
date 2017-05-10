@@ -27,21 +27,27 @@ class UPPrefs : public QObject {
     Q_OBJECT
 
 public:
-
+    UPPrefs() {}
     UPPrefs(QWidget *parent) 
-        : m_parent(parent), m_w(0) {
+        : m_parent(parent) {
+    }
+    
+    void setParent(QWidget *p) {
+        m_parent = p;
     }
 
+    enum Tab {PTAB_APP, PTAB_UPNP, PTAB_LASTFM, PTAB_DIRSORT};
+                                                              
 public slots:
-
     void onShowPrefs();
+    void onShowPrefs(Tab);
 
 signals:
     void sig_prefsChanged();
 
 private:
-    QWidget *m_parent;
-    confgui::ConfTabsW *m_w;
+    QWidget *m_parent{nullptr};
+    confgui::ConfTabsW *m_w{nullptr};
 };
 
 #endif

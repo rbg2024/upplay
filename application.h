@@ -63,6 +63,7 @@ public slots:
     void openSongcast();
     void reconnectOrChoose();
     void onSourceTypeChanged(OHProductQO::SourceType);
+    void onDirSortOrder();
     
 private:
 

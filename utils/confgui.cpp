@@ -136,6 +136,13 @@ int ConfTabsW::addForeignPanel(ConfPanelWIF* w, const QString& title)
     return tabWidget->addTab(qw, title);
 }
 
+void ConfTabsW::setCurrentIndex(int idx)
+{
+    if (tabWidget) {
+        tabWidget->setCurrentIndex(idx);
+    }
+}
+
 ConfParamW *ConfTabsW::addParam(
     int tabindex, ParamType tp, const QString& varname,
     const QString& label, const QString& tooltip,
