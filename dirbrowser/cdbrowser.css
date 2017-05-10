@@ -38,10 +38,37 @@ a {
 
 /* Directory listing */
 
+/* The table id is entrylist */
 #entrylist {
     clear: both;
     width: 100%;
+/*    table-layout: fixed;*/
 }
+
+// The table begins with a colgroup, with the following column
+// classes. I was not able to do anything really useful with setting
+// the widths, I find that the automatic approach is always
+// better. This might be different if overflow: and text-overflow:
+// worked, but they don't appear to. So the following is commented out
+// by default
+/*
+.coltracknumber {
+  width: 4%;
+}
+.coltitle {
+  font-size: 50%;
+  width: 30%;
+}
+.colartist {
+  width: 30%;
+}
+.colalbum {
+  width: 30%;
+}
+.colduration {
+  width: 6%;
+}
+*/
 
 /* Styles for the directory list cells */
 .tk_tracknum {
@@ -52,7 +79,11 @@ a {
     margin-left: 5px;
 }
 .tk_album {
-    margin-left: 5px;
+  margin-left: 5px;
+// Could not get this to work, 
+//  white-space: nowrap;
+//  overflow: hidden;
+//  text-overflow: ellipsis;
 }
 .tk_title {
     margin-left: 5px;

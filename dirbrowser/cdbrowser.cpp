@@ -492,7 +492,15 @@ static const QString init_container_pagemid = QString::fromUtf8(
 #endif
     );
 static const QString init_container_pagebot = QString::fromUtf8(
-    "<table id=\"entrylist\"></table>"
+    "<table id=\"entrylist\">"
+    "<colgroup>"
+    "<col class=\"coltracknumber\">"
+    "<col class=\"coltitle\">"
+    "<col class=\"colartist\">"
+    "<col class=\"colalbum\">"
+    "<col class=\"colduration\">"
+    "</colgroup>"
+    "</table>"
     "</body></html>"
     );
 
