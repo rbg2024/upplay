@@ -15,8 +15,10 @@ contains(WEBPLATFORM, webengine) {
 
 # VERSION is ^egrepped and must stay in the first column
 VERSION = 1.2.8
+COPYRDATES = 2011-2017
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
+QMAKE_CXXFLAGS += -DUPPLAY_COPYRDATES=\\\"$$COPYRDATES\\\" 
 QMAKE_CXXFLAGS += -std=c++0x
 
 buildtype = release

@@ -115,13 +115,11 @@ void GUI_Player::about(bool b)
     infobox.setInformativeText(
         QString("") +
         UPnPP::LibUPnP::versionString().c_str() + "<br/>" +
-        tr("Based on Sayonara, written by Lucio Carreras") + "<br />" +
-        tr("License") + ": GPL<br />" +
-        "Copyright 2011-2013<br /><br />" + link + "<br /><br />"
+        tr("Based on Sayonara, written by Lucio Carreras") + "<br/>" +
+        tr("License") + ": GPL<br/>" +
+        "Copyright " + UPPLAY_COPYRDATES + "<br/><br/>" + link + "<br/><br/>"
         );
     infobox.setStandardButtons(QMessageBox::Ok);
     infobox.button(QMessageBox::Ok)->setFocusPolicy(Qt::NoFocus);
     infobox.exec();
 }
-
-
