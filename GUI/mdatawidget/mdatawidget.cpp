@@ -20,6 +20,7 @@
 #include "mdatawidget.h"
 #include "HelperStructs/MetaData.h"
 #include "HelperStructs/Helper.h"
+#include "upadapt/upputils.h"
 
 MDataWidget::MDataWidget(QWidget *parent, bool horiz)
     : MDataWidgetIF(parent)
@@ -29,17 +30,17 @@ MDataWidget::MDataWidget(QWidget *parent, bool horiz)
 
 void MDataWidget::setData(const MetaData& md)
 {
-
     // Sometimes ignore the date
     QString albtxt;
     if (md.year < 1000 || md.album.contains(QString::number(md.year))) {
         albtxt = md.album.trimmed();
     } else {
-        albtxt = md.album.trimmed() + " (" +
-            QString::number(md.year) + ")";
+        albtxt = md.album.trimmed() + " (" + QString::number(md.year) + ")";
     }
     lab_album->setText(albtxt);
-    lab_album->setToolTip(QString::fromUtf8("<i></i>") + Helper::escapeHtml(albtxt));
+    QString html;
+    metaDataToHtml(&md, html);
+    lab_album->setToolTip(html);
 
     lab_artist->setText(md.artist);
     lab_artist->setToolTip(QString::fromUtf8("<i></i>") +
