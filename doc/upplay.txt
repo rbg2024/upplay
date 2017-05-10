@@ -70,10 +70,11 @@ following actions:
 - `Back`
 - `Send to playlist`: this is a recursive walk, it will send all tracks from
   the subtree to the playlist. Don't do this at the root of a big tree...
-- `Open in new tab.
+- `Open in new tab`.
 - `Random play by tracks`: this is analogous to `Send to playlist`, but the
-  list is shuffled, and sent to the Renderer by slices, so you can use a very
-  big list without swamping it.
+   list is shuffled, then sent to the Renderer by slices (of 30 tracks). The
+   slicing is so that so you can use a very big list without swamping the
+   renderer. 
 - `Random play by groups`: this will play groups of tracks, corresponding to
   the lowest level of directories in the subtree, typically albums, but
   these may also be MinimServer Groups for example.
