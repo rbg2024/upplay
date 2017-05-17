@@ -7,6 +7,7 @@ QT += script xml network
 contains(WEBPLATFORM, webengine) {
     QT += widgets webenginewidgets
     QMAKE_CXXFLAGS += -DUSING_WEBENGINE
+    DEFINES += USING_WEBENGINE
 } else {
     # Webkit (qt4 or 5)
     QT += webkit
@@ -19,7 +20,7 @@ COPYRDATES = 2011-2017
 
 QMAKE_CXXFLAGS += -DUPPLAY_VERSION=\\\"$$VERSION\\\" 
 QMAKE_CXXFLAGS += -DUPPLAY_COPYRDATES=\\\"$$COPYRDATES\\\" 
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++11
 
 buildtype = release
 CONFIG  += qt warn_on thread $$buildtype
@@ -188,6 +189,84 @@ unix {
   icond.path = $$PREFIX/share/upplay/icons/dark
 
   INSTALLS += target bdata desktop gdata icona iconb iconc icond
+}
+
+macos {
+  LIBS += -L /usr/local/lib -lupnpp
+  INCLUDEPATH += /usr/local/include
+  isEmpty(PREFIX) {
+    PREFIX = /usr/local
+  }
+  ICON = macos/appIcon.icns
+  APP_ICON_FILES.files = \
+                         GUI/icons/addtab.png \
+                         GUI/icons/append.png\
+                         GUI/icons/append_small.png\
+                         GUI/icons/arrow_down.png\
+                         GUI/icons/arrow_down_orange.png\
+                         GUI/icons/arrow_left.png\
+                         GUI/icons/arrow_left_orange.png\
+                         GUI/icons/arrow_right.png\
+                         GUI/icons/arrow_right_orange.png\
+                         GUI/icons/arrow_up.png\
+                         GUI/icons/arrow_up_orange.png\
+                         GUI/icons/broom.png\
+                         GUI/icons/bwd.png\
+                         GUI/icons/bwd_orange.png\
+                         GUI/icons/cb_checked.png\
+                         GUI/icons/cb_checked_disabled.png\
+                         GUI/icons/close.png\
+                         GUI/icons/cross.png\
+                         GUI/icons/dark\
+                         GUI/icons/delete.png\
+                         GUI/icons/dynamic.png\
+                         GUI/icons/edit.png\
+                         GUI/icons/fwd.png\
+                         GUI/icons/fwd_orange.png\
+                         GUI/icons/id3.png\
+                         GUI/icons/import.png\
+                         GUI/icons/info.png\
+                         GUI/icons/info_small.png\
+                         GUI/icons/items.svg\
+                         GUI/icons/logo.png\
+                         GUI/icons/logo.xpm\
+                         GUI/icons/logo_small.png\
+                         GUI/icons/lyrics.png\
+                         GUI/icons/numbers.png\
+                         GUI/icons/pause.png\
+                         GUI/icons/play.png\
+                         GUI/icons/play_small.png\
+                         GUI/icons/playlist.png\
+                         GUI/icons/power_off.png\
+                         GUI/icons/power_on.png\
+                         GUI/icons/radio.png\
+                         GUI/icons/rb_checked.png\
+                         GUI/icons/rb_checked_disabled.png\
+                         GUI/icons/rec.png\
+                         GUI/icons/rec_off.png\
+                         GUI/icons/reload.png\
+                         GUI/icons/rep1.png\
+                         GUI/icons/repAll.png\
+                         GUI/icons/rep_1.png\
+                         GUI/icons/save.png\
+                         GUI/icons/save_as.png\
+                         GUI/icons/scroll_hor_bg.png\
+                         GUI/icons/scroll_ver_bg.png\
+                         GUI/icons/shuffle.png\
+                         GUI/icons/slider_hor_bg.png\
+                         GUI/icons/slider_ver_bg.png\
+                         GUI/icons/stop.png\
+                         GUI/icons/upplay.ico\
+                         GUI/icons/upplay.png\
+                         GUI/icons/vol_1.png\
+                         GUI/icons/vol_2.png\
+                         GUI/icons/vol_3.png\
+                         GUI/icons/vol_mute.png\
+                         GUI/icons/volume-slider-inside.png\
+                         GUI/icons/volume-slider-outside.png
+  APP_ICON_FILES.path = Contents/Resources
+  QMAKE_BUNDLE_DATA += APP_ICON_FILES
+  QMAKE_INFO_PLIST = macos/Info.plist
 }
 
 windows {

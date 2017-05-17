@@ -44,6 +44,7 @@
 #include <QFileInfo>
 #include <QMap>
 #include <QString>
+#include <QtGlobal>
 
 #include "HelperStructs/Helper.h"
 #include "HelperStructs/MetaData.h"
@@ -157,17 +158,21 @@ QString GetExecPath()
 QString Helper::getSharePath()
 {
     QString path;
-#ifndef Q_OS_WIN
+
+#if defined(Q_OS_WIN)
+    QDir execdir(GetExecPath());
+    QString rpath("Share");
+    execdir.mkpath(rpath);
+    path = execdir.absoluteFilePath(rpath);
+#elif defined(Q_OS_MACOS)
+    path = QCoreApplication::applicationDirPath() + QString("/..");
+    path = QDir::cleanPath(path);
+#else
     if (QFile::exists(PREFIX "/share/upplay")) {
         path = PREFIX "/share/upplay/";
     } else {
         path = "";
     }
-#else
-    QDir execdir(GetExecPath());
-    QString rpath("Share");
-    execdir.mkpath(rpath);
-    path = execdir.absoluteFilePath(rpath);
 #endif
     return path;
 }
@@ -175,21 +180,22 @@ QString Helper::getSharePath()
 static QString styleSubDir;
 void Helper::setStyleSubDir(const QString& subd)
 {
-    //qDebug() << "Helper::setStyleSubDir: " << subd;
     styleSubDir = subd;
 }
 
 QString Helper::getIconDir()
 {
-    //return ":/icons/";
+#if defined(Q_OS_MACOS)
+    return QDir(getSharePath()).filePath("Resources");
+#else
     return QDir(getSharePath()).filePath("icons");
+#endif
 }
 
 QString Helper::getIconPath(const QString& icnm)
 {
     if (!styleSubDir.isEmpty()) {
         QDir styledir(QDir(getIconDir()).filePath(styleSubDir));
-        //qDebug() << "getIconPath(): testing " << styledir.filePath(icnm);
         if (QFile::exists(styledir.filePath(icnm))) {
             return styledir.filePath(icnm);
         }
