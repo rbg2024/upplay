@@ -258,7 +258,11 @@ void Application::chooseSourceOH()
     vector<int> rowtoidx;
     SourceChooseDLG dlg(m_player);
     for (unsigned int i = 0; i < srcs.size(); i++) {
-        if (!srcs[i].visible)
+        // Receiver can't be usefully selected (no way to specify the
+        // sender). Old versions of upmpdcli made Receiver not
+        // visible, but the linn device have it visible and this is
+        // necessary for kazoo, so just skip Receiver-type sources.
+        if (!srcs[i].visible || srcs[i].type == "Receiver")
             continue;
         QString stype = u8s2qs(srcs[i].type + "\t(" + srcs[i].name + ")");
         if (int(i) == cur) {

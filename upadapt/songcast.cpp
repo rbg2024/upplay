@@ -83,9 +83,12 @@ void SongcastTool::onSongcastApply()
         if (m->dlg->receiverOffRequested(i)) {
             stopReceiver(m->receivers[i]);
         } else  if (senderidx != -1 && m->dlg->receiverOnRequested(i)) {
-            setReceiverPlaying(m->receivers[i],
-                               m->senders[senderidx].uri,
-                               m->senders[senderidx].meta);
+            if (!setReceiverPlaying(m->receivers[i],
+                                    m->senders[senderidx].uri,
+                                    m->senders[senderidx].meta)) {
+                qDebug() << "onSongcastApply: setReceiverPlaying failed: " <<
+                    m->receivers[i].reason.c_str();
+            }
         }
     }
     QTimer::singleShot(500, this, SLOT(syncReceivers()));
