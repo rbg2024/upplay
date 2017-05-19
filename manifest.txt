@@ -197,6 +197,7 @@ dirbrowser/dirbrowser.cpp
 dirbrowser/dirbrowser.h
 dirbrowser/dirbrowser.ui
 dirbrowser/dirbrowser.ui.webengine
+dirbrowser/dirbrowser.ui.webkit
 dirbrowser/randplayer.cpp
 dirbrowser/randplayer.h
 dirbrowser/rreaper.cpp
@@ -217,6 +218,9 @@ doc/upplay-songcast.png
 doc/upplay.html
 doc/upplay.txt
 excludefile
+macos/
+macos/Info.plist
+macos/appIcon.icns
 makesrcdist.sh
 notifications/
 notifications/audioscrobbler.cpp
