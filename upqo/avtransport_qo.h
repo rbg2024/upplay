@@ -193,6 +193,11 @@ public slots:
         m_srv->seek(UPnPClient::AVTransport::SEEK_REL_TIME, secs);
     }
 
+    // Retrieve the current track length in seconds. This is useful
+    // if the available metadata does not have a duration (esp. happens with video)
+    virtual int trackSecs() {
+        return m_cursecs;
+    }
     virtual void fetchState() {
         update(true);
     }

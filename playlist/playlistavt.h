@@ -45,6 +45,7 @@ public slots:
     // Slots connected to player events
     void onExtTrackChange(const QString& uri);
     void onCurrentMetadata(const MetaData&);
+    void onRemoteSecsInSong_impl(quint32 s);
 
     // Insert after idx. Use -1 to insert at start
     void psl_insert_tracks(const MetaDataList&, int idx);
@@ -70,6 +71,7 @@ private slots:
 private:
     AVTPlayer *m_avto;
     std::string m_savefile;
+    void maybeSetDuration(bool);
 };
 
 #endif /* PLAYLISTAVT_H_ */

@@ -128,6 +128,29 @@ void PlaylistAVT::onExtTrackChange(const QString& uri)
     }
 }
 
+void PlaylistAVT::maybeSetDuration(bool needsig)
+{
+    if (m_play_idx< 0 || m_play_idx >= int(m_meta.size())) {
+        return;
+    }
+    MetaData& meta(m_meta[m_play_idx]);
+    if (meta.length_ms <= 0) {
+        int secs = m_avto->trackSecs();
+        if (secs > 0) {
+            meta.length_ms = secs * 1000;
+            if (needsig) {
+                emit sig_track_metadata(meta);
+            }
+        }
+    }
+}
+
+void PlaylistAVT::onRemoteSecsInSong_impl(quint32)
+{
+    maybeSetDuration(true);
+}
+
+
 void PlaylistAVT::psl_seek(int secs)
 {
     m_avto->seek(secs);
@@ -142,6 +165,7 @@ void PlaylistAVT::onCurrentMetadata(const MetaData& md)
         m_play_idx = m_meta.size() -1;
         playlist_updated();
     }
+    maybeSetDuration(false);
     bool preferlocal = true;
     if (localmeta && preferlocal) {
         emit sig_track_metadata(*localmeta);
