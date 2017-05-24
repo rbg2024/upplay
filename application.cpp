@@ -78,7 +78,7 @@ UPnPDeviceDirectory *superdir;
 static MRDH getRenderer(const string& name, bool isfriendlyname)
 {
     if (superdir == 0) {
-        superdir = UPnPDeviceDirectory::getTheDir();
+        superdir = UPnPDeviceDirectory::getTheDir(1);
         if (superdir == 0) {
             cerr << "Can't create UPnP discovery object" << endl;
             exit(1);
