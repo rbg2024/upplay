@@ -8,6 +8,13 @@
 - New tool for setting up and terminating multiple Linn Songcast
   Sender-Receiver connections.
 
+1.2.9:
+
+- Add entry to directory popup for adjusting sort order without going
+  through the main menu.
+- Don't show Receiver sources in source list, as nothing useful can be done
+  with them.
+  
 1.2.8:
 
 - Fix issue with accented characters in catalog pane.
