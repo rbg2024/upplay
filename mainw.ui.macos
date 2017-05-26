@@ -121,7 +121,7 @@
     <bool>true</bool>
    </property>
    <property name="nativeMenuBar">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menuFle">
     <property name="title">
