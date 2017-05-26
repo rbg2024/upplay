@@ -3,7 +3,7 @@ LANGUAGE        = C++
 
 QT += script xml network
 
-WEBPLATFORM = webengine
+#WEBPLATFORM = webengine
 contains(WEBPLATFORM, webengine) {
     QT += widgets webenginewidgets
     QMAKE_CXXFLAGS += -DUSING_WEBENGINE
