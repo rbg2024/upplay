@@ -3,7 +3,7 @@ LANGUAGE        = C++
 
 QT += script xml network
 
-# WEBPLATFORM = webengine
+WEBPLATFORM = webengine
 contains(WEBPLATFORM, webengine) {
     QT += widgets webenginewidgets
     QMAKE_CXXFLAGS += -DUSING_WEBENGINE
@@ -265,7 +265,18 @@ macos {
                          GUI/icons/volume-slider-inside.png\
                          GUI/icons/volume-slider-outside.png
   APP_ICON_FILES.path = Contents/Resources
-  QMAKE_BUNDLE_DATA += APP_ICON_FILES
+  APP_CSS_FILES.files = \
+                         GUI/common.css \
+                         GUI/dark.css \
+                         GUI/standard.css \
+                         dirbrowser/cdbrowser.css
+  APP_CSS_FILES.path = Contents/Resources
+
+  APP_JS_FILES.files = dirbrowser/containerscript.js
+  APP_JS_FILES.path = Contents/Resources
+
+  QMAKE_BUNDLE_DATA += APP_ICON_FILES APP_CSS_FILES APP_JS_FILES
+
   QMAKE_INFO_PLIST = macos/Info.plist
 }
 
