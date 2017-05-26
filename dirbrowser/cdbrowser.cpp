@@ -34,6 +34,7 @@
  
 #include <QWebEnginePage>
 #include <QWebEngineSettings>
+#include <QtWebEngineWidgets>
 #include <QLoggingCategory>
 #else
 #include <QWebFrame>
@@ -107,7 +108,11 @@ CDBrowser::CDBrowser(QWidget* parent)
 #ifdef USING_WEBENGINE
     if (html_top_js.isEmpty()) {
         QLoggingCategory("js").setEnabled(QtDebugMsg, true);
+#if !defined(Q_OS_MACOS) && !defined(Q_OS_MAC)
         QString jsfn = Helper::getSharePath() + "/cdbrowser/containerscript.js";
+#else
+        QString jsfn = Helper::getSharePath() + "/Resources/containerscript.js";
+#endif
         QString js = "<script type=\"text/javascript\">\n";
         js += QString::fromUtf8(Helper::readFileToByteArray(jsfn));
         js += "</script>\n";
@@ -171,14 +176,26 @@ void CDBrowser::mouseReleaseEvent(QMouseEvent *event)
 // top-of-page. 
 void CDBrowser::setStyleSheet(bool dark, bool redisplay)
 {
+#if defined(Q_OS_MACOS) || defined(Q_OS_MAC)
+    QString cssfn = Helper::getSharePath() + "/Resources/cdbrowser.css";
+#else
     QString cssfn = Helper::getSharePath() + "/cdbrowser/cdbrowser.css";
+#endif
     QString cssdata = QString::fromUtf8(Helper::readFileToByteArray(cssfn));
 
     if (dark) {
+#if defined(Q_OS_MACOS) || defined(Q_OS_MAC)
+        cssfn = Helper::getSharePath() + "/Resources/dark.css";
+#else
         cssfn = Helper::getSharePath() + "/cdbrowser/dark.css";
+#endif
         cssdata +=  Helper::readFileToByteArray(cssfn);
     } else {
+#if defined(Q_OS_MACOS) || defined(Q_OS_MAC)
+        cssfn = Helper::getSharePath() + "/Resources/standard.css";
+#else
         cssfn = Helper::getSharePath() + "/cdbrowser/standard.css";
+#endif
     }
     cssdata +=  Helper::readFileToByteArray(cssfn);
 
